@@ -1,16 +1,35 @@
 # Data Analysis Project Template
-A short background information about the project. This is based on this writeup in software carpentry [site](https://swcarpentry.github.io/good-enough-practices-in-scientific-computing/).
 
-## Suggested subfolders
+A short background information about the project.
 
-### data
-- Folder for  raw data. For example, fastq files, reference genomes, etc.
+## Subfolders
 
-### doc
-- Folder for documentation of scripts, lab notebook, manuscripts, figures, etc. Can create subfolder within these folders as per necessary.
+### raw_data
 
-### results
-- Folder for storing outputs or any data processed from raw data. Additionally, Jupyter notebooks can go here also.
+-   Folder for raw data
 
-### src
-- A place for keeping scripts (Python, R, etc.)
+### metadata
+
+-   Folder for metadata
+
+### analyses
+
+-   Folder for output of analyses (typically .txt or .csv files). Does not include visualizations (see docs folder)
+-   **taxonomy**
+    -   OTU relative abundance agglomerated to all taxonomic ranks
+-   **ordinations**
+    -   NMDS
+-   **nestedness**
+    -   nestedness vs turnover
+
+### docs
+
+-   Hosting Github Page for html output of data visualizations
+
+### processed_data
+
+-   Folder for storing outputs or any data processed from raw data including phyloseq objects (in subfolder **clean_rds_saves**
+
+### code
+
+-   A place for keeping scripts (Python, R, etc.)
