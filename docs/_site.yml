@@ -1,8 +1,0 @@
-name: "my-website"
-navbar:
-  title: "KSU Data Visualization"
-  left:
-    - text: "Home"
-      href: index.html
-    - text: "About"
-      href: about.html

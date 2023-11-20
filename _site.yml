@@ -5,5 +5,9 @@ navbar:
   left:
     - text: "Home"
       href: index.html
-    - text: "About"
-      href: about.html
+    - text: "Taxonomy"
+      href: code/3_KSU_TaxaPlots_kf.html
+    - text: "Betanull"
+      href: code/4_KSU_BetanullDeviation_kf.html
+    - text: "Ordinations"
+      href: code/5_KSU_CommunityOrdinations_kf.html
