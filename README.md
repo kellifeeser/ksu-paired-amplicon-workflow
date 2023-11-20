@@ -1,6 +1,6 @@
-# Data Analysis Project Template
+# KSU Paired 16S & ITS Amplicon Data Analysis Project
 
-A short background information about the project.
+Comparing and contrasting dynamics of bacterial and fungal arid grassland communities
 
 ## Subfolders
 
@@ -32,4 +32,4 @@ A short background information about the project.
 
 ### code
 
--   A place for keeping scripts (Python, R, etc.)
+-   Folder keeping scripts (mostly R/RMD)
