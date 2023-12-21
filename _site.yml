@@ -1,4 +1,4 @@
-name: "my-website"
+name: "ksu-github-main"
 output_dir: docs
 navbar:
   title: "KSU Data Visualization"
@@ -7,7 +7,9 @@ navbar:
       href: index.html
     - text: "Taxonomy"
       href: code/3_KSU_TaxaPlots_kf.html
-    - text: "Betanull"
-      href: code/4_KSU_BetanullDeviation_kf.html
+    - text: "Darksidea"
+      href: code/Darksidea.html
+    # - text: "Betanull"
+    #   href: code/4_KSU_BetanullDeviation_kf.html
     - text: "Ordinations"
       href: code/5_KSU_CommunityOrdinations_kf.html
