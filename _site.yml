@@ -1,4 +1,7 @@
 name: "ksu-github-main"
+output:
+  bookdown::html_document2:
+    lib_dir: docs/site_libs
 output_dir: docs
 navbar:
   title: "KSU Data Visualization"
@@ -6,12 +9,12 @@ navbar:
     - text: "Home"
       href: index.html
     - text: "Taxonomy"
-      href: code/3_KSU_TaxaPlots_kf.html
+      href: github_taxonomy.html
     - text: "Darksidea"
-      href: code/Darksidea.html
+      href: github_darksidea.html
     # - text: "Betanull"
     #   href: code/4_KSU_BetanullDeviation_kf.html
     - text: "Ordinations"
       href: code/5_KSU_CommunityOrdinations_kf.html
 
-baseurl: "/ksu-paired-amplicon-workflow" # Set your base URL here
+baseurl: "/ksu-paired-amplicon-workflow/" # Set your base URL here

@@ -2,5 +2,25 @@
 title: "KSU Data Visualization"
 ---
 
-taxonomy: 
+```{r render-site, include=FALSE,eval=F}
+library(rmarkdown)
+library(bookdown)
 
+
+#render darksidea
+rmarkdown::render("code/Darksidea.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_darksidea")
+
+#render Taxonomy
+rmarkdown::render("code/3_KSU_TaxaPlots_kf.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_taxonomy")
+
+#render ordinations
+rmarkdown::render("code/5_KSU_CommunityOrdinations_kf.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_ordinations")
+```
+
+\
+\
+
+
+<a href="docs/github_darksidea.html" target="_blank">Darksidea stats for Aaron</a>
+
+<a href="github_darksidea.html" target="_blank">Darksidea stats for Aaron</a>
