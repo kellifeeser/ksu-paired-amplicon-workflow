@@ -12,6 +12,13 @@ output:
     toc_depth: 2
     fig.caption: yes
     keep_md: yes
+  html_notebook:
+    code_folding: hide
+    df_print: paged
+    number_sections: yes
+    css: styles.css
+    toc: yes
+    toc_depth: 2
   html_document: 
     code_folding: hide
     css: test.css
@@ -21,18 +28,15 @@ output:
     theme: cosmo
     toc: yes
     toc_depth: 2
-  html_notebook:
-    code_folding: hide
-    df_print: paged
-    number_sections: yes
-    theme: cosmo
-    toc: yes
-    toc_depth: 2
 editor_options:
   chunk_output_type: inline
 ---
 
-<a href="https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html" target="_blank">Back to Home</a>
+\
+<div class="homelink">
+<a href="https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html" target="_blank" style="text-align:right">Back to Home</a>
+</div>
+
 
 
 ```r
@@ -43,7 +47,7 @@ opts <- options(knitr.kable.NA = "")
 
 
 
-# Set-up {.unlisted}
+# Set-up {.hidden .unlisted .unnumbered}
 
 ## Import clean OTU tables {.unlisted}
 
@@ -245,7 +249,7 @@ Available metadata:
 # Data overview {.tabset .tabset-pills}
 
 All EDGE samples excluded\
-OTU tables rarefied (16S: 9,048 & ITS: 10,116 seqs/sample\
+OTU tables rarefied (16S: 9,048 & ITS: 10,116 seqs/sample)\
 'Taxa' are OTUs\
 
 ## AllG (All Grasses) {.unnumbered}
@@ -493,7 +497,7 @@ Fun.AllG.Total       508     205.7      1.000
 
 # Subset by Grass Host
 
-## Colored by Latitudinal Bin {.tabset .tabset-pills}
+## Influence of discrete latitudinal bins {.tabset .tabset-pills}
 
 ### AllG (All Grasses) {.unnumbered}
 
@@ -683,7 +687,7 @@ Fun.SCSC.Total       160      65.3      1.000
 
 \
 
-## Colored by Longitudinal Gradient {.tabset .tabset-pills}
+## Influence of discrete longitudinal gradients {.tabset .tabset-pills}
 
 ### AllG (All Grasses) {.unnumbered}
 

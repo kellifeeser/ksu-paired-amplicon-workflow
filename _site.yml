@@ -10,11 +10,9 @@ navbar:
       href: index.html
     - text: "Taxonomy"
       href: github_taxonomy.html
-    - text: "Darksidea"
-      href: github_darksidea.html
     # - text: "Betanull"
     #   href: code/4_KSU_BetanullDeviation_kf.html
     - text: "Ordinations"
-      href: code/5_KSU_CommunityOrdinations_kf.html
+      href: github_ordinations.html
 
 baseurl: "/ksu-paired-amplicon-workflow/" # Set your base URL here

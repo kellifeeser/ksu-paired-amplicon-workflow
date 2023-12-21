@@ -32,6 +32,11 @@ editor_options:
   chunk_output_type: inline
 ---
 
+\
+<div class="homelink">
+<a href="https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html" target="_blank" style="text-align:right">Back to Home</a>
+</div>
+
 
 
 
