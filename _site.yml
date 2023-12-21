@@ -13,3 +13,5 @@ navbar:
     #   href: code/4_KSU_BetanullDeviation_kf.html
     - text: "Ordinations"
       href: code/5_KSU_CommunityOrdinations_kf.html
+
+baseurl: "/ksu-paired-amplicon-workflow" # Set your base URL here
