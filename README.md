@@ -1,6 +1,8 @@
 # KSU Paired 16S & ITS Amplicon Data Analysis Project
 
-Comparing and contrasting dynamics of bacterial and fungal arid grassland communities
+Comparing and contrasting dynamics of bacterial and fungal arid grassland communities. 
+\
+For results, go here: https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html 
 
 ## Subfolders
 
@@ -24,7 +26,7 @@ Comparing and contrasting dynamics of bacterial and fungal arid grassland commun
 
 ### docs
 
--   Hosting Github Page for html output of data visualizations
+-   Hosting Github Page for html output of data visualizations (https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html)
 
 ### processed_data
 
