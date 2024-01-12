@@ -20,6 +20,7 @@ output:
     theme: cosmo
     toc: yes
     toc_depth: 3
+
 editor_options:
   chunk_output_type: inline
 ---
@@ -137,8 +138,6 @@ Rudgers, J.A., Fox, S., Porras‐Alfaro, A., Herrera, J., Reazin, C., Kent, D.R.
 </tbody>
 </table>
 
-
-
 # Diversity analyses
 
 \
@@ -212,6 +211,10 @@ Rudgers, J.A., Fox, S., Porras‐Alfaro, A., Herrera, J., Reazin, C., Kent, D.R.
 
 
 
+
+
+
+
 ------------------------------------------------------------------------
 
 ## Analysis (1) Does the diversity, composition or abundance of root-associated fungi vary with latitude and are latitudinal gradients similar across host plant species?
@@ -233,7 +236,8 @@ Rudgers, J.A., Fox, S., Porras‐Alfaro, A., Herrera, J., Reazin, C., Kent, D.R.
     -   Significant grass species ×latitude interactions were decomposed via secondary analysis for each grass species.
 -   Other notes
     -   The model for B. eriopoda, which occurred only on the western gradient, lacked the gradient random effect. We chose the best linear or quadratic model for latitude using the second-order Akaike's Information Criterion (AICc). Analyses met assumptions of normality of residuals and homogeneity of variances following square-root transformation of evenness and log-transformation of root colonisation.
--   Cite: using the lmer function in <lme4> (Bates et al., 2015; R Core Team, 2020). \
+-   Cite: using the lmer function in <lme4> (Bates et al., 2015; R Core Team, 2020).\
+
 
 
 
@@ -246,35 +250,47 @@ Rudgers, J.A., Fox, S., Porras‐Alfaro, A., Herrera, J., Reazin, C., Kent, D.R.
 
 ### Results
 
-Latitudinal gradients in fungal diversity and composition differed
-among grass species (Latitude × Species, Table 1). 
+Latitudinal gradients in fungal diversity and composition differed among grass species (Latitude × Species, Table 1).
 
-The expected linear poleward decline in **diversity** occurred only in *A. gerardii*
-(Figure 2a (below), Table 1). \
+#### Diversity: species richness and evenness
 
-![Figure 2a](../processed_data/Rudgers2021/comparison_figs/Fig2a.png){width="80%" height="80%"}
+-   [Linear poleward decline]{.underline}
 
+The expected linear poleward decline in **richness** occurred only in *A. gerardii* (Figure 2a (below), Table 1).\
 
-In *B. dactyloides*, fungal OTU richness peaked at the highest and lowest latitudes (Figure 2b, Table 1, quadratic), and fungal evenness had a similar latitudinal “U” pattern in *B. gracilis* (Figure 2i). \
+![Figure 2a](../processed_data/Rudgers2021/comparison_figs/Fig2a.png){width="80%"}
 
-![Figure 2b](../processed_data/Rudgers2021/comparison_figs/Fig2b.png){width="80%" height="80%"}
-![Figure 2i](../processed_data/Rudgers2021/comparison_figs/Fig2i.png){width="80%" height="80%"}
 \
 
+-   [Latitudinal "U" pattern]{.underline}
 
-Conversely, evenness peaked at mid-latitudes in
-both *B. dactyloides* (Figure 2g) and *B. eriopoda* (Figure 2h). 
+In *B. dactyloides*, fungal OTU **richness** peaked at the highest and lowest latitudes (Figure 2b, Table 1, quadratic), and fungal **evenness** had a similar latitudinal "U" pattern in *B. gracilis* (Figure 2i).\
 
-[TBD]
+![Figure 2b](../processed_data/Rudgers2021/comparison_figs/Fig2b.png){width="80%" height="80%"}
 
-Only *B. dactyloides* had a latitudinal trend in root colonisation, with
-greater colonisation of roots for plants at high latitudes (Figure 2l;
-Table 1, p = 0.0853).
+![Figure 2i](../processed_data/Rudgers2021/comparison_figs/Fig2i.png){width="80%"}
+
+\
+\
+
+-   [Latitudinal inverse "U" pattern]{.underline}
+
+Conversely, evenness peaked at mid-latitudes in both *B. dactyloides* (Figure 2g) and *B. eriopoda* (Figure 2h).\
+
+![Figure 2g](../processed_data/Rudgers2021/comparison_figs/Fig2g.png){width="80%"}
+
+![Figure 2h](../processed_data/Rudgers2021/comparison_figs/Fig2h.png){width="80%" height="80%"}
+
+[*Note for Figure 2h (B. eriopoda evenness):* We have an additional site vs Rudger2021, but I'm not sure why. The site is Central Plains Experimental Range (CPR) at 40.81553 latitude. Conversely we are also missing a site that they had - Gile National Forest (GNF) at 31.95908 latitude. We have this site covered in other grass host species...? We both have the same number of *B. eriopoda* samples (n=78). Not sure what's going on here!]{style="color: red;"}\
+\
+
+#### Root colonization
+
+Only *B. dactyloides* had a latitudinal trend in root colonisation, with greater colonisation of roots for plants at high latitudes (Figure 2l; Table 1, p = 0.0853).
 
 [TBD]
 
 ------------------------------------------------------------------------
-
 
 \
 \
