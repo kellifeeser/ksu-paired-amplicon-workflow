@@ -39,4 +39,3 @@ rmarkdown::render("code/Comparison_Rudgers2021.Rmd", output_file="/Users/L347123
 \
 \
 
-[sorry I've locked a lot of the additional content on this page until I get some more troubleshooting done...]
