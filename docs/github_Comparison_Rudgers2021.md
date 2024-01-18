@@ -6,6 +6,7 @@ date: '2024-01-02'
 output:
   bookdown::html_document2:
     code_folding: hide
+    df_print: kable
     css: styles.css
     number_sections: yes
     toc: yes
@@ -14,7 +15,7 @@ output:
     keep_md: yes
   html_notebook:
     code_folding: hide
-    df_print: paged
+    df_print: kable
     css: test.css
     number_sections: yes
     theme: cosmo
@@ -260,7 +261,7 @@ Latitudinal gradients in fungal diversity and composition differed among grass s
 
 The expected linear poleward decline in **richness** occurred only in *A. gerardii* (Figure 2a (below), Table 1).\
 
-![Figure 2a](../processed_data/Rudgers2021/comparison_figs/Fig2a.png){width="80%"}
+![**Figure 2a.**](../processed_data/Rudgers2021/comparison_figs/Fig2a.png){width="80%"}
 
 \
 
@@ -268,9 +269,9 @@ The expected linear poleward decline in **richness** occurred only in *A. gerard
 
 In *B. dactyloides*, fungal OTU **richness** peaked at the highest and lowest latitudes (Figure 2b, Table 1, quadratic), and fungal **evenness** had a similar latitudinal "U" pattern in *B. gracilis* (Figure 2i).\
 
-![Figure 2b](../processed_data/Rudgers2021/comparison_figs/Fig2b.png){width="80%" height="80%"}
+![**Figure 2b.**](../processed_data/Rudgers2021/comparison_figs/Fig2b.png){width="80%" height="80%"}
 
-![Figure 2i](../processed_data/Rudgers2021/comparison_figs/Fig2i.png){width="80%"}
+![**Figure 2i.**](../processed_data/Rudgers2021/comparison_figs/Fig2i.png){width="80%"}
 
 \
 
@@ -278,9 +279,9 @@ In *B. dactyloides*, fungal OTU **richness** peaked at the highest and lowest la
 
 Conversely, evenness peaked at mid-latitudes in both *B. dactyloides* (Figure 2g) and *B. eriopoda* (Figure 2h).\
 
-![Figure 2g](../processed_data/Rudgers2021/comparison_figs/Fig2g.png){width="80%"}
+![**Figure 2g.**](../processed_data/Rudgers2021/comparison_figs/Fig2g.png){width="80%"}
 
-![Figure 2h](../processed_data/Rudgers2021/comparison_figs/Fig2h.png){width="80%" height="80%"}
+![**Figure 2h.**](../processed_data/Rudgers2021/comparison_figs/Fig2h.png){width="80%" height="80%"}
 
 [*Note for Figure 2h (B. eriopoda evenness):* We have an additional site vs Rudger2021, but I'm not sure why. The site is Central Plains Experimental Range (CPR) at 40.81553 latitude. Conversely we are also missing a site that they had - Gile National Forest (GNF) at 31.95908 latitude. We have this site covered in other grass host species? We both have the same number of *B. eriopoda* samples (n=78). Not sure what's going on here... maybe an EDGE site?]{style="color: red;"}
 
@@ -294,7 +295,22 @@ Conversely, evenness peaked at mid-latitudes in both *B. dactyloides* (Figure 2g
 
 Note: I did this in R, not Primer
 
-[TBD]
+Fungal composition varied with latitude across all grasses combined (Table 1, Latitude p = 0.0218, Table S3), although latitude did not explain a large fraction of the variation in fungal communities within individual grass species (Figure 3, $R^2$ = 0.03 -- 0.09).
+
+
+
+permANOVA/`vegan::adonis2(method = "bray")`
+
+|                                  |  **Rudger2021: Fungal**  |     **Current: Fungal**     |   **Current: Bacterial**    |
+|-----------------|:--------------:|:----------------:|:----------------:|
+| [*all host species*]{.underline} | F-value \| \* \| p-value | F-value \| $R^2$ \| p-value | F-value \| $R^2$ \| p-value |
+| host species                     |    3.98 \| \| 0.0001     | 10.06 \| 0.064 \| \< 0.001  | 24.73 \| 0.132 \| \< 0.001  |
+| latitude                         |    1.91 \| \| 0.0218     | 11.50 \| 0.055 \| \< 0.001  | 12.72 \| 0.051 \| \< 0.001  |
+| latitude^2^                      |            ns            | 10.58 \| 0.017 \| \< 0.001  | 24.20 \| 0.032 \| \< 0.001  |
+| latitude x host species          |     1.68 \| \| 0.001     |  3.59 \| 0.069 \| \< 0.001  |  5.20 \| 0.083 \| \< 0.001  |
+| latitude^2^ x host species       |            ns            |  3.08 \| 0.020 \| \< 0.001  |  4.07 \| 0.022 \| \< 0.001  |
+
+: **Table 1.** Statistical results of mixed-effects models examining the effects of latitude on the root-associated fungi of grass species together. Analyses of composition (perMANOVA, pseudo-F). \*Note: Rudgers2021 didn't calculate $R^2$ values.
 
 ------------------------------------------------------------------------
 
@@ -366,13 +382,57 @@ GDMs examine how species turnover increases with spatial distance among sites, a
 
 \
 
-###  Results: composition \~ latitude (GDMs)
+### Results: composition \~ latitude (GDMs)
 
 Grass species differed in the relative importance of environmental predictors of root fungal composition (Figure 4).
 
-A complex set of climatic, edaphic and plant trait variables explained 17% of variability in fungal composition across grass species together (Figure 4a, p = 0.02) and 9-- 65% of variation in composition for individual grass species (Figure 4b-f).
+"A complex set of climatic, edaphic and plant trait variables" explained 17% of variability in fungal composition across grass species together (Figure 4a, p = 0.02) and 9-65% of variation in composition for individual grass species (Figure 4b-f).
+
+|                            | **Rudger2021: Fungal** | **Current: Fungal** | **Current: Fungal** |
+|-------------------|:----------------:|:----------------:|:----------------:|
+| GDM $R^2$ - all species    |         16.95%         |                     |                     |
+| #1 predictor - all species |        soil pH         |                     |                     |
+|                            |                        |                     |                     |
+
+![**Figure 4a.** *I*-splines from the best model among generalised dissimilarity models (GDM) comparing climatic factors (blue colours), edaphic factors (brown colours), or plant traits (green colours) as predictors of root-associated fungal composition. The proportion of deviance explained by each best model is given in the upper left corner of each plot for statistically significant models. All species combined are shown in (a)](../processed_data/Rudgers2021/comparison_figs/Fig4a.png){width="65%"}
+
+-   In every grass host species, fungal composition was most sensitive to soil pH at values that occurred below the mean pH (nonlinearity).
+
+-   The degree of nonlinearity in the *I*-splines was greatest for plant trait-related variables, indicating that the sensitivity of fungal composition varied with average values of these traits.
+
+-   Traits with nonlinearity in *I*-splines:
+
+    -   pH (combined hosts, and all individual hosts except for *A. gerardii*)
+
+    -   precipitation (combined hosts, and some individual hosts)
+
+    -   specific leaf area (some hosts)
+
+    -   herbivory (combined hosts, and some individual hosts)\
 
 
+|GDM summary                                     |         Rudgers2021: Fungal         | Current: Fungal  | Current: Bacterial |Term explaination                                                                                                                                             |
+|:-----------------------------------------------|:-----------------------------------:|:----------------:|:------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|Data subset                                     |          all host species           | all host species |         NA         |                                                                                                                                                              |
+|nsamples                                        |                1596                 |        NA        |         NA         |number of pairwise site comparisons                                                                                                                           |
+|Geographical distance used in model fitting?    |                TRUE                 |       TRUE       |         NA         |if TRUE, geographic distance between sites is included as a model term                                                                                        |
+|NULL Deviance                                   |               119.71                |        NA        |         NA         |the deviance of the null model                                                                                                                                |
+|GDM Deviance                                    |               99.414                |        NA        |         NA         |the deviance of the fitted GDM model                                                                                                                          |
+|Percent Deviance Explained                      |               16.954                |        NA        |         NA         |the percentage of null deviance explained by the fitted GDM model                                                                                             |
+|Model p-value                                   |                0.01                 |   not run yet    |         NA         |p-values for best models via backward
+selection in gdm.varImp()                                                                                                |
+|Predictor Order by Sum of I-Spline Coefficients |                  -                  |        -         |         -          |predictors that were used to fit the model, in order of the amount of turnover associated with each predictor (based on the sum of the I-spline coefficients) |
+|Predictor 1 (Sum of Coefficients for P1)        |         Edaphic: pH (0.472)         |        NA        |         NA         |category: predictor (sum of I-spline coefficients for predictor)                                                                                              |
+|Predictor 2 (Sum of Coefficients for P2)        |      Geographic coords (0.461)      |        NA        |         NA         |                                                                                                                                                              |
+|Predictor 3 (Sum of Coefficients for P3)        |      Plant: Herbivory (0.416)       |        NA        |         NA         |                                                                                                                                                              |
+|Predictor 4 (Sum of Coefficients for P4)        |   Climatic: Precipitation (0.329)   |        NA        |         NA         |                                                                                                                                                              |
+|Predictor 5 (Sum of Coefficients for P5)        |      Edaphic: Ammonium (0.21)       |        NA        |         NA         |                                                                                                                                                              |
+|Predictor 6 (Sum of Coefficients for P6)        |  Plant: Specific Leaf Area (0.182)  |        NA        |         NA         |                                                                                                                                                              |
+|Predictor 7 (Sum of Coefficients for P7)        | Plant: Specific Root Length (0.009) |        NA        |         NA         |                                                                                                                                                              |
+|Predictor 8 (Sum of Coefficients for P8)        |     Climatic: Degree Days (ns)      |        NA        |         NA         |if (ns), predictor was removed from model via backwards selection                                                                                             |
+|Predictor 9 (Sum of Coefficients for P9)        |  Climatic: Gravimetric Water (ns)   |        NA        |         NA         |                                                                                                                                                              |
+|Predictor 10 (Sum of Coefficients for P10)      |      Edaphic: Phosphorus (ns)       |        NA        |         NA         |                                                                                                                                                              |
+|Predictor 11 (Sum of Coefficients for P11)      |           Elevation (ns)            |        NA        |         NA         |                                                                                                                                                              |
 
 ------------------------------------------------------------------------
 
@@ -389,9 +449,9 @@ A complex set of climatic, edaphic and plant trait variables explained 17% of va
 
 
 
-![](../figures/Rudgers2021_comparison/fig1b_comparison.png){width="80%" height="64%"}
+![**Figure 1b** Rudgers2021 and current fungal. NMDS plots showing variation in the composition of root-associated fungi for five grass species: Species pseudo-F = 4.0, p \< 0.0001, 2-dimensional stress = 0.26 due to strong differences in fungal composition among species. Symbols show the NMDS centroid ± bidirectional SE. Samples were pooled within sites, then SE. calculated across sites for each plant species.](../figures/Rudgers2021_comparison/fig1b_comparison.png){width="80%"}
 
-*Note:* Rudgers 2021 reports a stress of 0.26 (for *k* = 3) which I would strongly consider to be too high (guidelines: \>0.2 is poor (risks for false interpretation), 0.1 - 0.2 is fair (some distances can be misleading for interpretation), 0.05 - 0.1 is good (can be confident in inferences from plot), and \<0.05 is excellent (this can be rare)). I created this ordination with a higher *k* value of 5 and resulting stress of 0.11.\
+*Note:* Rudgers2021 reports a stress of 0.26 (for *k* = 3) which I would strongly consider to be too high (guidelines: \>0.2 is poor (risks for false interpretation), 0.1 - 0.2 is fair (some distances can be misleading for interpretation), 0.05 - 0.1 is good (can be confident in inferences from plot), and \<0.05 is excellent (this can be rare)). I created this ordination with a higher *k* value of 5 and resulting stress of 0.11.\
 \
 \
 \
@@ -401,6 +461,9 @@ A complex set of climatic, edaphic and plant trait variables explained 17% of va
 \
 \
 
-TBD\
+
+
+![**Figure 2.** Relationships between fungal OTU richness (a-e), evenness, as square-root of the inverse Simpson evenness, E (f-j) against latitude for each of five grass species: *Andropogon gerardii*, *Bouteloua dactyloides*, *B. eriopoda*, *B. gracilis* and ~~*Schizachyrium scoparium*~~ (note: omitted). *p* values for significant (p \< 0.05) trends in latitude are from a mixed effects general linear model for each grass species. Full statistical results are in Table 1. Samples were pooled within sites, then SE calculated across sites.](../processed_data/Rudgers2021/comparison_figs/Fig2.png){width="80%"}
+
 \
 \
