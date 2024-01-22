@@ -283,7 +283,7 @@ Conversely, evenness peaked at mid-latitudes in both *B. dactyloides* (Figure 2g
 
 ![**Figure 2h.**](../processed_data/Rudgers2021/comparison_figs/Fig2h.png){width="80%" height="80%"}
 
-[*Note for Figure 2h (B. eriopoda evenness):* We have an additional site vs Rudger2021, but I'm not sure why. The site is Central Plains Experimental Range (CPR) at 40.81553 latitude. Conversely we are also missing a site that they had - Gile National Forest (GNF) at 31.95908 latitude. We have this site covered in other grass host species? We both have the same number of *B. eriopoda* samples (n=78). Not sure what's going on here... maybe an EDGE site?]{style="color: red;"}
+[*Note for Figure 2h (B. eriopoda evenness):* We have an additional site vs Rudger2021, but I'm not sure why. The site is Central Plains Experimental Range (CPR) at 40.81553 latitude. Conversely we are also missing a site that they had - Gile National Forest (GNF) at 31.95908 latitude. We have this site covered in other grass host species? We both have the same number of *B. eriopoda* samples (n=78). Not sure what's going on here... maybe an EDGE site?]{style="color: darkred;"}
 
 ------------------------------------------------------------------------
 
@@ -299,10 +299,10 @@ Fungal composition varied with latitude across all grasses combined (Table 1, La
 
 
 
-permANOVA/`vegan::adonis2(method = "bray")`
+permANOVA/`vegan::adonis2(phyloseq::distance(Fun, method="bray") ~ Grass*Bin+I(Latitude^2)+I(Latitude^2)*Grass, data = (as(sample_data(Fun), "data.frame")))`
 
 |                                  |  **Rudger2021: Fungal**  |     **Current: Fungal**     |   **Current: Bacterial**    |
-|-----------------|:--------------:|:----------------:|:----------------:|
+|------------------|:----------------:|:----------------:|:----------------:|
 | [*all host species*]{.underline} | F-value \| \* \| p-value | F-value \| $R^2$ \| p-value | F-value \| $R^2$ \| p-value |
 | host species                     |    3.98 \| \| 0.0001     | 10.06 \| 0.064 \| \< 0.001  | 24.73 \| 0.132 \| \< 0.001  |
 | latitude                         |    1.91 \| \| 0.0218     | 11.50 \| 0.055 \| \< 0.001  | 12.72 \| 0.051 \| \< 0.001  |
@@ -310,7 +310,7 @@ permANOVA/`vegan::adonis2(method = "bray")`
 | latitude x host species          |     1.68 \| \| 0.001     |  3.59 \| 0.069 \| \< 0.001  |  5.20 \| 0.083 \| \< 0.001  |
 | latitude^2^ x host species       |            ns            |  3.08 \| 0.020 \| \< 0.001  |  4.07 \| 0.022 \| \< 0.001  |
 
-: **Table 1.** Statistical results of mixed-effects models examining the effects of latitude on the root-associated fungi of grass species together. Analyses of composition (perMANOVA, pseudo-F). \*Note: Rudgers2021 didn't calculate $R^2$ values.
+: **Table 1i.** Statistical results of mixed-effects models examining the effects of latitude on the root-associated fungi of grass species together. Analyses of composition (perMANOVA, pseudo-F). \*Note: Rudgers2021 didn't calculate $R^2$ values.
 
 ------------------------------------------------------------------------
 
@@ -333,11 +333,116 @@ Only *B. dactyloides* had a latitudinal trend in root colonization, with greater
 
 ## Analysis (2) Does the composition of non-mycorrhizal root-associated fungi converge near host range edges?
 
-"We used permDISP to examine divergence among individual plants in fungal composition (Clarke & Gorley, 2015) and to test the hypothesis that fungal composition was more homogenous among plants nearing the hosts' latitudinal range edge. Models for each host grass compared dispersion among latitudinal categories (North, North-Central, South-Central or South), each containing similar numbers of samples (Table S1)"
+"We used permDISP to examine divergence among individual plants in fungal composition (Clarke & Gorley, 2015) and to test the hypothesis that fungal composition was more homogenous among plants nearing the hosts' latitudinal range edge."
 
-[TBD]
+### Methods: beta dispersion \~ latitude (betadisper)
 
-All host grass species had significant latitudinal gradients in dis- persion, or turn-over, in fungal composition (Table 1, p \< 0.0001). Dispersion was smallest at sites near grass species' range edges (Figure 3, Figure S1, Table S3). In the desert grass B. eriopoda, dis- persion decreased northward towards its northern range edge (Figure 3c), whereas other species were sampled approaching their southern range limits, where fungal communities became more simi- lar among host individuals. Among the grasses, S. scoparium had the greatest dispersion across all sites and samples (Figure 3e, Table 1, Species p = 0.0024), even though B. gracilis was sampled at the most sites (Figure 1a, Table S1)
+"Models for each host grass compared dispersion among latitudinal categories (North, North-Central, South-Central or South), each containing similar numbers of samples (Table S1)"\
+\
+- Details: We measured the multivariate dispersion (variance) for the groups of samples by calculating the average distance of group members to the group centroid ~~or spatial median~~ (aka the 'centroid') in multivariate space. (kf)\
+
+```         
+Fun_bray<-phyloseq::distance(Fun, method="bray")
+
+vegan::betadisper(Fun_bray, group = sd_Fun$Latitudinal_Bin,
+                            type = "centroid",      # I can't figure out if they used median or centroid for type of analysis to perform: either adjust groups relative to their spatial median or to the group centroid
+                            bias.adjust = FALSE,    # guessing the default here ("logical: adjust for small sample bias in beta diversity estimates?")
+                            sqrt.dist = FALSE,      # and here ("Take square root of dissimilarities. This often euclidifies dissimilarities.")
+                            add = FALSE             # and here
+                            )
+
+# type = "centroid" (distance from each sample unit to the centroid of its group)
+```
+
+**Significance testing**\
+- Do the dispersions of communities vary among latitudinal bins?\
+- Multivariate homogeneity of groups dispersions (variances)\
+- To test if the dispersions (variances) of one or more groups differed, the distances of group members to the group centroid were subject to ANOVA. This is a multivariate analogue of Levene's test for homogeneity of variances (but instead resorting to Euclidean distances for community data, I/we used Bray-Curtis distance matrices)\
+\
+[Details]{.underline}\
+- To test if one or more groups is more variable than the others, ANOVA of the distances to group centroids can be performed and parametric theory used to interpret the significance of $F$. An alternative is to use a permutation test. [`permutest.betadisper`](http://127.0.0.1:32033/help/library/vegan/help/permutest.betadisper) permutes model residuals to generate a permutation distribution of F under the Null hypothesis of no difference in dispersion between groups.\
+- Re: the flag `bias.adjust`:
+
+> As noted in passing by Anderson (2006) and in a related context by O'Neill (2000), estimates of dispersion around a central location (median or centroid) that is calculated from the same data will be biased downward. This bias matters most when comparing diversity among treatments with small, unequal numbers of samples. Setting `bias.adjust=TRUE` when using `betadisper` imposes a $\sqrt{n/(n−1)}$​ correction (Stier et al. 2013).
+
+\- Pairwise comparisons of group mean dispersions can also be performed using [`permutest.betadisper`](http://127.0.0.1:32033/help/library/vegan/help/permutest.betadisper). An alternative to the classical comparison of group dispersions, is to calculate Tukey's Honest Significant Differences between groups, via `TukeyHSD.betadisper`. (Use with caution if function has unbalanced design.)
+
+```         
+## Permutation test for F
+
+vegan::permutest(bray_betadisper_Fun_current, pairwise = TRUE, permutations = 99)
+
+  # Permutation test for homogeneity of multivariate dispersions
+  # Permutation: free
+  # Number of permutations: 99
+
+  # Response: Distances
+```
+
+
+
+### Results: beta dispersion \~ latitude (betadisper)
+
+All host grass species had significant latitudinal gradients in dispersion, or turn-over, in fungal composition (Table 1, p \< 0.0001). Dispersion was smallest at sites near grass species' range edges (Figure 3, Figure S1, Table S3). In the desert grass *B. eriopoda*, dispersion decreased northward towards its northern range edge (Figure 3c), whereas other species were sampled approaching their southern range limits, where fungal communities became more similar among host individuals. Among the grasses, *S. scoparium* had the greatest dispersion across all sites and samples (Figure 3e, Table 1, Species p = 0.0024), even though *B. gracilis* was sampled at the most sites (Figure 1a, Table S1).\
+\
+
+|                                  | **Rudger2021: Fungal** |   **Current: Fungal**    | **Current: Bacterial** |
+|------------------|:----------------:|:----------------:|:----------------:|
+| [*all host species*]{.underline} |                        | Av. distance to centroid |                        |
+| North                            |                        |          0.649           |         0.4580         |
+| North Central                    |                        |          0.572           |         0.4999         |
+| South Central                    |                        |          0.658           |         0.5291         |
+| South                            |                        |          0.550           |         0.4939         |
+|                                  |                        |                          |                        |
+
+: **Table 1ii.** Statistical results of mixed-effects models examining the effects of latitude on the root-associated fungi of grass species together. Analyses of dispersion (permDISP for Rudgers2021).
+
+**Permutation test for homogeneity of multivariate dispersions**
+
+**Current: Fungal\
+** Response: Distances\
+                          Df   SumSq   MeanSq               F   N.Perm   Pr(\>F)\
+Lat. Bin            3   1.1552   0.38507       48.759           99     0.01 \*\*\
+Residuals   505   3.9882   0.00790\
+- - -\
+Signif. codes: 0 '\*\*\*' 0.001 '*\*' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+        Calculated $R^2$ for regression: 0.225
+
+*Pairwise comparisons:*\
+(Observed p-value below diagonal, permuted p-value above diagonal)
+
+|                   |   North    | North Central | South Central | South |
+|------------------:|:----------:|:-------------:|:-------------:|:-----:|
+|         **North** |            |     0.001     |     0.008     | 0.01  |
+| **North Central** | 1.5244e-14 |               |     0.001     | 0.19  |
+| **South Central** |   0.005    |  9.5364e-17   |               | 0.01  |
+|         **South** | 9.4955e-15 |    0.0161     |  4.1209e-16   |       |
+
+\
+
+**Current: Bacterial\
+** Response: Distances\
+                          Df   SumSq   MeanSq                   F   N.Perm   Pr(\>F)\
+Lat. Bin            3   0.36658   0.122194       32.425           99     0.01 \*\*\
+Residuals   529   1.99353   0.003768\
+- - -\
+Signif. codes: 0 '\*\*\*' 0.001 '*\*' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+        Calculated $R^2$ for regression: 0.155
+
+*Pairwise comparisons:*\
+(Observed p-value below diagonal, permuted p-value above diagonal)
+
+|                   |   North    | North Central | South Central | South |
+|------------------:|:----------:|:-------------:|:-------------:|:-----:|
+|         **North** |            |     0.001     |     0.001     | 0.01  |
+| **North Central** | 2.5536e-08 |               |     0.001     | 0.39  |
+| **South Central** | 2.0902e-17 |  2.4435e-04   |               | 0.01  |
+|         **South** | 1.5022e-06 |     0.040     |  8.7131e-06   |       |
+
+\
+\
 
 ------------------------------------------------------------------------
 
