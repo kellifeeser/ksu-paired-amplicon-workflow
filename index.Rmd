@@ -31,18 +31,18 @@ rmarkdown::render("code/nestedness.Rmd", output_file="/Users/L347123/Desktop/ksu
 
 \
 \
-<a href="github_Comparison_Rudgers2021.html" target="_blank">Comparison to previous manuscript</a> - Rudgers, J.A., Fox, S., Porras‐Alfaro, A., Herrera, J., Reazin, C., Kent, D.R., Souza, L., Chung, Y.A., & Jumpponen, A. (2022). Biogeography of root‐associated fungi in foundation grasses of North American plains. Journal of Biogeography, 49(1), 22-37. doi/10.1111/jbi.14260\
+<a href="github_Comparison_Rudgers2021.html" target="_blank">Comparison</a> to previous manuscript (Rudgers, J.A., Fox, S., Porras‐Alfaro, A., Herrera, J., Reazin, C., Kent, D.R., Souza, L., Chung, Y.A., & Jumpponen, A. (2022). Biogeography of root‐associated fungi in foundation grasses of North American plains. Journal of Biogeography, 49(1), 22-37. doi/10.1111/jbi.14260)\
 <object data="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/JournalofBiogeography2021_Rudgers_BiogeographyOfRootAssociatedFungiInFoundationGrassesOfNorthAmericanPlains.pdf" type="application/pdf" width="100%" height="500px">
 
-<p>Unable to display PDF file. <a href="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/JournalofBiogeography2021_Rudgers_BiogeographyOfRootAssociatedFungiInFoundationGrassesOfNorthAmericanPlains.pdf">Download</a> instead.</p>
+<p>Unable to display PDF file. <a href="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/JournalofBiogeography2021_Rudgers_BiogeographyOfRootAssociatedFungiInFoundationGrassesOfNorthAmericanPlains.pdf">Download</a> instead (whether the PDF displays depends on your browser).</p>
 
 </object>
+
 \
 \
 \
 
-
-###  New Analyses {.unnumbered}
+### New Analyses {.unnumbered}
 
 \*Links coming soon
 
