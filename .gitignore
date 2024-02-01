@@ -54,7 +54,9 @@ code/
 figures/
 #figures/taxa_plots/
 metadata/
-raw_data/
+raw_data/knb-lter-sev.332.2/
+docs/raw_data/
+
 processed_data/
 unorganized_data/
 ksu-paired-amplicon-workflow.Rproj
