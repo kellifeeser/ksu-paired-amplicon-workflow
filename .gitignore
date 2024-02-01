@@ -56,8 +56,13 @@ figures/
 metadata/
 raw_data/knb-lter-sev.332.2/
 docs/raw_data/
+docs/processed_data/
 
-processed_data/
+processed_data/Rudgers2021/
+processed_data/OTU_occurrencefrequency/
+processed_data/clean_rds_saves/
+processed_data/adonis2/
+
 unorganized_data/
 ksu-paired-amplicon-workflow.Rproj
 14Nov2023.RData
