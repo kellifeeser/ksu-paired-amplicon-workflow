@@ -44,10 +44,12 @@ rmarkdown::render("code/nestedness.Rmd", output_file="/Users/L347123/Desktop/ksu
 
 ### New Analyses {.unnumbered}
 
-\*Links coming soon
+\*more links coming soon
+
+-   down-selecting environmental/edaphic var of interst
 
 -   <a href="github_nestedness.html" target="_blank">Nestedness vs turnover</a>
 
 -   $\beta_{NULL}$-diversity modeling
 
--   [TBD]
+-   ordinations & permANOVA
