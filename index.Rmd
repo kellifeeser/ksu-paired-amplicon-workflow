@@ -23,6 +23,10 @@ rmarkdown::render("code/Comparison_Rudgers2021.Rmd", output_file="/Users/L347123
 
 #render nestedness
 rmarkdown::render("code/nestedness.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_nestedness")
+
+#render explanatory var
+rmarkdown::render("code/ExplanatoryVariables.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_explanatoryVariables")
+
 ```
 
 \
@@ -46,7 +50,7 @@ rmarkdown::render("code/nestedness.Rmd", output_file="/Users/L347123/Desktop/ksu
 
 \*more links coming soon
 
--   down-selecting environmental/edaphic var of interst
+-   <a href="github_explanatoryVariables.html" target="_blank">down-selecting environmental/edaphic var of interest</a>
 
 -   <a href="github_nestedness.html" target="_blank">Nestedness vs turnover</a>
 
