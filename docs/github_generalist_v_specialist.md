@@ -70,64 +70,18 @@ spec.gen: <https://rdrr.io/github/GuillemSalazar/EcolUtils/man/spec.gen.html>\
 
 \
 
-## load packages
+## load packages {.hidden .unlisted .unnumbered}
 
 
 ```r
 library("ggplot2"); packageVersion("ggplot2") #‘3.4.4’
-```
-
-```
-## [1] '3.4.4'
-```
-
-```r
 library("vegan"); packageVersion("vegan") # # ‘2.6.4’
-```
-
-```
-## [1] '2.6.4'
-```
-
-```r
 library("phyloseq"); packageVersion("phyloseq") #‘1.44.0’
-```
-
-```
-## [1] '1.41.1'
-```
-
-```r
 library("EcolUtils"); packageVersion("EcolUtils") #‘0.1’
-```
-
-```
-## [1] '0.1'
-```
-
-```r
 # detach("package:metagMisc", unload = T)
 library("spaa"); packageVersion("spaa") #‘0.2.2’
-```
-
-```
-## [1] '0.2.2'
-```
-
-```r
 library("plyr"); packageVersion("plyr") #‘1.8.9’
-```
-
-```
-## [1] '1.8.9'
-```
-
-```r
 library("dplyr"); packageVersion("dplyr") #‘1.1.3’
-```
-
-```
-## [1] '1.1.3'
 ```
 
 \
@@ -287,6 +241,9 @@ fun_BUDA<-Fun_BUDA_shared
 \
 
 # Run generalist vs specialist code {.tabset .tabset-pills}
+
+R package: library("EcolUtils"); packageVersion("EcolUtils") #‘0.1’
+\
 
 `spec.gen(comm.tab,n=1000, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))` \
 \
