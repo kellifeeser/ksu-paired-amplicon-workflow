@@ -111,71 +111,11 @@ library("spaa"); packageVersion("spaa") #‘0.2.2’
 ```
 
 ```
-## 
-## Attaching package: 'spaa'
-```
-
-```
-## The following object is masked from 'package:geodist':
-## 
-##     geodist
-```
-
-```
 ## [1] '0.2.2'
 ```
 
 ```r
 library("plyr"); packageVersion("plyr") #‘1.8.9’
-```
-
-```
-## -----------------------------------------------------------------------------------------------------------------------------
-```
-
-```
-## You have loaded plyr after dplyr - this is likely to cause problems.
-## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
-## library(plyr); library(dplyr)
-```
-
-```
-## -----------------------------------------------------------------------------------------------------------------------------
-```
-
-```
-## 
-## Attaching package: 'plyr'
-```
-
-```
-## The following objects are masked from 'package:dplyr':
-## 
-##     arrange, count, desc, failwith, id, mutate, rename, summarise, summarize
-```
-
-```
-## The following object is masked from 'package:XVector':
-## 
-##     compact
-```
-
-```
-## The following object is masked from 'package:IRanges':
-## 
-##     desc
-```
-
-```
-## The following object is masked from 'package:S4Vectors':
-## 
-##     rename
-```
-
-```
-## The following object is masked from 'package:ggpubr':
-## 
-##     mutate
 ```
 
 ```
@@ -348,7 +288,9 @@ fun_BUDA<-Fun_BUDA_shared
 
 # Run generalist vs specialist code {.tabset .tabset-pills}
 
-`spec.gen(comm.tab,n=1000, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))`\
+`spec.gen(comm.tab,n=1000, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))` \
+\
+
 
 |                      |                                                                                                                                                             |
 |--------------|----------------------------------------------------------|
