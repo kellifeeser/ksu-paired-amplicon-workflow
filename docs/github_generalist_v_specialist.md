@@ -373,19 +373,19 @@ Specialists: 300 OTUs\
 
 **Bacteria**
 
-<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Res_16S_AllGrasses_nperm100.csv" download>Click to download bacterial OTU classifications (all grasses)</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Res_16S_AllGrasses_nperm100.csv"  download>Click to download bacterial OTU classifications (all grasses)</a>
 
 -   OTUs are rows (n=18016). If observed OTU occurrence \< confidence interval thresholds, then sign = "specialist'
 
-<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_OTU_16S_AllGrasses_relabund.csv" download>Click to download bacterial OTU table (converted to relative abundance)</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_OTU_16S_AllGrasses_relabund.csv"  download>Click to download bacterial OTU table (converted to relative abundance)</a>
 
 -   OTUs are rows (n=18016), samples are columns (n=484)
 
-<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Taxa_16S_AllGrasses.csv" download>Click to download bacterial OTU taxonomy (GvS classification is 2nd column)</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Taxa_16S_AllGrasses.csv"  download>Click to download bacterial OTU taxonomy (GvS classification is 2nd column)</a>
 
 -   OTUs are rows (n=18016)
 
-`<a href="`{=html}../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_sampledata_16S_AllGrasses.csv`" download>`{=html}Click to download bacterial sample metadata</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_sampledata_16S_AllGrasses.csv"  download>Click to download bacterial sample metadata</a>
 
 -   samples are rows (n=484), metadata are columns (n=39)
 
@@ -394,19 +394,19 @@ Specialists: 300 OTUs\
 
 **Fungi**
 
-<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Res_ITS_AllGrasses_nperm100.csv" download>Click to download fungal OTU classifications (all grasses)</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Res_ITS_AllGrasses_nperm100.csv"  download>Click to download fungal OTU classifications (all grasses)</a>
 
 -   OTUs are rows (n=5875). If observed OTU occurrence \< confidence interval thresholds, then sign = "specialist'
 
-<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_OTU_ITS_AllGrasses_relabund.csv" download>Click to download fungal OTU table (converted to relative abundance)</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_OTU_ITS_AllGrasses_relabund.csv"  download>Click to download fungal OTU table (converted to relative abundance)</a>
 
 -   OTUs are rows (n=5875), samples are columns (n=484)
 
-<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Taxa_ITS_AllGrasses.csv" download>Click to download fungal OTU taxonomy (GvS classification is 2nd column)</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Taxa_ITS_AllGrasses.csv"  download>Click to download fungal OTU taxonomy (GvS classification is 2nd column)</a>
 
 -   OTUs are rows (n=5875)
 
-`<a href="`{=html}../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_sampledata_ITS_AllGrasses.csv`" download>`{=html}Click to download fungal sample metadata</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_sampledata_ITS_AllGrasses.csv"  download>Click to download fungal sample metadata</a>
 
 -   samples are rows (n=484), metadata are columns (n=39)
 
@@ -418,11 +418,11 @@ Specialists: 300 OTUs\
 
 **Bacteria**
 
-<a href="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_Res_16S_BOGR_nperm500.csv" download>Click to download bacterial OTU classifications (*Blue grama* only)</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_Res_16S_BOGR_nperm500.csv"  download>Click to download bacterial OTU classifications (*Blue grama* only)</a>
 
 -   OTUs are rows (n=7004). If observed OTU occurrence \< confidence interval thresholds, then sign = "specialist'
 
-<a href="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_OTU_16S_BOGR_relabund.csv" download>Click to download bacterial OTU table (converted to relative abundance)</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_OTU_16S_BOGR_relabund.csv"  download>Click to download bacterial OTU table (converted to relative abundance)</a>
 
 -   OTUs are rows (n=7004), samples are columns (n=75)
 
@@ -430,7 +430,7 @@ Specialists: 300 OTUs\
 
 -   OTUs are rows (n=7004)
 
-<a href="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_sampledata_16S_BOGR.csv" download>Click to download bacterial sample metadata</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_sampledata_16S_BOGR.csv"  download>Click to download bacterial sample metadata</a>
 
 -   samples are rows (n=75), metadata are columns (n=39)
 
@@ -439,11 +439,11 @@ Specialists: 300 OTUs\
 
 **Fungi**
 
-<a href="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_Res_ITS_BOGR_nperm500.csv" download>Click to download fungal OTU classifications (*Blue grama* only)</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_Res_ITS_BOGR_nperm500.csv"  download>Click to download fungal OTU classifications (*Blue grama* only)</a>
 
 -   OTUs are rows (n=1922). If observed OTU occurrence \< confidence interval thresholds, then sign = "specialist'
 
-<a href="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_OTU_ITS_BOGR_relabund.csv" download>Click to download fungal OTU table (converted to relative abundance)</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_OTU_ITS_BOGR_relabund.csv"  download>Click to download fungal OTU table (converted to relative abundance)</a>
 
 -   OTUs are rows (n=1922), samples are columns (n=75)
 
@@ -451,7 +451,7 @@ Specialists: 300 OTUs\
 
 -   OTUs are rows (n=1922)
 
-`<a href="`{=html}../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_sampledata_ITS_BOGR.csv`" download>`{=html}Click to download fungal sample metadata</a>
+<a href="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_sampledata_ITS_BOGR.csv" download>Click to download fungal sample metadata</a>
 
 -   samples are rows (n=75), metadata are columns (n=39)
 
