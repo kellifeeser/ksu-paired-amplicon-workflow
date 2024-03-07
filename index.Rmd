@@ -29,6 +29,9 @@ rmarkdown::render("code/ExplanatoryVariables.Rmd", output_file="/Users/L347123/D
 
 #render spe gen
 rmarkdown::render("code/2_KSU_OTUdownselection.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_generalist_v_specialist")
+
+#render InterkingdomRegressions
+rmarkdown::render("code/InterkingdomRegressions.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_InterkingdomRegressions")
 ```
 
 \
@@ -50,7 +53,7 @@ rmarkdown::render("code/2_KSU_OTUdownselection.Rmd", output_file="/Users/L347123
 
 ### New Analyses {.unnumbered}
 
-\*more links coming soon
+-   <a href="github_InterkingdomRegressions.html" target="_blank">Inter-kingdom Regressions</a>
 
 -   <a href="github_generalist_v_specialist.html" target="_blank">Generalist vs. Specialist (OTU down-selection)</a>
 
