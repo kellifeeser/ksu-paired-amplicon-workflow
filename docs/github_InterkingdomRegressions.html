@@ -318,6 +318,75 @@ if (window.hljs) {
 
 
 
+<style type="text/css">
+body {
+font-family: "Arial", sans-serif;
+background-color: #fff; 
+color: #333; 
+}
+
+header {
+background-image: linear-gradient(to right, #0366d6, #34d058); 
+color: #fff; 
+}
+
+h1, h2, h3, h4, h5, h6 {
+font-weight: bold;
+color: #228b22; 
+}
+
+#table-of-contents a {
+font-weight: normal;
+color: #0366d6; 
+}
+
+#table-of-contents {
+border: 1px solid #e1e4e8; 
+background-color: #fff; 
+padding: 10px;
+margin-bottom: 20px;
+}
+
+#table-of-contents a {
+text-decoration: none;
+}
+#table-of-contents a:hover {
+text-decoration: underline;
+}
+
+pre,
+code {
+font-family: "Courier New", monospace; 
+background-color: #f6f8fa; 
+padding: 5px;
+border-radius: 3px;
+}
+
+blockquote {
+border-left: 4px solid #dfe2e5; 
+margin: 0;
+padding-left: 15px;
+}
+
+ul, ol {
+margin-left: 20px; 
+}
+
+.homelink, a:link[href*="index"] {
+color: #0366d6;
+font-size: 25px;
+text-align: center;
+background-color: #f6f8fa;
+text-decoration: underline;
+}
+.homelink, a:visited {
+color: #34d058;
+font-size: 25px;
+text-align: center;
+background-color: underline;
+background-color: #f6f8fa;
+text-decoration: none;
+}</style>
 
 
 
@@ -438,17 +507,23 @@ display: none;
 <ul>
 <li><a href="#input-data" id="toc-input-data"><span class="toc-section-number">1.1</span> Input data</a></li>
 <li><a href="#create-distance-matrices" id="toc-create-distance-matrices"><span class="toc-section-number">1.2</span> Create distance matrices</a></li>
-<li><a href="#run-mrm-model" id="toc-run-mrm-model"><span class="toc-section-number">1.3</span> Run MRM Model</a></li>
+<li><a href="#multiple-regression-models-for-distance-matrices-mrm" id="toc-multiple-regression-models-for-distance-matrices-mrm"><span class="toc-section-number">1.3</span> Multiple regression models for distance matrices (MRM)</a></li>
+<li><a href="#mrm-model-specifications-and-fitting" id="toc-mrm-model-specifications-and-fitting"><span class="toc-section-number">1.4</span> MRM model specifications and fitting</a></li>
 </ul></li>
 <li><a href="#results" id="toc-results"><span class="toc-section-number">2</span> Results</a>
 <ul>
 <li><a href="#do-fungal-community-dissimilarities-influence-bacterial-community-dissimilarities" id="toc-do-fungal-community-dissimilarities-influence-bacterial-community-dissimilarities"><span class="toc-section-number">2.1</span> Do fungal community dissimilarities influence bacterial community dissimilarities?</a>
 <ul>
-<li><a href="#abundance-weighted" id="toc-abundance-weighted">abundance-weighted</a></li>
+<li><a href="#predictor-fungi---whole-community-abundance-weighted-otus" id="toc-predictor-fungi---whole-community-abundance-weighted-otus"><span class="toc-section-number">2.1.1</span> Predictor: Fungi - whole community, abundance-weighted OTUs</a></li>
+<li><a href="#predictor-fungi---whole-community-pa-of-otus-sørensen" id="toc-predictor-fungi---whole-community-pa-of-otus-sørensen"><span class="toc-section-number">2.1.2</span> Predictor: Fungi - whole community, p/a of OTUs (Sørensen)</a></li>
+<li><a href="#predictor-fungi---generalists-abundance-weighted-otus" id="toc-predictor-fungi---generalists-abundance-weighted-otus"><span class="toc-section-number">2.1.3</span> Predictor: Fungi - Generalists, abundance-weighted OTUs</a></li>
+<li><a href="#predictor-fungi---whole-community-abundance-weighted-genera" id="toc-predictor-fungi---whole-community-abundance-weighted-genera"><span class="toc-section-number">2.1.4</span> Predictor: Fungi - whole community, abundance-weighted genera</a></li>
 </ul></li>
 <li><a href="#do-bacterial-community-dissimilarities-influence-fungal-community-dissimilarities" id="toc-do-bacterial-community-dissimilarities-influence-fungal-community-dissimilarities"><span class="toc-section-number">2.2</span> Do bacterial community dissimilarities influence fungal community dissimilarities?</a>
 <ul>
-<li><a href="#abundance-weighted-1" id="toc-abundance-weighted-1">abundance-weighted</a></li>
+<li><a href="#predictor-bacteria---whole-community-abundance-weighted-otus" id="toc-predictor-bacteria---whole-community-abundance-weighted-otus"><span class="toc-section-number">2.2.1</span> Predictor: Bacteria - whole community, abundance-weighted OTUs</a></li>
+<li><a href="#predictor-bacteria---generalists-abundance-weighted-otus" id="toc-predictor-bacteria---generalists-abundance-weighted-otus"><span class="toc-section-number">2.2.2</span> Predictor: Bacteria - Generalists, abundance-weighted OTUs</a></li>
+<li><a href="#predictor-bacteria---whole-community-abundance-weighted-genera" id="toc-predictor-bacteria---whole-community-abundance-weighted-genera"><span class="toc-section-number">2.2.3</span> Predictor: Bacteria - whole community, abundance-weighted genera</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -487,8 +562,51 @@ display: none;
 </ul></li>
 </ul></li>
 </ul>
-<div id="multiple-regression-models-for-distance-matrices-mrm" class="section level4 unlisted unnumbered">
-<h4><strong>Multiple regression models for distance matrices (MRM)</strong></h4>
+</div>
+<div id="prep-data" class="section level1 unlisted unnumbered hidden">
+<h1>Prep data</h1>
+<p><br />
+<br />
+</p>
+<hr />
+<p><br />
+<br />
+</p>
+</div>
+<div id="methods" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Methods</h1>
+<div id="input-data" class="section level2" number="1.1">
+<h2><span class="header-section-number">1.1</span> Input data</h2>
+<p><br />
+Bacterial and fungal OTU tables subset to only those with samples present from both kingdoms. I have added the generalist vs. specialist results from all grasses to the taxa slots in the objects.</p>
+<ul>
+<li><p>n = 484 samples</p></li>
+<li><p>22,661 bacterial OTUs (2,145 are ‘Generalists’)</p></li>
+<li><p>6,626 fungal OTUs (896 are ‘Generalists’)</p></li>
+</ul>
+</div>
+<div id="create-distance-matrices" class="section level2" number="1.2">
+<h2><span class="header-section-number">1.2</span> Create distance matrices</h2>
+<p>➞ We are assessing the impact of fungal OTU abundance on bacterial composition, therefore using Bray-Curtis as a distance metric… also trying presence/absence via Sørensen.</p>
+<ul>
+<li>Bacteria
+<ul>
+<li>whole community</li>
+<li>generalists (from all grasses)</li>
+<li>whole community agglomerated to genus-level</li>
+</ul></li>
+<li>Fungi
+<ul>
+<li>whole community</li>
+<li>generalists (from all grasses)</li>
+<li>whole community agglomerated to genus-level</li>
+</ul></li>
+</ul>
+<p><br />
+</p>
+</div>
+<div id="multiple-regression-models-for-distance-matrices-mrm" class="section level2" number="1.3">
+<h2><span class="header-section-number">1.3</span> Multiple regression models for distance matrices (MRM)</h2>
 <p>Main reference: <a href="https://people.clas.ufl.edu/jlichstein/files/Lichstein_2007_Plant_Ecol.pdf" title="Multiple regression on distance matrices: a multivariate spatial analysis tool">Lichstein 2007</a></p>
 <p>Compared to multiple regressions, all variables in MRM are distance matrices and P-values are estimated by permutation test (9999 runs) to remove the effect of non-independence between cases on P-values (Legendre, Lapointe &amp; Casgrain 1994).</p>
 <p>MRM is an explicitly distance-based method somewhat similar to the (partial) Mantel test, except that MRM preserves the individual-nature of input distance matrices instead of a compound distance, i.e., each dependent variables is converted to a distance matrix separately ➞ be careful to state hypotheses and conclusions in terms of distances rather than raw data</p>
@@ -526,8 +644,8 @@ display: none;
 <p><strong>Arguments</strong></p>
 <table>
 <colgroup>
-<col width="29%" />
-<col width="70%" />
+<col width="33%" />
+<col width="66%" />
 </colgroup>
 <tbody>
 <tr class="odd">
@@ -557,8 +675,8 @@ display: none;
 <p><strong>Value</strong></p>
 <table>
 <colgroup>
-<col width="29%" />
-<col width="70%" />
+<col width="33%" />
+<col width="66%" />
 </colgroup>
 <tbody>
 <tr class="odd">
@@ -574,85 +692,733 @@ display: none;
 <td>F-statistic and p-value for overall F-test for lack of fit (linear only).</td>
 </tr>
 <tr class="even">
-<td><code>dev</code></td>
-<td>Residual deviance, degrees of freedom, and associated p-value (logistic only).</td>
+<td><del><code>dev</code></del></td>
+<td><del>Residual deviance, degrees of freedom, and associated p-value (logistic only).</del></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-<div id="prep-data" class="section level1 unlisted unnumbered hidden">
-<h1>Prep data</h1>
 <p><br />
 <br />
 </p>
 </div>
-<div id="methods" class="section level1" number="1">
-<h1><span class="header-section-number">1</span> Methods</h1>
-<div id="input-data" class="section level2" number="1.1">
-<h2><span class="header-section-number">1.1</span> Input data</h2>
-<p><br />
-Bacterial and fungal OTU tables subset to only those with samples present from both kingdoms. I have added the generalist vs. specialist results from all grasses to the taxa slots in the objects.</p>
+<div id="mrm-model-specifications-and-fitting" class="section level2" number="1.4">
+<h2><span class="header-section-number">1.4</span> MRM model specifications and fitting</h2>
+<ol style="list-style-type: decimal">
+<li><p><strong>Model Specification</strong>:</p>
 <ul>
-<li><p>n = 484 samples</p></li>
-<li><p>22,661 bacterial OTUs (2,145 are ‘Generalists’)</p></li>
-<li><p>6,626 fungal OTUs (896 are ‘Generalists’)</p></li>
-</ul>
-</div>
-<div id="create-distance-matrices" class="section level2" number="1.2">
-<h2><span class="header-section-number">1.2</span> Create distance matrices</h2>
-<p>➞ We are assessing the impact of fungal OTU abundance on bacterial composition, therefore using Bray-Curtis as a distance metric.</p>
-<ul>
-<li>Bacteria
-<ul>
-<li>whole community<br />
-</li>
+<li><p>Define our MRM model. In this case, it would involve specifying the bacterial distance matrix as the response variable and the fungal distance matrix as the predictor variable(s).</p></li>
+<li><p>We may include other covariates in the model if necessary, such as environmental variables or sample metadata.</p></li>
 </ul></li>
-<li>Fungi
+<li><p><strong>Model Fitting</strong>:</p>
 <ul>
-<li>whole community</li>
-<li>generalists (from all grasses)</li>
+<li><p>Fit the MRM models using the <code>ecodist</code> package.</p></li>
+<li><p>Ensure that the model assumptions are met, such as linearity, independence, and normality of residuals.</p></li>
 </ul></li>
-</ul>
+<li><p><strong>Model Assessment</strong>:</p>
+<ul>
+<li><p>Evaluate the significance of the fungal predictors on bacterial community composition using appropriate statistical tests, such as F-tests or permutation tests.</p></li>
+<li><p>Assess the goodness-of-fit of the model and check for any violations of assumptions.</p></li>
+</ul></li>
+<li><p><strong>Interpretation</strong>:</p>
+<ul>
+<li><p>Interpret the coefficients associated with the fungal predictors to understand their impact on bacterial community composition.</p></li>
+<li><p>Consider the direction and magnitude of the coefficients to determine the strength and direction of the relationship between fungal abundance and bacterial composition.</p></li>
+</ul></li>
+<li><p><strong>Validation and Sensitivity Analysis</strong>:</p>
+<ul>
+<li><p>Validate the results using cross-validation or other validation techniques to ensure the robustness of the findings.</p></li>
+<li><p>Conduct sensitivity analysis to assess the robustness of the results to potential outliers or influential data points.</p></li>
+</ul></li>
+</ol>
 <p><br />
+<br />
 </p>
-</div>
-<div id="run-mrm-model" class="section level2" number="1.3">
-<h2><span class="header-section-number">1.3</span> Run MRM Model</h2>
+<hr />
 <p><br />
+<br />
 </p>
 </div>
 </div>
 <div id="results" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Results</h1>
-<div id="do-fungal-community-dissimilarities-influence-bacterial-community-dissimilarities" class="section level2 tabset" number="2.1">
+<p><br />
+<br />
+</p>
+<div id="do-fungal-community-dissimilarities-influence-bacterial-community-dissimilarities" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Do fungal community dissimilarities influence bacterial community dissimilarities?</h2>
 <p><br />
 </p>
-<div id="abundance-weighted" class="section level3 tabset tabset-pills unnumbered">
-<h3>abundance-weighted</h3>
-<div id="whole-communities" class="section level4 unnumbered">
-<h4>Whole communities</h4>
+<div id="predictor-fungi---whole-community-abundance-weighted-otus" class="section level3 tabset" number="2.1.1">
+<h3><span class="header-section-number">2.1.1</span> Predictor: Fungi - whole community, abundance-weighted OTUs</h3>
 <p><br />
 </p>
-<div id="linear" class="section level5 unnumbered unlisted">
-<h5>Linear</h5>
+<div id="response-bacteria---abundance-weighted" class="section level4 tabset tabset-pills unnumbered">
+<h4>Response: Bacteria - abundance-weighted</h4>
+<div id="whole-community-otus" class="section level5 unnumbered">
+<h5>Whole community (OTUs)</h5>
 <ul>
 <li>A: Yes, but barely</li>
 </ul>
-<pre class="r"><code>MRM(Bac_bray_wholecommunity ~ Fun_bray_wholecommunity, nperm=1000, method = &quot;linear&quot;)</code></pre>
+<pre class="r"><code>round_mrm(MRM(Bac_bray_wholecommunity ~ Fun_bray_wholecommunity, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
 <pre><code>## $coef
 ##                         Bac_bray_wholecommunity  pval
-## Int                                   0.6220954 1.000
-## Fun_bray_wholecommunity               0.1073886 0.001
+## Int                                       0.622 1.000
+## Fun_bray_wholecommunity                   0.107 0.001
 ## 
 ## $r.squared
-##         R2       pval 
-## 0.01415722 0.00100000 
+##    R2  pval 
+## 0.014 0.001 
 ## 
 ## $F.test
 ##        F   F.pval 
 ## 1678.516    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="generalists-otus" class="section level5 unnumbered">
+<h5>Generalists (OTUs)</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Bac_bray_generalists ~ Fun_bray_wholecommunity, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                         Bac_bray_generalists  pval
+## Int                                    0.569 1.000
+## Fun_bray_wholecommunity                0.109 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.016 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 1932.171    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="whole-community-genus-level" class="section level5 unnumbered">
+<h5>Whole community (Genus-level)</h5>
+<p>OTU table agglomerated to genus-level<br />
+- A: Yes, but barely</p>
+<pre class="r"><code>round_mrm(MRM(Bac_bray_wholecommunity_genus ~ Fun_bray_wholecommunity, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                         Bac_bray_wholecommunity_genus  pval
+## Int                                             0.485 1.000
+## Fun_bray_wholecommunity                         0.104 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.010 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 1161.389    0.001</code></pre>
+<p><br />
+</p>
+</div>
+</div>
+<div id="response-bacteria---pa-sørensen" class="section level4 tabset tabset-pills unnumbered">
+<h4>Response: Bacteria - p/a (Sørensen)</h4>
+<div id="whole-community-otus-1" class="section level5 unnumbered">
+<h5>Whole community (OTUs)</h5>
+<ul>
+<li>A: Slightly more</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Bac_sor_wholecommunity$beta.sor ~ Fun_bray_wholecommunity, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                         Bac_sor_wholecommunity$beta.sor  pval
+## Int                                               0.599 1.000
+## Fun_bray_wholecommunity                           0.101 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.020 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 2378.244    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="generalists-otus-1" class="section level5 unnumbered">
+<h5>Generalists (OTUs)</h5>
+<ul>
+<li>A: Slightly more</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Bac_sor_generalists$beta.sor ~ Fun_bray_wholecommunity, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                         Bac_sor_generalists$beta.sor  pval
+## Int                                            0.462 1.000
+## Fun_bray_wholecommunity                        0.122 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.024 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 2820.168    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="whole-community-genus-level-1" class="section level5 unnumbered">
+<h5>Whole community (Genus-level)</h5>
+<p>OTU table agglomerated to genus-level<br />
+- A: Yes, but barely</p>
+<pre class="r"><code>round_mrm(MRM(Bac_sor_wholecommunity_genus$beta.sor ~ Fun_bray_wholecommunity, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                         Bac_sor_wholecommunity_genus$beta.sor  pval
+## Int                                                     0.341 0.998
+## Fun_bray_wholecommunity                                 0.046 0.003
+## 
+## $r.squared
+##    R2  pval 
+## 0.006 0.003 
+## 
+## $F.test
+##       F  F.pval 
+## 755.418   0.003</code></pre>
+<p><br />
+<br />
+</p>
+</div>
+</div>
+</div>
+<div id="predictor-fungi---whole-community-pa-of-otus-sørensen" class="section level3 tabset" number="2.1.2">
+<h3><span class="header-section-number">2.1.2</span> Predictor: Fungi - whole community, p/a of OTUs (Sørensen)</h3>
+<p><br />
+</p>
+<div id="response-bacteria---abundance-weighted-1" class="section level4 tabset tabset-pills unnumbered">
+<h4>Response: Bacteria - abundance-weighted</h4>
+<div id="whole-community-otus-2" class="section level5 unnumbered">
+<h5>Whole community (OTUs)</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Bac_bray_wholecommunity ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                                 Bac_bray_wholecommunity  pval
+## Int                                               0.663 1.000
+## Fun_sor_wholecommunity$beta.sor                   0.067 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.008 0.001 
+## 
+## $F.test
+##       F  F.pval 
+## 900.327   0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="generalists-otus-2" class="section level5 unnumbered">
+<h5>Generalists (OTUs)</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Bac_bray_generalists ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                                 Bac_bray_generalists  pval
+## Int                                            0.591 1.000
+## Fun_sor_wholecommunity$beta.sor                0.091 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.016 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 1849.683    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="whole-community-genus-level-2" class="section level5 unnumbered">
+<h5>Whole community (Genus-level)</h5>
+<p>OTU table agglomerated to genus-level<br />
+- A: Yes, but barely</p>
+<pre class="r"><code>round_mrm(MRM(Bac_bray_wholecommunity_genus ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                                 Bac_bray_wholecommunity_genus  pval
+## Int                                                     0.530 0.989
+## Fun_sor_wholecommunity$beta.sor                         0.059 0.016
+## 
+## $r.squared
+##    R2  pval 
+## 0.004 0.016 
+## 
+## $F.test
+##       F  F.pval 
+## 503.496   0.016</code></pre>
+<p><br />
+</p>
+</div>
+</div>
+<div id="response-bacteria---pa-sørensen-1" class="section level4 tabset tabset-pills unnumbered">
+<h4>Response: Bacteria - p/a (Sørensen)</h4>
+<div id="whole-community-otus-3" class="section level5 unnumbered">
+<h5>Whole community (OTUs)</h5>
+<ul>
+<li>A: Yes, barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Bac_sor_wholecommunity$beta.sor ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                                 Bac_sor_wholecommunity$beta.sor  pval
+## Int                                                       0.629 1.000
+## Fun_sor_wholecommunity$beta.sor                           0.074 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.015 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 1727.772    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="generalists-otus-3" class="section level5 unnumbered">
+<h5>Generalists (OTUs)</h5>
+<ul>
+<li>A: Slightly more</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Bac_sor_generalists$beta.sor ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                                 Bac_sor_generalists$beta.sor  pval
+## Int                                                    0.494 1.000
+## Fun_sor_wholecommunity$beta.sor                        0.093 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.019 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 2227.378    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="whole-community-genus-level-3" class="section level5 unnumbered">
+<h5>Whole community (Genus-level)</h5>
+<p>OTU table agglomerated to genus-level<br />
+- A: Yes, but barely</p>
+<pre class="r"><code>round_mrm(MRM(Bac_sor_wholecommunity_genus$beta.sor ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                                 Bac_sor_wholecommunity_genus$beta.sor  pval
+## Int                                                             0.360 0.984
+## Fun_sor_wholecommunity$beta.sor                                 0.027 0.025
+## 
+## $r.squared
+##    R2  pval 
+## 0.003 0.025 
+## 
+## $F.test
+##       F  F.pval 
+## 350.273   0.025</code></pre>
+<p><br />
+<br />
+</p>
+<hr />
+<p><br />
+</p>
+</div>
+</div>
+</div>
+<div id="predictor-fungi---generalists-abundance-weighted-otus" class="section level3 tabset" number="2.1.3">
+<h3><span class="header-section-number">2.1.3</span> Predictor: Fungi - Generalists, abundance-weighted OTUs</h3>
+<p><br />
+</p>
+<div id="response-bacteria---abundance-weighted-2" class="section level4 tabset tabset-pills unnumbered">
+<h4>Response: Bacteria - abundance-weighted</h4>
+<div id="whole-community-otus-4" class="section level5 unnumbered">
+<h5>Whole community (OTUs)</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Bac_bray_wholecommunity ~ Fun_bray_generalists, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                      Bac_bray_wholecommunity  pval
+## Int                                    0.671 1.000
+## Fun_bray_generalists                   0.058 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.009 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 1114.180    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="generalists-otus-4" class="section level5 unnumbered">
+<h5>Generalists (OTUs)</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Bac_bray_generalists ~ Fun_bray_generalists, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                      Bac_bray_generalists  pval
+## Int                                 0.616 1.000
+## Fun_bray_generalists                0.061 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.012 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 1398.430    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="whole-community-genus-level-4" class="section level5 unnumbered">
+<h5>Whole community (Genus-level)</h5>
+<p>OTU table agglomerated to genus-level<br />
+- A: Yes, but barely</p>
+<pre class="r"><code>round_mrm(MRM(Bac_bray_wholecommunity_genus ~ Fun_bray_generalists, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                      Bac_bray_wholecommunity_genus  pval
+## Int                                          0.529 0.999
+## Fun_bray_generalists                         0.061 0.002
+## 
+## $r.squared
+##    R2  pval 
+## 0.008 0.002 
+## 
+## $F.test
+##       F  F.pval 
+## 908.868   0.002</code></pre>
+<p><br />
+<br />
+</p>
+<hr />
+<p><br />
+</p>
+</div>
+</div>
+</div>
+<div id="predictor-fungi---whole-community-abundance-weighted-genera" class="section level3 tabset" number="2.1.4">
+<h3><span class="header-section-number">2.1.4</span> Predictor: Fungi - whole community, abundance-weighted genera</h3>
+<p><br />
+Fungal OTU table agglomerated to genus-level<br />
+</p>
+<div id="response-bacteria---abundance-weighted-3" class="section level4 tabset tabset-pills unnumbered">
+<h4>Response: Bacteria - abundance-weighted</h4>
+<div id="whole-community-otus-5" class="section level5 unnumbered">
+<h5>Whole community (OTUs)</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Bac_bray_wholecommunity ~ Fun_bray_wholecommunity_genus, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                               Bac_bray_wholecommunity  pval
+## Int                                             0.624 1.000
+## Fun_bray_wholecommunity_genus                   0.117 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.020 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 2369.690    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="generalists-otus-5" class="section level5 unnumbered">
+<h5>Generalists (OTUs)</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Bac_bray_generalists ~ Fun_bray_wholecommunity_genus, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                               Bac_bray_generalists  pval
+## Int                                          0.571 1.000
+## Fun_bray_wholecommunity_genus                0.119 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.023 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 2739.624    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="whole-community-genus-level-5" class="section level5 unnumbered">
+<h5>Whole community (Genus-level)</h5>
+<p>OTU table agglomerated to genus-level<br />
+- A: Yes, but barely</p>
+<pre class="r"><code>round_mrm(MRM(Bac_bray_wholecommunity_genus ~ Fun_bray_wholecommunity_genus, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                               Bac_bray_wholecommunity_genus  pval
+## Int                                                   0.487 1.000
+## Fun_bray_wholecommunity_genus                         0.114 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.014 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 1635.345    0.001</code></pre>
+<p><br />
+<br />
+</p>
+<p><br />
+<br />
+</p>
+<hr />
+<hr />
+<p><br />
+<br />
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="do-bacterial-community-dissimilarities-influence-fungal-community-dissimilarities" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Do bacterial community dissimilarities influence fungal community dissimilarities?</h2>
+<p><br />
+</p>
+<div id="predictor-bacteria---whole-community-abundance-weighted-otus" class="section level3 tabset" number="2.2.1">
+<h3><span class="header-section-number">2.2.1</span> Predictor: Bacteria - whole community, abundance-weighted OTUs</h3>
+<p><br />
+</p>
+<div id="response-fungi---abundance-weighted" class="section level4 tabset tabset-pills unnumbered">
+<h4>Response: Fungi - abundance-weighted</h4>
+<div id="whole-community-otus-6" class="section level5 unnumbered">
+<h5>Whole community (OTUs)</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Fun_bray_wholecommunity ~ Bac_bray_wholecommunity, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                         Fun_bray_wholecommunity  pval
+## Int                                       0.797 1.000
+## Bac_bray_wholecommunity                   0.132 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.014 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 1678.516    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="generalists-otus-6" class="section level5 unnumbered">
+<h5>Generalists (OTUs)</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Fun_bray_generalists ~ Bac_bray_wholecommunity, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                         Fun_bray_generalists  pval
+## Int                                    0.695 1.000
+## Bac_bray_wholecommunity                0.163 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.009 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 1114.180    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="whole-community-genus-level-6" class="section level5 unnumbered">
+<h5>Whole community (Genus-level)</h5>
+<p>OTU table agglomerated to genus-level<br />
+- A: Yes, but barely</p>
+<pre class="r"><code>round_mrm(MRM(Fun_bray_wholecommunity_genus ~ Bac_bray_wholecommunity, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                         Fun_bray_wholecommunity_genus  pval
+## Int                                             0.678 1.000
+## Bac_bray_wholecommunity                         0.170 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.020 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 2369.690    0.001</code></pre>
+<p><br />
+<br />
+</p>
+<hr />
+<p><br />
+</p>
+</div>
+</div>
+</div>
+<div id="predictor-bacteria---generalists-abundance-weighted-otus" class="section level3 tabset" number="2.2.2">
+<h3><span class="header-section-number">2.2.2</span> Predictor: Bacteria - Generalists, abundance-weighted OTUs</h3>
+<p><br />
+</p>
+<div id="response-fungi---abundance-weighted-1" class="section level4 tabset tabset-pills unnumbered">
+<h4>Response: Fungi - abundance-weighted</h4>
+<div id="whole-community-otus-7" class="section level5 unnumbered">
+<h5>Whole community (OTUs)</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Fun_bray_wholecommunity ~ Bac_bray_generalists, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                      Fun_bray_wholecommunity  pval
+## Int                                    0.792 1.000
+## Bac_bray_generalists                   0.150 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.016 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 1932.171    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="generalists-otus-7" class="section level5 unnumbered">
+<h5>Generalists (OTUs)</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Fun_bray_generalists ~ Bac_bray_generalists, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                      Fun_bray_generalists  pval
+## Int                                 0.683 1.000
+## Bac_bray_generalists                0.193 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.012 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 1398.430    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="whole-community-genus-level-7" class="section level5 unnumbered">
+<h5>Whole community (Genus-level)</h5>
+<p>OTU table agglomerated to genus-level<br />
+- A: Yes, but barely</p>
+<pre class="r"><code>round_mrm(MRM(Fun_bray_wholecommunity_genus ~ Bac_bray_generalists, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                      Fun_bray_wholecommunity_genus  pval
+## Int                                          0.671 1.000
+## Bac_bray_generalists                         0.193 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.023 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 2739.624    0.001</code></pre>
+<p><br />
+<br />
+</p>
+<hr />
+<p><br />
+</p>
+</div>
+</div>
+</div>
+<div id="predictor-bacteria---whole-community-abundance-weighted-genera" class="section level3 tabset" number="2.2.3">
+<h3><span class="header-section-number">2.2.3</span> Predictor: Bacteria - whole community, abundance-weighted genera</h3>
+<p><br />
+Bacterial OTU table agglomerated to genus-level<br />
+</p>
+<div id="response-fungi---abundance-weighted-2" class="section level4 tabset tabset-pills unnumbered">
+<h4>Response: Fungi - abundance-weighted</h4>
+<div id="whole-community-otus-8" class="section level5 unnumbered">
+<h5>Whole community (OTUs)</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Fun_bray_wholecommunity ~ Bac_bray_wholecommunity_genus, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                               Fun_bray_wholecommunity  pval
+## Int                                             0.837 1.000
+## Bac_bray_wholecommunity_genus                   0.094 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.010 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 1161.389    0.001</code></pre>
+<p><br />
+</p>
+</div>
+<div id="generalists-otus-8" class="section level5 unnumbered">
+<h5>Generalists (OTUs)</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
+<pre class="r"><code>round_mrm(MRM(Fun_bray_generalists ~ Bac_bray_wholecommunity_genus, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                               Fun_bray_generalists  pval
+## Int                                          0.739 0.999
+## Bac_bray_wholecommunity_genus                0.126 0.003
+## 
+## $r.squared
+##    R2  pval 
+## 0.008 0.003 
+## 
+## $F.test
+##       F  F.pval 
+## 908.868   0.003</code></pre>
+<p><br />
+</p>
+</div>
+<div id="whole-community-genus-level-8" class="section level5 unnumbered">
+<h5>Whole community (Genus-level)</h5>
+<p>OTU table agglomerated to genus-level<br />
+- A: Yes, but barely</p>
+<pre class="r"><code>round_mrm(MRM(Fun_bray_wholecommunity_genus ~ Bac_bray_wholecommunity_genus, nperm = 1000, method = &quot;linear&quot;), digits = 3)</code></pre>
+<pre><code>## $coef
+##                               Fun_bray_wholecommunity_genus  pval
+## Int                                                   0.729 1.000
+## Bac_bray_wholecommunity_genus                         0.121 0.001
+## 
+## $r.squared
+##    R2  pval 
+## 0.014 0.001 
+## 
+## $F.test
+##        F   F.pval 
+## 1635.345    0.001</code></pre>
+<p><br />
+<br />
+</p>
+<p><br />
+<br />
+</p>
+<hr />
+<hr />
+<p><br />
+<br />
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="cut-code" class="section level1 unnumbered unlisted hidden">
+<h1>Cut code</h1>
+<div id="logistic" class="section level5 unnumbered unlisted hidden">
+<h5>Logistic</h5>
+<ul>
+<li>A: Yes, but barely</li>
+</ul>
 <p>For ease of interpretation:</p>
 <ul>
 <li><p><code>$F.test</code></p>
@@ -670,155 +1436,6 @@ Bacterial and fungal OTU tables subset to only those with samples present from b
 </ul></li>
 </ul></li>
 </ul>
-</div>
-<div id="logistic" class="section level5 unnumbered unlisted hidden">
-<h5>Logistic</h5>
-<p>n/a</p>
-<p><br />
-</p>
-</div>
-</div>
-<div id="fungal-generalists" class="section level4 unnumbered">
-<h4>Fungal Generalists</h4>
-<p><br />
-</p>
-<div id="linear-1" class="section level5 unnumbered unlisted">
-<h5>Linear</h5>
-<ul>
-<li>A: Yes, but barely</li>
-</ul>
-<pre class="r"><code>MRM(Bac_bray_wholecommunity ~ Fun_bray_generalists, nperm=1000, method = &quot;linear&quot;)</code></pre>
-<pre><code>## $coef
-##                      Bac_bray_wholecommunity  pval
-## Int                                0.6707107 1.000
-## Fun_bray_generalists               0.0580814 0.001
-## 
-## $r.squared
-##          R2        pval 
-## 0.009442349 0.001000000 
-## 
-## $F.test
-##        F   F.pval 
-## 1114.180    0.001</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div id="do-bacterial-community-dissimilarities-influence-fungal-community-dissimilarities" class="section level2 tabset" number="2.2">
-<h2><span class="header-section-number">2.2</span> Do bacterial community dissimilarities influence fungal community dissimilarities?</h2>
-<p><br />
-</p>
-<div id="abundance-weighted-1" class="section level3 tabset tabset-pills unnumbered">
-<h3>abundance-weighted</h3>
-<div id="whole-communities-1" class="section level4 unnumbered">
-<h4>Whole communities</h4>
-<p><br />
-</p>
-<div id="linear-2" class="section level5 unnumbered unlisted">
-<h5>Linear</h5>
-<ul>
-<li>A: Yes, but barely</li>
-</ul>
-<pre class="r"><code>MRM(Fun_bray_wholecommunity ~ Bac_bray_wholecommunity, nperm=1000, method = &quot;linear&quot;)</code></pre>
-<pre><code>## $coef
-##                         Fun_bray_wholecommunity  pval
-## Int                                   0.7970641 1.000
-## Bac_bray_wholecommunity               0.1318317 0.001
-## 
-## $r.squared
-##         R2       pval 
-## 0.01415722 0.00100000 
-## 
-## $F.test
-##        F   F.pval 
-## 1678.516    0.001</code></pre>
-<p><br />
-</p>
-</div>
-<div id="logistic-1" class="section level5 unnumbered unlisted hidden">
-<h5>Logistic</h5>
-<p>n/a</p>
-<p><br />
-</p>
-</div>
-</div>
-<div id="fungal-generalists-1" class="section level4 unnumbered">
-<h4>Fungal Generalists</h4>
-<p><br />
-</p>
-<div id="linear-3" class="section level5 unnumbered unlisted">
-<h5>Linear</h5>
-<ul>
-<li>A: Yes, but barely</li>
-</ul>
-<pre class="r"><code>MRM(Fun_bray_generalists ~ Bac_bray_wholecommunity, nperm=1000, method = &quot;linear&quot;)</code></pre>
-<pre><code>## $coef
-##                         Fun_bray_generalists  pval
-## Int                                0.6949702 1.000
-## Bac_bray_wholecommunity            0.1625710 0.001
-## 
-## $r.squared
-##          R2        pval 
-## 0.009442349 0.001000000 
-## 
-## $F.test
-##        F   F.pval 
-## 1114.180    0.001</code></pre>
-<p><br />
-</p>
-</div>
-</div>
-<div id="bacterial-generalists" class="section level4 unnumbered">
-<h4>Bacterial Generalists</h4>
-<p><br />
-</p>
-<div id="linear-4" class="section level5 unnumbered unlisted">
-<h5>Linear</h5>
-<ul>
-<li>A: Yes, but barely</li>
-</ul>
-<pre class="r"><code>MRM(Fun_bray_wholecommunity ~ Bac_bray_generalists, nperm=1000, method = &quot;linear&quot;)</code></pre>
-<pre><code>## $coef
-##                      Fun_bray_wholecommunity  pval
-## Int                                0.7920041 1.000
-## Bac_bray_generalists               0.1497743 0.001
-## 
-## $r.squared
-##         R2       pval 
-## 0.01626185 0.00100000 
-## 
-## $F.test
-##        F   F.pval 
-## 1932.171    0.001</code></pre>
-<p><br />
-</p>
-</div>
-</div>
-<div id="both-generalists" class="section level4 unnumbered">
-<h4>Both Generalists</h4>
-<p><br />
-</p>
-<div id="linear-5" class="section level5 unnumbered unlisted">
-<h5>Linear</h5>
-<ul>
-<li>A: Yes, but barely</li>
-</ul>
-<pre class="r"><code>MRM(Fun_bray_generalists ~ Bac_bray_generalists, nperm=1000, method = &quot;linear&quot;)</code></pre>
-<pre><code>## $coef
-##                      Fun_bray_generalists  pval
-## Int                             0.6833139 1.000
-## Bac_bray_generalists            0.1928345 0.001
-## 
-## $r.squared
-##        R2      pval 
-## 0.0118228 0.0010000 
-## 
-## $F.test
-##        F   F.pval 
-## 1398.430    0.001</code></pre>
-</div>
-</div>
-</div>
 </div>
 </div>
 
