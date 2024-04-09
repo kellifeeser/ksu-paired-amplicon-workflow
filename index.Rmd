@@ -34,7 +34,7 @@ rmarkdown::render("code/2_KSU_OTUdownselection.Rmd", output_file="/Users/L347123
 rmarkdown::render("code/InterkingdomRegressions.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_InterkingdomRegressions")
 
 #render DriversOfFungalCommunities
-rmarkdown::render("code/DriversOfFungalCommunities.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_DriversOfFungalCommunities")
+rmarkdown::render("code/DriversOfFungalCommunities.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_DriversOfFungalCommunities2")
 ```
 
 \
@@ -64,7 +64,7 @@ rmarkdown::render("code/DriversOfFungalCommunities.Rmd", output_file="/Users/L34
 
 -   <a href="github_nestedness.html" target="_blank">Nestedness vs turnover</a>
 
--   <a href="github_DriversOfFungalCommunities.html" target="_blank">Drivers Of Fungal Community Dynamics</a>
+-   <a href="github_DriversOfFungalCommunities2.html" target="_blank">Drivers Of Fungal Community Dynamics</a>
 
 -   $\beta_{NULL}$-diversity modeling
 
