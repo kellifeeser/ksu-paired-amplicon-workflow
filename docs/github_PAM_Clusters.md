@@ -307,6 +307,11 @@ Clusters 2 & 3 seem to be the outgroup / most distantly related \
 
 \
 
+## Generalists v Specialists {.unnumbered}
+
+![](../figures/taxa_plots/Fun_Sign_Full_sample_cluster.png){width="100%"}
+
+\
 
 
 
