@@ -35,6 +35,9 @@ rmarkdown::render("code/InterkingdomRegressions.Rmd", output_file="/Users/L34712
 
 #render DriversOfFungalCommunities
 rmarkdown::render("code/DriversOfFungalCommunities.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_DriversOfFungalCommunities2")
+
+#render PAM_Clusters
+rmarkdown::render("code/PAM_Clusters.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters")
 ```
 
 \
@@ -56,6 +59,10 @@ rmarkdown::render("code/DriversOfFungalCommunities.Rmd", output_file="/Users/L34
 
 ### New Analyses {.unnumbered}
 
+-   <a href="github_PAM_Clusters.html" target="_blank">PAM Clustering (newest)</a>
+
+-   <a href="github_DriversOfFungalCommunities2.html" target="_blank">Drivers Of Fungal Community Dynamics</a>
+
 -   <a href="github_InterkingdomRegressions.html" target="_blank">Inter-kingdom Regressions</a>
 
 -   <a href="github_generalist_v_specialist.html" target="_blank">Generalist vs. Specialist (OTU down-selection)</a>
@@ -63,8 +70,6 @@ rmarkdown::render("code/DriversOfFungalCommunities.Rmd", output_file="/Users/L34
 -   <a href="github_explanatoryVariables.html" target="_blank">down-selecting environmental/edaphic var of interest</a>
 
 -   <a href="github_nestedness.html" target="_blank">Nestedness vs turnover</a>
-
--   <a href="github_DriversOfFungalCommunities2.html" target="_blank">Drivers Of Fungal Community Dynamics</a>
 
 -   $\beta_{NULL}$-diversity modeling
 
