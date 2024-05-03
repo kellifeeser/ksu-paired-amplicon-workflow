@@ -1,0 +1,18 @@
+---
+title: "homelink"
+output: html_fragment
+  css: code/homelink.css
+---
+
+\
+
+::: homelink
+<a href="https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html" target="_blank" style="text-align:right">Back to Home</a>
+:::
+
+\
+
+```{r, include=FALSE,eval=F}
+rmarkdown::render("homelink.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/code/homelink2")
+```
+

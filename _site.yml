@@ -2,6 +2,13 @@ name: "ksu-github-main"
 output:
   bookdown::html_document2:
     lib_dir: docs/site_libs
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    fig.caption: yes
+    keep_md: yes
 output_dir: docs
 navbar:
   title: "KSU Data Visualization"

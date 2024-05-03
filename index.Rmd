@@ -9,6 +9,9 @@ library(bookdown)
 #might need to remake docs/ everytime?
 #knit this then commit and push
 
+#render homelink
+# rmarkdown::render("homelink.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/code/homelink")
+
 #render darksidea
 rmarkdown::render("code/Darksidea.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_darksidea")
 
@@ -59,7 +62,7 @@ rmarkdown::render("code/PAM_Clusters.Rmd", output_file="/Users/L347123/Desktop/k
 
 ### New Analyses {.unnumbered}
 
--   <a href="github_PAM_Clusters.html" target="_blank">PAM Clustering (newest, last updated 01 May 2024)</a>
+-   <a href="github_PAM_Clusters.html" target="_blank">PAM Clustering (newest, last updated 02 May 2024)</a>
 
 -   <a href="github_DriversOfFungalCommunities2.html" target="_blank">Drivers Of Fungal Community Dynamics</a>
 
