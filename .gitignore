@@ -57,6 +57,7 @@ metadata/
 raw_data/knb-lter-sev.332.2/
 docs/raw_data/
 docs/processed_data/
+meeting_notes/
 
 processed_data/Rudgers2021/
 processed_data/OTU_occurrencefrequency/
