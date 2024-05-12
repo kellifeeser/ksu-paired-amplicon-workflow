@@ -1,5 +1,5 @@
 ---
-title: "KSU Data Visualization"
+title: "RAM Data Visualization"
 ---
 
 ```{r render-site, include=FALSE,eval=F}
@@ -41,6 +41,11 @@ rmarkdown::render("code/DriversOfFungalCommunities.Rmd", output_file="/Users/L34
 
 #render PAM_Clusters
 rmarkdown::render("code/PAM_Clusters.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters")
+
+#render BacterialFungalClusterInteractions
+rmarkdown::render("code/BacterialFungalClusterInteractions.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_BacterialFungal_Cluster_Interactions")
+
+
 ```
 
 \
@@ -62,7 +67,9 @@ rmarkdown::render("code/PAM_Clusters.Rmd", output_file="/Users/L347123/Desktop/k
 
 ### New Analyses {.unnumbered}
 
--   <a href="github_PAM_Clusters.html" target="_blank">PAM Clustering (now has Bacteria, last updated 11 May 2024)</a>
+-   <a href="/github_BacterialFungal_Cluster_Interactions.html" target="_blank">~~Relationships Among Bacterial and Fungal Clusters (newest, last updated 12 May 2024)~~</a>
+
+-   <a href="github_PAM_Clusters.html" target="_blank">PAM Clustering (now has Bacteria, last updated 12 May 2024)</a>
 
 -   <a href="github_DriversOfFungalCommunities2.html" target="_blank">Drivers Of Fungal Community Dynamics</a>
 
