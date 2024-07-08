@@ -1,10 +1,10 @@
-name: "ksu-github-main"
+name: "RAM-github-main"
 output:
   bookdown::html_document2:
     lib_dir: docs/site_libs
 output_dir: docs
 navbar:
-  title: "KSU Data Visualization"
+  title: "RAM Data Visualization"
   left:
     - text: "Home"
       href: index.html

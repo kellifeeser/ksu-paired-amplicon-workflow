@@ -26,6 +26,7 @@ rmarkdown::render("code/Comparison_Rudgers2021.Rmd", output_file="/Users/L347123
 
 #render nestedness
 rmarkdown::render("code/nestedness.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_nestedness")
+rmarkdown::render("code/nestedness_clusters_v2.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_nestedness_clusters")
 
 #render explanatory var
 rmarkdown::render("code/ExplanatoryVariables.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_explanatoryVariables")
@@ -37,13 +38,19 @@ rmarkdown::render("code/2_KSU_OTUdownselection.Rmd", output_file="/Users/L347123
 rmarkdown::render("code/InterkingdomRegressions.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_InterkingdomRegressions")
 
 #render DriversOfFungalCommunities
-rmarkdown::render("code/DriversOfFungalCommunities.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_DriversOfFungalCommunities2")
+rmarkdown::render("code/DriversOfFungalCommunities.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_DriversOfFungalCommunities3")
 
 #render PAM_Clusters
 rmarkdown::render("code/PAM_Clusters.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters")
 
 #render BacterialFungalClusterInteractions
 rmarkdown::render("code/BacterialFungalClusterInteractions.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_BacterialFungal_Cluster_Interactions")
+
+#render SFAFposter
+rmarkdown::render("code/SFAFposter.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_SFAFposter")
+
+#render ManuscriptOrganizing
+rmarkdown::render("code/ManuscriptOrganizing.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_ManuscriptOrganizing")
 
 
 ```
@@ -65,7 +72,27 @@ rmarkdown::render("code/BacterialFungalClusterInteractions.Rmd", output_file="/U
 \
 \
 
-### New Analyses {.unnumbered}
+## Pulling story elements for manuscript {.unnumbered}
+
+\
+
+## Bulk Analyses {.unnumbered}
+
+\
+
+
+### New/Corrected Analyses {.unnumbered}
+
+\
+
+-   <a href="github_DriversOfFungalCommunities3.html" target="_blank">Drivers Of Fungal Community Dynamics (last updated 07 July 2024)</a>
+
+\
+
+### Analyses with metadata not yet fixed {.unnumbered}
+
+\*Error in metadata: Site ONF should have GPS coordinates of 34.80954, -94.13184 instead of 3[9]{style="color:red;"}.80954, -94.13184\
+\
 
 -   <a href="/github_BacterialFungal_Cluster_Interactions.html" target="_blank">~~Relationships Among Bacterial and Fungal Clusters (newest, last updated 12 May 2024)~~</a>
 
