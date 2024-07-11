@@ -1,0 +1,1296 @@
+---
+title: "**KSU paired 16S & ITS: \n Down-selecting for generalist OTUs**"
+subtitle: Generalist vs. Specialist framework to select OTUs for downstream
+  co-occurrence network analyses (EDGE samples excluded). 
+author: "Kelli Feeser"
+date: '2023-08-22'
+output:
+  bookdown::html_document2:
+    code_folding: hide
+    df_print: kable
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    fig.caption: yes
+    keep_md: yes
+  html_notebook:
+    code_folding: hide
+    df_print: kable
+    number_sections: yes
+    css: styles.css
+    toc: yes
+    toc_depth: 3
+  html_document: 
+    code_folding: hide
+    css: test.css
+    number_sections: yes
+    theme: cosmo
+    toc: yes
+    toc_depth: 2
+editor_options:
+  chunk_output_type: inline
+---
+
+**FYI** - I use 'GvS' for 'generalist vs specialist'\
+\
+
+**Reference:** Hou 2019 doi: 10.1264/jsme2.ME18107\
+\
+
+**Overview**\
+Habitat generalists and specialists were classified based on the occurrence of bacterial and archaeal OTUs (16S) and fungal OTUs (ITS) with permutation algorithms (1,000 permutations) using EcolUtils (v0.1 package, <https://github.com/GuillemSalazar/EcolUtils>).\
+This approach generated 1,000 stimulated OTU tables using the quasiswap algorithm. The occurrence of OTUs was calculated based on 1,000 randomly generated OTU tables, and the observed occurrences for the true microbial communities were then compared to the 95% confidence interval derived from the means of randomly generated occurrences.\
+Habitat generalist and specialist OTUs were identified with observed occurrences that were higher than the upper 95% confidence interval and lower than the lower 95% confidence interval, respectively.\
+
+-   *Generalists*: highest 2.5% of occurrence:abundance distribution\
+-   *Specialists*: lowest 2.5% of occurrence:abundance distribution\
+-   *Non-significant (NS)*: the 95% in-between\
+
+\
+
+**Source code**\
+spec.gen: <https://rdrr.io/github/GuillemSalazar/EcolUtils/man/spec.gen.html>\
+\
+
+**Other notes**\
+-- niche.width.method = occurence or levins\
+-- input: Community data, a matrix-like object (samples as rows; OTUs as columns).\
+\
+
+------------------------------------------------------------------------
+
+# Set-up & data import -------------------------------------------------------
+
+```{r 'LANL proxies', eval=FALSE, include=FALSE}
+Sys.setenv(HTTP_PROXY='http://proxyout.lanl.gov:8080')
+Sys.setenv(HTTPS_PROXY='http://proxyout.lanl.gov:8080')
+```
+
+## install packages {.hidden .unlisted .unnumbered}
+
+```{r eval=FALSE, warning=FALSE, include=F}
+install.packages("~/Downloads/statnet.common_4.1.4.tar", repos = NULL, type="source")
+library(devtools)
+devtools::install_github("GuillemSalazar/EcolUtils")
+```
+
+\
+
+## load packages {.hidden .unlisted .unnumbered}
+
+```{r eval=T, echo=T, message=FALSE,error=FALSE, results='hide'}
+library("ggplot2"); packageVersion("ggplot2") #‘3.4.4’
+library("vegan"); packageVersion("vegan") # # ‘2.6.4’
+library("phyloseq"); packageVersion("phyloseq") #‘1.44.0’
+library("EcolUtils"); packageVersion("EcolUtils") #‘0.1’
+# detach("package:metagMisc", unload = T)
+library("spaa"); packageVersion("spaa") #‘0.2.2’
+library("plyr"); packageVersion("plyr") #‘1.8.9’
+library("dplyr"); packageVersion("dplyr") #‘1.1.3’
+```
+
+\
+
+## 16S and ITS OTUs
+
+Input data: rarefied 16S and ITS OTU tables, EDGE samples excluded. Data subset to samples where both 16S and ITS data were available. GvS run for i) all grass hosts combined, and ii-xi) the 5 grass hosts independently (subset OTU tables)
+
+|             | Bacteria |    Fungi    |             |
+|-------------|:--------:|:-----------:|:-----------:|
+|             | *n OTUs* | *n samples* | *n samples* |
+| All Grasses |  22,661  |    6,626    |     485     |
+| ANGE        |  13,778  |    2,930    |     95      |
+| BOER        |  8,224   |    1,662    |     78      |
+| BOGR        |  9,671   |    2,415    |     75      |
+| BUDA        |  10,954  |    2,343    |     79      |
+| SCSC        |  17,022  |    4,322    |     157     |
+
+: Numbers of bacterial and fungal OTUs and samples input into GvS
+
+\
+\
+
+OTU tables were then pruned to a minimum OTU occurrence of 2 (i.e., singleton OTUs removed).
+
+## read-in clean phyloseq obects {.hidden .unlisted .unnumbered}
+
+### all grass hosts (all samples, excluding EDGE samples)
+
+```{r eval=FALSE, warning=FALSE, include=F}
+BacArch_min2_noEDGE_raw<-readRDS(file = "../processed_data/clean_rds_saves/BacArch_min2_rare9048_v1.rds")
+BacArch_min2_noEDGE_raw
+# should be
+  # phyloseq-class experiment-level object
+  # otu_table()   OTU Table:         [ 23156 taxa and 533 samples ]
+  # sample_data() Sample Data:       [ 533 samples by 39 sample variables ]
+  # tax_table()   Taxonomy Table:    [ 23156 taxa by 6 taxonomic ranks ]
+
+Fun_min2_noEDGE_raw<-readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_v2.rds")
+Fun_min2_noEDGE_raw
+# should be
+  # phyloseq-class experiment-level object
+  # otu_table()   OTU Table:         [ 6749 taxa and 509 samples ]
+  # sample_data() Sample Data:       [ 509 samples by 39 sample variables ]
+  # tax_table()   Taxonomy Table:    [ 6749 taxa by 7 taxonomic ranks ]
+
+
+#subset to only the samples present in both datasets
+sd_bac_allgrasses<-sample_data(BacArch_min2_noEDGE_raw)
+sd_fun_allgrasses<-sample_data(Fun_min2_noEDGE_raw)
+
+bac_allgrasses_names1<-((sample_data(BacArch_min2_noEDGE_raw))$sample_name)
+fun_allgrasses_names1<-((sample_data(Fun_min2_noEDGE_raw))$sample_name)
+
+allgrasses_common_names<-Reduce(intersect, list(bac_allgrasses_names1,fun_allgrasses_names1))
+
+Bac_allgrasses_shared<-subset_samples(BacArch_min2_noEDGE_raw, sample_name %in% allgrasses_common_names)
+Bac_allgrasses_shared <- prune_taxa(taxa_sums(Bac_allgrasses_shared) > 0, Bac_allgrasses_shared)
+Bac_allgrasses_shared
+# should be
+  # otu_table()   OTU Table:         [ 22661 taxa and 484 samples ]
+
+Fun_allgrasses_shared<-subset_samples(Fun_min2_noEDGE_raw, sample_name %in% allgrasses_common_names)
+Fun_allgrasses_shared <- prune_taxa(taxa_sums(Fun_allgrasses_shared) > 0, Fun_allgrasses_shared)
+Fun_allgrasses_shared
+# should be
+  # otu_table()   OTU Table:         [ 6626 taxa and 484 samples ]
+
+
+# easier naming
+bac_allgrasses<-Bac_allgrasses_shared
+fun_allgrasses<-Fun_allgrasses_shared
+
+```
+
+### *Blue grama* OTUs
+
+```{r eval=FALSE, warning=FALSE, include=F}
+BacArch_min2_noEDGE_BOGR_raw<-readRDS(file = "../processed_data/clean_rds_saves/BacArch_min2_rare9048_noEDGE_BOGR_v1.rds")
+BacArch_min2_noEDGE_BOGR_raw
+# should be
+  # otu_table()   OTU Table:         [ 10108 taxa and 86 samples ]
+
+Fun_min2_noEDGE_raw_BOGR_raw<-readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_noEDGE_BOGR_v1.rds")
+Fun_min2_noEDGE_raw_BOGR_raw
+# should be
+  # otu_table()   OTU Table:         [ 2668 taxa and 92 samples ]
+
+# subset to only the samples present in both datasets
+bac_BOGR_names1<-((sample_data(BacArch_min2_noEDGE_BOGR_raw))$sample_name)
+fun_BOGR_names1<-((sample_data(Fun_min2_noEDGE_raw_BOGR_raw))$sample_name)
+
+BOGR_common_names<-Reduce(intersect, list(bac_BOGR_names1,fun_BOGR_names1))
+
+Bac_BOGR_shared<-subset_samples(BacArch_min2_noEDGE_BOGR_raw, sample_name %in% BOGR_common_names)
+Bac_BOGR_shared <- prune_taxa(taxa_sums(Bac_BOGR_shared) > 0, Bac_BOGR_shared)
+Bac_BOGR_shared
+# should be
+  # otu_table()   OTU Table:         [ 9671 taxa and 75 samples ]
+
+Fun_BOGR_shared<-subset_samples(Fun_min2_noEDGE_raw_BOGR_raw, sample_name %in% BOGR_common_names)
+Fun_BOGR_shared <- prune_taxa(taxa_sums(Fun_BOGR_shared) > 0, Fun_BOGR_shared)
+Fun_BOGR_shared
+# should be
+  # otu_table()   OTU Table:         [ 2415 taxa and 75 samples ]
+
+Bac_BOGR_shared_otu<-otu_table(Bac_BOGR_shared)
+
+# easier naming
+bac_BOGR<-Bac_BOGR_shared
+fun_BOGR<-Fun_BOGR_shared
+```
+
+### *Black grama* OTUs
+
+```{r eval=FALSE, warning=FALSE, include=F}
+BacArch_min2_noEDGE_BOER_raw<-readRDS(file = "clean_rds_saves/BacArch_min2_rare9048_noEDGE_BOER_v1.rds")
+BacArch_min2_noEDGE_BOER_raw
+# should be
+  # otu_table()   OTU Table:         [ 8374 taxa and 84 samples ]
+
+Fun_min2_noEDGE_BOER_raw<-readRDS(file = "clean_rds_saves/Fun_min2_rare10116_noEDGE_BOER_v1.rds")
+Fun_min2_noEDGE_BOER_raw
+# should be
+  # otu_table()   OTU Table:         [ 1662 taxa and 78 samples ]
+
+# subset to only the samples present in both datasets
+bac_BOER_names1<-((sample_data(BacArch_min2_noEDGE_BOER_raw))$sample_name)
+fun_BOER_names1<-((sample_data(Fun_min2_noEDGE_BOER_raw))$sample_name)
+
+BOER_common_names<-Reduce(intersect, list(bac_BOER_names1,fun_BOER_names1))
+
+Bac_BOER_shared<-subset_samples(BacArch_min2_noEDGE_BOER_raw, sample_name %in% BOER_common_names)
+Bac_BOER_shared <- prune_taxa(taxa_sums(Bac_BOER_shared) > 0, Bac_BOER_shared)
+Bac_BOER_shared
+# should be
+  # otu_table()   OTU Table:         [ 8224 taxa and 78 samples ]
+
+Fun_BOER_shared<-subset_samples(Fun_min2_noEDGE_BOER_raw, sample_name %in% BOER_common_names)
+Fun_BOER_shared <- prune_taxa(taxa_sums(Fun_BOER_shared) > 0, Fun_BOER_shared)
+Fun_BOER_shared
+# should be
+  # otu_table()   OTU Table:         [ 1662 taxa and 78 samples ]
+
+
+# easier naming
+bac_BOER<-Bac_BOER_shared
+fun_BOER<-Fun_BOER_shared
+```
+
+### *Little Bluestem* OTUs
+
+```{r eval=FALSE, warning=FALSE, include=T}
+BacArch_min2_noEDGE_SCSC_raw<-readRDS(file = "clean_rds_saves/BacArch_min2_rare9048_noEDGE_SCSC_v1.rds")
+BacArch_min2_noEDGE_SCSC_raw
+# should be
+  # otu_table()   OTU Table:         [ 17568 taxa and 174 samples ]
+
+Fun_min2_noEDGE_SCSC_raw<-readRDS(file = "clean_rds_saves/Fun_min2_rare10116_noEDGE_SCSC_v1.rds")
+Fun_min2_noEDGE_SCSC_raw
+# should be
+  # otu_table()   OTU Table:         [ 4347 taxa and 161 samples ]
+
+# subset to only the samples present in both datasets
+bac_SCSC_names1<-((sample_data(BacArch_min2_noEDGE_SCSC_raw))$sample_name)
+fun_SCSC_names1<-((sample_data(Fun_min2_noEDGE_SCSC_raw))$sample_name)
+
+SCSC_common_names<-Reduce(intersect, list(bac_SCSC_names1,fun_SCSC_names1))
+
+Bac_SCSC_shared<-subset_samples(BacArch_min2_noEDGE_SCSC_raw, sample_name %in% SCSC_common_names)
+Bac_SCSC_shared <- prune_taxa(taxa_sums(Bac_SCSC_shared) > 0, Bac_SCSC_shared)
+Bac_SCSC_shared
+# should be
+  # otu_table()   OTU Table:         [ 17022 taxa and 157 samples ]
+
+Fun_SCSC_shared<-subset_samples(Fun_min2_noEDGE_SCSC_raw, sample_name %in% SCSC_common_names)
+Fun_SCSC_shared <- prune_taxa(taxa_sums(Fun_SCSC_shared) > 0, Fun_SCSC_shared)
+Fun_SCSC_shared
+# should be
+  # otu_table()   OTU Table:         [ 4322 taxa and 157 samples ]
+
+
+# easier naming
+bac_SCSC<-Bac_SCSC_shared
+fun_SCSC<-Fun_SCSC_shared
+```
+
+### *Big Bluestem* OTUs
+
+```{r eval=FALSE, warning=FALSE, include=T}
+BacArch_min2_noEDGE_ANGE_raw<-readRDS(file = "clean_rds_saves/BacArch_min2_rare9048_noEDGE_ANGE_v1.rds")
+BacArch_min2_noEDGE_ANGE_raw
+# should be
+  # otu_table()   OTU Table:         [ 14268 taxa and 106 samples ]
+
+Fun_min2_noEDGE_ANGE_raw<-readRDS(file = "clean_rds_saves/Fun_min2_rare10116_noEDGE_ANGE_v1.rds")
+Fun_min2_noEDGE_ANGE_raw
+# should be
+  # otu_table()   OTU Table:         [ 2985 taxa and 98 samples ]
+
+# subset to only the samples present in both datasets
+bac_ANGE_names1<-((sample_data(BacArch_min2_noEDGE_ANGE_raw))$sample_name)
+fun_ANGE_names1<-((sample_data(Fun_min2_noEDGE_ANGE_raw))$sample_name)
+
+ANGE_common_names<-Reduce(intersect, list(bac_ANGE_names1,fun_ANGE_names1))
+
+Bac_ANGE_shared<-subset_samples(BacArch_min2_noEDGE_ANGE_raw, sample_name %in% ANGE_common_names)
+Bac_ANGE_shared <- prune_taxa(taxa_sums(Bac_ANGE_shared) > 0, Bac_ANGE_shared)
+Bac_ANGE_shared
+# should be
+  # otu_table()   OTU Table:         [ 13778 taxa and 95 samples ]
+
+Fun_ANGE_shared<-subset_samples(Fun_min2_noEDGE_ANGE_raw, sample_name %in% ANGE_common_names)
+Fun_ANGE_shared <- prune_taxa(taxa_sums(Fun_ANGE_shared) > 0, Fun_ANGE_shared)
+Fun_ANGE_shared
+# should be
+  # otu_table()   OTU Table:         [ 2930 taxa and 95 samples ]
+
+
+# easier naming
+bac_ANGE<-Bac_ANGE_shared
+fun_ANGE<-Fun_ANGE_shared
+```
+
+### *Buffalograss* OTUs
+
+```{r eval=FALSE, warning=FALSE, include=T}
+BacArch_min2_noEDGE_BUDA_raw<-readRDS(file = "../processed_data/clean_rds_saves/BacArch_min2_rare9048_noEDGE_BUDA_v1.rds")
+BacArch_min2_noEDGE_BUDA_raw
+# should be
+  # otu_table()   OTU Table:         [ 11048 taxa and 83 samples ]
+
+Fun_min2_noEDGE_BUDA_raw<-readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_noEDGE_BUDA_v1.rds")
+Fun_min2_noEDGE_BUDA_raw
+# should be
+  # otu_table()   OTU Table:         [ 2369 taxa and 80 samples ]
+
+# subset to only the samples present in both datasets
+bac_BUDA_names1<-((sample_data(BacArch_min2_noEDGE_BUDA_raw))$sample_name)
+fun_BUDA_names1<-((sample_data(Fun_min2_noEDGE_BUDA_raw))$sample_name)
+
+BUDA_common_names<-Reduce(intersect, list(bac_BUDA_names1,fun_BUDA_names1))
+
+Bac_BUDA_shared<-subset_samples(BacArch_min2_noEDGE_BUDA_raw, sample_name %in% BUDA_common_names)
+Bac_BUDA_shared <- prune_taxa(taxa_sums(Bac_BUDA_shared) > 0, Bac_BUDA_shared)
+Bac_BUDA_shared
+# should be
+  # otu_table()   OTU Table:         [ 10954 taxa and 79 samples ]
+
+Fun_BUDA_shared<-subset_samples(Fun_min2_noEDGE_BUDA_raw, sample_name %in% BUDA_common_names)
+Fun_BUDA_shared <- prune_taxa(taxa_sums(Fun_BUDA_shared) > 0, Fun_BUDA_shared)
+Fun_BUDA_shared
+# should be
+  # otu_table()   OTU Table:         [ 2343 taxa and 79 samples ]
+
+# easier naming
+bac_BUDA<-Bac_BUDA_shared
+fun_BUDA<-Fun_BUDA_shared
+```
+
+\
+
+------------------------------------------------------------------------
+
+\
+
+# Run generalist vs specialist code {.tabset .tabset-pills}
+
+R package: library("EcolUtils"); packageVersion("EcolUtils") #‘0.1’
+\
+
+`spec.gen(comm.tab,n=1000, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))` \
+\
+
+
+|                      |                                                                                                                                                             |
+|--------------|----------------------------------------------------------|
+| `niche.width.method` | Niche width index (from `niche.width` in **spaa**): `levins` (default) or `shannon`. Or simply the `occurrence`: the number of samples where an OTU occurs. |
+| `perm.method`        | Method for null model construction (from `permatswap` in **vegan**). Currently, only `quasiswap` (default) has been thoroughly tested.                      |
+| `n`                  | Number of permutations.                                                                                                                                     |
+| `probs`              | Probabilities for confidence interval calculations.                                                                                                         |
+
+```{r spe.gen source, eval=FALSE}
+# Extract abundance matrix from the phyloseq object
+OTU1 = as(otu_table(phylo_obj), "matrix")
+# transpose if necessary
+if(taxa_are_rows(phylo_obj)){OTU1 <- t(OTU1)}
+# Coerce to data.frame
+OTUdf = as.data.frame(OTU1)
+comm.tab<-OTUdf
+
+com_min2 <- prune_taxa(taxa_sums(phylo_obj) > 1, phylo_obj)
+comm.tabRA  = transform_sample_counts(com_min2, function(x) x / sum(x) )
+OTU2 = as(otu_table(comm.tabRA), "matrix")
+write.csv(OTU2, file="KSU_phylo_out/2_GvS_out/GvS_OTU_[].csv")
+
+OTU3 = as(tax_table(comm.tabRA), "matrix")
+write.csv(OTU3, file="KSU_phylo_out/2_GvS_out/GvS_Taxa_[].csv")
+
+comm.tab<-comm.tab[,which(colSums(comm.tab)>1)]
+res<-spec.gen(comm.tab,n=100, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))
+write.csv(res, file="KSU_phylo_out/2_GvS_out/GvS_res_[].csv")
+
+```
+
+\
+\
+
+## All Grasses {.tabset}
+
+### 16S {.unnumbered}
+
+```{r 16S AllGrasses spe.gen, eval=FALSE, echo=F}
+phylo_obj<-bac_allgrasses
+
+bac_AllGrasses_OTU1 = as(otu_table(phylo_obj), "matrix")
+if(taxa_are_rows(phylo_obj)){bac_AllGrasses_OTU1 <- t(bac_AllGrasses_OTU1)}
+bac_AllGrasses_OTUdf = as.data.frame(bac_AllGrasses_OTU1)
+bac_AllGrasses_comm.tab<-bac_AllGrasses_OTUdf
+
+com_min2_AllGrasses <- prune_taxa(taxa_sums(phylo_obj) > 1, phylo_obj)
+bac_AllGrasses_comm.tabRA  = transform_sample_counts(com_min2_AllGrasses, function(x) x / sum(x) )
+bac_AllGrasses_OTU2 = as(otu_table(bac_AllGrasses_comm.tabRA), "matrix")
+write.csv(bac_AllGrasses_OTU2, file="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_OTU_16S_AllGrasses_relabund.csv")
+
+bac_AllGrasses_OTU3 = as(tax_table(bac_AllGrasses_comm.tabRA), "matrix")
+write.csv(bac_AllGrasses_OTU3, file="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Taxa_16S_AllGrasses.csv")
+
+bac_AllGrasses_comm.tab<-bac_AllGrasses_comm.tab[,which(colSums(bac_AllGrasses_comm.tab)>1)]
+
+bac_AllGrasses_res_nperm100<-spec.gen(bac_AllGrasses_comm.tab,n=100, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))
+
+library(plyr)
+bac_AllGrasses_res_nperm100$sign<-revalue(bac_AllGrasses_res_nperm100$sign, c("SPECIALIST"="Specialists", "GENERALIST"="Generalists"
+             , "NON SIGNIFICANT"="NS"))
+
+write.csv(bac_AllGrasses_res_nperm100, file="KSU_phylo_out/2_GvS_out/GvS_AllGrasses/GvS_Res_16S_AllGrasses_nperm100.csv")
+
+# remake phyloseq object
+bac_AllGrasses_comm.tab.bin<-ceiling(bac_AllGrasses_comm.tab/max(bac_AllGrasses_comm.tab))
+# ncol(bac_AllGrasses_comm.tab.bin)
+
+bac_AllGrasses_OA<-data.frame(matrix(ncol = 3, nrow = ncol(bac_AllGrasses_comm.tab.bin)))
+x <- c("Abundance", "Occurrence", "sign")
+colnames(bac_AllGrasses_OA) <- x
+bac_AllGrasses_OA$Abundance<-(colSums(bac_AllGrasses_comm.tab))
+bac_AllGrasses_OA$Occurrence<-(colSums(bac_AllGrasses_comm.tab.bin)/dim(bac_AllGrasses_comm.tab.bin)[1])
+bac_AllGrasses_OA$sign<-bac_AllGrasses_res_nperm100$sign
+# levels(bac_AllGrasses_OA$sign)
+
+bac_AllGrasses_min2 <- prune_taxa(taxa_sums(bac_allgrasses) > 1, bac_allgrasses)
+bac_AllGrasses_min2.OTUtab <- otu_table(bac_AllGrasses_min2, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+
+bac_AllGrasses_tax_results1<-cbind(bac_AllGrasses_OTU3, bac_AllGrasses_OA)
+colnames(bac_AllGrasses_tax_results1)[8] <- "Abundance_count"
+bac_AllGrasses_tax_results2<-subset(bac_AllGrasses_tax_results1, select=-c(Abundance_count,Occurrence))
+bac_AllGrasses_tax_table.mat<-as.matrix(bac_AllGrasses_tax_results2)
+bac_AllGrasses_tax_table<-tax_table(bac_AllGrasses_tax_table.mat)
+
+# subset to generalists
+bac_AllGrasses_min2_GvS_counts <- phyloseq(bac_AllGrasses_min2.OTUtab,  bac_AllGrasses_tax_table)
+bac_AllGrasses_min2_GvS.RA  = transform_sample_counts(bac_AllGrasses_min2_GvS_counts, function(x) x / sum(x) )
+bac_AllGrasses_generalists1<-subset_taxa(bac_AllGrasses_min2_GvS.RA, sign=="Generalists")
+# otu_table()   OTU Table:         [ 360 taxa and 86 samples ]
+# tax_table()   Taxonomy Table:    [ 360 taxa by 8 taxonomic ranks ]
+
+# export OTU table with relative abundance
+write.csv(as.data.frame(otu_table(bac_AllGrasses_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_AllGrasses/Generalist_AllGrasses_16S_OTUtab_RA.csv")
+
+# export taxa table 
+write.csv(as.data.frame(tax_table(bac_AllGrasses_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_AllGrasses/Generalist_AllGrasses_16S_taxonomy.csv")
+
+
+sampledata_16S_AllGrasses<-as(sample_data(Bac_allgrasses_shared), "data.frame")
+
+write.csv(sampledata_16S_AllGrasses,file="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_sampledata_16S_AllGrasses.csv")
+```
+
+Generalists: 2,145 OTUs\
+Specialists: 5,140 OTUs\
+
+
+### ITS {.unnumbered}
+
+```{r ITS AllGrasses spe.gen, eval=FALSE, echo=F}
+phylo_obj<-fun_allgrasses
+
+fun_AllGrasses_OTU1 = as(otu_table(phylo_obj), "matrix")
+if(taxa_are_rows(phylo_obj)){fun_AllGrasses_OTU1 <- t(fun_AllGrasses_OTU1)}
+fun_AllGrasses_OTUdf = as.data.frame(fun_AllGrasses_OTU1)
+fun_AllGrasses_comm.tab<-fun_AllGrasses_OTUdf
+
+com_min2_AllGrasses <- prune_taxa(taxa_sums(phylo_obj) > 1, phylo_obj)
+fun_AllGrasses_comm.tabRA  = transform_sample_counts(com_min2_AllGrasses, function(x) x / sum(x) )
+fun_AllGrasses_OTU2 = as(otu_table(fun_AllGrasses_comm.tabRA), "matrix")
+write.csv(fun_AllGrasses_OTU2, file="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_OTU_ITS_AllGrasses_relabund.csv")
+
+fun_AllGrasses_OTU3 = as(tax_table(fun_AllGrasses_comm.tabRA), "matrix")
+write.csv(fun_AllGrasses_OTU3, file="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Taxa_ITS_AllGrasses.csv")
+
+fun_AllGrasses_comm.tab<-fun_AllGrasses_comm.tab[,which(colSums(fun_AllGrasses_comm.tab)>1)]
+
+fun_AllGrasses_res_nperm100<-spec.gen(fun_AllGrasses_comm.tab,n=100, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))
+
+library(plyr)
+fun_AllGrasses_res_nperm100$sign<-revalue(fun_AllGrasses_res_nperm100$sign, c("SPECIALIST"="Specialists", "GENERALIST"="Generalists"
+             , "NON SIGNIFICANT"="NS"))
+
+write.csv(fun_AllGrasses_res_nperm100, file="KSU_phylo_out/2_GvS_out/GvS_AllGrasses/GvS_Res_ITS_AllGrasses_nperm100.csv")
+
+# remake phyloseq object
+fun_AllGrasses_comm.tab.bin<-ceiling(fun_AllGrasses_comm.tab/max(fun_AllGrasses_comm.tab))
+# ncol(fun_AllGrasses_comm.tab.bin)
+
+fun_AllGrasses_OA<-data.frame(matrix(ncol = 3, nrow = ncol(fun_AllGrasses_comm.tab.bin)))
+x <- c("Abundance", "Occurrence", "sign")
+colnames(fun_AllGrasses_OA) <- x
+fun_AllGrasses_OA$Abundance<-(colSums(fun_AllGrasses_comm.tab))
+fun_AllGrasses_OA$Occurrence<-(colSums(fun_AllGrasses_comm.tab.bin)/dim(fun_AllGrasses_comm.tab.bin)[1])
+fun_AllGrasses_OA$sign<-fun_AllGrasses_res_nperm100$sign
+# levels(fun_AllGrasses_OA$sign)
+
+fun_AllGrasses_min2 <- prune_taxa(taxa_sums(fun_allgrasses) > 1, fun_allgrasses)
+fun_AllGrasses_min2.OTUtab <- otu_table(fun_AllGrasses_min2, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+
+fun_AllGrasses_tax_results1<-cbind(fun_AllGrasses_OTU3, fun_AllGrasses_OA)
+colnames(fun_AllGrasses_tax_results1)[8] <- "Abundance_count"
+fun_AllGrasses_tax_results2<-subset(fun_AllGrasses_tax_results1, select=-c(Abundance_count,Occurrence))
+fun_AllGrasses_tax_table.mat<-as.matrix(fun_AllGrasses_tax_results2)
+fun_AllGrasses_tax_table<-tax_table(fun_AllGrasses_tax_table.mat)
+
+# subset to generalists
+fun_AllGrasses_min2_GvS_counts <- phyloseq(fun_AllGrasses_min2.OTUtab,  fun_AllGrasses_tax_table)
+fun_AllGrasses_min2_GvS.RA  = transform_sample_counts(fun_AllGrasses_min2_GvS_counts, function(x) x / sum(x) )
+fun_AllGrasses_generalists1<-subset_taxa(fun_AllGrasses_min2_GvS.RA, sign=="Generalists")
+# otu_table()   OTU Table:         [ 360 taxa and 86 samples ]
+# tax_table()   Taxonomy Table:    [ 360 taxa by 8 taxonomic ranks ]
+
+# export OTU table with relative abundance
+write.csv(as.data.frame(otu_table(fun_AllGrasses_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_AllGrasses/Generalist_AllGrasses_ITS_OTUtab_RA.csv")
+
+# export taxa table 
+write.csv(as.data.frame(tax_table(fun_AllGrasses_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_AllGrasses/Generalist_AllGrasses_ITS_taxonomy.csv")
+
+
+sampledata_ITS_AllGrasses<-as(sample_data(Fun_allgrasses_shared), "data.frame")
+
+write.csv(sampledata_ITS_AllGrasses,file="../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_sampledata_ITS_AllGrasses.csv")
+```
+
+Generalists: 896 OTUs\
+Specialists: 1,803 OTUs\
+
+## BOGR (*B. gracilis* / Blue grama) {.tabset}
+
+### 16S {.unnumbered}
+
+```{r 16S Bluegrama spe.gen, eval=FALSE, echo=F}
+phylo_obj<-bac_BOGR
+
+bac_BOGR_OTU1 = as(otu_table(phylo_obj), "matrix")
+if(taxa_are_rows(phylo_obj)){bac_BOGR_OTU1 <- t(bac_BOGR_OTU1)}
+bac_BOGR_OTUdf = as.data.frame(bac_BOGR_OTU1)
+bac_BOGR_comm.tab<-bac_BOGR_OTUdf
+
+com_min2_BOGR <- prune_taxa(taxa_sums(phylo_obj) > 1, phylo_obj)
+bac_BOGR_comm.tabRA  = transform_sample_counts(com_min2_BOGR, function(x) x / sum(x) )
+bac_BOGR_OTU2 = as(otu_table(bac_BOGR_comm.tabRA), "matrix")
+write.csv(bac_BOGR_OTU2, file="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_OTU_16S_BOGR_relabund.csv")
+
+bac_BOGR_OTU3 = as(tax_table(bac_BOGR_comm.tabRA), "matrix")
+write.csv(bac_BOGR_OTU3, file="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_Taxa_16S_BOGR.csv")
+
+bac_BOGR_comm.tab<-bac_BOGR_comm.tab[,which(colSums(bac_BOGR_comm.tab)>1)]
+
+bac_BOGR_res_nperm500<-spec.gen(bac_BOGR_comm.tab,n=500, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))
+
+bac_BOGR_res_nperm500$sign<-revalue(bac_BOGR_res_nperm500$sign, c("SPECIALIST"="Specialists", "GENERALIST"="Generalists", "NON SIGNIFICANT"="NS"))
+
+write.csv(bac_BOGR_res_nperm500, file="KSU_phylo_out/2_GvS_out/GvS_Bluegrama/GvS_Res_16S_BOGR_nperm500.csv")
+
+# remake phyloseq object
+bac_BOGR_comm.tab.bin<-ceiling(bac_BOGR_comm.tab/max(bac_BOGR_comm.tab))
+# ncol(bac_BOGR_comm.tab.bin)
+
+bac_BOGR_OA<-data.frame(matrix(ncol = 3, nrow = ncol(bac_BOGR_comm.tab.bin)))
+x <- c("Abundance", "Occurrence", "sign")
+colnames(bac_BOGR_OA) <- x
+bac_BOGR_OA$Abundance<-(colSums(bac_BOGR_comm.tab))
+bac_BOGR_OA$Occurrence<-(colSums(bac_BOGR_comm.tab.bin)/dim(bac_BOGR_comm.tab.bin)[1])
+bac_BOGR_OA$sign<-bac_BOGR_res_nperm500$sign
+# levels(bac_BOGR_OA$sign)
+
+bac_BOGR_min2 <- prune_taxa(taxa_sums(bac_BOGR) > 1, bac_BOGR)
+bac_BOGR_min2.OTUtab <- otu_table(bac_BOGR_min2, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+
+bac_BOGR_tax_results1<-cbind(bac_BOGR_OTU3, bac_BOGR_OA)
+colnames(bac_BOGR_tax_results1)[7] <- "Abundance_count"
+bac_BOGR_tax_results2<-subset(bac_BOGR_tax_results1, select=-c(Abundance_count,Occurrence))
+bac_BOGR_tax_table.mat<-as.matrix(bac_BOGR_tax_results2)
+bac_BOGR_tax_table<-tax_table(bac_BOGR_tax_table.mat)
+
+# subset to generalists
+bac_BOGR_min2_GvS_counts <- phyloseq(bac_BOGR_min2.OTUtab,  bac_BOGR_tax_table)
+bac_BOGR_min2_GvS.RA  = transform_sample_counts(bac_BOGR_min2_GvS_counts, function(x) x / sum(x) )
+bac_BOGR_generalists1<-subset_taxa(bac_BOGR_min2_GvS.RA, sign=="Generalists")
+bac_BOGR_generalists1
+# otu_table()   OTU Table:         [ 788 taxa and 75 samples ]
+# tax_table()   Taxonomy Table:    [ 788 taxa by 7 taxonomic ranks ]
+
+# export OTU table with relative abundance
+write.csv(as.data.frame(otu_table(bac_BOGR_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_Bluegrama/Generalist_Bluegrama_16S_OTUtab_RA.csv")
+
+# export taxa table 
+write.csv(as.data.frame(tax_table(bac_BOGR_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_Bluegrama/Generalist_Bluegrama_16S_taxonomy.csv")
+
+sampledata_16S_BOGR<-as(sample_data(Bac_BOGR_shared), "data.frame")
+
+write.csv(sampledata_16S_BOGR,file="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_sampledata_16S_BOGR.csv")
+```
+
+Generalists: 788 OTUs\
+Specialists: 1,113 OTUs\
+
+### ITS {.unnumbered}
+
+```{r ITS Bluegrama spe.gen, eval=FALSE, echo=F}
+phylo_obj<-fun_BOGR
+
+fun_BOGR_OTU1 = as(otu_table(phylo_obj), "matrix")
+if(taxa_are_rows(phylo_obj)){fun_BOGR_OTU1 <- t(fun_BOGR_OTU1)}
+fun_BOGR_OTUdf = as.data.frame(fun_BOGR_OTU1)
+fun_BOGR_comm.tab<-fun_BOGR_OTUdf
+
+com_min2_BOGR <- prune_taxa(taxa_sums(phylo_obj) > 1, phylo_obj)
+fun_BOGR_comm.tabRA  = transform_sample_counts(com_min2_BOGR, function(x) x / sum(x) )
+fun_BOGR_OTU2 = as(otu_table(fun_BOGR_comm.tabRA), "matrix")
+write.csv(fun_BOGR_OTU2, file="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_OTU_ITS_BOGR_relabund.csv")
+
+fun_BOGR_OTU3 = as(tax_table(fun_BOGR_comm.tabRA), "matrix")
+write.csv(fun_BOGR_OTU3, file="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_Taxa_ITS_BOGR.csv")
+
+fun_BOGR_comm.tab<-fun_BOGR_comm.tab[,which(colSums(fun_BOGR_comm.tab)>1)]
+
+fun_BOGR_res_nperm500<-spec.gen(fun_BOGR_comm.tab,n=500, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))
+
+fun_BOGR_res_nperm500$sign<-revalue(fun_BOGR_res_nperm500$sign, c("SPECIALIST"="Specialists", "GENERALIST"="Generalists"
+                                                                  , "NON SIGNIFICANT"="NS"))
+
+write.csv(fun_BOGR_res_nperm500, file="KSU_phylo_out/2_GvS_out/GvS_Bluegrama/GvS_Res_ITS_BOGR_nperm500.csv")
+
+# remake phyloseq object
+fun_BOGR_comm.tab.bin<-ceiling(fun_BOGR_comm.tab/max(fun_BOGR_comm.tab))
+# ncol(fun_BOGR_comm.tab.bin)
+
+fun_BOGR_OA<-data.frame(matrix(ncol = 3, nrow = ncol(fun_BOGR_comm.tab.bin)))
+x <- c("Abundance", "Occurrence", "sign")
+colnames(fun_BOGR_OA) <- x
+fun_BOGR_OA$Abundance<-(colSums(fun_BOGR_comm.tab))
+fun_BOGR_OA$Occurrence<-(colSums(fun_BOGR_comm.tab.bin)/dim(fun_BOGR_comm.tab.bin)[1])
+fun_BOGR_OA$sign<-fun_BOGR_res_nperm500$sign
+# levels(fun_BOGR_OA$sign)
+
+fun_BOGR_min2 <- prune_taxa(taxa_sums(fun_BOGR) > 1, fun_BOGR)
+fun_BOGR_min2.OTUtab <- otu_table(fun_BOGR_min2, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+
+fun_BOGR_tax_results1<-cbind(fun_BOGR_OTU3, fun_BOGR_OA)
+colnames(fun_BOGR_tax_results1)[8] <- "Abundance_count"
+fun_BOGR_tax_results2<-subset(fun_BOGR_tax_results1, select=-c(Abundance_count,Occurrence))
+fun_BOGR_tax_table.mat<-as.matrix(fun_BOGR_tax_results2)
+fun_BOGR_tax_table<-tax_table(fun_BOGR_tax_table.mat)
+
+# subset to generalists
+fun_BOGR_min2_GvS_counts <- phyloseq(fun_BOGR_min2.OTUtab,  fun_BOGR_tax_table)
+fun_BOGR_min2_GvS.RA  = transform_sample_counts(fun_BOGR_min2_GvS_counts, function(x) x / sum(x) )
+fun_BOGR_generalists1<-subset_taxa(fun_BOGR_min2_GvS.RA, sign=="Generalists")
+fun_BOGR_generalists1
+# otu_table()   OTU Table:         [ 286 taxa and 75 samples ]
+# tax_table()   Taxonomy Table:    [ 286 taxa by 8 taxonomic ranks ]
+
+# export OTU table with relative abundance
+write.csv(as.data.frame(otu_table(fun_BOGR_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_Bluegrama/Generalist_Bluegrama_ITS_OTUtab_RA.csv")
+
+# export taxa table 
+write.csv(as.data.frame(tax_table(fun_BOGR_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_Bluegrama/Generalist_Bluegrama_ITS_taxonomy.csv")
+
+
+sampledata_ITS_BOGR<-as(sample_data(Fun_BOGR_shared), "data.frame")
+
+write.csv(sampledata_ITS_BOGR,file="../processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_sampledata_ITS_BOGR.csv")
+```
+
+Generalists: 286 OTUs\
+Specialists: 300 OTUs\
+
+## BOER (*B. eriopoda* / Black grama) {.tabset}
+
+### 16S {.unnumbered}
+
+```{r 16S Blackgrama spe.gen, eval=FALSE, echo=F}
+phylo_obj<-bac_BOER
+
+bac_OTU1 = as(otu_table(phylo_obj), "matrix")
+if(taxa_are_rows(phylo_obj)){bac_OTU1 <- t(bac_OTU1)}
+bac_OTUdf = as.data.frame(bac_OTU1)
+bac_comm.tab<-bac_OTUdf
+
+com_min2 <- prune_taxa(taxa_sums(phylo_obj) > 1, phylo_obj)
+bac_comm.tabRA  = transform_sample_counts(com_min2, function(x) x / sum(x) )
+bac_OTU2 = as(otu_table(bac_comm.tabRA), "matrix")
+write.csv(bac_OTU2, file="KSU_phylo_out/2_GvS_out/GvS_Blackgrama/GvS_OTU_16S.csv")
+
+bac_OTU3 = as(tax_table(bac_comm.tabRA), "matrix")
+write.csv(bac_OTU3, file="KSU_phylo_out/2_GvS_out/GvS_Blackgrama/GvS_Taxa_16S.csv")
+
+bac_comm.tab<-bac_comm.tab[,which(colSums(bac_comm.tab)>1)]
+bac_res_nperm500<-spec.gen(bac_comm.tab,n=500, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))
+
+bac_res_nperm500$sign<-revalue(bac_res_nperm500$sign, c("SPECIALIST"="Specialists", "GENERALIST"="Generalists"
+             , "NON SIGNIFICANT"="NS"))
+
+
+write.csv(bac_res_nperm500, file="KSU_phylo_out/2_GvS_out/GvS_Blackgrama/GvS_Res_16S_nperm500.csv")
+
+# remake phyloseq object
+bac_comm.tab.bin<-ceiling(bac_comm.tab/max(bac_comm.tab))
+ncol(bac_comm.tab.bin)
+
+bac_OA<-data.frame(matrix(ncol = 3, nrow = ncol(bac_comm.tab.bin)))
+x <- c("Abundance", "Occurrence", "sign")
+colnames(bac_OA) <- x
+bac_OA$Abundance<-(colSums(bac_comm.tab))
+bac_OA$Occurrence<-(colSums(bac_comm.tab.bin)/dim(bac_comm.tab.bin)[1])
+bac_OA$sign<-bac_res_nperm500$sign
+#levels(bac_OA$sign)
+
+bac_BOER_min2 <- prune_taxa(taxa_sums(bac_BOER) > 1, bac_BOER)
+bac_BOER_min2.OTUtab <- otu_table(bac_BOER_min2, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+
+bac_BOER_tax_results1<-cbind(bac_OTU3, bac_OA)
+colnames(bac_BOER_tax_results1)[7] <- "Abundance_count"
+bac_BOER_tax_results2<-subset(bac_BOER_tax_results1, select=-c(Abundance_count,Occurrence))
+bac_BOER_tax_table.mat<-as.matrix(bac_BOER_tax_results2)
+bac_BOER_tax_table<-tax_table(bac_BOER_tax_table.mat)
+
+# subset to generalists
+bac_BOER_min2_GvS_counts <- phyloseq(bac_BOER_min2.OTUtab,  bac_BOER_tax_table)
+bac_BOER_min2_GvS.RA  = transform_sample_counts(bac_BOER_min2_GvS_counts, function(x) x / sum(x) )
+bac_BOER_generalists1<-subset_taxa(bac_BOER_min2_GvS.RA, sign=="Generalists")
+bac_BOER_generalists1
+# otu_table()   OTU Table:         [ 828 taxa and 78 samples ]
+
+
+# export OTU table with relative abundance
+write.csv(as.data.frame(otu_table(bac_BOER_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_Blackgrama/Generalist_Blackgrama_16S_OTUtab_RA.csv")
+
+# export taxa table 
+write.csv(as.data.frame(tax_table(bac_BOER_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_Blackgrama/Generalist_Blackgrama_16S_taxonomy.csv")
+```
+
+### ITS {.unnumbered}
+
+```{r ITS Blackgrama spe.gen, eval=FALSE, echo=F}
+phylo_obj<-fun_BOER
+
+fun_OTU1 = as(otu_table(phylo_obj), "matrix")
+if(taxa_are_rows(phylo_obj)){fun_OTU1 <- t(fun_OTU1)}
+fun_OTUdf = as.data.frame(fun_OTU1)
+fun_comm.tab<-fun_OTUdf
+
+com_min2 <- prune_taxa(taxa_sums(phylo_obj) > 1, phylo_obj)
+fun_comm.tabRA  = transform_sample_counts(com_min2, function(x) x / sum(x) )
+fun_OTU2 = as(otu_table(fun_comm.tabRA), "matrix")
+write.csv(fun_OTU2, file="KSU_phylo_out/2_GvS_out/GvS_Blackgrama/GvS_OTU_ITS.csv")
+
+fun_OTU3 = as(tax_table(fun_comm.tabRA), "matrix")
+write.csv(fun_OTU3, file="KSU_phylo_out/2_GvS_out/GvS_Blackgrama/GvS_Taxa_ITS.csv")
+
+fun_comm.tab<-fun_comm.tab[,which(colSums(fun_comm.tab)>1)]
+
+fun_BOER_res_nperm500<-spec.gen(fun_comm.tab,n=500, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))
+
+fun_BOER_res_nperm500$sign<-revalue(fun_BOER_res_nperm500$sign, c("SPECIALIST"="Specialists", "GENERALIST"="Generalists"
+             , "NON SIGNIFICANT"="NS"))
+
+write.csv(fun_BOER_res_nperm500, file="KSU_phylo_out/2_GvS_out/GvS_Blackgrama/GvS_Res_ITS_nperm500.csv")
+
+# remake phyloseq object
+fun_BOER_comm.tab.bin<-ceiling(fun_comm.tab/max(fun_comm.tab))
+# ncol(fun_BOER_comm.tab.bin)
+
+fun_BOER_OA<-data.frame(matrix(ncol = 3, nrow = ncol(fun_BOER_comm.tab.bin)))
+x <- c("Abundance", "Occurrence", "sign")
+colnames(fun_BOER_OA) <- x
+fun_BOER_OA$Abundance<-(colSums(fun_comm.tab))
+fun_BOER_OA$Occurrence<-(colSums(fun_BOER_comm.tab.bin)/dim(fun_BOER_comm.tab.bin)[1])
+fun_BOER_OA$sign<-fun_BOER_res_nperm500$sign
+# levels(fun_BOER_OA$sign)
+
+fun_BOER_min2 <- prune_taxa(taxa_sums(fun_BOER) > 1, fun_BOER)
+fun_BOER_min2.OTUtab <- otu_table(fun_BOER_min2, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+
+fun_BOER_tax_results1<-cbind(fun_OTU3, fun_BOER_OA)
+colnames(fun_BOER_tax_results1)[8] <- "Abundance_count"
+fun_BOER_tax_results2<-subset(fun_BOER_tax_results1, select=-c(Abundance_count,Occurrence))
+fun_BOER_tax_table.mat<-as.matrix(fun_BOER_tax_results2)
+fun_BOER_tax_table<-tax_table(fun_BOER_tax_table.mat)
+
+# subset to generalists
+fun_BOER_min2_GvS_counts <- phyloseq(fun_BOER_min2.OTUtab,  fun_BOER_tax_table)
+fun_BOER_min2_GvS.RA  = transform_sample_counts(fun_BOER_min2_GvS_counts, function(x) x / sum(x) )
+fun_BOER_generalists1<-subset_taxa(fun_BOER_min2_GvS.RA, sign=="Generalists")
+fun_BOER_generalists1
+# otu_table()   OTU Table:         [ 251 taxa and 78 samples ]
+
+# export OTU table with relative abundance
+write.csv(as.data.frame(otu_table(fun_BOER_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_Blackgrama/Generalist_Blackgrama_ITS_OTUtab_RA.csv")
+
+# export taxa table 
+write.csv(as.data.frame(tax_table(fun_BOER_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_Blackgrama/Generalist_Blackgrama_ITS_taxonomy.csv")
+```
+
+\
+\
+
+## SCSC (*Schizachyrium scoparium* / Little bluestem) {.tabset}
+
+### 16S {.unnumbered}
+
+```{r 16S LittleBluestem spe.gen, eval=FALSE, echo=F}
+phylo_obj<-bac_SCSC
+
+bac_OTU1 = as(otu_table(phylo_obj), "matrix")
+if(taxa_are_rows(phylo_obj)){bac_OTU1 <- t(bac_OTU1)}
+bac_OTUdf = as.data.frame(bac_OTU1)
+bac_comm.tab<-bac_OTUdf
+
+com_min2 <- prune_taxa(taxa_sums(phylo_obj) > 1, phylo_obj)
+bac_comm.tabRA  = transform_sample_counts(com_min2, function(x) x / sum(x) )
+bac_OTU2 = as(otu_table(bac_comm.tabRA), "matrix")
+write.csv(bac_OTU2, file="KSU_phylo_out/2_GvS_out/GvS_LittleBluestem/GvS_OTU_16S.csv")
+
+bac_OTU3 = as(tax_table(bac_comm.tabRA), "matrix")
+write.csv(bac_OTU3, file="KSU_phylo_out/2_GvS_out/GvS_LittleBluestem/GvS_Taxa_16S.csv")
+
+bac_comm.tab<-bac_comm.tab[,which(colSums(bac_comm.tab)>1)]
+bac_SCSC_res_nperm500<-spec.gen(bac_comm.tab,n=500, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))
+
+bac_SCSC_res_nperm500$sign<-revalue(bac_SCSC_res_nperm500$sign, c("SPECIALIST"="Specialists", "GENERALIST"="Generalists"
+             , "NON SIGNIFICANT"="NS"))
+
+
+write.csv(bac_SCSC_res_nperm500, file="KSU_phylo_out/2_GvS_out/GvS_LittleBluestem/GvS_Res_16S_SCSC_nperm500.csv")
+
+# remake phyloseq object
+bac_SCSC_comm.tab.bin<-ceiling(bac_comm.tab/max(bac_comm.tab))
+ncol(bac_SCSC_comm.tab.bin)
+
+bac_SCSC_OA<-data.frame(matrix(ncol = 3, nrow = ncol(bac_SCSC_comm.tab.bin)))
+x <- c("Abundance", "Occurrence", "sign")
+colnames(bac_SCSC_OA) <- x
+bac_SCSC_OA$Abundance<-(colSums(bac_comm.tab))
+bac_SCSC_OA$Occurrence<-(colSums(bac_SCSC_comm.tab.bin)/dim(bac_SCSC_comm.tab.bin)[1])
+bac_SCSC_OA$sign<-bac_SCSC_res_nperm500$sign
+#levels(bac_SCSC_OA$sign)
+
+bac_SCSC_min2 <- prune_taxa(taxa_sums(bac_SCSC) > 1, bac_SCSC)
+bac_SCSC_min2.OTUtab <- otu_table(bac_SCSC_min2, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+
+bac_SCSC_tax_results1<-cbind(bac_OTU3, bac_SCSC_OA)
+colnames(bac_SCSC_tax_results1)[7] <- "Abundance_count"
+bac_SCSC_tax_results2<-subset(bac_SCSC_tax_results1, select=-c(Abundance_count,Occurrence))
+bac_SCSC_tax_table.mat<-as.matrix(bac_SCSC_tax_results2)
+bac_SCSC_tax_table<-tax_table(bac_SCSC_tax_table.mat)
+
+# subset to generalists
+bac_SCSC_min2_GvS_counts <- phyloseq(bac_SCSC_min2.OTUtab,  bac_SCSC_tax_table)
+bac_SCSC_min2_GvS.RA  = transform_sample_counts(bac_SCSC_min2_GvS_counts, function(x) x / sum(x) )
+bac_SCSC_generalists1<-subset_taxa(bac_SCSC_min2_GvS.RA, sign=="Generalists")
+# otu_table()   OTU Table:         [ 1458 taxa and 157 samples ]
+# tax_table()   Taxonomy Table:    [ 1458 taxa by 7 taxonomic ranks ]
+
+# export OTU table with relative abundance
+write.csv(as.data.frame(otu_table(bac_SCSC_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_LittleBluestem/Generalist_LittleBluestem_16S_OTUtab_RA.csv")
+
+# export taxa table 
+write.csv(as.data.frame(tax_table(bac_SCSC_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_LittleBluestem/Generalist_LittleBluestem_16S_taxonomy.csv")
+```
+
+### ITS {.unnumbered}
+
+```{r ITS LittleBluestem spe.gen, eval=FALSE, echo=F}
+phylo_obj<-fun_SCSC
+
+fun_SCSC_OTU1 = as(otu_table(phylo_obj), "matrix")
+if(taxa_are_rows(phylo_obj)){fun_SCSC_OTU1 <- t(fun_SCSC_OTU1)}
+fun_SCSC_OTUdf = as.data.frame(fun_SCSC_OTU1)
+fun_SCSC_comm.tab<-fun_SCSC_OTUdf
+
+com_min2_SCSC <- prune_taxa(taxa_sums(phylo_obj) > 1, phylo_obj)
+fun_SCSC_comm.tabRA  = transform_sample_counts(com_min2_SCSC, function(x) x / sum(x) )
+fun_SCSC_OTU2 = as(otu_table(fun_SCSC_comm.tabRA), "matrix")
+write.csv(fun_SCSC_OTU2, file="KSU_phylo_out/2_GvS_out/GvS_LittleBluestem/GvS_OTU_ITS_SCSC.csv")
+
+fun_SCSC_OTU3 = as(tax_table(fun_SCSC_comm.tabRA), "matrix")
+write.csv(fun_SCSC_OTU3, file="KSU_phylo_out/2_GvS_out/GvS_LittleBluestem/GvS_Taxa_ITS_SCSC.csv")
+
+fun_SCSC_comm.tab<-fun_SCSC_comm.tab[,which(colSums(fun_SCSC_comm.tab)>1)]
+
+fun_SCSC_res_nperm500_B<-spec.gen(fun_SCSC_comm.tab,n=500, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))
+
+fun_SCSC_res_nperm500<-fun_SCSC_res_nperm500_B
+
+fun_SCSC_res_nperm500$sign<-revalue(fun_SCSC_res_nperm500$sign, c("SPECIALIST"="Specialists", "GENERALIST"="Generalists"
+             , "NON SIGNIFICANT"="NS"))
+
+write.csv(fun_SCSC_res_nperm500, file="KSU_phylo_out/2_GvS_out/GvS_LittleBluestem/GvS_Res_ITS_SCSC_nperm500.csv")
+
+# remake phyloseq object
+fun_SCSC_comm.tab.bin<-ceiling(fun_SCSC_comm.tab/max(fun_SCSC_comm.tab))
+# ncol(fun_SCSC_comm.tab.bin)
+
+fun_SCSC_OA<-data.frame(matrix(ncol = 3, nrow = ncol(fun_SCSC_comm.tab.bin)))
+x <- c("Abundance", "Occurrence", "sign")
+colnames(fun_SCSC_OA) <- x
+fun_SCSC_OA$Abundance<-(colSums(fun_SCSC_comm.tab))
+fun_SCSC_OA$Occurrence<-(colSums(fun_SCSC_comm.tab.bin)/dim(fun_SCSC_comm.tab.bin)[1])
+fun_SCSC_OA$sign<-fun_SCSC_res_nperm500$sign
+# levels(fun_SCSC_OA$sign)
+
+fun_SCSC_min2 <- prune_taxa(taxa_sums(fun_SCSC) > 1, fun_SCSC)
+fun_SCSC_min2.OTUtab <- otu_table(fun_SCSC_min2, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+
+fun_SCSC_tax_results1<-cbind(fun_SCSC_OTU3, fun_SCSC_OA)
+colnames(fun_SCSC_tax_results1)[8] <- "Abundance_count"
+fun_SCSC_tax_results2<-subset(fun_SCSC_tax_results1, select=-c(Abundance_count,Occurrence))
+fun_SCSC_tax_table.mat<-as.matrix(fun_SCSC_tax_results2)
+fun_SCSC_tax_table<-tax_table(fun_SCSC_tax_table.mat)
+
+# subset to generalists
+fun_SCSC_min2_GvS_counts <- phyloseq(fun_SCSC_min2.OTUtab,  fun_SCSC_tax_table)
+fun_SCSC_min2_GvS.RA  = transform_sample_counts(fun_SCSC_min2_GvS_counts, function(x) x / sum(x) )
+fun_SCSC_generalists1<-subset_taxa(fun_SCSC_min2_GvS.RA, sign=="Generalists")
+# otu_table()   OTU Table:         [ 527 taxa and 157 samples ]
+# tax_table()   Taxonomy Table:    [ 527 taxa by 8 taxonomic ranks ]
+
+# export OTU table with relative abundance
+write.csv(as.data.frame(otu_table(fun_SCSC_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_LittleBluestem/Generalist_LittleBluestem_ITS_OTUtab_RA.csv")
+
+# export taxa table 
+write.csv(as.data.frame(tax_table(fun_SCSC_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_LittleBluestem/Generalist_LittleBluestem_ITS_taxonomy.csv")
+```
+
+\
+\
+
+## ANGE (*Andropogon gerardii* / Big bluestem) {.tabset}
+
+### 16S {.unnumbered}
+
+```{r 16S BigBluestem spe.gen, eval=FALSE, echo=F}
+phylo_obj<-bac_ANGE
+
+bac_ANGE_OTU1 = as(otu_table(phylo_obj), "matrix")
+if(taxa_are_rows(phylo_obj)){bac_ANGE_OTU1 <- t(bac_ANGE_OTU1)}
+bac_ANGE_OTUdf = as.data.frame(bac_ANGE_OTU1)
+bac_ANGE_comm.tab<-bac_ANGE_OTUdf
+
+com_min2_ANGE <- prune_taxa(taxa_sums(phylo_obj) > 1, phylo_obj)
+bac_ANGE_comm.tabRA  = transform_sample_counts(com_min2_ANGE, function(x) x / sum(x) )
+bac_ANGE_OTU2 = as(otu_table(bac_ANGE_comm.tabRA), "matrix")
+write.csv(bac_ANGE_OTU2, file="KSU_phylo_out/2_GvS_out/GvS_BigBluestem/GvS_OTU_16S_ANGE.csv")
+
+bac_ANGE_OTU3 = as(tax_table(bac_ANGE_comm.tabRA), "matrix")
+write.csv(bac_ANGE_OTU3, file="KSU_phylo_out/2_GvS_out/GvS_BigBluestem/GvS_Taxa_16S_ANGE.csv")
+
+bac_ANGE_comm.tab<-bac_ANGE_comm.tab[,which(colSums(bac_ANGE_comm.tab)>1)]
+
+bac_ANGE_res_nperm500<-spec.gen(bac_ANGE_comm.tab,n=500, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))
+
+bac_ANGE_res_nperm500$sign<-revalue(bac_ANGE_res_nperm500$sign, c("SPECIALIST"="Specialists", "GENERALIST"="Generalists"
+             , "NON SIGNIFICANT"="NS"))
+
+write.csv(bac_ANGE_res_nperm500, file="KSU_phylo_out/2_GvS_out/GvS_BigBluestem/GvS_Res_16S_ANGE_nperm500.csv")
+
+# remake phyloseq object
+bac_ANGE_comm.tab.bin<-ceiling(bac_ANGE_comm.tab/max(bac_ANGE_comm.tab))
+# ncol(bac_ANGE_comm.tab.bin)
+
+bac_ANGE_OA<-data.frame(matrix(ncol = 3, nrow = ncol(bac_ANGE_comm.tab.bin)))
+x <- c("Abundance", "Occurrence", "sign")
+colnames(bac_ANGE_OA) <- x
+bac_ANGE_OA$Abundance<-(colSums(bac_ANGE_comm.tab))
+bac_ANGE_OA$Occurrence<-(colSums(bac_ANGE_comm.tab.bin)/dim(bac_ANGE_comm.tab.bin)[1])
+bac_ANGE_OA$sign<-bac_ANGE_res_nperm500$sign
+# levels(bac_ANGE_OA$sign)
+
+bac_ANGE_min2 <- prune_taxa(taxa_sums(bac_ANGE) > 1, bac_ANGE)
+bac_ANGE_min2.OTUtab <- otu_table(bac_ANGE_min2, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+
+bac_ANGE_tax_results1<-cbind(bac_ANGE_OTU3, bac_ANGE_OA)
+colnames(bac_ANGE_tax_results1)[7] <- "Abundance_count"
+bac_ANGE_tax_results2<-subset(bac_ANGE_tax_results1, select=-c(Abundance_count,Occurrence))
+bac_ANGE_tax_table.mat<-as.matrix(bac_ANGE_tax_results2)
+bac_ANGE_tax_table<-tax_table(bac_ANGE_tax_table.mat)
+
+# subset to generalists
+bac_ANGE_min2_GvS_counts <- phyloseq(bac_ANGE_min2.OTUtab,  bac_ANGE_tax_table)
+bac_ANGE_min2_GvS.RA  = transform_sample_counts(bac_ANGE_min2_GvS_counts, function(x) x / sum(x) )
+bac_ANGE_generalists1<-subset_taxa(bac_ANGE_min2_GvS.RA, sign=="Generalists")
+bac_ANGE_generalists1
+# otu_table()   OTU Table:         [ 1116 taxa and 95 samples ]
+# tax_table()   Taxonomy Table:    [ 1116 taxa by 7 taxonomic ranks ]
+
+# export OTU table with relative abundance
+write.csv(as.data.frame(otu_table(bac_ANGE_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_BigBluestem/Generalist_BigBluestem_16S_OTUtab_RA.csv")
+
+# export taxa table 
+write.csv(as.data.frame(tax_table(bac_ANGE_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_BigBluestem/Generalist_BigBluestem_16S_taxonomy.csv")
+```
+
+### ITS {.unnumbered}
+
+```{r ITS BigBluestem spe.gen, eval=FALSE, echo=F}
+phylo_obj<-fun_ANGE
+
+fun_ANGE_OTU1 = as(otu_table(phylo_obj), "matrix")
+if(taxa_are_rows(phylo_obj)){fun_ANGE_OTU1 <- t(fun_ANGE_OTU1)}
+fun_ANGE_OTUdf = as.data.frame(fun_ANGE_OTU1)
+fun_ANGE_comm.tab<-fun_ANGE_OTUdf
+
+com_min2_ANGE <- prune_taxa(taxa_sums(phylo_obj) > 1, phylo_obj)
+fun_ANGE_comm.tabRA  = transform_sample_counts(com_min2_ANGE, function(x) x / sum(x) )
+fun_ANGE_OTU2 = as(otu_table(fun_ANGE_comm.tabRA), "matrix")
+write.csv(fun_ANGE_OTU2, file="KSU_phylo_out/2_GvS_out/GvS_BigBluestem/GvS_OTU_ITS_ANGE.csv")
+
+fun_ANGE_OTU3 = as(tax_table(fun_ANGE_comm.tabRA), "matrix")
+write.csv(fun_ANGE_OTU3, file="KSU_phylo_out/2_GvS_out/GvS_BigBluestem/GvS_Taxa_ITS_ANGE.csv")
+
+fun_ANGE_comm.tab<-fun_ANGE_comm.tab[,which(colSums(fun_ANGE_comm.tab)>1)]
+
+fun_ANGE_res_nperm500<-spec.gen(fun_ANGE_comm.tab,n=500, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))
+
+fun_ANGE_res_nperm500$sign<-revalue(fun_ANGE_res_nperm500$sign, c("SPECIALIST"="Specialists", "GENERALIST"="Generalists"
+             , "NON SIGNIFICANT"="NS"))
+
+write.csv(fun_ANGE_res_nperm500, file="KSU_phylo_out/2_GvS_out/GvS_BigBluestem/GvS_Res_ITS_ANGE_nperm500.csv")
+
+# remake phyloseq object
+fun_ANGE_comm.tab.bin<-ceiling(fun_ANGE_comm.tab/max(fun_ANGE_comm.tab))
+# ncol(fun_ANGE_comm.tab.bin)
+
+fun_ANGE_OA<-data.frame(matrix(ncol = 3, nrow = ncol(fun_ANGE_comm.tab.bin)))
+x <- c("Abundance", "Occurrence", "sign")
+colnames(fun_ANGE_OA) <- x
+fun_ANGE_OA$Abundance<-(colSums(fun_ANGE_comm.tab))
+fun_ANGE_OA$Occurrence<-(colSums(fun_ANGE_comm.tab.bin)/dim(fun_ANGE_comm.tab.bin)[1])
+fun_ANGE_OA$sign<-fun_ANGE_res_nperm500$sign
+# levels(fun_ANGE_OA$sign)
+
+fun_ANGE_min2 <- prune_taxa(taxa_sums(fun_ANGE) > 1, fun_ANGE)
+fun_ANGE_min2.OTUtab <- otu_table(fun_ANGE_min2, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+
+fun_ANGE_tax_results1<-cbind(fun_ANGE_OTU3, fun_ANGE_OA)
+colnames(fun_ANGE_tax_results1)[8] <- "Abundance_count"
+fun_ANGE_tax_results2<-subset(fun_ANGE_tax_results1, select=-c(Abundance_count,Occurrence))
+fun_ANGE_tax_table.mat<-as.matrix(fun_ANGE_tax_results2)
+fun_ANGE_tax_table<-tax_table(fun_ANGE_tax_table.mat)
+
+# subset to generalists
+fun_ANGE_min2_GvS_counts <- phyloseq(fun_ANGE_min2.OTUtab,  fun_ANGE_tax_table)
+fun_ANGE_min2_GvS.RA  = transform_sample_counts(fun_ANGE_min2_GvS_counts, function(x) x / sum(x) )
+fun_ANGE_generalists1<-subset_taxa(fun_ANGE_min2_GvS.RA, sign=="Generalists")
+fun_ANGE_generalists1
+# otu_table()   OTU Table:         [ 369 taxa and 95 samples ]
+# tax_table()   Taxonomy Table:    [ 369 taxa by 8 taxonomic ranks ]
+
+# export OTU table with relative abundance
+write.csv(as.data.frame(otu_table(fun_ANGE_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_BigBluestem/Generalist_BigBluestem_ITS_OTUtab_RA.csv")
+
+# export taxa table 
+write.csv(as.data.frame(tax_table(fun_ANGE_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_BigBluestem/Generalist_BigBluestem_ITS_taxonomy.csv")
+```
+
+\
+\
+
+## BUDA (*Bouteloua dactyloides* / Buffalograss) {.tabset}
+
+### 16S {.unnumbered}
+
+```{r 16S Buffalograss spe.gen, eval=FALSE, echo=F}
+phylo_obj<-bac_BUDA
+
+bac_BUDA_OTU1 = as(otu_table(phylo_obj), "matrix")
+if(taxa_are_rows(phylo_obj)){bac_BUDA_OTU1 <- t(bac_BUDA_OTU1)}
+bac_BUDA_OTUdf = as.data.frame(bac_BUDA_OTU1)
+bac_BUDA_comm.tab<-bac_BUDA_OTUdf
+
+com_min2_BUDA <- prune_taxa(taxa_sums(phylo_obj) > 1, phylo_obj)
+bac_BUDA_comm.tabRA  = transform_sample_counts(com_min2_BUDA, function(x) x / sum(x) )
+bac_BUDA_OTU2 = as(otu_table(bac_BUDA_comm.tabRA), "matrix")
+write.csv(bac_BUDA_OTU2, file="KSU_phylo_out/2_GvS_out/GvS_Buffalograss/GvS_OTU_16S_BUDA.csv")
+
+bac_BUDA_OTU3 = as(tax_table(bac_BUDA_comm.tabRA), "matrix")
+write.csv(bac_BUDA_OTU3, file="KSU_phylo_out/2_GvS_out/GvS_Buffalograss/GvS_Taxa_16S_BUDA.csv")
+
+bac_BUDA_comm.tab<-bac_BUDA_comm.tab[,which(colSums(bac_BUDA_comm.tab)>1)]
+
+bac_BUDA_res_nperm500<-spec.gen(bac_BUDA_comm.tab,n=500, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))
+
+bac_BUDA_res_nperm500$sign<-revalue(bac_BUDA_res_nperm500$sign, c("SPECIALIST"="Specialists", "GENERALIST"="Generalists", "NON SIGNIFICANT"="NS"))
+
+write.csv(bac_BUDA_res_nperm500, file="KSU_phylo_out/2_GvS_out/GvS_Buffalograss/GvS_Res_16S_BUDA_nperm500.csv")
+
+# remake phyloseq object
+bac_BUDA_comm.tab.bin<-ceiling(bac_BUDA_comm.tab/max(bac_BUDA_comm.tab))
+# ncol(bac_BUDA_comm.tab.bin)
+
+bac_BUDA_OA<-data.frame(matrix(ncol = 3, nrow = ncol(bac_BUDA_comm.tab.bin)))
+x <- c("Abundance", "Occurrence", "sign")
+colnames(bac_BUDA_OA) <- x
+bac_BUDA_OA$Abundance<-(colSums(bac_BUDA_comm.tab))
+bac_BUDA_OA$Occurrence<-(colSums(bac_BUDA_comm.tab.bin)/dim(bac_BUDA_comm.tab.bin)[1])
+bac_BUDA_OA$sign<-bac_BUDA_res_nperm500$sign
+# levels(bac_BUDA_OA$sign)
+
+bac_BUDA_min2 <- prune_taxa(taxa_sums(bac_BUDA) > 1, bac_BUDA)
+bac_BUDA_min2.OTUtab <- otu_table(bac_BUDA_min2, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+
+bac_BUDA_tax_results1<-cbind(bac_BUDA_OTU3, bac_BUDA_OA)
+colnames(bac_BUDA_tax_results1)[7] <- "Abundance_count"
+bac_BUDA_tax_results2<-subset(bac_BUDA_tax_results1, select=-c(Abundance_count,Occurrence))
+bac_BUDA_tax_table.mat<-as.matrix(bac_BUDA_tax_results2)
+bac_BUDA_tax_table<-tax_table(bac_BUDA_tax_table.mat)
+
+# subset to generalists
+bac_BUDA_min2_GvS_counts <- phyloseq(bac_BUDA_min2.OTUtab,  bac_BUDA_tax_table)
+bac_BUDA_min2_GvS.RA  = transform_sample_counts(bac_BUDA_min2_GvS_counts, function(x) x / sum(x) )
+bac_BUDA_generalists1<-subset_taxa(bac_BUDA_min2_GvS.RA, sign=="Generalists")
+bac_BUDA_generalists1
+# otu_table()   OTU Table:         [ 850 taxa and 79 samples ]
+# tax_table()   Taxonomy Table:    [ 850 taxa by 7 taxonomic ranks ]
+
+# export OTU table with relative abundance
+write.csv(as.data.frame(otu_table(bac_BUDA_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_Buffalograss/Generalist_Buffalograss_16S_OTUtab_RA.csv")
+
+# export taxa table 
+write.csv(as.data.frame(tax_table(bac_BUDA_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_Buffalograss/Generalist_Buffalograss_16S_taxonomy.csv")
+```
+
+### ITS {.unnumbered}
+
+```{r ITS Buffalograss spe.gen, eval=FALSE, echo=F}
+phylo_obj<-fun_BUDA
+
+fun_BUDA_OTU1 = as(otu_table(phylo_obj), "matrix")
+if(taxa_are_rows(phylo_obj)){fun_BUDA_OTU1 <- t(fun_BUDA_OTU1)}
+fun_BUDA_OTUdf = as.data.frame(fun_BUDA_OTU1)
+fun_BUDA_comm.tab<-fun_BUDA_OTUdf
+
+com_min2_BUDA <- prune_taxa(taxa_sums(phylo_obj) > 1, phylo_obj)
+fun_BUDA_comm.tabRA  = transform_sample_counts(com_min2_BUDA, function(x) x / sum(x) )
+fun_BUDA_OTU2 = as(otu_table(fun_BUDA_comm.tabRA), "matrix")
+write.csv(fun_BUDA_OTU2, file="KSU_phylo_out/2_GvS_out/GvS_Buffalograss/GvS_OTU_ITS_BUDA.csv")
+
+fun_BUDA_OTU3 = as(tax_table(fun_BUDA_comm.tabRA), "matrix")
+write.csv(fun_BUDA_OTU3, file="KSU_phylo_out/2_GvS_out/GvS_Buffalograss/GvS_Taxa_ITS_BUDA.csv")
+
+fun_BUDA_comm.tab<-fun_BUDA_comm.tab[,which(colSums(fun_BUDA_comm.tab)>1)]
+
+fun_BUDA_res_nperm500<-spec.gen(fun_BUDA_comm.tab,n=500, perm.method="quasiswap", niche.width.method="occurrence", probs = c(0.025, 0.975))
+
+fun_BUDA_res_nperm500$sign<-revalue(fun_BUDA_res_nperm500$sign, c("SPECIALIST"="Specialists", "GENERALIST"="Generalists"
+             , "NON SIGNIFICANT"="NS"))
+
+write.csv(fun_BUDA_res_nperm500, file="KSU_phylo_out/2_GvS_out/GvS_Buffalograss/GvS_Res_ITS_BUDA_nperm500.csv")
+
+# remake phyloseq object
+fun_BUDA_comm.tab.bin<-ceiling(fun_BUDA_comm.tab/max(fun_BUDA_comm.tab))
+# ncol(fun_BUDA_comm.tab.bin)
+
+fun_BUDA_OA<-data.frame(matrix(ncol = 3, nrow = ncol(fun_BUDA_comm.tab.bin)))
+x <- c("Abundance", "Occurrence", "sign")
+colnames(fun_BUDA_OA) <- x
+fun_BUDA_OA$Abundance<-(colSums(fun_BUDA_comm.tab))
+fun_BUDA_OA$Occurrence<-(colSums(fun_BUDA_comm.tab.bin)/dim(fun_BUDA_comm.tab.bin)[1])
+fun_BUDA_OA$sign<-fun_BUDA_res_nperm500$sign
+# levels(fun_BUDA_OA$sign)
+
+fun_BUDA_min2 <- prune_taxa(taxa_sums(fun_BUDA) > 1, fun_BUDA)
+fun_BUDA_min2.OTUtab <- otu_table(fun_BUDA_min2, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+
+fun_BUDA_tax_results1<-cbind(fun_BUDA_OTU3, fun_BUDA_OA)
+colnames(fun_BUDA_tax_results1)[8] <- "Abundance_count"
+fun_BUDA_tax_results2<-subset(fun_BUDA_tax_results1, select=-c(Abundance_count,Occurrence))
+fun_BUDA_tax_table.mat<-as.matrix(fun_BUDA_tax_results2)
+fun_BUDA_tax_table<-tax_table(fun_BUDA_tax_table.mat)
+
+# subset to generalists
+fun_BUDA_min2_GvS_counts <- phyloseq(fun_BUDA_min2.OTUtab,  fun_BUDA_tax_table)
+fun_BUDA_min2_GvS.RA  = transform_sample_counts(fun_BUDA_min2_GvS_counts, function(x) x / sum(x) )
+fun_BUDA_generalists1<-subset_taxa(fun_BUDA_min2_GvS.RA, sign=="Generalists")
+fun_BUDA_generalists1
+# otu_table()   OTU Table:         [ 334 taxa and 79 samples ]
+# tax_table()   Taxonomy Table:    [ 334 taxa by 8 taxonomic ranks ]
+
+# export OTU table with relative abundance
+write.csv(as.data.frame(otu_table(fun_BUDA_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_Buffalograss/Generalist_Buffalograss_ITS_OTUtab_RA.csv")
+
+# export taxa table 
+write.csv(as.data.frame(tax_table(fun_BUDA_generalists1)), file="KSU_phylo_out/2_GvS_out/GvS_Buffalograss/Generalist_Buffalograss_ITS_taxonomy.csv")
+```
+
+\
+\
+
+# Download CSV files
+
+## All Grasses
+
+**Bacteria**
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Res_16S_AllGrasses_nperm100.csv"  download>Click to download bacterial OTU classifications (all grasses)</a>
+
+-   OTUs are rows (n=18016). If observed OTU occurrence \< confidence interval thresholds, then sign = "specialist'
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_OTU_16S_AllGrasses_relabund.csv"  download>Click to download bacterial OTU table (converted to relative abundance)</a>
+
+-   OTUs are rows (n=18016), samples are columns (n=484)
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Taxa_16S_AllGrasses.csv"  download>Click to download bacterial OTU taxonomy (GvS classification is 2nd column)</a>
+
+-   OTUs are rows (n=18016)
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_sampledata_16S_AllGrasses.csv"  download>Click to download bacterial sample metadata</a>
+
+-   samples are rows (n=484), metadata are columns (n=39)
+
+-   Bacterial-fungal df joiner is col D `sample_name`
+\
+
+**Fungi**
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Res_ITS_AllGrasses_nperm100.csv"  download>Click to download fungal OTU classifications (all grasses)</a>
+
+-   OTUs are rows (n=5875). If observed OTU occurrence \< confidence interval thresholds, then sign = "specialist'
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_OTU_ITS_AllGrasses_relabund.csv"  download>Click to download fungal OTU table (converted to relative abundance)</a>
+
+-   OTUs are rows (n=5875), samples are columns (n=484)
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Taxa_ITS_AllGrasses.csv"  download>Click to download fungal OTU taxonomy (GvS classification is 2nd column)</a>
+
+-   OTUs are rows (n=5875)
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_sampledata_ITS_AllGrasses.csv"  download>Click to download fungal sample metadata</a>
+
+-   samples are rows (n=484), metadata are columns (n=39)
+
+-   Bacterial-fungal df joiner is col D `sample_name` (note that this is essentially same as the bacterial sample data
+\
+\
+
+## *Blue Grama*
+
+**Bacteria**
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_Res_16S_BOGR_nperm500.csv"  download>Click to download bacterial OTU classifications (*Blue grama* only)</a>
+
+-   OTUs are rows (n=7004). If observed OTU occurrence \< confidence interval thresholds, then sign = "specialist'
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_OTU_16S_BOGR_relabund.csv"  download>Click to download bacterial OTU table (converted to relative abundance)</a>
+
+-   OTUs are rows (n=7004), samples are columns (n=75)
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_Taxa_16S_BOGR.csv" download>Click to download bacterial OTU taxonomy (GvS classification is 2nd column)</a>
+
+-   OTUs are rows (n=7004)
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_sampledata_16S_BOGR.csv"  download>Click to download bacterial sample metadata</a>
+
+-   samples are rows (n=75), metadata are columns (n=39)
+
+-   Bacterial-fungal df joiner is col D `sample_name`
+\
+
+**Fungi**
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_Res_ITS_BOGR_nperm500.csv"  download>Click to download fungal OTU classifications (*Blue grama* only)</a>
+
+-   OTUs are rows (n=1922). If observed OTU occurrence \< confidence interval thresholds, then sign = "specialist'
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_OTU_ITS_BOGR_relabund.csv"  download>Click to download fungal OTU table (converted to relative abundance)</a>
+
+-   OTUs are rows (n=1922), samples are columns (n=75)
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_Taxa_ITS_BOGR.csv" download>Click to download fungal OTU taxonomy (GvS classification is 2nd column)</a>
+
+-   OTUs are rows (n=1922)
+
+<a href="processed_data/2_generalist_vs_specialist/GvS_Bluegrama/GvS_sampledata_ITS_BOGR.csv" download>Click to download fungal sample metadata</a>
+
+-   samples are rows (n=75), metadata are columns (n=39)
+
+-   Bacterial-fungal df joiner is col D `sample_name` (note that this is essentially same as the bacterial sample data

@@ -1,0 +1,1477 @@
+---
+title: "**KSU paired amplicons**"
+subtitle: "Pre-processing and cleaning of 16S and ITS OTU tables"
+author: "Kelli Feeser"
+date: '2023-09-16'
+output:
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+    keep_md: yes
+  html_notebook:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+  html_document:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+# set-up & data import ------------------------------------------------------
+
+```{r LANL-proxies, eval=T, include=FALSE}
+# LANL proxies
+Sys.setenv('HTTP_PROXY'='http://proxyout.lanl.gov:8080')
+Sys.setenv('HTTPS_PROXY'='http://proxyout.lanl.gov:8080')
+```
+
+## install packages --------------
+
+```{r install-packages, eval=FALSE, warning=FALSE, include=T,echo=T}
+# devtools::install_github("GuillemSalazar/EcolUtils")
+library("devtools"); packageVersion("devtools") #‘2.4.5’
+install_github("hughjonesd/huxtable")
+
+devtools::install_github("jfq3/RDPutils", dependencies = TRUE)
+```
+
+\
+
+## load packages -----------------
+
+```{r load-packages, eval=T, include=T, echo=TRUE,message=FALSE, results='hide'}
+
+library("ggplot2"); packageVersion("ggplot2") #‘3.4.4’
+library("vegan"); packageVersion("vegan") # ‘2.6.4’
+library("phyloseq"); packageVersion("phyloseq") #‘1.41.1’
+library("RDPutils"); packageVersion("RDPutils") #‘1.4.1’
+library("huxtable"); packageVersion("huxtable") #‘5.5.6.9000’
+library("scales"); packageVersion("scales") #‘1.2.1’
+library("swatches"); packageVersion("swatches") #‘0.5.0’
+library("ggsci"); packageVersion("ggsci") #‘3.0.0’
+library("ggpubr"); packageVersion("ggpubr") #‘0.6.0’
+library("factoextra"); packageVersion("factoextra") #‘1.0.7’
+library("magrittr"); packageVersion("magrittr") #‘2.0.3’
+library("viridis"); packageVersion("viridis") #‘0.6.4’
+library("RColorBrewer"); packageVersion("RColorBrewer") #‘1.1.3’
+library("cowplot"); packageVersion("cowplot") #‘1.1.1’
+library("EcolUtils"); packageVersion("EcolUtils") #‘0.1’
+library("kableExtra"); packageVersion("kableExtra") #‘1.3.4.9000’
+library(dplyr); packageVersion("dplyr") #‘1.1.3’
+
+source("../../black-sheep-club/code/sheepish_scripts.R")
+
+# library("EcolUtils"); packageVersion("EcolUtils") #‘0.1’
+# library(metagMisc); packageVersion("metagMisc") #‘0.0.4’
+# library(ade4); packageVersion("ade4") #‘1.7.20’
+# library(tidyverse); packageVersion("tidyverse") #‘1.3.1’
+# library(tibble)
+# library("data.table"); packageVersion("data.table") #‘1.14.4’
+# library(Rfast); packageVersion("Rfast") #‘2.0.6’
+```
+
+
+## read-in raw USEARCH OTU tables, taxonomy, and metadata ---- {.tabset .tabset-pills}
+
+\
+
+### read-in raw 16S data {.unnumbered .tabset .tabset-pills}
+
+\
+
+#### 16S otu table {.unnumbered}
+
+```{r 16S-otu-readin, eval=T, echo=T, warning=F, message=T, cache=TRUE}
+otu.16S.sample.file = "../raw_data/raw_otu_tables/16S_otutab.txt"    ###This is your otu file
+otu.16S.samples <- read.table(file = otu.16S.sample.file, header = TRUE, row.names = 1,sep = '\t', comment.char = "")
+head(otu.16S.samples)
+otu.16S.samples <- otu_table(otu.16S.samples, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+class(otu.16S.samples)   
+samplenames_16S<-as.data.frame(sample_names(otu.16S.samples))
+head(samplenames_16S)
+# write.csv(samplenames_16S, file="samplenames_16S.csv")
+```
+
+\
+
+#### 16S sintax taxonomy file {.unnumbered}
+
+16S ref db: RDP 16S v18\
+
+```{r 16S-taxa-readin, eval=T, echo=T, warning=F, message=T, cache=TRUE}
+
+# 16S: RDP 16S v18
+rdp.16s.all.taxa.file = "../raw_data/full_taxonomy_tables/KSU_16S_sintax_rdp_16s_v18_v1.txt" 
+
+
+rdp.16s.all.taxa <- make_tax_table(in_file = rdp.16s.all.taxa.file, confidence = 0.8) 
+head(rdp.16s.all.taxa)               
+rank_names(rdp.16s.all.taxa)
+# taxa_names(rdp.16s.all.taxa)
+# class(rdp.16s.all.taxa)
+```
+
+\
+
+#### 16S metadata file {.unnumbered}
+
+```{r 16S-metadata-readin, eval=T, echo=T, warning=T, message=F,results='hide'}
+map_16S.file = "../raw_data/16s_metadata_kf.txt" 
+
+map_16S <- import_qiime_sample_data(map_16S.file)
+
+map_16S$Site<-factor(map_16S$Site)
+map_16S$Site_Grass<-factor(map_16S$Site_Grass)
+map_16S$Grass<-factor(map_16S$Grass)
+
+map_16S$Grassland<-factor(map_16S$Grassland)
+levels(map_16S$Grassland)
+map_16S$Grassland<-factor(map_16S$Grassland, levels = c("tallgrass","mixed grass","shortgrass","desert",""))
+
+map_16S$Gradient<-factor(map_16S$Gradient)
+levels(map_16S$Gradient)
+map_16S$Gradient<-factor(map_16S$Gradient, levels = c("West","Middle","East",""))
+
+map_16S$Bin<-factor(map_16S$Bin)
+levels(map_16S$Bin)
+map_16S$Bin<-factor(map_16S$Bin, levels = c("North","North Central","South Central","South",""))
+```
+
+```{r eval=TRUE,echo=TRUE,message=FALSE}
+kbl(as(map_16S, "data.frame")) %>%
+  kable_styling() %>%
+  scroll_box(width = "80%", height = "400px")
+```
+
+\
+
+### read-in raw ITS data {.unnumbered .tabset .tabset-pills}
+
+\
+
+#### ITS otu table {.unnumbered}
+
+```{r ITS-otu-readin, eval=T, echo=T, warning=F, message=T, cache=TRUE}
+otu.its.sample.file = "../raw_data/raw_otu_tables/ITS_otutab.txt"    ###This is your otu file
+otu.its.samples <- read.table(file = otu.its.sample.file, header = TRUE, row.names = 1,sep = '\t', comment.char = "")
+head(otu.its.samples)
+otu.its.samples <- otu_table(otu.its.samples, taxa_are_rows = TRUE, errorIfNULL = TRUE) 
+class(otu.its.samples)   
+samplenames_its<-as.data.frame(sample_names(otu.its.samples))
+head(samplenames_its)
+```
+
+\
+
+#### ITS sintax taxonomy file {.unnumbered}
+
+ITS ref db: unite all euks 25.07.2023 with old taxonomy naming and with new naming schema\
+
+```{r ITS-taxa-readin, eval=T, echo=T, warning=T, message=T, cache=TRUE}
+
+# ITS: unite all euks 25.07.2023
+# UNITE_alleuk.its.all.taxa.file = "../raw_data/full_taxonomy_tables/KSU_ITS_sintax_unite_alleuks_v1.txt" 
+
+
+# UNITE_alleuk.its.all.taxa <- make_tax_table(in_file = UNITE_alleuk.its.all.taxa.file, confidence = 0.8) 
+# head(UNITE_alleuk.its.all.taxa)               
+# rank_names(UNITE_alleuk.its.all.taxa)
+# taxa_names(UNITE_alleuk.its.all.taxa)
+# class(UNITE_alleuk.its.all.taxa)
+
+# new ITS taxonomy (9/26/23)
+UNITE_alleuk.its.all.newphyla.taxa.file = "../raw_data/full_taxonomy_tables/KSU_ITS_sintax_unite_alleuks_newphyla_v1.txt"
+
+UNITE_alleuk.its.all.newphyla.taxa <- make_tax_table(in_file = UNITE_alleuk.its.all.newphyla.taxa.file, confidence = 0.8)
+
+head(UNITE_alleuk.its.all.newphyla.taxa)
+rank_names(UNITE_alleuk.its.all.newphyla.taxa)
+```
+
+\
+
+#### ITS metadata file {.unnumbered}
+
+```{r ITS-metadata-readin, eval=T, echo=T, warning=T, message=F,results='hide'}
+map_ITS.file = "../raw_data//its_metadata_kf.txt" 
+
+map_ITS <- import_qiime_sample_data(map_ITS.file)
+
+map_ITS$Site<-factor(map_ITS$Site)
+map_ITS$Site_Grass<-factor(map_ITS$Site_Grass)
+map_ITS$Grass<-factor(map_ITS$Grass)
+
+map_ITS$Grassland<-factor(map_ITS$Grassland)
+levels(map_ITS$Grassland)
+map_ITS$Grassland<-factor(map_ITS$Grassland, levels = c("tallgrass","mixed grass","shortgrass","desert",""))
+
+map_ITS$Gradient<-factor(map_ITS$Gradient)
+levels(map_ITS$Gradient)
+map_ITS$Gradient<-factor(map_ITS$Gradient, levels = c("West","Middle","East",""))
+
+map_ITS$Bin<-factor(map_ITS$Bin)
+levels(map_ITS$Bin)
+map_ITS$Bin<-factor(map_ITS$Bin, levels = c("North","North Central","South Central","South",""))
+```
+
+```{r eval=TRUE,echo=TRUE,message=FALSE}
+kbl(as(map_ITS, "data.frame")) %>%
+  kable_styling() %>%
+  scroll_box(width = "80%", height = "400px")
+```
+
+\
+
+####  {.unnumbered}
+
+## initiate phyloseq objects -----
+
+\
+
+**16S**
+
+```{r 16S-merge-raw-files, eval=T, echo=T, warning=T, message=T}
+unrarefied_16S_unprunned <- phyloseq(otu.16S.samples, rdp.16s.all.taxa,map_16S)
+unrarefied_16S_unprunned <- prune_taxa(taxa_sums(unrarefied_16S_unprunned) > 0, unrarefied_16S_unprunned)
+# unrarefied_16S_unprunned
+# otu_table()   OTU Table:         [ 100,485 taxa and 699 samples ]
+# sample_data() Sample Data:       [ 699 samples by 10 sample variables ]
+# tax_table()   Taxonomy Table:    [ 100,485 taxa by 7 taxonomic ranks ]
+```
+
+```{r echo-raw 16S-object-stats, eval=T}
+unrarefied_16S_unprunned
+```
+
+\
+\
+**ITS**
+
+```{r ITS-merge-raw-files, eval=T, echo=T, warning=T, message=T}
+unrarefied_ITS_alleuk_unprunned <- phyloseq(otu.its.samples, UNITE_alleuk.its.all.newphyla.taxa,map_ITS)
+unrarefied_ITS_alleuk_unprunned <- prune_taxa(taxa_sums(unrarefied_ITS_alleuk_unprunned) > 0, unrarefied_ITS_alleuk_unprunned)
+# unrarefied_ITS_alleuk_unprunned
+# otu_table()   OTU Table:         [ 10,616 taxa and 705 samples ]
+# sample_data() Sample Data:       [ 705 samples by 10 sample variables ]
+# tax_table()   Taxonomy Table:    [ 10,616 taxa by 7 taxonomic ranks ]
+```
+
+```{r echo-raw-ITS-object-stats, eval=T}
+unrarefied_ITS_alleuk_unprunned
+```
+
+("Taxa" are OTUs)\
+
+```{r save-raw-objects, eval=F, echo=T, include=T}
+# Save an object to a file
+saveRDS(unrarefied_16S_unprunned, file = "../processed_data/raw_rds_saves/KSU_unrarefied_16S_unprunned.rds")
+
+saveRDS(unrarefied_ITS_alleuk_unprunned, file = "../processed_data/raw_rds_saves/KSU_unrarefied_ITS_alleuks_unprunned.rds")
+```
+
+```{r restore-raw-objects, eval=T, echo=T}
+# Restore the objects
+unrarefied_16S_unprunned<-readRDS(file = "../processed_data/raw_rds_saves/KSU_unrarefied_16S_unprunned.rds")
+
+unrarefied_ITS_alleuk_unprunned<-readRDS(file = "../processed_data/raw_rds_saves/KSU_unrarefied_ITS_alleuks_unprunned.rds")
+```
+
+```{r, eval=TRUE, include=FALSE}
+sd<-as(sample_data(unrarefied_16S_unprunned),"data.frame")
+```
+
+\
+
+# basic data overview -----------------------------------------------------------
+
+\
+
+**Foundational Grasses** (n=6, really 5)\
+6 plant hosts (family Poaceae):
+
+-   ANGE (*Andropogon gerardii* / Big bluestem)
+-   BUDA (*Bouteloua dactyloides* / Buffalograss)
+-   BOER (*B. eriopoda* / Black grama)
+-   BOGR (*B. gracilis* / Blue grama)
+-   BOCU (*B. curtipendula* / Sideoats grama) - note: only present in EDGE sites
+-   SCSC (*Schizachyrium scoparium* / Little bluestem)\
+
+**Total Samples**
+
+-   5 grasses x ~~24~~ 22 sites x 12 individuals per grass per site
+-   Potential for 1,440 samples (each for 16S and ITS) but not all grasses present at each site
+-   n=699 16S samples, 705 ITS
+    -   after rarefaction and subset to samples with retained pairs, overall sample number dropped to 484 per domain\
+
+## Metadata structure
+
+### Sampling Variables
+
+[*Categorical*]{.underline}
+
+-   **Site**
+    -   n = 22
+    -   n=3 replicate latitudinal transects
+        -   spanned an east-west gradient of 14° longitude and \~1000 mm in mean annual precipitation, a north-south gradient of 17° latitude (\~1430 km, 42°−29°N) and \~10°C in mean annual temperature, and approached a latitudinal range limit for each grass species.\
+\
+-   **Grassland type**
+    -   n = 4
+    -   tallgrass, mixed grass, shortgrass, desert\
+\
+-   **Grass host species**
+    -   "foundational grass species" all family Poaceae
+
+    -   n = 5 (originally 6 but 1 found only in EDGE samples)
+
+        -   ANGE (*Andropogon gerardii* / Big bluestem)
+        -   BUDA (*Bouteloua dactyloides* / Buffalograss)
+        -   BOER (*B. eriopoda* / Black grama)
+        -   BOGR (*B. gracilis* / Blue grama)
+        -   BOCU (*B. curtipendula* / Sideoats grama) - note: only present in EDGE sites
+        -   SCSC (*Schizachyrium scoparium* / Little bluestem)
+
+[*Continuous*]{.underline}
+
+-   **Elevation** (in meters)
+    -   ranges from -20 to 2,747 m
+-   **Latitude**
+    -   29.23005 to 41.12200° N
+-   **Longitude**
+    -   -108.28760 to -94.13184° W
+
+### Climate Data
+
+-   "We measured soil gravimetric water content (GWC) for each soil sample.
+
+-   We also used daily climate data at 800 m spatial resolution (PRISM Climate Group, 2019) to calculate average GDD and mean annual precipitation as 30-y normals for each site."
+
+[*Continuous*]{.underline}
+
+-   **ppt** = mean annual precipitation (determined over 3- and 30-year windows and 2015)
+-   **GDD** = growing degree days (determined over 3- and 30-year windows and 2015)\
+
+### Edaphic Variables
+
+-   "We collected 10--20 g soil below each plant, then combined soils into a single sample for each grass species × site combination.
+
+-   We assessed five edaphic variables: ammonium (NH4+) and nitrate (NO3--) with the Lachat Autoanalyzer QuikChem method 12-107-06-1-A and 12-107- 04-1-F (Loveland, CO), soil organic matter (SOM) via loss on ignition (Zhang & Wang, 2014) and phosphorous (total P) and pH following Robertson et al. (1999)."
+
+[*Continuous: (min, max values)*]{.underline}
+
+-   **pH**: (`r round(range(sd$pH,na.rm=T),2)`)
+-   **SOM** (via LoI): (`r round(range(sd$SOM,na.rm=T),2)`)
+-   **soil moisture**: (`r round(range(sd$perc_moisture,na.rm=T),1)`%)
+-   **phosphorous**: (`r round(range(sd$phos,na.rm=T),3)`)
+-   **ammonium**: (`r round(range(sd$ammonium,na.rm=T),2)`)
+-   **nitrate**: (`r round(range(sd$nitrate,na.rm=T),2)`)
+
+### Plant Traits
+
+[*Continuous: (min, max values)*]{.underline}
+
+-   **avg_SLA**: specific leaf area (`r round(range(sd$avg_SLA,na.rm=T),1)`)
+
+-   **avg_SRL**: specific root length (`r round(range(sd$avg_SRL,na.rm=T),1)`)
+
+    -   Large values of specific leaf area (SLA) and specific root length (SRL) reflect large plant investment in resource acquisition; small values indicate investment in plant tissue longevity
+
+-   **herbivory_perc**: (`r round(range(sd$herbivory_perc,na.rm=T),1)`%)
+
+    -   average site level damage estimate for herbivory, averaged over all species and individuals at the site; could be used to indicate herbivory pressure at the site level
+
+### Excluding the Extreme Drought in the Grasslands Experiment (EDGE) samples
+
+-   six grassland sites spanning the central United States, with mean annual precipitation ranging 242--860 mm
+-   Treatments:
+    -   control(?)
+    -   EDGE_A
+    -   EDGE_B
+
+**Other acronyms**\
+Sites\
+- HPG: northern mixed grass prairie\
+- HAR: southern mixed grass prairie\
+- KNZ: tallgrass prairie
+...
+\
+\
+
+## Full Datasets, unrarefied, unprunned 
+
+### Read Counts 
+
+```{r raw-read-count-echo, echo=T, message=FALSE, results="asis"}
+
+read_stats <- hux(
+        'Seqs per sample' = c("min", "max", "mean", "sd","total"),
+        `Full 16S OTU table` = c(1:1),
+        `Full ITS OTU table` = c(2),
+        add_colnames = T
+        # add_columns(x, y, after = ncol(x), copy_cell_props = TRUE)
+      )
+
+read_stats <- read_stats %>%
+          #set_bold(1,everywhere, TRUE) %>%
+          set_bold(1,everywhere,value=TRUE)%>%
+          set_font_size(10) %>%
+          set_align(everywhere,2,"right") %>%
+          set_align(everywhere,1,"left") %>%
+          set_outer_padding(everywhere,everywhere,10) %>%
+          set_number_format(everywhere,2:3,fmt_pretty(big.mark = ",",preserve.width="none")) %>%
+          set_bottom_border(1, everywhere,0.4)%>%
+          set_bottom_border(5, everywhere,0.1)
+
+read_stats$`Full 16S OTU table`[2]<-min(sample_sums(unrarefied_16S_unprunned))
+read_stats$`Full 16S OTU table`[3]<-max(sample_sums(unrarefied_16S_unprunned))
+read_stats$`Full 16S OTU table`[4]<-round(mean(sample_sums(unrarefied_16S_unprunned)),0)
+read_stats$`Full 16S OTU table`[5]<-round(sd(sample_sums(unrarefied_16S_unprunned)),0)
+read_stats$`Full 16S OTU table`[6]<-sum(sample_sums(unrarefied_16S_unprunned))
+
+read_stats$`Full ITS OTU table`[2]<-min(sample_sums(unrarefied_ITS_alleuk_unprunned))
+read_stats$`Full ITS OTU table`[3]<-max(sample_sums(unrarefied_ITS_alleuk_unprunned))
+read_stats$`Full ITS OTU table`[4]<-round(mean(sample_sums(unrarefied_ITS_alleuk_unprunned)),0)
+read_stats$`Full ITS OTU table`[5]<-round(sd(sample_sums(unrarefied_ITS_alleuk_unprunned)),0)
+read_stats$`Full ITS OTU table`[6]<-sum(sample_sums(unrarefied_ITS_alleuk_unprunned))
+
+options("huxtable.print" = huxtable::print_html)
+read_stats
+# func_hable(read_stats)
+```
+
+\
+
+### Unique Domains detected {.tabset .tabset-pills}
+
+\
+
+#### 16S {.unnumbered}
+
+```{r, echo=TRUE}
+get_taxa_unique(unrarefied_16S_unprunned, taxonomic.rank="Domain")
+```
+
+\
+
+#### ITS {.unnumbered}
+
+```{r, echo=TRUE}
+get_taxa_unique(unrarefied_ITS_alleuk_unprunned, taxonomic.rank="Domain")
+```
+
+\
+
+### Reads per Domain {.tabset .tabset-pills}
+
+\
+
+#### 16S {.unnumbered}
+
+```{r unique-16S-domain-set-up, eval=FALSE, warning=FALSE, include=T,echo=T,results="asis",message=FALSE}
+
+unrarefied_16S_domainA <- tax_glom(unrarefied_16S_unprunned, taxrank="Domain")
+unrarefied_16S_domainB <- prune_taxa(taxa_sums(unrarefied_16S_domainA) > 0, unrarefied_16S_domainA)
+unrarefied_16S_domain.r  = transform_sample_counts(unrarefied_16S_domainB, function(x) x / sum(x) )
+
+Domains_16S<-(get_taxa_unique(unrarefied_16S_unprunned, taxonomic.rank="Domain"))
+uniq_doms_16S<-data.frame(matrix(ncol=3,nrow=length(Domains_16S)))
+row.names(uniq_doms_16S)<-Domains_16S
+colnames(uniq_doms_16S)<-c("Domain","reads_assigned","percentage_all_reads")
+uniq_doms_16S[,1]<-Domains_16S
+uniq_doms_16S[,2]<-taxa_sums(unrarefied_16S_domainB)
+uniq_doms_16S[,3]<-taxa_sums(unrarefied_16S_domainB)/sum(sample_sums(unrarefied_16S_domainB))
+
+# Save an object to a file
+saveRDS(uniq_doms_16S, file = "../processed_data/clean_rds_saves/uniq_doms_16S.rds")
+# tax_table(unrarefied_16S_domainB)
+```
+
+```{r, eval=T, echo=T}
+uniq_doms_16S<-readRDS(file = "../processed_data/clean_rds_saves/uniq_doms_16S.rds")
+```
+
+```{r unique-domain-reads-table, echo=T, message=FALSE, results="asis"}
+hux(uniq_doms_16S) %>%
+          #set_bold(1,everywhere, TRUE) %>%
+          set_bold(1,everywhere,value=TRUE)%>%
+          set_font_size(10) %>%
+          set_align(everywhere,2,"right") %>%
+          set_align(everywhere,1,"left") %>%
+          set_outer_padding(everywhere,everywhere,10) %>%
+          set_number_format(everywhere,2,fmt_pretty(big.mark = ",",preserve.width="none")) %>%
+          set_number_format(everywhere,3,fmt_percent(digits = 2)) %>%
+          set_bottom_border(1, everywhere,0.4)%>%
+          set_bottom_border(5, everywhere,0.1)
+```
+
+\
+
+   ***For now, only continuing with reads assigned at >= 80% confidence
+      to domain = Bacteria or Archaea*** \
+      \
+\
+
+#### ITS {.unnumbered}
+
+```{r unique-ITS-domain-set-up, eval=FALSE, warning=FALSE, include=T,echo=T,results="asis",message=FALSE}
+unrarefied_ITS_domainA <- tax_glom(unrarefied_ITS_alleuk_unprunned, taxrank="Domain")
+unrarefied_ITS_domainB <- prune_taxa(taxa_sums(unrarefied_ITS_domainA) > 0, unrarefied_ITS_domainA)
+unrarefied_ITS_domain.r  = transform_sample_counts(unrarefied_ITS_domainB, function(x) x / sum(x) )
+
+Domains_ITS<-(get_taxa_unique(unrarefied_ITS_alleuk_unprunned, taxonomic.rank="Domain"))
+uniq_doms_ITS<-data.frame(matrix(ncol=3,nrow=length(Domains_ITS)))
+row.names(uniq_doms_ITS)<-Domains_ITS
+colnames(uniq_doms_ITS)<-c("Domain","reads_assigned","percentage_all_reads")
+uniq_doms_ITS[,1]<-Domains_ITS
+uniq_doms_ITS[,2]<-taxa_sums(unrarefied_ITS_domainB)
+uniq_doms_ITS[,3]<-taxa_sums(unrarefied_ITS_domainB)/sum(sample_sums(unrarefied_ITS_domainB))
+
+# Save an object to a file
+saveRDS(uniq_doms_ITS, file = "../processed_data/clean_rds_saves/uniq_doms_ITS.rds")
+# tax_table(unrarefied_ITS_domainB)
+```
+
+
+```{r, eval=T, echo=T}
+uniq_doms_ITS<-readRDS(file = "../processed_data/clean_rds_saves/uniq_doms_ITS.rds")
+```
+
+```{r unique-ITS-domain-reads-table, echo=T, message=FALSE, results="asis"}
+hux(uniq_doms_ITS) %>%
+          #set_bold(1,everywhere, TRUE) %>%
+          set_bold(1,everywhere,value=TRUE)%>%
+          set_font_size(10) %>%
+          set_align(everywhere,2,"right") %>%
+          set_align(everywhere,1,"left") %>%
+          set_outer_padding(everywhere,everywhere,10) %>%
+          set_number_format(everywhere,2,fmt_pretty(big.mark = ",",preserve.width="none")) %>%
+          set_number_format(everywhere,3,fmt_percent(digits = 2)) %>%
+          set_bottom_border(1, everywhere,0.4)%>%
+          set_bottom_border(11, everywhere,0.1)
+```
+
+\
+
+   ***For now, only continuing with reads assigned at >= 80% confidence
+      to domain = Fungi*** \
+      \
+\
+
+# Cleaning OTU tables
+
+## Removing EDGE samples {.tabset .tabset-pills}
+
+\
+
+```{r remove-EDGE-sites, include=T, echo=TRUE,eval=TRUE,message=FALSE,results='hide'}
+unrarefied_16S_unprunned_noEDGE <- subset_samples(
+  unrarefied_16S_unprunned, Edge=="no")
+unrarefied_16S_unprunned_noEDGE
+
+unrarefied_ITS_alleuk_unprunned_noEDGE <- subset_samples(
+  unrarefied_ITS_alleuk_unprunned, Edge=="no")
+unrarefied_ITS_alleuk_unprunned_noEDGE
+```
+
+### 16S {.unnumbered}
+
+- `r ntaxa(unrarefied_16S_unprunned)-ntaxa(unrarefied_16S_unprunned_noEDGE)` OTUs removed \
+- `r nsamples(unrarefied_16S_unprunned)-nsamples(unrarefied_16S_unprunned_noEDGE)` samples removed \
+\
+
+yay, we didn't lose any OTUs unique to EDGE samples! \
+
+### ITS {.unnumbered}
+
+- `r ntaxa(unrarefied_ITS_alleuk_unprunned)-ntaxa(unrarefied_ITS_alleuk_unprunned_noEDGE)` OTUs removed \
+- `r nsamples(unrarefied_ITS_alleuk_unprunned)-nsamples(unrarefied_ITS_alleuk_unprunned_noEDGE)` samples removed \
+\
+
+yay, we didn't lose any OTUs unique to EDGE samples! \
+
+## Pruning taxa {.tabset .tabset-pills}
+
+\
+
+### 16S {.unnumbered}
+
+```{r domain_BA_subset1, include=T,echo=TRUE,message=FALSE,results='hide'}
+unrarefied_16S_NOuncl_Domain <- subset_taxa(
+  unrarefied_16S_unprunned_noEDGE, Domain!="uncl_Domain")
+unrarefied_16S_NOuncl_Domain
+```
+
+```{r domain_BA_subset2, include=T,echo=TRUE,message=FALSE,results='hide'}
+unrarefied_16S_NOuncl_Domain_noEuk <- subset_taxa(
+  unrarefied_16S_NOuncl_Domain, Domain!="Eukaryota")
+unrarefied_16S_NOuncl_Domain_noEuk
+```
+
+**Domain-level:** \
+
+1. Remove anything unclassified at Domain-level (`r prettyNum(sum(sample_sums(unrarefied_16S_unprunned_noEDGE))-sum(sample_sums(unrarefied_16S_NOuncl_Domain)),big.mark = ",")` reads; `r prettyNum(ntaxa(unrarefied_16S_unprunned_noEDGE)-ntaxa(unrarefied_16S_NOuncl_Domain),big.mark = ",")` OTUs) 
+
+
+2. Remove Domain = Eukaryota (`r prettyNum(sum(sample_sums(unrarefied_16S_NOuncl_Domain))-sum(sample_sums(unrarefied_16S_NOuncl_Domain_noEuk)),big.mark = ",")` reads; `r prettyNum(ntaxa(unrarefied_16S_NOuncl_Domain)-ntaxa(unrarefied_16S_NOuncl_Domain_noEuk),big.mark = ",")` OTUs) 
+
+**Phylum-level:** \
+
+```{r echo-unique-16S-phyla, echo=T, eval=T}
+kbl(get_taxa_unique(unrarefied_16S_NOuncl_Domain_noEuk, taxonomic.rank = "Phylum"),col.names="Unique phyla")%>%
+  kable_styling() %>%
+  scroll_box(width = "70%", height = "300px")
+```
+
+```{r phylum_BA_subset1, include=T,echo=TRUE,message=FALSE,results='hide'}
+unrarefied_16S_D_ok.P_NOuncl_Bac <- subset_taxa(
+  unrarefied_16S_NOuncl_Domain_noEuk, Phylum!="uncl_Bacteria")
+unrarefied_16S_D_ok.P_NOuncl_Bac
+
+unrarefied_16S_D_ok.P_NOuncl_BacArc <- subset_taxa(
+  unrarefied_16S_D_ok.P_NOuncl_Bac, Phylum!="uncl_Archaea")
+unrarefied_16S_D_ok.P_NOuncl_BacArc
+```
+
+3. Remove Phylum = "uncl_Bacteria" (`r prettyNum(sum(sample_sums(unrarefied_16S_NOuncl_Domain_noEuk))-sum(sample_sums(unrarefied_16S_D_ok.P_NOuncl_Bac)),big.mark = ",")` reads; `r prettyNum(ntaxa(unrarefied_16S_NOuncl_Domain_noEuk)-ntaxa(unrarefied_16S_D_ok.P_NOuncl_Bac),big.mark = ",")` OTUs) 
+
+4. Remove Phylum = "uncl_Archaea" (`r prettyNum(sum(sample_sums(unrarefied_16S_D_ok.P_NOuncl_Bac))-sum(sample_sums(unrarefied_16S_D_ok.P_NOuncl_BacArc)),big.mark = ",")` reads; `r prettyNum(ntaxa(unrarefied_16S_D_ok.P_NOuncl_Bac)-ntaxa(unrarefied_16S_D_ok.P_NOuncl_BacArc),big.mark = ",")` OTUs) 
+
+
+5. Look at Phylum "Cyanobacteria/Chloroplast"
+    - It contains these Classes: `r get_taxa_unique(subset_taxa(
+  unrarefied_16S_NOuncl_Domain_noEuk, Phylum=="Cyanobacteria/Chloroplast"), taxonomic.rank = "Class")`
+
+**Class-level:** \
+
+```{r echo-unique-16S-class, echo=T, eval=T}
+kbl(get_taxa_unique(unrarefied_16S_D_ok.P_NOuncl_BacArc, taxonomic.rank = "Class"),col.names="Unique Classes")%>%
+  kable_styling() %>%
+  scroll_box(width = "70%", height = "300px")
+```
+
+```{r class_BA_subset1, include=T,echo=TRUE,message=FALSE,results='hide'}
+unrarefied_16S_DP_ok.C_NOchloro <- subset_taxa(
+  unrarefied_16S_D_ok.P_NOuncl_BacArc, Class!="Chloroplast")
+unrarefied_16S_DP_ok.C_NOchloro
+
+unrarefied_16S_DP_ok.C_NOchloro_uncl_CC <- subset_taxa(
+  unrarefied_16S_DP_ok.C_NOchloro, Class!="uncl_Cyanobacteria/Chloroplast")
+unrarefied_16S_DP_ok.C_NOchloro_uncl_CC
+```
+
+6. Remove Class = "Chloroplast" (`r prettyNum(sum(sample_sums(unrarefied_16S_D_ok.P_NOuncl_BacArc))-sum(sample_sums(unrarefied_16S_DP_ok.C_NOchloro)),big.mark = ",")` reads; `r prettyNum(ntaxa(unrarefied_16S_D_ok.P_NOuncl_BacArc)-ntaxa(unrarefied_16S_DP_ok.C_NOchloro),big.mark = ",")` OTUs) [*and subsetting this Class for export]
+
+7. Remove Class = "uncl_Cyanobacteria/Chloroplast" (`r prettyNum(sum(sample_sums(unrarefied_16S_DP_ok.C_NOchloro))-sum(sample_sums(unrarefied_16S_DP_ok.C_NOchloro_uncl_CC)),big.mark = ",")` reads; `r prettyNum(ntaxa(unrarefied_16S_DP_ok.C_NOchloro)-ntaxa(unrarefied_16S_DP_ok.C_NOchloro_uncl_CC),big.mark = ",")` OTUs) [*and subsetting this Class for export]
+
+8. Because the Phylum "Cyanobacteria/Chloroplast" now only contains Cyanobacteria, I am renaming it to "Cyanobacteria"
+
+```{r rename-phylum-cyano, echo=T, eval=T}
+taxtable_16S_old<-as.data.frame(tax_table(unrarefied_16S_DP_ok.C_NOchloro_uncl_CC))
+
+taxtable_16S_old$Phylum <- recode(taxtable_16S_old$Phylum, "Cyanobacteria/Chloroplast" = 'Cyanobacteria')
+
+new.16S.taxnames<-tax_table(as.matrix(taxtable_16S_old))
+
+
+unrarefied_16S_taxapruned<-phyloseq(sample_data(unrarefied_16S_DP_ok.C_NOchloro_uncl_CC),otu_table(unrarefied_16S_DP_ok.C_NOchloro_uncl_CC),new.16S.taxnames)
+```
+
+**Order-level:** \
+[no pruning]
+
+```{r echo-unique-16S-Orders, echo=T, eval=T}
+kbl(get_taxa_unique(unrarefied_16S_taxapruned, taxonomic.rank = "Order"),col.names="Unique Orders")%>%
+  kable_styling() %>%
+  scroll_box(width = "70%", height = "300px")
+```
+
+**Family-level:** \
+
+```{r fam_BA_subset1, include=T,echo=TRUE,message=FALSE,results='hide'}
+unrarefied_16S_taxapruned.noMito <- subset_taxa(
+  unrarefied_16S_taxapruned, Family!="Mitochondria")
+unrarefied_16S_taxapruned.noMito
+```
+
+9. Remove Family = "Mitochondria" (`r prettyNum(sum(sample_sums(unrarefied_16S_taxapruned))-sum(sample_sums(unrarefied_16S_taxapruned.noMito)),big.mark = ",")` reads; `r prettyNum(ntaxa(unrarefied_16S_taxapruned)-ntaxa(unrarefied_16S_taxapruned.noMito),big.mark = ",")` OTUs) 
+\
+
+```{r echo-unique-16S-Families, echo=T, eval=T}
+kbl(get_taxa_unique(unrarefied_16S_taxapruned, taxonomic.rank = "Family"),col.names="Unique Families")%>%
+  kable_styling() %>%
+  scroll_box(width = "70%", height = "300px")
+```
+
+```{r remove-16S-pruned-OTUs, include=T,echo=TRUE,message=FALSE,results='hide'}
+unrare_BacArch_min1 <- prune_taxa(taxa_sums(unrarefied_16S_taxapruned) > 0, unrarefied_16S_taxapruned)
+```
+
+**Remaining data:** \
+  - `r prettyNum(sum(sample_sums(unrare_BacArch_min1)),big.mark = ",")` total reads \
+  - `r prettyNum(mean(sample_sums(unrare_BacArch_min1)),big.mark = ",")` average reads/sample \
+  - `r prettyNum(ntaxa(unrare_BacArch_min1),big.mark = ",")` OTUs \
+  - `r prettyNum(nsamples(unrare_BacArch_min1),big.mark = ",")` samples \
+\
+\
+
+### ITS {.unnumbered}
+
+**Domain-level:** \
+
+```{r ITS domain_BA_subset1, include=T,echo=TRUE,message=FALSE,results='hide'}
+unrarefied_ITS_Dfungi <- subset_taxa(
+  unrarefied_ITS_alleuk_unprunned_noEDGE, Domain=="Fungi")
+unrarefied_ITS_Dfungi
+```
+
+1. Retain only Domain = Fungi (`r prettyNum(sum(sample_sums(unrarefied_ITS_alleuk_unprunned_noEDGE))-sum(sample_sums(unrarefied_ITS_Dfungi)),big.mark = ",")` reads; `r prettyNum(ntaxa(unrarefied_ITS_alleuk_unprunned_noEDGE)-ntaxa(unrarefied_ITS_Dfungi),big.mark = ",")` OTUs) 
+
+**Phylum-level:** \
+
+```{r echo-unique-ITS-phyla, echo=T, eval=T}
+kbl(get_taxa_unique(unrarefied_ITS_Dfungi, taxonomic.rank = "Phylum"),col.names="Unique phyla")%>%
+  kable_styling() %>%
+  scroll_box(width = "70%", height = "300px")
+```
+
+```{r phylum_F_subset1, include=T,echo=TRUE,message=FALSE,results='hide'}
+unrarefied_ITS_p.NOuncl_Fun <- subset_taxa(
+  unrarefied_ITS_Dfungi, Phylum!="uncl_Fungi")
+unrarefied_ITS_p.NOuncl_Fun
+```
+
+2. Remove Phylum = "uncl_Fungi" (`r prettyNum(sum(sample_sums(unrarefied_ITS_Dfungi))-sum(sample_sums(unrarefied_ITS_p.NOuncl_Fun)),big.mark = ",")` reads; `r prettyNum(ntaxa(unrarefied_ITS_Dfungi)-ntaxa(unrarefied_ITS_p.NOuncl_Fun),big.mark = ",")` OTUs) 
+
+**Class-level:** \
+  [no pruning]
+
+```{r echo-unique-ITS-Classes, echo=T, eval=T}
+kbl(get_taxa_unique(unrarefied_ITS_p.NOuncl_Fun, taxonomic.rank = "Class"),col.names="Unique Classes")%>%
+  kable_styling() %>%
+  scroll_box(width = "70%", height = "300px")
+```
+
+**Order-level:** \
+  [no pruning]
+
+```{r echo-unique-ITS-Orders, echo=T, eval=T}
+kbl(get_taxa_unique(unrarefied_ITS_p.NOuncl_Fun, taxonomic.rank = "Order"),col.names="Unique Orders")%>%
+  kable_styling() %>%
+  scroll_box(width = "70%", height = "300px")
+```
+
+**Family-level:** \
+
+```{r fam_F_subset1, include=T,echo=TRUE,message=FALSE,results='hide'}
+unrarefied_ITS_p.NOuncl_Fun.noMito <- subset_taxa(
+  unrarefied_ITS_p.NOuncl_Fun, Family!="Mitochondria")
+unrarefied_ITS_p.NOuncl_Fun.noMito
+```
+
+3. Remove Family = "Mitochondria" (`r prettyNum(sum(sample_sums(unrarefied_ITS_p.NOuncl_Fun))-sum(sample_sums(unrarefied_ITS_p.NOuncl_Fun.noMito)),big.mark = ",")` reads; `r prettyNum(ntaxa(unrarefied_ITS_p.NOuncl_Fun)-ntaxa(unrarefied_ITS_p.NOuncl_Fun.noMito),big.mark = ",")` OTUs) 
+
+  [None found] \
+\
+
+```{r echo-unique-ITS-Families, echo=T, eval=T}
+kbl(get_taxa_unique(unrarefied_ITS_p.NOuncl_Fun.noMito, taxonomic.rank = "Family"),col.names="Unique Families")%>%
+  kable_styling() %>%
+  scroll_box(width = "70%", height = "300px")
+```
+
+```{r remove-ITS-pruned-OTUs, include=T,echo=TRUE,message=FALSE,results='hide'}
+unrare_Fun_min1 <- prune_taxa(taxa_sums(unrarefied_ITS_p.NOuncl_Fun.noMito) > 0, unrarefied_ITS_p.NOuncl_Fun.noMito)
+```
+
+**Remaining data:** \
+  - `r prettyNum(sum(sample_sums(unrare_Fun_min1)),big.mark = ",")` total reads \
+  - `r prettyNum(mean(sample_sums(unrare_Fun_min1)),big.mark = ",")` average reads/sample \
+  - `r prettyNum(ntaxa(unrare_Fun_min1),big.mark = ",")` OTUs \
+  - `r prettyNum(nsamples(unrare_Fun_min1),big.mark = ",")` samples \
+\
+
+
+
+##  Removing singleton OTUs
+
+At this point, the unrarefied **16S** dataset with unwanted taxa prunned has `r prettyNum(ntaxa(unrare_BacArch_min1),big.mark = ",")` OTUs and a total of `r prettyNum(sum(sample_sums(unrare_BacArch_min1)),big.mark = ",")` reads, \
+and the **ITS** dataset with unwanted taxa prunned has `r prettyNum(ntaxa(unrare_Fun_min1),big.mark = ",")` OTUs and a total of `r prettyNum(sum(sample_sums(unrare_Fun_min1)),big.mark = ",")` reads. \
+\
+```{r remove-singletons, echo=T, eval=T}
+unrare_BacArch_min2 <- prune_taxa(taxa_sums(unrare_BacArch_min1) > 1, unrare_BacArch_min1)
+unrare_Fun_min2 <- prune_taxa(taxa_sums(unrare_Fun_min1) > 1, unrare_Fun_min1)
+```
+
+```{r save-prunned-objects-min2, echo=T, eval=F}
+# saveRDS(unrare_BacArch_min1, file = "../processed_data/clean_rds_saves/KSU_unrare_BacArch_min1.rds")
+# saveRDS(unrare_BacArch_min2, file = "../processed_data/clean_rds_saves/KSU_unrare_BacArch_min2.rds")
+
+# saveRDS(unrare_Fun_min1, file = "../processed_data/clean_rds_saves/KSU_unrare_Fun_min1.rds")
+# saveRDS(unrare_Fun_min2, file = "../processed_data/clean_rds_saves/KSU_unrare_Fun_min2.rds")
+```
+
+```{r restore-prunned-objects min2, echo=T, eval=F}
+unrare_BacArch_min1<-readRDS(file = "../processed_data/clean_rds_saves/KSU_unrare_BacArch_min1.rds")
+unrare_BacArch_min2<-readRDS(file = "../processed_data/clean_rds_saves/KSU_unrare_BacArch_min2.rds")
+
+unrare_Fun_min1<-readRDS(file = "../processed_data/clean_rds_saves/KSU_unrare_Fun_min1.rds")
+unrare_Fun_min2<-readRDS(file = "../processed_data/clean_rds_saves/KSU_unrare_Fun_min2.rds")
+```
+
+**16S** \
+  - `r prettyNum((ntaxa(unrare_BacArch_min1)-ntaxa(unrare_BacArch_min2)),big.mark = ",")` singleton OTUs were present and removed (corresponding to `r prettyNum((sum(sample_sums(unrare_BacArch_min1))-sum(sample_sums(unrare_BacArch_min2))),big.mark = ",")` reads) \
+  
+  - `r prettyNum(ntaxa(unrare_BacArch_min2),big.mark = ",")` OTUs remain \
+  
+  - `r prettyNum(sum(sample_sums(unrare_BacArch_min2)),big.mark = ",")` total reads remain \
+  
+    - average: `r prettyNum(mean(sample_sums(unrare_BacArch_min2)),big.mark = ",")` \
+    
+    - sd: `r prettyNum(sd(sample_sums(unrare_BacArch_min2)),big.mark = ",")` \
+    
+\
+
+
+**ITS** \
+  - `r prettyNum((ntaxa(unrare_Fun_min1)-ntaxa(unrare_Fun_min2)),big.mark = ",")` singleton OTUs were present and removed (corresponding to `r prettyNum((sum(sample_sums(unrare_Fun_min1))-sum(sample_sums(unrare_Fun_min2))),big.mark = ",")` reads) \
+  
+  - `r prettyNum(ntaxa(unrare_Fun_min2),big.mark = ",")` OTUs remain \
+  
+  - `r prettyNum(sum(sample_sums(unrare_Fun_min2)),big.mark = ",")` total reads remain \
+  
+    - average: `r prettyNum(mean(sample_sums(unrare_Fun_min2)),big.mark = ",")` \
+    
+    - sd: `r prettyNum(sd(sample_sums(unrare_Fun_min2)),big.mark = ",")` \
+    
+\
+\
+
+##  Exporting unknown / chloroplast OTUs and exporting
+
+```{r subsets-for-export, echo=T, eval=T,message=FALSE,results='hide'}
+unrarefied_16S_DP_ok.C_NOchloro <- subset_taxa(
+  unrarefied_16S_D_ok.P_NOuncl_BacArc, Class!="Chloroplast")
+unrarefied_16S_DP_ok.C_NOchloro
+
+
+# 16S, domain = bacteria / archaea, phylum = "Cyanobacteria/Chloroplast"
+unrarefied_16S_phylum_CyanoChloroplast <- subset_taxa(
+  unrarefied_16S_NOuncl_Domain_noEuk, Phylum=="Cyanobacteria/Chloroplast")
+
+  unrarefied_16S_phylum_CyanoChloroplast
+  
+  get_taxa_unique(unrarefied_16S_phylum_CyanoChloroplast, taxonomic.rank = "Class")
+
+    # Class = Chloroplast
+    unrarefied_16S_class_Chloroplast <- subset_taxa(unrarefied_16S_phylum_CyanoChloroplast, Class=="Chloroplast")
+
+    unrarefied_16S_class_Chloroplast
+    
+    saveRDS(unrarefied_16S_class_Chloroplast, file = "../processed_data/KSU_select_seqs_for_Julia/KSU_16S_unrarefied_Class_Chloroplast.rds")
+
+    # Class = uncl_Cyanobacteria/Chloroplast
+    unrarefied_16S_class_uncl_CyanobacteriaChloroplast <- subset_taxa(unrarefied_16S_phylum_CyanoChloroplast, Class=="uncl_Cyanobacteria/Chloroplast")
+
+    unrarefied_16S_class_uncl_CyanobacteriaChloroplast
+
+    saveRDS(unrarefied_16S_class_uncl_CyanobacteriaChloroplast, file = "../processed_data/KSU_select_seqs_for_Julia/KSU_16S_unrarefied_Class_unclCyanoChloroplast.rds")
+```
+
+```{r}
+get_taxa_unique(unrarefied_16S_phylum_CyanoChloroplast, taxonomic.rank = "Order")
+```
+
+
+##  BacArch OTU Rarefaction Curves
+
+\
+
+### 16S samples with highest read count
+
+```{r high-16S-reads, echo=T, eval=T,message=FALSE,results='hide'}
+readcounts_unrare_BacArch_min2<-(as.data.frame(sample_sums(unrare_BacArch_min2)))
+
+X1351_1453<-subset_samples(unrare_BacArch_min2, sample_name=="FCP_BUDA_12") 
+X1351_1453<-prune_taxa(taxa_sums(X1351_1453) > 0, X1351_1453)
+
+X1351_1453_fun<-subset_samples(unrare_Fun_min2, sample_name=="FCP_BUDA_12") 
+X1351_1453_fun<-prune_taxa(taxa_sums(X1351_1453_fun) > 0, X1351_1453_fun)
+```
+
+\
+
+**Top 3 *16S* samples with highest read counts** \
+  
+  - 1351_1453 \
+    -- FCP_BUDA_12 (Site = FCP;  Plant Host = BUDA;  rep = 12) \
+      - `r prettyNum(ntaxa(X1351_1453),big.mark = ",")` 16S OTUs \
+      - `r prettyNum(sample_sums(X1351_1453),big.mark = ",")` 16S reads \
+      
+    -- ITS sample name: SRR13801191 \
+      - `r prettyNum(ntaxa(X1351_1453_fun),big.mark = ",")` ITS OTUs \
+      - `r prettyNum(sample_sums(X1351_1453_fun),big.mark = ",")` ITS reads \
+    \
+    
+  - 1351_1566 \
+    -- KNZ_BUDA_3 (Site = KNZ;  Plant Host = BUDA;  rep = 3) \
+    -- ITS sample name: SRR13801139
+\
+
+  - 1351_1558 \
+    -- KNZ_SCSC_7 (Site = KNZ;  Plant Host = SCSC;  rep = 7) \
+    -- ITS sample name: SRR13801391
+\
+
+
+\
+**Notes:** \
+These 3 samples appear to only approach an asymptote @ >1.5 mil reads -> very diverse and our down-stream results will likely underestimate their diversity
+\
+\
+
+my custom rarefaction curve script: 
+
+```{r my-rarefaction-curve-code, echo=T}
+# custom script to plot rarefaction curves, will edit later to map cols
+
+plot_rarecurves <-function (x, step = 1, sample, 
+                   xlab = "Sequences per Sample", ylab = "OTU Count", 
+                   label = TRUE, 
+                   cols = c(rep('blue', nrow(x) / 1)), 
+                   #cols = c(rep('red', nrow(x) / 2), rep('blue', nrow(x) / 2)), 
+                   ...) {
+  tot <- rowSums(x)
+  S <- specnumber(x)
+  nr <- nrow(x)
+  
+  out <- lapply(seq_len(nr), function(i) {
+    n <- seq(1, tot[i], by = step)
+    if (n[length(n)] != tot[i]) 
+      n <- c(n, tot[i])
+  
+      drop(rarefy(x[i, ], n))
+  })
+  
+  Nmax <- sapply(out, function(x) max(attr(x, "Subsample")))
+  Smax <- sapply(out, max)
+  plot(c(1, max(Nmax)), c(1, max(Smax)), xlab = xlab, ylab = ylab, 
+       type = "n", 
+       las=1, # horizontal axis text
+       xaxt = "n", 
+       ...)
+  axis(1, at=axTicks(1),
+       labels=format(axTicks(1),big.mark=",", scientific=FALSE)) #add axis text comma separator
+  if (!missing(sample)) {
+    abline(v = sample)
+    rare <- sapply(out, function(z) approx(x = attr(z, "Subsample"), 
+                                           y = z, xout = sample, rule = 1)$y)
+    abline(h = rare, lwd = 0.5)
+  }
+  for (ln in seq_len(length(out))) {
+    N <- attr(out[[ln]], "Subsample")
+    lines(N, out[[ln]], col = cols[ln], ...)
+  }
+  if (label) {
+    ordilabel(cbind(tot, S), cex = 0.8,labels = rownames(x), ...)
+  }
+  invisible(out)
+}
+```
+
+\
+
+### All samples, full depth range
+
+```{r Rarecurve_16S_fullrange, echo=TRUE, fig.align='center', fig.width=6, eval=F, dev = "png",dpi=300, message=F}
+par(mar = c(5.1, 4.1, 5.1, 2.1)) # c(bottom, left, top, right)
+
+dev.copy(png,'figures/Rarefaction/Rarecurve_16S_fullrange.png',width = 650)
+
+plot_rarecurves(t(otu_table(unrare_BacArch_min2)), step = 5000,xlim=c(0,max(sample_sums(unrare_BacArch_min2))),
+  title(main="Rarefaction Curves for all 16S samples\nDomain=Bacteria or Archaea, taxa prunned", adj=0),
+   label=T,cex.main=1.2)
+
+dev.off()
+```
+
+![](../docs/figures/Rarefaction/Rarecurve_16S_fullrange.png){width=90%} 
+
+3 samples with > 1 million sequences. Most samples <30k\
+see above section 3.2.1 Samples with highest read count \
+29 samples with <10k reads \
+54 samples < 12k
+\
+\
+
+### All samples, max 40k seqs/samples
+
+```{r Rarecurve_16S_nolabs_max40k, echo=TRUE, fig.align='center', fig.width=6, eval=F, dpi=300, message=F}
+par(mar = c(5.1, 4.1, 5.1, 2.1)) # c(bottom, left, top, right)
+
+dev.copy(png,'../docs/figures/Rarefaction/Rarecurve_16S_nolabs_max40k.png',width = 650)
+
+plot_rarecurves(t(otu_table(unrare_BacArch_min2)), step = 2000,xlim=c(0,40000),ylim=c(0,4000),
+   title(main="Rarefaction Curves for all 16S samples\nDomain=Bacteria or Archaea, taxa prunned", adj=0),
+   label=F,cex.main=1.2)
+
+dev.off()
+```
+
+![](../docs/figures/Rarefaction/Rarecurve_16S_nolabs_max40k.png){width=90%} 
+
+If we rarefy to 9,048, we will only lose 20 samples. What does this look like?
+
+
+### All samples, max 15k seqs/samples
+
+```{r Rarecurve_16S_nolabs_max15k, echo=TRUE, fig.align='center', fig.width=6, eval=F, dpi=300, message=F}
+
+#plot.new ()
+
+par(mar = c(5.1, 4.1, 5.1, 2.1)) # c(bottom, left, top, right)
+
+dev.copy(png,'../docs/figures/Rarefaction/Rarecurve_16S_nolabs_max15k.png',width = 650)
+
+plot_rarecurves(t(otu_table(unrare_BacArch_min2)), step = 500,xlim=c(0,15000),ylim=c(0,3000), sample = 9048,
+  title(main="Rarefaction Curves for all 16S samples\nDomain=Bacteria or Archaea, taxa prunned \nestimating richness from slope derivative", adj=0),
+   label=F,cex.main=1.2)
+
+dev.off()
+```
+
+![](../docs/figures/Rarefaction/Rarecurve_16S_nolabs_max15k.png){width=90%} 
+
+
+## Rarefying 16S OTU table to 9,048 seqs/sample
+
+```{r 16S-rare-check, echo=TRUE,message=FALSE,results='hide'}
+reads_16S_rare_kept<-subset(readcounts_unrare_BacArch_min2, `sample_sums(unrare_BacArch_min2)` >= 9048)
+
+nsamples(unrare_BacArch_min2) - nrow(reads_16S_rare_kept)
+
+((nsamples(unrare_BacArch_min2) - nrow(reads_16S_rare_kept))/nsamples(unrare_BacArch_min2))*100
+```
+
+\
+
+```{r}
+BacArch_min2_rare9048<-readRDS(file = "../processed_data/clean_rds_saves/BacArch_min2_rare9048_v1.rds")
+```
+
+**Rarefaction threshold of 9,048 sequences per sample -> we'd lose:** \
+
+  - `r nsamples(unrare_BacArch_min2)-(nrow(subset(readcounts_unrare_BacArch_min2, sample_sums(unrare_BacArch_min2) >= 9048)))` samples overall (`r round(100*(nsamples(unrare_BacArch_min2)-(nrow(subset(readcounts_unrare_BacArch_min2, sample_sums(unrare_BacArch_min2) >= 9048))))/(nsamples(unrare_BacArch_min2)),1)`% of the total `r nsamples(unrare_BacArch_min2)` samples) \
+    -- `r prettyNum(ntaxa(unrare_BacArch_min2)-ntaxa(BacArch_min2_rare9048),big.mark = ",")` OTUs (`r round(100*((ntaxa(unrare_BacArch_min2)-ntaxa(BacArch_min2_rare9048))/(ntaxa(unrare_BacArch_min2))),1)`% of the total `r prettyNum(ntaxa(unrare_BacArch_min2),big.mark = ",")` OTUs) \
+    -- `r prettyNum(ntaxa(BacArch_min2_rare9048),big.mark = ",")` OTUs remain \
+
+*Of note, I am rarefying via subsampling WITHOUT replacement and removing OTUs no longer in dataset* \
+
+```{r rarefaction-of-16S, eval=F, echo=T}
+BacArch_min2_rare9048 <-rarefy_even_depth(unrare_BacArch_min2,
+                                                      sample.size = 9048, rngseed = FALSE, 
+                                                      replace = F, trimOTUs = TRUE, verbose = TRUE)
+
+# Save an object to a file
+saveRDS(BacArch_min2_rare9048, file = "../processed_data/clean_rds_saves/KSU_16S_BacArch_min2_rare9048.rds")
+```
+
+\
+Indeed: \
+  - 20 samples removed because they contained fewer reads than `sample.size`.
+\
+  - 6,967 OTUs were removed because they are no longer present in any sample after random subsampling
+
+
+```{r, eval=F}
+BacArch_min2_rare9048
+```
+
+\
+\
+
+
+
+##  Fungal OTU Rarefaction Curves
+\
+
+### ITS samples with highest read count
+
+```{r high-ITS-reads, echo=T,eval=T,message=FALSE,results='hide'}
+readcounts_unrare_Fun_min2<-(as.data.frame(sample_sums(unrare_Fun_min2)))
+
+# X1351_1453<-subset_samples(unrare_BacArch_min2, sample_name=="FCP_BUDA_12") 
+# X1351_1453<-prune_taxa(taxa_sums(X1351_1453) > 0, X1351_1453)
+# 
+X1351_1453_fun<-subset_samples(unrare_Fun_min2, sample_name=="FCP_BUDA_12")
+X1351_1453_fun<-prune_taxa(taxa_sums(X1351_1453_fun) > 0, X1351_1453_fun)
+```
+
+\
+
+**Top 4 *ITS* samples with highest read counts** \
+old:   
+  - 1351_1453 \
+    -- FCP_BUDA_12 (Site = FCP;  Plant Host = BUDA;  rep = 12) \
+      - `r prettyNum(ntaxa(X1351_1453),big.mark = ",")` 16S OTUs \
+      - `r prettyNum(sample_sums(X1351_1453),big.mark = ",")` 16S reads \
+      
+    -- ITS sample name: SRR13801191 \
+      - `r prettyNum(ntaxa(X1351_1453_fun),big.mark = ",")` ITS OTUs \
+      - `r prettyNum(sample_sums(X1351_1453_fun),big.mark = ",")` ITS reads \
+    \
+its:    
+  - SRR9182444 \
+    -- HAR_E_BOCU_8 (EDGE site; Site = HAR; Plant Host = BOCU; rep = 8) \
+    -- the line with the highest OTU count has clearly not reached an asymptote -> very diverse sample \
+    \
+    
+  - SRR13801264 \
+    -- LBJ_SCSC_12 (Site = LBJ; Plant Host = SCSC; rep = 12) \
+\
+
+  - SRR13800994 \
+    -- LBJ_ANGE_8 (Site = LBJ; Plant Host = ANGE; rep = 8) \
+\
+
+  - SRR13801266 \
+    -- LBJ_SCSC_10 (Site = LBJ; Plant Host = SCSC; rep = 10) \
+\
+\
+
+
+\
+**Notes:** \
+These 3 samples appear to only approach an asymptote @ >1.5 mil reads -> very diverse and our down-stream results will likely underestimate their diversity
+\
+\
+
+### All samples, full depth range
+
+```{r Rarecurve_ITS_fullrange, echo=TRUE, fig.align='center', fig.width=6, eval=F, dev = "png",dpi=300, message=F}
+par(mar = c(5.1, 4.1, 5.1, 2.1)) # c(bottom, left, top, right)
+
+dev.copy(png,'../docs/figures/Rarefaction/Rarecurve_ITS_fullrange.png',width = 650)
+
+plot_rarecurves(t(otu_table(unrare_Fun_min2)), step = 5000,xlim=c(0,max(sample_sums(unrare_Fun_min2))),
+  title(main="Rarefaction Curves for ITS samples (Domain=Fungi, Phylum assigned)", adj=0),
+   label=T,cex.main=1.2)
+
+dev.off()
+```
+
+![](../docs/figures/Rarefaction/Rarecurve_ITS_fullrange.png){width=90%} 
+
+
+### All samples, max 200k seqs/samples
+
+```{r Rarecurve_ITS_nolabs_max200k, echo=TRUE, fig.align='center', fig.width=6, eval=F, dpi=300, message=F}
+par(mar = c(5.1, 4.1, 5.1, 2.1)) # c(bottom, left, top, right)
+
+dev.copy(png,'../docs/figures/Rarefaction/Rarecurve_ITS_nolabs_max200k.png',width = 650)
+
+plot_rarecurves(t(otu_table(unrare_Fun_min2)), step = 2000,xlim=c(0,200000),
+                #ylim=c(0,4000),
+   title(main="Rarefaction Curves for ITS samples (Domain=Fungi, Phylum assigned)\nmax 200k seqs/sample", adj=0),
+   label=F,cex.main=1.2)
+
+dev.off()
+```
+
+![](../docs/figures/Rarefaction/Rarecurve_ITS_nolabs_max200k.png){width=90%} 
+
+Note: it seems like most samples sequenced to 100k have reached an asymptote\
+zomming in again to 60k \
+
+
+### All samples, max 60k seqs/samples
+
+```{r Rarecurve_ITS_nolabs_max60k, echo=TRUE, fig.align='center', fig.width=6, eval=F, dpi=300, message=F}
+par(mar = c(5.1, 4.1, 5.1, 2.1)) # c(bottom, left, top, right)
+
+dev.copy(png,'../docs/figures/Rarefaction/Rarecurve_ITS_nolabs_max60k.png',width = 650)
+
+plot_rarecurves(t(otu_table(unrare_Fun_min2)), step = 1000,xlim=c(0,60000),
+                #ylim=c(0,4000),
+   title(main="Rarefaction Curves for ITS samples (Domain=Fungi, Phylum assigned)\nmax 60k seqs/sample", adj=0),
+   label=F,cex.main=1.2)
+
+dev.off()
+```
+
+![](../docs/figures/Rarefaction/Rarecurve_ITS_nolabs_max60k.png){width=90%} 
+
+Good news again, the majority of samples have reached an asymptote, OTU counts level off between ~25 (?) to 300 OTUs. This occurs at sampling depths between 10-30k\
+\
+
+```{r ITS-rare, echo=T, eval=T}
+Fun_min2_rare30k <-rarefy_even_depth(unrare_Fun_min2,
+                                                      sample.size = 30000, rngseed = FALSE, 
+                                                      replace = F, trimOTUs = TRUE, verbose = TRUE)
+```
+
+I'd like to rarefy around 30k but we'd lose too much data: \
+  
+  - `r nsamples(unrare_Fun_min2)-(nrow(subset(readcounts_unrare_Fun_min2, sample_sums(unrare_Fun_min2) >= 30000)))` samples overall (`r round(100*(nsamples(unrare_Fun_min2)-(nrow(subset(readcounts_unrare_Fun_min2, sample_sums(unrare_Fun_min2) >= 30000))))/(nsamples(unrare_Fun_min2)),1)`% of the total `r nsamples(unrare_Fun_min2)` samples) \
+    -- `r prettyNum(ntaxa(unrare_Fun_min2)-ntaxa(Fun_min2_rare30k),big.mark = ",")` OTUs (`r round(100*((ntaxa(unrare_Fun_min2)-ntaxa(Fun_min2_rare30k))/(ntaxa(unrare_Fun_min2))),1)`% of the total `r prettyNum(ntaxa(unrare_Fun_min2),big.mark = ",")` OTUs) \
+      - `r prettyNum(ntaxa(Fun_min2_rare30k),big.mark = ",")` OTUs would remain \
+
+    
+My general rarefaction rule of thumb is cut off no more than 10% of samples. For that reason, I'm going with a depth of 10,116. If you want me to change this I can \
+
+
+## Rarefying ITS OTU table to 10,116 seqs/sample
+
+```{r ITS-rare-check, echo=TRUE,message=FALSE,results='hide'}
+reads_ITS_rare_kept<-subset(readcounts_unrare_Fun_min2, `sample_sums(unrare_Fun_min2)` >= 10116)
+
+nsamples(unrare_Fun_min2) - nrow(reads_ITS_rare_kept)
+
+((nsamples(unrare_Fun_min2) - nrow(reads_ITS_rare_kept))/nsamples(unrare_Fun_min2))*100
+```
+
+\
+
+```{r, echo=T, eval=T}
+Fun_min2_rare10116<-readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_noEDGE_v2.rds")
+```
+
+**Rarefaction threshold of 10,116 sequences per sample -> we'd lose:** \
+
+  - `r nsamples(unrare_Fun_min2)-(nrow(subset(readcounts_unrare_Fun_min2, sample_sums(unrare_Fun_min2) >= 10116)))` samples overall (`r round(100*(nsamples(unrare_Fun_min2)-(nrow(subset(readcounts_unrare_Fun_min2, sample_sums(unrare_Fun_min2) >= 10116))))/(nsamples(unrare_Fun_min2)),1)`% of the total `r nsamples(unrare_Fun_min2)` samples) \
+    -- `r prettyNum(ntaxa(unrare_Fun_min2)-ntaxa(Fun_min2_rare10116),big.mark = ",")` OTUs (`r round(100*((ntaxa(unrare_Fun_min2)-ntaxa(Fun_min2_rare10116))/(ntaxa(unrare_Fun_min2))),1)`% of the total `r prettyNum(ntaxa(unrare_Fun_min2),big.mark = ",")` OTUs) \
+    -- `r prettyNum(ntaxa(Fun_min2_rare10116),big.mark = ",")` OTUs remain \
+
+
+*Of note, I am rarefying via subsampling WITHOUT replacement and removing OTUs no longer in dataset* \
+
+```{r rarefaction-of-ITS, eval=F, echo=T}
+Fun_min2_rare10116 <-rarefy_even_depth(unrare_Fun_min2,
+                                                      sample.size = 10116, rngseed = FALSE, 
+                                                      replace = F, trimOTUs = TRUE, verbose = TRUE)
+
+# Save an object to a file
+saveRDS(Fun_min2_rare10116, file = "../processed_data/clean_rds_saves/KSU_ITS_Fun_min2_rare10116.rds")
+```
+
+\
+Indeed: \
+  - 50 samples removed because they contained fewer reads than `sample.size`.
+\
+  - 696 OTUs were removed because they are no longer present in any sample after random subsampling
+
+```{r, eval=T}
+Fun_min2_rare10116
+```
+\
+\
+
+### Subset to Blue Grama non-EDGE sites (post rarefaction) 
+
+#### 16S 
+
+```{r, eval=T, echo=TRUE}
+BacArch_min2_rare9048_noEDGE_BOGR <- subset_samples(BacArch_min2_rare9048, Grass=="BOGR")
+
+BacArch_min2_rare9048_noEDGE_BOGR <- prune_taxa(taxa_sums(BacArch_min2_rare9048_noEDGE_BOGR) > 0, BacArch_min2_rare9048_noEDGE_BOGR)
+
+# saveRDS(BacArch_min2_rare9048_noEDGE_BOGR, file = "clean_rds_saves/BacArch_min2_rare9048_noEDGE_BOGR_v1.rds")
+
+Fun_min2_rare10116_noEDGE_BOGR <- subset_samples(Fun_min2_rare10116, Grass=="BOGR")
+
+Fun_min2_rare10116_noEDGE_BOGR <- prune_taxa(taxa_sums(Fun_min2_rare10116_noEDGE_BOGR) > 0, Fun_min2_rare10116_noEDGE_BOGR)
+```
+
+```{r}
+BacArch_min2_rare9048_noEDGE_BOGR
+```
+
+### ITS 
+
+```{r, eval=T}
+Fun_min2_rare10116_noEDGE_BOGR
+```
+\
+\
+
+# Export genus-level taxonomy of *Blue grama* samples ranked by frequency
+
+```{r export-genusFreq-BOGR-16S, eval=T,echo=TRUE}
+BacArch_min2_rare9048_noEDGE_BOGR_genus<-tax_glom(BacArch_min2_rare9048_noEDGE_BOGR, taxrank = "Genus")
+
+BOGR_16S_genera_names<-as.data.frame(tax_table(BacArch_min2_rare9048_noEDGE_BOGR_genus))
+
+BOGR_16S_genera_freq<-calc_occurrence(
+  BacArch_min2_rare9048_noEDGE_BOGR_genus,
+  variable = NULL, #Character string of  var name of sample groups (should be present in sample_data) or NULL (no sample groups)
+  taxa_frequency = "percentage", # if TRUE relative frequency of species occurence; if F sample count per OTU
+  drop_zeroes = FALSE, #taxa with total zero abundance will be removed
+  justdf = TRUE, # T=df out; F= phyloseq object out
+  long = FALSE #f TRUE, data frame with taxa occurrences will be returned in long format (with a single column defining the sample group); if FALSE (default), species occurrences will be returned in a wide format (sample groups as columns)
+)
+
+row.names(BOGR_16S_genera_freq)<-BOGR_16S_genera_freq[,1]
+
+BOGR_16S_genera<-cbind(BOGR_16S_genera_freq,BOGR_16S_genera_names)
+
+write.csv(BOGR_16S_genera, file="../processed_data/taxa_summaries/KSU_16S_BOGR_genera_ranked_byfreq.csv")
+```
+
+```{r export-genusFreq-BOGR-ITS, eval=T,echo=TRUE}
+Fun_min2_rare10116_noEDGE_BOGR_genus<-tax_glom(Fun_min2_rare10116_noEDGE_BOGR, taxrank = "Genus")
+
+BOGR_ITS_genera_names<-as.data.frame(tax_table(Fun_min2_rare10116_noEDGE_BOGR_genus))
+
+BOGR_ITS_genera_freq<-calc_occurrence(
+  Fun_min2_rare10116_noEDGE_BOGR_genus,
+  variable = NULL, #Character string of  var name of sample groups (should be present in sample_data) or NULL (no sample groups)
+  taxa_frequency = "percentage", # if TRUE relative frequency of species occurence; if F sample count per OTU
+  drop_zeroes = FALSE, #taxa with total zero abundance will be removed
+  justdf = TRUE, # T=df out; F= phyloseq object out
+  long = FALSE #f TRUE, data frame with taxa occurrences will be returned in long format (with a single column defining the sample group); if FALSE (default), species occurrences will be returned in a wide format (sample groups as columns)
+)
+
+row.names(BOGR_ITS_genera_freq)<-BOGR_ITS_genera_freq[,1]
+
+BOGR_ITS_genera<-cbind(BOGR_ITS_genera_freq,BOGR_ITS_genera_names)
+
+write.csv(BOGR_ITS_genera, file="../processed_data/taxa_summaries/KSU_ITS_BOGR_genera_ranked_byfreq.csv")
+```
+
+\
+\
+
+# Taxonomy tables (clean)
+
+\
+
+## Unique BacArch Phyla detected
+
+```{r echo-clean-phyla-setup-16S, echo=TRUE,message=FALSE,results='hide'}
+BacArch_min2_rare9048.Phyla.A <- tax_glom(BacArch_min2_rare9048, taxrank="Phylum")
+
+BacArch_min2_rare9048.Phyla <- prune_taxa(taxa_sums(BacArch_min2_rare9048.Phyla.A) > 0, BacArch_min2_rare9048.Phyla.A)
+
+BA_Phyla<-get_taxa_unique(BacArch_min2_rare9048.Phyla, taxonomic.rank="Phylum")
+uniq_BAphyla<-data.frame(matrix(ncol=4,nrow=length(BA_Phyla)))
+row.names(uniq_BAphyla)<-BA_Phyla
+colnames(uniq_BAphyla)<-c("BacArch_Phylum","reads_assigned","percentage_BacArch_reads", "OTU_count")
+uniq_BAphyla[,1]<-BA_Phyla
+uniq_BAphyla[,2]<-taxa_sums(BacArch_min2_rare9048.Phyla)
+# uniq_BAphyla[,2]<-sample_sums(BacArch_min2_rare9048.Phyla)
+uniq_BAphyla[,3]<-taxa_sums(BacArch_min2_rare9048.Phyla)/sum(sample_sums(BacArch_min2_rare9048.Phyla))
+```
+
+```{r, include=FALSE}
+uniq_BAphyla[1,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[1,1]))
+uniq_BAphyla[2,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[2,1]))
+uniq_BAphyla[3,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[3,1]))
+uniq_BAphyla[4,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[4,1]))
+uniq_BAphyla[5,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[5,1]))
+uniq_BAphyla[6,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[6,1]))
+uniq_BAphyla[7,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[7,1]))
+uniq_BAphyla[8,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[8,1]))
+uniq_BAphyla[9,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[9,1]))
+uniq_BAphyla[10,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[10,1]))
+uniq_BAphyla[11,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[11,1]))
+uniq_BAphyla[12,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[12,1]))
+uniq_BAphyla[13,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[13,1]))
+uniq_BAphyla[14,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[14,1]))
+uniq_BAphyla[15,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[15,1]))
+uniq_BAphyla[16,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[16,1]))
+uniq_BAphyla[17,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[17,1]))
+uniq_BAphyla[18,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[18,1]))
+uniq_BAphyla[19,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[19,1]))
+uniq_BAphyla[20,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[20,1]))
+uniq_BAphyla[21,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[21,1]))
+uniq_BAphyla[22,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[22,1]))
+uniq_BAphyla[23,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[23,1]))
+uniq_BAphyla[24,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[24,1]))
+uniq_BAphyla[25,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[25,1]))
+uniq_BAphyla[26,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[26,1]))
+uniq_BAphyla[27,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[27,1]))
+uniq_BAphyla[28,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[28,1]))
+uniq_BAphyla[29,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[29,1]))
+uniq_BAphyla[30,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[30,1]))
+uniq_BAphyla[31,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[31,1]))
+uniq_BAphyla[32,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[32,1]))
+uniq_BAphyla[33,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[33,1]))
+uniq_BAphyla[34,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[34,1]))
+uniq_BAphyla[35,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[35,1]))
+
+uniq_BAphyla.s<-uniq_BAphyla[order(uniq_BAphyla$reads_assigned, decreasing = TRUE),]
+```
+
+```{r unique-BacArch phyla-reads-table, echo=T, message=FALSE, results="asis"}
+hux(uniq_BAphyla.s) %>%
+          set_bold(1,everywhere,value=TRUE)%>%
+          set_font_size(10) %>%
+          set_align(everywhere,2,"right") %>%
+          set_align(everywhere,1,"left") %>%
+          set_outer_padding(everywhere,everywhere,10) %>%
+          set_number_format(everywhere,2,fmt_pretty(big.mark = ",",preserve.width="none")) %>%
+          set_number_format(everywhere,3,fmt_percent(digits = 2)) %>%
+          set_number_format(everywhere,4,fmt_pretty(big.mark = ",",preserve.width="none")) %>%
+          set_bottom_border(1, everywhere,0.4)%>%
+          set_bottom_border(36, everywhere,0.1)
+```
+
+\
+\
+
+## Unique Fungal Phyla detected
+
+```{r echo-clean-phyla-setup-ITS, echo=TRUE,message=FALSE,results='hide'}
+Fun_min2_rare10116.Phyla.A <- tax_glom(Fun_min2_rare10116, taxrank="Phylum")
+
+Fun_min2_rare10116.Phyla <- prune_taxa(taxa_sums(Fun_min2_rare10116.Phyla.A) > 0, Fun_min2_rare10116.Phyla.A)
+
+F_Phyla<-get_taxa_unique(Fun_min2_rare10116.Phyla, taxonomic.rank="Phylum")
+uniq_Fphyla<-data.frame(matrix(ncol=4,nrow=length(F_Phyla)))
+row.names(uniq_Fphyla)<-F_Phyla
+colnames(uniq_Fphyla)<-c("Fungal_Phylum","reads_assigned","percentage_Fungal_reads", "OTU_count")
+uniq_Fphyla[,1]<-F_Phyla
+uniq_Fphyla[,2]<-taxa_sums(Fun_min2_rare10116.Phyla)
+# uniq_Fphyla[,2]<-sample_sums(Fun_min2_rare10116.Phyla)
+uniq_Fphyla[,3]<-taxa_sums(Fun_min2_rare10116.Phyla)/sum(sample_sums(Fun_min2_rare10116.Phyla))
+
+uniq_Fphyla[1,4]<-ntaxa(subset_taxa(Fun_min2_rare10116, Phylum==uniq_Fphyla[1,1]))
+uniq_Fphyla[2,4]<-ntaxa(subset_taxa(Fun_min2_rare10116, Phylum==uniq_Fphyla[2,1]))
+uniq_Fphyla[3,4]<-ntaxa(subset_taxa(Fun_min2_rare10116, Phylum==uniq_Fphyla[3,1]))
+uniq_Fphyla[4,4]<-ntaxa(subset_taxa(Fun_min2_rare10116, Phylum==uniq_Fphyla[4,1]))
+uniq_Fphyla[5,4]<-ntaxa(subset_taxa(Fun_min2_rare10116, Phylum==uniq_Fphyla[5,1]))
+uniq_Fphyla[6,4]<-ntaxa(subset_taxa(Fun_min2_rare10116, Phylum==uniq_Fphyla[6,1]))
+uniq_Fphyla[7,4]<-ntaxa(subset_taxa(Fun_min2_rare10116, Phylum==uniq_Fphyla[7,1]))
+uniq_Fphyla[8,4]<-ntaxa(subset_taxa(Fun_min2_rare10116, Phylum==uniq_Fphyla[8,1]))
+uniq_Fphyla[9,4]<-ntaxa(subset_taxa(Fun_min2_rare10116, Phylum==uniq_Fphyla[9,1]))
+
+uniq_Fphyla.s<-uniq_Fphyla[order(uniq_Fphyla$reads_assigned, decreasing = TRUE),]
+```
+
+```{r unique-Fun-phyla-reads-table, echo=T, message=FALSE, results="asis"}
+hux(uniq_Fphyla.s) %>%
+          set_bold(1,everywhere,value=TRUE)%>%
+          set_font_size(10) %>%
+          set_align(everywhere,2,"right") %>%
+          set_align(everywhere,1,"left") %>%
+          set_outer_padding(everywhere,everywhere,10) %>%
+          set_number_format(everywhere,2,fmt_pretty(big.mark = ",",preserve.width="none")) %>%
+          set_number_format(everywhere,3,fmt_percent(digits = 2)) %>%
+          set_number_format(everywhere,4,fmt_pretty(big.mark = ",",preserve.width="none")) %>%
+          set_bottom_border(1, everywhere,0.4)%>%
+          set_bottom_border(10, everywhere,0.1)
+```
