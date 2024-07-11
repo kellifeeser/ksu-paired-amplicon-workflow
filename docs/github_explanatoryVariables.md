@@ -2,31 +2,33 @@
 title: "Overview of Explanatory Variables"
 subtitle: "Analyzing and visualizing KSU explanatory variables"
 author: "Kelli Feeser"
-date: '2023-10-02'
+date: "2024-07-10"
 output:
   bookdown::html_document2:
     code_folding: hide
-    df_print: kable
     css: styles.css
     number_sections: yes
     toc: yes
-    toc_depth: 3
+    toc_depth: 4
+    toc_float: true
     fig.caption: yes
     keep_md: yes
+  html_document:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
   html_notebook:
     code_folding: hide
-    df_print: kable
-    number_sections: yes
     css: styles.css
-    toc: yes
-    toc_depth: 3
-  html_document: 
-    code_folding: hide
-    css: test.css
     number_sections: yes
-    theme: cosmo
     toc: yes
-    toc_depth: 2
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
 editor_options:
   chunk_output_type: inline
 ---
@@ -37,20 +39,31 @@ editor_options:
 <a href="https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html" target="_blank" style="text-align:right">Back to Home</a>
 :::
 
+\
 
-```r
-opts <- options(knitr.kable.NA = "")
-```
+------------------------------------------------------------------------
+
+Document last updated: 2024-07-10
+
+------------------------------------------------------------------------
+
+\
+
+# Set-up {.unlisted .unnumbered .hidden}
 
 
+
+
+
+## load packages
 
 
 
 \
 
-# Set-up {.hidden .unlisted .unnumbered}
+## load rds
 
-\
+
 
 # Metadata structure
 
@@ -61,7 +74,8 @@ opts <- options(knitr.kable.NA = "")
 [*Categorical*]{.underline}
 
 -   **Site**
-    -   n = 23
+    -   n = 22
+        -   FCP - Four Canyon Preserve; Oklahoma, 36.0235,-99.9439
 -   **Grassland type**
     -   n = 4
     -   tallgrass, mixed grass, shortgrass, desert
@@ -69,15 +83,15 @@ opts <- options(knitr.kable.NA = "")
     -   n = 5
         -   ANGE (*Andropogon gerardii* / Big bluestem)
         -   SCSC (*Schizachyrium scoparium* / Little bluestem)
-        -   BOER (*B. eriopoda* / Black grama)
+        -   BOER (*Bouteloua eriopoda* / Black grama)
         -   BOGR (*B. gracilis* / Blue grama)
-        -   BUDA (*Bouteloua dactyloides* / Buffalograss)
--   **Latitudinal Bin**
-    -   n = 4
-    -   North, North Central, South Central, South
--   **Longitudinal Gradient**:
-    -   n = 3
-    -   East, Middle, West
+        -   BUDA (*B. dactyloides* / Buffalograss)
+-   ~~**Latitudinal Bin**~~
+    -   ~~n = 4~~
+    -   ~~North, North Central, South Central, South~~
+-   ~~**Longitudinal Gradient**:~~
+    -   ~~n = 3~~
+    -   ~~East, Middle, West~~
 
 [*Continuous*]{.underline}
 
@@ -93,42 +107,40 @@ opts <- options(knitr.kable.NA = "")
 
 [*Continuous*]{.underline}
 
--   **GDD** = growing degree days (determined over 3- and 30-year windows and 2015)
--   **ppt** = mean annual precipitation (determined over 3- and 30-year windows and 2015)\
+-   **ppt** = mean annual precipitation (determined over 3- and 30-year windows and 2015)
+-   **GDD** = growing degree days (determined over 3- and 30-year windows and 2015)\
     \
 
 ## Edaphic Variables
 
-[*Continuous*]{.underline}
+[*Continuous: (min, max values)*]{.underline}
 
--   **soil_moisture**
--   **ammonium**
--   **nitrate**
--   **phosphorous**
--   **SOM** (via LoI)
--   **pH**\
+-   **pH**: (5.05, 8.36)
+-   **SOM** (via LoI): (0.45, 11.14)
+-   **soil moisture**: (0.65, 0.99%)
+-   **phosphorous**: (0.171, 0.269)
+-   **ammonium**: (0.87, 1.38)
+-   **nitrate**: (0.35, 0.55)\
     \
 
 ## Plant Traits
 
-[*Continuous*]{.underline}
+[*Continuous: (min, max values)*]{.underline}
 
--   **avg_SRL**: specific root length
--   **avg_SLA**: specific leaf area
+-   **avg_SLA**: specific leaf area (98.4, 191)
+-   **avg_SRL**: specific root length (659.4, 3306.4)
+
     -   Large values of specific leaf area (SLA) and specific root length (SRL) reflect large plant investment in resource acquisition; small values indicate investment in plant tissue longevity
--   **herbivory_perc**:
+-   **herbivory_perc**: (0, 17%)
     -   average site level damage estimate for herbivory, averaged over all species and individuals at the site; could be used to indicate herbivory pressure at the site level
-    -   ranges from 1:17 (%)
 
 \
 
 # Data Standardization/Transformations
 
 \
-All continuous data (climate, edaphic, and plant trait) were mean standardized. All predictors were scaled to mean = 0 and SD = 1.\
+All continuous data predictors (climate, edaphic, and plant trait) were mean standardized, i.e., scaled to mean = 0 and SD = 1.\
 \
-
-
 
 
 
@@ -143,22 +155,126 @@ Viewing tables of variable-variable correlations by category. Tables have been f
 ### Sampling {.unnumbered}
 
 \
-\
 
-
+<table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable Category </th>
+   <th style="text-align:left;"> Var1 </th>
+   <th style="text-align:left;"> Var2 </th>
+   <th style="text-align:right;"> Correlation </th>
+   <th style="text-align:left;"> Var1 Cat </th>
+   <th style="text-align:left;"> Var2 Cat </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Sampling </td>
+   <td style="text-align:left;"> Longitude </td>
+   <td style="text-align:left;"> Elevation_m </td>
+   <td style="text-align:right;"> -0.9076341 </td>
+   <td style="text-align:left;"> Sampling </td>
+   <td style="text-align:left;"> Sampling </td>
+  </tr>
+</tbody>
+</table>
 
 
 ### Climate {.unnumbered}
 
 \
-\
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable Category </th>
+   <th style="text-align:left;"> Var1 </th>
+   <th style="text-align:left;"> Var2 </th>
+   <th style="text-align:right;"> Correlation </th>
+   <th style="text-align:left;"> Var1 Cat </th>
+   <th style="text-align:left;"> Var2 Cat </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Climate </td>
+   <td style="text-align:left;"> GDD3yr_m.std </td>
+   <td style="text-align:left;"> GDD2015_m.std </td>
+   <td style="text-align:right;"> 0.9962364 </td>
+   <td style="text-align:left;"> Climate </td>
+   <td style="text-align:left;"> Climate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Climate </td>
+   <td style="text-align:left;"> ppt3yr_m.std </td>
+   <td style="text-align:left;"> ppt2015_m.std </td>
+   <td style="text-align:right;"> 0.9513075 </td>
+   <td style="text-align:left;"> Climate </td>
+   <td style="text-align:left;"> Climate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Climate </td>
+   <td style="text-align:left;"> ppt30yr_m.std </td>
+   <td style="text-align:left;"> ppt3yr_m.std </td>
+   <td style="text-align:right;"> 0.9415934 </td>
+   <td style="text-align:left;"> Climate </td>
+   <td style="text-align:left;"> Climate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Climate </td>
+   <td style="text-align:left;"> ppt30yr_m.std </td>
+   <td style="text-align:left;"> ppt2015_m.std </td>
+   <td style="text-align:right;"> 0.9071337 </td>
+   <td style="text-align:left;"> Climate </td>
+   <td style="text-align:left;"> Climate </td>
+  </tr>
+</tbody>
+</table>
 
 Retaining GDD3yr over GDD2015 (degree growing days) & similarly, ppt3yr (mean annual precipitation)\
 
 ### Edaphic {.unnumbered}
 
 \
-\
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable Category </th>
+   <th style="text-align:left;"> Var1 </th>
+   <th style="text-align:left;"> Var2 </th>
+   <th style="text-align:right;"> Correlation </th>
+   <th style="text-align:left;"> Var1 Cat </th>
+   <th style="text-align:left;"> Var2 Cat </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Edaphic </td>
+   <td style="text-align:left;"> ammonium_m.std </td>
+   <td style="text-align:left;"> nitrate_m.std </td>
+   <td style="text-align:right;"> 1.0000000 </td>
+   <td style="text-align:left;"> Edaphic </td>
+   <td style="text-align:left;"> Edaphic </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Edaphic </td>
+   <td style="text-align:left;"> phos_m.std </td>
+   <td style="text-align:left;"> ammonium_m.std </td>
+   <td style="text-align:right;"> 0.9868129 </td>
+   <td style="text-align:left;"> Edaphic </td>
+   <td style="text-align:left;"> Edaphic </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Edaphic </td>
+   <td style="text-align:left;"> phos_m.std </td>
+   <td style="text-align:left;"> nitrate_m.std </td>
+   <td style="text-align:right;"> 0.9868129 </td>
+   <td style="text-align:left;"> Edaphic </td>
+   <td style="text-align:left;"> Edaphic </td>
+  </tr>
+</tbody>
+</table>
 
 Retaining soil_moisture over GWC and percent soil moisture (complement). Retaining ammonium over nitrate because Rudgers2021 did. I am considering removing phos.
 
@@ -172,227 +288,513 @@ n/a\
 ### Mixed {.unnumbered}
 
 \
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable Category </th>
+   <th style="text-align:left;"> Var1 </th>
+   <th style="text-align:left;"> Var2 </th>
+   <th style="text-align:right;"> Correlation </th>
+   <th style="text-align:left;"> Var1 Cat </th>
+   <th style="text-align:left;"> Var2 Cat </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Mixed </td>
+   <td style="text-align:left;"> Longitude </td>
+   <td style="text-align:left;"> ppt30yr_m.std </td>
+   <td style="text-align:right;"> 0.9525351 </td>
+   <td style="text-align:left;"> Sampling </td>
+   <td style="text-align:left;"> Climate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Mixed </td>
+   <td style="text-align:left;"> Longitude </td>
+   <td style="text-align:left;"> ppt3yr_m.std </td>
+   <td style="text-align:right;"> 0.9050114 </td>
+   <td style="text-align:left;"> Sampling </td>
+   <td style="text-align:left;"> Climate </td>
+  </tr>
+</tbody>
+</table>
+
 \
 
 Precipitation is highly correlated to longitude. Interesting...\
-
-
-# Summary by variable {.tabset .tabset-pills}
-
-For these variable summaries, I am showing *non-standardized*/raw data values.
 \
 
 
+# Summary stats of variables {.tabset .tabset-pills}
 
-```r
-# Load required libraries
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(corrplot)
-
-# Define the list of explanatory variable names
-#var_all <- c("var1", "var2", "var3")  # Add all variable names here
-
-# Define the dataframe containing the data
-Bac_all_meta_df1 <- data.frame(sample_data(Bac_m.std))
-
-idx <- match(var_all_ut, names(Bac_all_meta_df1))
-idx <- sort(c(idx))
-
-Bac_all_meta_df <- Bac_all_meta_df1[,idx] 
-Bac_all_meta_dfN <- select_if(Bac_all_meta_df, is.numeric)
-
-# Loop through each explanatory variable
-for (var in var_all_numeric_ut) {
-  
-  # Print the current variable being explored
-  cat("## ", var, " {.unnumbered} \n\n")
-  
-  # Summary statistics
-  summary_stats <- summary(Bac_all_meta_dfN[[var]])
-  cat("Summary Statistics:\n")
-  print(summary_stats)
-  cat("\n")
-  
-  # Histogram
-  hist_plot <- ggplot(Bac_all_meta_dfN, aes(x = !!sym(var))) +
-    geom_histogram(fill = "skyblue", color = "black", bins = 20) +
-    labs(title = paste("Histogram of", var),
-         x = var, y = "Frequency") +
-    theme_minimal()
-  
-  # Save histogram plot
-  hist_file <- paste0("../figures/explanatory_variables/histogram_", var, ".png")
-  ggsave(hist_file, hist_plot, width = 6, height = 4)
-  
-  # Print histogram plot
-  cat("Histogram Plot:\n")
-  # knitr::include_graphics(hist_file)
-  cat("![](../figures/explanatory_variables/histogram_",var,".png)", sep = "")
-  cat("\n\n")
-  
-  # Check variance
-  # cat("Variance:\n")
-  # var_val <- var(Bac_all_meta_df[[var]])
-  # cat("Variance of", var, ":", var_val, "\n\n")
-  
-  # Check variations by "Site" variable
-  # cat("Variations in ", var, "by Site, Latitudinal Bin, Longitudinal Gradient, Grass Host:\n")
-  # site_variations <- Bac_all_meta_df %>%
-  #   group_by(Site) %>%
-  #   summarise(mean_val = mean(!!sym(var), na.rm = TRUE),
-  #             sd_val = sd(!!sym(var), na.rm = TRUE))
-  # 
-  # print(site_variations)
-  # cat("\n\n")
-}
-```
+For these variable summaries, I am showing *non-standardized*/raw data values.\
 
 ##  Latitude  {.unnumbered} 
 
-Summary Statistics:
-   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  29.23   31.96   36.02   35.37   39.07   41.12 
+Summary Statistics: 
 
-Histogram Plot:
-![](../figures/explanatory_variables/histogram_Latitude.png)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  29.23   31.96   34.98   35.15   39.07   41.12 
+
+
+
+
+###  Histograms of  Latitude  {.unnumbered .tabset} 
+
+ 
+####  All Sites  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_Latitude.png){width=50%}
+
+####  By Site  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bysite_Latitude.png){width=90%}
+
+####  By Grass  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bygrass_Latitude.png){width=60%}
+
+####  By Fun Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byFun_sor_clusters_Latitude.png){width=90%}
+
+####  By Bac Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byBac_sor_clusters_Latitude.png){width=90%}
 
 ##  Longitude  {.unnumbered} 
 
-Summary Statistics:
-   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
--108.29 -104.53  -98.91 -100.27  -97.52  -94.13 
+Summary Statistics: 
 
-Histogram Plot:
-![](../figures/explanatory_variables/histogram_Longitude.png)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+-108.29 -104.53  -98.91 -100.25  -97.52  -94.13 
+
+
+
+
+###  Histograms of  Longitude  {.unnumbered .tabset} 
+
+ 
+####  All Sites  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_Longitude.png){width=50%}
+
+####  By Site  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bysite_Longitude.png){width=90%}
+
+####  By Grass  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bygrass_Longitude.png){width=60%}
+
+####  By Fun Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byFun_sor_clusters_Longitude.png){width=90%}
+
+####  By Bac Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byBac_sor_clusters_Longitude.png){width=90%}
 
 ##  Elevation_m  {.unnumbered} 
 
-Summary Statistics:
+Summary Statistics: 
+
    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  -19.8   335.0   635.0   916.4  1551.0  2747.0 
+  -19.8   335.0   635.0   917.3  1551.0  2747.0 
 
-Histogram Plot:
-![](../figures/explanatory_variables/histogram_Elevation_m.png)
 
-##  GDD3yr  {.unnumbered} 
 
-Summary Statistics:
-   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-   2048    3935    4427    4480    5010    6005 
 
-Histogram Plot:
-![](../figures/explanatory_variables/histogram_GDD3yr.png)
+###  Histograms of  Elevation_m  {.unnumbered .tabset} 
 
-##  ppt3yr  {.unnumbered} 
+ 
+####  All Sites  {.unnumbered} 
 
-Summary Statistics:
-   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  188.4   415.2   606.2   617.2   858.3  1064.2 
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_Elevation_m.png){width=50%}
 
-Histogram Plot:
-![](../figures/explanatory_variables/histogram_ppt3yr.png)
+####  By Site  {.unnumbered} 
 
-##  avg_SRL  {.unnumbered} 
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bysite_Elevation_m.png){width=90%}
 
-Summary Statistics:
-   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  659.4  1523.6  1732.1  1858.3  2150.4  3306.4 
+####  By Grass  {.unnumbered} 
 
-Histogram Plot:
-![](../figures/explanatory_variables/histogram_avg_SRL.png)
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bygrass_Elevation_m.png){width=60%}
 
-##  soil_moisture  {.unnumbered} 
+####  By Fun Clusters  {.unnumbered} 
 
-Summary Statistics:
-   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
- 0.6474  0.8291  0.8780  0.8713  0.9333  0.9889 
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byFun_sor_clusters_Elevation_m.png){width=90%}
 
-Histogram Plot:
-![](../figures/explanatory_variables/histogram_soil_moisture.png)
+####  By Bac Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byBac_sor_clusters_Elevation_m.png){width=90%}
 
 ##  pH  {.unnumbered} 
 
-Summary Statistics:
+Summary Statistics: 
+
    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  5.050   6.670   7.250   7.109   7.750   8.360 
+  5.050   6.670   7.250   7.124   7.770   8.360 
 
-Histogram Plot:
-![](../figures/explanatory_variables/histogram_pH.png)
 
-##  phos  {.unnumbered} 
 
-Summary Statistics:
-   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
- 0.1705  0.1828  0.1937  0.1975  0.2041  0.2690 
 
-Histogram Plot:
-![](../figures/explanatory_variables/histogram_phos.png)
+###  Histograms of  pH  {.unnumbered .tabset} 
 
-##  ammonium  {.unnumbered} 
+ 
+####  All Sites  {.unnumbered} 
 
-Summary Statistics:
-   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
- 0.8722  0.9233  0.9976  1.0100  1.0470  1.3796 
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_pH.png){width=50%}
 
-Histogram Plot:
-![](../figures/explanatory_variables/histogram_ammonium.png)
+####  By Site  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bysite_pH.png){width=90%}
+
+####  By Grass  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bygrass_pH.png){width=60%}
+
+####  By Fun Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byFun_sor_clusters_pH.png){width=90%}
+
+####  By Bac Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byBac_sor_clusters_pH.png){width=90%}
 
 ##  SOM  {.unnumbered} 
 
-Summary Statistics:
-   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
- 0.4508  2.0087  4.3897  4.4058  6.8384 11.1393 
+Summary Statistics: 
 
-Histogram Plot:
-![](../figures/explanatory_variables/histogram_SOM.png)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.4508  2.0087  4.3897  4.4057  6.8384 11.1393 
+
+
+
+
+###  Histograms of  SOM  {.unnumbered .tabset} 
+
+ 
+####  All Sites  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_SOM.png){width=50%}
+
+####  By Site  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bysite_SOM.png){width=90%}
+
+####  By Grass  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bygrass_SOM.png){width=60%}
+
+####  By Fun Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byFun_sor_clusters_SOM.png){width=90%}
+
+####  By Bac Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byBac_sor_clusters_SOM.png){width=90%}
+
+##  soil_moisture  {.unnumbered} 
+
+Summary Statistics: 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.6474  0.8291  0.8780  0.8705  0.9333  0.9889 
+
+
+
+
+###  Histograms of  soil_moisture  {.unnumbered .tabset} 
+
+ 
+####  All Sites  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_soil_moisture.png){width=50%}
+
+####  By Site  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bysite_soil_moisture.png){width=90%}
+
+####  By Grass  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bygrass_soil_moisture.png){width=60%}
+
+####  By Fun Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byFun_sor_clusters_soil_moisture.png){width=90%}
+
+####  By Bac Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byBac_sor_clusters_soil_moisture.png){width=90%}
+
+##  phos  {.unnumbered} 
+
+Summary Statistics: 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.1705  0.1841  0.1937  0.1975  0.2028  0.2690 
+
+
+
+
+###  Histograms of  phos  {.unnumbered .tabset} 
+
+ 
+####  All Sites  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_phos.png){width=50%}
+
+####  By Site  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bysite_phos.png){width=90%}
+
+####  By Grass  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bygrass_phos.png){width=60%}
+
+####  By Fun Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byFun_sor_clusters_phos.png){width=90%}
+
+####  By Bac Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byBac_sor_clusters_phos.png){width=90%}
+
+##  ammonium  {.unnumbered} 
+
+Summary Statistics: 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.8722  0.9233  0.9976  1.0096  1.0470  1.3796 
+
+
+
+
+###  Histograms of  ammonium  {.unnumbered .tabset} 
+
+ 
+####  All Sites  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_ammonium.png){width=50%}
+
+####  By Site  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bysite_ammonium.png){width=90%}
+
+####  By Grass  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bygrass_ammonium.png){width=60%}
+
+####  By Fun Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byFun_sor_clusters_ammonium.png){width=90%}
+
+####  By Bac Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byBac_sor_clusters_ammonium.png){width=90%}
+
+##  ppt3yr  {.unnumbered} 
+
+Summary Statistics: 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  188.4   415.2   606.2   616.5   858.3  1064.2 
+
+
+
+
+###  Histograms of  ppt3yr  {.unnumbered .tabset} 
+
+ 
+####  All Sites  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_ppt3yr.png){width=50%}
+
+####  By Site  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bysite_ppt3yr.png){width=90%}
+
+####  By Grass  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bygrass_ppt3yr.png){width=60%}
+
+####  By Fun Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byFun_sor_clusters_ppt3yr.png){width=90%}
+
+####  By Bac Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byBac_sor_clusters_ppt3yr.png){width=90%}
+
+##  GDD3yr  {.unnumbered} 
+
+Summary Statistics: 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   2048    3930    4427    4475    5010    6005 
+
+
+
+
+###  Histograms of  GDD3yr  {.unnumbered .tabset} 
+
+ 
+####  All Sites  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_GDD3yr.png){width=50%}
+
+####  By Site  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bysite_GDD3yr.png){width=90%}
+
+####  By Grass  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bygrass_GDD3yr.png){width=60%}
+
+####  By Fun Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byFun_sor_clusters_GDD3yr.png){width=90%}
+
+####  By Bac Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byBac_sor_clusters_GDD3yr.png){width=90%}
 
 ##  avg_SLA  {.unnumbered} 
 
-Summary Statistics:
-   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  98.42  124.81  139.78  141.27  155.90  191.04 
+Summary Statistics: 
 
-Histogram Plot:
-![](../figures/explanatory_variables/histogram_avg_SLA.png)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  98.42  124.81  140.01  141.69  155.90  191.04 
+
+
+
+
+###  Histograms of  avg_SLA  {.unnumbered .tabset} 
+
+ 
+####  All Sites  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_avg_SLA.png){width=50%}
+
+####  By Site  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bysite_avg_SLA.png){width=90%}
+
+####  By Grass  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bygrass_avg_SLA.png){width=60%}
+
+####  By Fun Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byFun_sor_clusters_avg_SLA.png){width=90%}
+
+####  By Bac Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byBac_sor_clusters_avg_SLA.png){width=90%}
+
+##  avg_SRL  {.unnumbered} 
+
+Summary Statistics: 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  659.4  1523.6  1723.4  1857.6  2150.4  3306.4 
+
+
+
+
+###  Histograms of  avg_SRL  {.unnumbered .tabset} 
+
+ 
+####  All Sites  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_avg_SRL.png){width=50%}
+
+####  By Site  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bysite_avg_SRL.png){width=90%}
+
+####  By Grass  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bygrass_avg_SRL.png){width=60%}
+
+####  By Fun Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byFun_sor_clusters_avg_SRL.png){width=90%}
+
+####  By Bac Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byBac_sor_clusters_avg_SRL.png){width=90%}
 
 ##  herbivory_perc  {.unnumbered} 
 
-Summary Statistics:
+Summary Statistics: 
+
    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  0.000   0.625   2.625   3.428   4.375  17.000 
+  0.000   1.042   2.625   3.450   4.479  17.000 
 
-Histogram Plot:
-![](../figures/explanatory_variables/histogram_herbivory_perc.png)
 
-```r
-# summary(aov(soil_moisture ~ Site, data = Bac_all_meta_df))
-# 
-# m1<-(aov(soil_moisture ~ Grass*Site+Bin+Gradient, data = Bac_all_meta_df))
-# m2<-(aov(soil_moisture ~ Grass+Bin+Gradient, data = Bac_all_meta_df))
-# 
-# # fit the regression model
-# model_sampling <- lm(soil_moisture ~ Grass+Bin+Gradient+Elevation_m+Grassland, data = Bac_all_meta_df)
-# model_climate <- lm(soil_moisture ~ GDD3yr+ppt3yr, data = Bac_all_meta_df)
-# model_edaphic <- lm(soil_moisture ~ soil_moisture+pH+phos+ammonium+SOM, data = Bac_all_meta_df)
-# model_plant <- lm(soil_moisture ~ avg_SRL+avg_SLA+herbivory_perc, data = Bac_all_meta_df)
-# 
-# 
-# # get the F statistics and performance metrics
-# summary(model)$fstatistic[1]
-# 89.51454 
-# 
-# summary(model)$r.squared
-# 0.6063617
-# 
-# summary(model)$adj.r.squared
-# 0.5995878
-# 
-# # load package
-# library(car)
-# 
-# # calculate VIF for each predictor variable from fitted model
-# vif(model,type="predictor")
-```
+
+
+###  Histograms of  herbivory_perc  {.unnumbered .tabset} 
+
+ 
+####  All Sites  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_herbivory_perc.png){width=50%}
+
+####  By Site  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bysite_herbivory_perc.png){width=90%}
+
+####  By Grass  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_bygrass_herbivory_perc.png){width=60%}
+
+####  By Fun Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byFun_sor_clusters_herbivory_perc.png){width=90%}
+
+####  By Bac Clusters  {.unnumbered} 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/figures/explanatory_variables/histogram_byBac_sor_clusters_herbivory_perc.png){width=90%}
+
+
+
+
+# Check variance of variables {.tabset .tabset-pills}
+
+[tbd]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# IGNORE testing  {.hidden .unlisted .unnumbered}
+
+
+
+
+
+
+
+
+# Summary table of variables {.hidden .unlisted}
+
+
+
+
+
+
+
+
 
