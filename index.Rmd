@@ -52,6 +52,8 @@ rmarkdown::render("code/SFAFposter.Rmd", output_file="/Users/L347123/Desktop/ksu
 #render ManuscriptOrganizing
 rmarkdown::render("code/ManuscriptOrganizing.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_ManuscriptOrganizing")
 
+#render ManuscriptOrganizing
+rmarkdown::render("code/ManuscriptOrganizing.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_ManuscriptOrganizing")
 
 ```
 
@@ -84,6 +86,8 @@ rmarkdown::render("code/ManuscriptOrganizing.Rmd", output_file="/Users/L347123/D
 ### New/Corrected Analyses {.unnumbered}
 
 \
+
+-   <a href="1_KSU_16S_ITS_otu_processing_kf_EXAMPLE.html" target="_blank">Raw OTU table processing (last updated 11 July 2024)</a>
 
 -   <a href="github_DriversOfFungalCommunities3.html" target="_blank">Drivers Of Fungal Community Dynamics (last updated 07 July 2024)</a>
 
