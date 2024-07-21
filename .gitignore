@@ -55,23 +55,22 @@ figures/
 #figures/taxa_plots/
 metadata/
 raw_data/knb-lter-sev.332.2/
-docs/raw_data/
-docs/processed_data/
 meeting_notes/
 
+# docs
 docs/presentations/
 #docs/presentations/Feeser_TechTalk_2024Feb8_notes.pptx
 #docs/presentations/2024_07_08_RAMecology_MonAMmtg.pptx
-
 docs/*nb.html
-
 docs/github_*2files/
 docs/github_ordinations_files/
 docs/github_*_files/
+docs/raw_data/
+docs/processed_data/
 
 
 processed_data/Rudgers2021/
-processed_data/OTU_occurrencefrequency/
+#processed_data/OTU_occurrencefrequency/
 processed_data/clean_rds_saves/
 processed_data/adonis2/
 
