@@ -59,6 +59,10 @@ rmarkdown::render("code/ManuscriptOrganizing.Rmd", output_file="/Users/L347123/D
 #render ManuscriptOrganizing
 rmarkdown::render("code/ManuscriptOrganizing.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_ManuscriptOrganizing")
 
+
+#render AlphaBetaGamma_BySite
+rmarkdown::render("code/AlphaBetaGamma_BySite.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite")
+
 ```
 
 \
@@ -78,10 +82,6 @@ rmarkdown::render("code/ManuscriptOrganizing.Rmd", output_file="/Users/L347123/D
 \
 \
 
-## Pulling story elements for manuscript {.unnumbered .hidden}
-
-\
-
 ## RAM paired amplicons taxa of interest queries {.unnumbered}
 
 ### Distribution and diversity of *Darksidea* and *Monosporascus* sp. with variable input data {.unnumbered}
@@ -95,6 +95,19 @@ rmarkdown::render("code/ManuscriptOrganizing.Rmd", output_file="/Users/L347123/D
     -   changes: increased n of samples from 484 to 654, n SEV samples increased from 10 to 53
 
 \
+\
+\
+
+## Pulling story elements for manuscript {.unnumbered}
+
+\
+
+-   <a href="github_explanatoryVariables.html" target="_blank">Environmental/metadata processing and summary stats (last updated 10 July 2024)</a>
+
+-   <a href="github_AlphaBetaGamma_BySite.html" target="_blank">Alpha- Beta- Gamma- diversity by site (last updated 22 July 2024)</a>
+
+\
+\
 
 ## Bulk Analyses {.unnumbered}
 
@@ -107,8 +120,6 @@ rmarkdown::render("code/ManuscriptOrganizing.Rmd", output_file="/Users/L347123/D
 -   <a href="1_KSU_16S_ITS_otu_processing_kf_EXAMPLE.html" target="_blank">Raw OTU table processing (last updated 11 July 2024)</a>
 
 -   <a href="github_DriversOfFungalCommunities3.html" target="_blank">Drivers Of Fungal Community Dynamics (last updated 07 July 2024)</a>
-
--   <a href="github_explanatoryVariables.html" target="_blank">Environmental/metadata processing and summary stats (last updated 10 July 2024)</a>
 
 \
 
