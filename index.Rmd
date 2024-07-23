@@ -1,9 +1,5 @@
 ---
 title: "RAM Data Visualization"
-output:
-  html_document:
-    toc: yes
-    toc_depth: 2
 ---
 
 ```{r render-site, include=FALSE,eval=F}
@@ -86,7 +82,11 @@ rmarkdown::render("code/AlphaBetaGamma_BySite.Rmd", output_file="/Users/L347123/
 \
 \
 
+# {.unnumbered}
+
 ## RAM paired amplicons taxa of interest queries {.unnumbered}
+
+as a link: <a href="DistributionOfDarksideaMono.html" target="_blank">Distribution of *Darksidea* and *Monosporascus*</a>
 
 ### Distribution and diversity of *Darksidea* and *Monosporascus* sp. with variable input data {.unnumbered}
 
