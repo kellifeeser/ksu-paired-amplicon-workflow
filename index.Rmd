@@ -82,7 +82,7 @@ rmarkdown::render("code/AlphaBetaGamma_BySite.Rmd", output_file="/Users/L347123/
 \
 \
 
-# {.unnumbered}
+#  {.unnumbered}
 
 ## RAM paired amplicons taxa of interest queries {.unnumbered}
 
@@ -104,9 +104,17 @@ as a link: <a href="DistributionOfDarksideaMono.html" target="_blank">Distributi
 
 \
 
+-   <a href="1_KSU_16S_ITS_otu_processing_kf_EXAMPLE.html" target="_blank">Raw OTU table processing for 16S and ITS (last updated 11 July 2024)</a>
+
 -   <a href="github_explanatoryVariables.html" target="_blank">Environmental/metadata processing and summary stats (last updated 10 July 2024)</a>
 
 -   <a href="github_AlphaBetaGamma_BySite.html" target="_blank">Alpha- Beta- Gamma- diversity by site (last updated 23 July 2024)</a>
+
+-   Partitioning beta diversity into nestedness and turnover components
+
+    -   Partitioning &beta;-diversity of bacterial sub-assemblages
+
+    -   Partitioning &beta;-diversity of fungal sub-assemblages
 
 \
 \
@@ -118,8 +126,6 @@ as a link: <a href="DistributionOfDarksideaMono.html" target="_blank">Distributi
 ### New/Corrected Analyses {.unnumbered}
 
 \
-
--   <a href="1_KSU_16S_ITS_otu_processing_kf_EXAMPLE.html" target="_blank">Raw OTU table processing (last updated 11 July 2024)</a>
 
 -   <a href="github_DriversOfFungalCommunities3.html" target="_blank">Drivers Of Fungal Community Dynamics (last updated 07 July 2024)</a>
 
