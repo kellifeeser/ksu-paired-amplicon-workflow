@@ -1,7 +1,7 @@
 ---
 title: "Alpha beta gamma by Site"
 author: "Kelli Feeser"
-date: "2024-07-22"
+date: "2024-07-23"
 output:
   bookdown::html_document2:
     code_folding: hide
@@ -42,7 +42,7 @@ editor_options:
 
 ------------------------------------------------------------------------
 
-Document last updated: 2024-07-22
+Document last updated: 2024-07-23
 
 ------------------------------------------------------------------------
 
@@ -143,10 +143,10 @@ Bac_gamma_Site3 %>%
       # ,format.args = format(list(big.mark = ',', digit))
       ) %>%
   kable_styling() %>%
-  scroll_box(width = "80%", height = "550px")
+  scroll_box(width = "90%", height = "550px")
 ```
 
-<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:550px; overflow-x: scroll; width:80%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:550px; overflow-x: scroll; width:90%; "><table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:unnamed-chunk-1)Gamma diversity of sites: bacteria</caption>
  <thead>
   <tr>
@@ -166,7 +166,7 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 4,689 </td>
    <td style="text-align:center;"> 23 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 2344.5 </td>
+   <td style="text-align:center;"> 203.9 </td>
    <td style="text-align:center;"> 924.7 </td>
    <td style="text-align:center;"> 0.197 </td>
    <td style="text-align:center;"> 0.029 </td>
@@ -176,7 +176,7 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 4,547 </td>
    <td style="text-align:center;"> 15 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 2273.5 </td>
+   <td style="text-align:center;"> 303.1 </td>
    <td style="text-align:center;"> 964.1 </td>
    <td style="text-align:center;"> 0.212 </td>
    <td style="text-align:center;"> 0.033 </td>
@@ -186,8 +186,8 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 8,620 </td>
    <td style="text-align:center;"> 38 </td>
    <td style="text-align:center;"> 4 </td>
-   <td style="text-align:center;"> 2155 </td>
-   <td style="text-align:center;"> 1419.1 </td>
+   <td style="text-align:center;"> 226.8 </td>
+   <td style="text-align:center;"> 1,419.1 </td>
    <td style="text-align:center;"> 0.165 </td>
    <td style="text-align:center;"> 0.031 </td>
   </tr>
@@ -196,7 +196,7 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 5,427 </td>
    <td style="text-align:center;"> 27 </td>
    <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 1809 </td>
+   <td style="text-align:center;"> 201 </td>
    <td style="text-align:center;"> 931.7 </td>
    <td style="text-align:center;"> 0.172 </td>
    <td style="text-align:center;"> 0.041 </td>
@@ -206,7 +206,7 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 2,719 </td>
    <td style="text-align:center;"> 11 </td>
    <td style="text-align:center;"> 1 </td>
-   <td style="text-align:center;"> 2719 </td>
+   <td style="text-align:center;"> 247.2 </td>
    <td style="text-align:center;"> 814.4 </td>
    <td style="text-align:center;"> 0.3 </td>
    <td style="text-align:center;"> 0.045 </td>
@@ -216,7 +216,7 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 5,801 </td>
    <td style="text-align:center;"> 26 </td>
    <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 1933.7 </td>
+   <td style="text-align:center;"> 223.1 </td>
    <td style="text-align:center;"> 942.7 </td>
    <td style="text-align:center;"> 0.163 </td>
    <td style="text-align:center;"> 0.022 </td>
@@ -226,8 +226,8 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 6,362 </td>
    <td style="text-align:center;"> 27 </td>
    <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 2120.7 </td>
-   <td style="text-align:center;"> 1154.5 </td>
+   <td style="text-align:center;"> 235.6 </td>
+   <td style="text-align:center;"> 1,154.5 </td>
    <td style="text-align:center;"> 0.181 </td>
    <td style="text-align:center;"> 0.026 </td>
   </tr>
@@ -236,7 +236,7 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 4,076 </td>
    <td style="text-align:center;"> 15 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 2038 </td>
+   <td style="text-align:center;"> 271.7 </td>
    <td style="text-align:center;"> 922.6 </td>
    <td style="text-align:center;"> 0.226 </td>
    <td style="text-align:center;"> 0.026 </td>
@@ -246,8 +246,8 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 4,362 </td>
    <td style="text-align:center;"> 19 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 2181 </td>
-   <td style="text-align:center;"> 1010.6 </td>
+   <td style="text-align:center;"> 229.6 </td>
+   <td style="text-align:center;"> 1,010.6 </td>
    <td style="text-align:center;"> 0.232 </td>
    <td style="text-align:center;"> 0.034 </td>
   </tr>
@@ -256,7 +256,7 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 2,711 </td>
    <td style="text-align:center;"> 7 </td>
    <td style="text-align:center;"> 1 </td>
-   <td style="text-align:center;"> 2711 </td>
+   <td style="text-align:center;"> 387.3 </td>
    <td style="text-align:center;"> 964.9 </td>
    <td style="text-align:center;"> 0.356 </td>
    <td style="text-align:center;"> 0.03 </td>
@@ -266,8 +266,8 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 6,631 </td>
    <td style="text-align:center;"> 37 </td>
    <td style="text-align:center;"> 4 </td>
-   <td style="text-align:center;"> 1657.8 </td>
-   <td style="text-align:center;"> 1058.9 </td>
+   <td style="text-align:center;"> 179.2 </td>
+   <td style="text-align:center;"> 1,058.9 </td>
    <td style="text-align:center;"> 0.16 </td>
    <td style="text-align:center;"> 0.028 </td>
   </tr>
@@ -276,8 +276,8 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 4,043 </td>
    <td style="text-align:center;"> 15 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 2021.5 </td>
-   <td style="text-align:center;"> 1061.3 </td>
+   <td style="text-align:center;"> 269.5 </td>
+   <td style="text-align:center;"> 1,061.3 </td>
    <td style="text-align:center;"> 0.263 </td>
    <td style="text-align:center;"> 0.035 </td>
   </tr>
@@ -286,7 +286,7 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 6,909 </td>
    <td style="text-align:center;"> 32 </td>
    <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 2303 </td>
+   <td style="text-align:center;"> 215.9 </td>
    <td style="text-align:center;"> 875.5 </td>
    <td style="text-align:center;"> 0.127 </td>
    <td style="text-align:center;"> 0.061 </td>
@@ -296,8 +296,8 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 7,892 </td>
    <td style="text-align:center;"> 42 </td>
    <td style="text-align:center;"> 4 </td>
-   <td style="text-align:center;"> 1973 </td>
-   <td style="text-align:center;"> 1390.3 </td>
+   <td style="text-align:center;"> 187.9 </td>
+   <td style="text-align:center;"> 1,390.3 </td>
    <td style="text-align:center;"> 0.176 </td>
    <td style="text-align:center;"> 0.019 </td>
   </tr>
@@ -306,7 +306,7 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 4,516 </td>
    <td style="text-align:center;"> 27 </td>
    <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 1505.3 </td>
+   <td style="text-align:center;"> 167.3 </td>
    <td style="text-align:center;"> 785.2 </td>
    <td style="text-align:center;"> 0.174 </td>
    <td style="text-align:center;"> 0.032 </td>
@@ -316,8 +316,8 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 7,876 </td>
    <td style="text-align:center;"> 34 </td>
    <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 2625.3 </td>
-   <td style="text-align:center;"> 1217.4 </td>
+   <td style="text-align:center;"> 231.6 </td>
+   <td style="text-align:center;"> 1,217.4 </td>
    <td style="text-align:center;"> 0.155 </td>
    <td style="text-align:center;"> 0.026 </td>
   </tr>
@@ -326,8 +326,8 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 5,964 </td>
    <td style="text-align:center;"> 20 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 2982 </td>
-   <td style="text-align:center;"> 1325.1 </td>
+   <td style="text-align:center;"> 298.2 </td>
+   <td style="text-align:center;"> 1,325.1 </td>
    <td style="text-align:center;"> 0.222 </td>
    <td style="text-align:center;"> 0.031 </td>
   </tr>
@@ -336,8 +336,8 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 5,569 </td>
    <td style="text-align:center;"> 22 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 2784.5 </td>
-   <td style="text-align:center;"> 1127.8 </td>
+   <td style="text-align:center;"> 253.1 </td>
+   <td style="text-align:center;"> 1,127.8 </td>
    <td style="text-align:center;"> 0.203 </td>
    <td style="text-align:center;"> 0.034 </td>
   </tr>
@@ -346,8 +346,8 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 2,517 </td>
    <td style="text-align:center;"> 6 </td>
    <td style="text-align:center;"> 1 </td>
-   <td style="text-align:center;"> 2517 </td>
-   <td style="text-align:center;"> 1007.5 </td>
+   <td style="text-align:center;"> 419.5 </td>
+   <td style="text-align:center;"> 1,007.5 </td>
    <td style="text-align:center;"> 0.4 </td>
    <td style="text-align:center;"> 0.055 </td>
   </tr>
@@ -356,7 +356,7 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 2,505 </td>
    <td style="text-align:center;"> 10 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 1252.5 </td>
+   <td style="text-align:center;"> 250.5 </td>
    <td style="text-align:center;"> 712.3 </td>
    <td style="text-align:center;"> 0.284 </td>
    <td style="text-align:center;"> 0.031 </td>
@@ -366,8 +366,8 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 5,456 </td>
    <td style="text-align:center;"> 10 </td>
    <td style="text-align:center;"> 1 </td>
-   <td style="text-align:center;"> 5456 </td>
-   <td style="text-align:center;"> 1471.5 </td>
+   <td style="text-align:center;"> 545.6 </td>
+   <td style="text-align:center;"> 1,471.5 </td>
    <td style="text-align:center;"> 0.27 </td>
    <td style="text-align:center;"> 0.021 </td>
   </tr>
@@ -376,8 +376,8 @@ Bac_gamma_Site3 %>%
    <td style="text-align:center;"> 8,020 </td>
    <td style="text-align:center;"> 21 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 4010 </td>
-   <td style="text-align:center;"> 1711.6 </td>
+   <td style="text-align:center;"> 381.9 </td>
+   <td style="text-align:center;"> 1,711.6 </td>
    <td style="text-align:center;"> 0.213 </td>
    <td style="text-align:center;"> 0.021 </td>
   </tr>
@@ -444,10 +444,10 @@ Fun_gamma_Site3 %>%
       # ,format.args = format(list(big.mark = ',', digit))
       ) %>%
   kable_styling() %>%
-  scroll_box(width = "80%", height = "550px")
+  scroll_box(width = "90%", height = "550px")
 ```
 
-<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:550px; overflow-x: scroll; width:80%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:550px; overflow-x: scroll; width:90%; "><table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:unnamed-chunk-2)Gamma diversity of sites: fungi</caption>
  <thead>
   <tr>
@@ -467,7 +467,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 983 </td>
    <td style="text-align:center;"> 23 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 491.5 </td>
+   <td style="text-align:center;"> 42.7 </td>
    <td style="text-align:center;"> 181.3 </td>
    <td style="text-align:center;"> 0.184 </td>
    <td style="text-align:center;"> 0.029 </td>
@@ -477,7 +477,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 633 </td>
    <td style="text-align:center;"> 15 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 316.5 </td>
+   <td style="text-align:center;"> 42.2 </td>
    <td style="text-align:center;"> 83.2 </td>
    <td style="text-align:center;"> 0.131 </td>
    <td style="text-align:center;"> 0.04 </td>
@@ -487,7 +487,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 1,341 </td>
    <td style="text-align:center;"> 38 </td>
    <td style="text-align:center;"> 4 </td>
-   <td style="text-align:center;"> 335.2 </td>
+   <td style="text-align:center;"> 35.3 </td>
    <td style="text-align:center;"> 120 </td>
    <td style="text-align:center;"> 0.09 </td>
    <td style="text-align:center;"> 0.021 </td>
@@ -497,7 +497,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 923 </td>
    <td style="text-align:center;"> 27 </td>
    <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 307.7 </td>
+   <td style="text-align:center;"> 34.2 </td>
    <td style="text-align:center;"> 173.3 </td>
    <td style="text-align:center;"> 0.188 </td>
    <td style="text-align:center;"> 0.019 </td>
@@ -507,7 +507,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 430 </td>
    <td style="text-align:center;"> 11 </td>
    <td style="text-align:center;"> 1 </td>
-   <td style="text-align:center;"> 430 </td>
+   <td style="text-align:center;"> 39.1 </td>
    <td style="text-align:center;"> 94.1 </td>
    <td style="text-align:center;"> 0.219 </td>
    <td style="text-align:center;"> 0.031 </td>
@@ -517,7 +517,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 1,044 </td>
    <td style="text-align:center;"> 26 </td>
    <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 348 </td>
+   <td style="text-align:center;"> 40.2 </td>
    <td style="text-align:center;"> 93.3 </td>
    <td style="text-align:center;"> 0.089 </td>
    <td style="text-align:center;"> 0.024 </td>
@@ -527,7 +527,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 1,169 </td>
    <td style="text-align:center;"> 27 </td>
    <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 389.7 </td>
+   <td style="text-align:center;"> 43.3 </td>
    <td style="text-align:center;"> 120.5 </td>
    <td style="text-align:center;"> 0.103 </td>
    <td style="text-align:center;"> 0.03 </td>
@@ -537,7 +537,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 522 </td>
    <td style="text-align:center;"> 15 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 261 </td>
+   <td style="text-align:center;"> 34.8 </td>
    <td style="text-align:center;"> 71.4 </td>
    <td style="text-align:center;"> 0.137 </td>
    <td style="text-align:center;"> 0.023 </td>
@@ -547,7 +547,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 646 </td>
    <td style="text-align:center;"> 19 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 323 </td>
+   <td style="text-align:center;"> 34 </td>
    <td style="text-align:center;"> 189 </td>
    <td style="text-align:center;"> 0.293 </td>
    <td style="text-align:center;"> 0.022 </td>
@@ -557,7 +557,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 256 </td>
    <td style="text-align:center;"> 7 </td>
    <td style="text-align:center;"> 1 </td>
-   <td style="text-align:center;"> 256 </td>
+   <td style="text-align:center;"> 36.6 </td>
    <td style="text-align:center;"> 74 </td>
    <td style="text-align:center;"> 0.289 </td>
    <td style="text-align:center;"> 0.059 </td>
@@ -567,7 +567,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 1,315 </td>
    <td style="text-align:center;"> 37 </td>
    <td style="text-align:center;"> 4 </td>
-   <td style="text-align:center;"> 328.8 </td>
+   <td style="text-align:center;"> 35.5 </td>
    <td style="text-align:center;"> 129.4 </td>
    <td style="text-align:center;"> 0.098 </td>
    <td style="text-align:center;"> 0.025 </td>
@@ -577,7 +577,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 717 </td>
    <td style="text-align:center;"> 15 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 358.5 </td>
+   <td style="text-align:center;"> 47.8 </td>
    <td style="text-align:center;"> 165.3 </td>
    <td style="text-align:center;"> 0.23 </td>
    <td style="text-align:center;"> 0.052 </td>
@@ -587,7 +587,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 1,202 </td>
    <td style="text-align:center;"> 32 </td>
    <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 400.7 </td>
+   <td style="text-align:center;"> 37.6 </td>
    <td style="text-align:center;"> 119.5 </td>
    <td style="text-align:center;"> 0.099 </td>
    <td style="text-align:center;"> 0.018 </td>
@@ -597,7 +597,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 1,337 </td>
    <td style="text-align:center;"> 42 </td>
    <td style="text-align:center;"> 4 </td>
-   <td style="text-align:center;"> 334.2 </td>
+   <td style="text-align:center;"> 31.8 </td>
    <td style="text-align:center;"> 141 </td>
    <td style="text-align:center;"> 0.105 </td>
    <td style="text-align:center;"> 0.02 </td>
@@ -607,7 +607,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 694 </td>
    <td style="text-align:center;"> 27 </td>
    <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 231.3 </td>
+   <td style="text-align:center;"> 25.7 </td>
    <td style="text-align:center;"> 90.8 </td>
    <td style="text-align:center;"> 0.131 </td>
    <td style="text-align:center;"> 0.027 </td>
@@ -617,7 +617,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 1,442 </td>
    <td style="text-align:center;"> 34 </td>
    <td style="text-align:center;"> 3 </td>
-   <td style="text-align:center;"> 480.7 </td>
+   <td style="text-align:center;"> 42.4 </td>
    <td style="text-align:center;"> 218.6 </td>
    <td style="text-align:center;"> 0.152 </td>
    <td style="text-align:center;"> 0.025 </td>
@@ -627,7 +627,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 1,007 </td>
    <td style="text-align:center;"> 20 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 503.5 </td>
+   <td style="text-align:center;"> 50.4 </td>
    <td style="text-align:center;"> 219.3 </td>
    <td style="text-align:center;"> 0.218 </td>
    <td style="text-align:center;"> 0.021 </td>
@@ -637,7 +637,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 1,068 </td>
    <td style="text-align:center;"> 22 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 534 </td>
+   <td style="text-align:center;"> 48.5 </td>
    <td style="text-align:center;"> 203.3 </td>
    <td style="text-align:center;"> 0.19 </td>
    <td style="text-align:center;"> 0.019 </td>
@@ -647,7 +647,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 443 </td>
    <td style="text-align:center;"> 6 </td>
    <td style="text-align:center;"> 1 </td>
-   <td style="text-align:center;"> 443 </td>
+   <td style="text-align:center;"> 73.8 </td>
    <td style="text-align:center;"> 179.7 </td>
    <td style="text-align:center;"> 0.406 </td>
    <td style="text-align:center;"> 0.035 </td>
@@ -657,7 +657,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 379 </td>
    <td style="text-align:center;"> 10 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 189.5 </td>
+   <td style="text-align:center;"> 37.9 </td>
    <td style="text-align:center;"> 73.5 </td>
    <td style="text-align:center;"> 0.194 </td>
    <td style="text-align:center;"> 0.055 </td>
@@ -667,7 +667,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 817 </td>
    <td style="text-align:center;"> 10 </td>
    <td style="text-align:center;"> 1 </td>
-   <td style="text-align:center;"> 817 </td>
+   <td style="text-align:center;"> 81.7 </td>
    <td style="text-align:center;"> 188.4 </td>
    <td style="text-align:center;"> 0.231 </td>
    <td style="text-align:center;"> 0.051 </td>
@@ -677,7 +677,7 @@ Fun_gamma_Site3 %>%
    <td style="text-align:center;"> 936 </td>
    <td style="text-align:center;"> 21 </td>
    <td style="text-align:center;"> 2 </td>
-   <td style="text-align:center;"> 468 </td>
+   <td style="text-align:center;"> 44.6 </td>
    <td style="text-align:center;"> 212 </td>
    <td style="text-align:center;"> 0.226 </td>
    <td style="text-align:center;"> 0.024 </td>
@@ -692,72 +692,8 @@ Fun_gamma_Site3 %>%
 ## Calculate multivariate dispersions {.tabset}
 
 
-```r
-# Fun
-Fun_wc_sorensen_distmat <- as.matrix(sor.dist.list$Fun_wholecommunity)
-
-Fun_wc_sorensen_dist<-as.dist(Fun_wc_sorensen_distmat)
-
-## Calculate multivariate dispersions
-betadisp_Site_Fun_addC <- betadisper(Fun_wc_sorensen_dist,
-                            group = phylo2vegan_sd(Fun_wholecommunity)$Site,
-                            type = "median", # type = "median" (distance from each sample unit to the spatial median of its group)
-                            bias.adjust = T, # adjust for small sample bias in beta div estimates?
-                            sqrt.dist = FALSE,
-                            add = "lingoes")
-
-# Bac
-Bac_wc_sorensen_distmat <- as.matrix(beta.pair(decostand(phylo2vegan_OTU(Bac_wholecommunity), method = "pa"), index.family = "sorensen")$beta.sor)
-
-Bac_wc_sorensen_dist<-as.dist(Bac_wc_sorensen_distmat)
-
-## Calculate multivariate dispersions
-betadisp_Site_Bac_addC <- betadisper(Bac_wc_sorensen_dist,
-                            group = phylo2vegan_sd(Bac_wholecommunity)$Site,
-                            type = "median", # type = "median" (distance from each sample unit to the spatial median of its group)
-                            bias.adjust = T, # adjust for small sample bias in beta div estimates?
-                            sqrt.dist = FALSE,
-                            add = "lingoes")
-```
 
 
-```r
-perform_anova_betadisper <- function(betadisper_object, grouping) {
-
-  # Perform ANOVA 
-  anova_result <- anova(betadisper_object)
-  
-  tidy_aov <- tidy(anova_result)
-  tidy_df <- as.data.frame(tidy_aov)
-  
-  tidy_df$term[1] <- paste0(grouping)
-
-  sum_squares_regression <- tidy_df$sumsq[1]
-  sum_squares_residuals <- tidy_df$sumsq[2]
-
-  R_squared <- sum_squares_regression /
-            (sum_squares_regression + sum_squares_residuals)*100
-
-  tidier_df <- data.frame(Term = character(),df = numeric(),
-                          SumSq = numeric(),MeanSq = numeric(),
-                          F.statistic = numeric(),
-                          R_squared = numeric(),p.value = character(),
-                          stringsAsFactors = FALSE)
-  
-  tidier_df[1,"Term"] <- tidy_df$term[1]
-  tidier_df[2,"Term"] <- tidy_df$term[2]
-  tidier_df[1:2,2] <- (tidy_df$df)[1:2]
-  tidier_df$SumSq <- round(tidy_df$sumsq[1:2],2)
-  tidier_df$MeanSq <- round(tidy_df$meansq[1:2],3)
-  tidier_df$F.statistic <- round(tidy_df$statistic,2)
-  tidier_df[1,"R_squared"] <- round(R_squared,2)
-  tidier_df[2,"R_squared"] <- 100-(round(R_squared,2))
-  tidier_df[1,"P.value"] <- prettyNum(tidy_df$p.value[1],digits=2)
-
-  # Return ANOVA results for the specified taxa_of_interest
-  return(tidier_df)
-}
-```
 
 ### Bac {.unnumbered}
 
@@ -765,13 +701,35 @@ perform_anova_betadisper <- function(betadisper_object, grouping) {
 range of site dispersions:
 
 
-```r
-summary(betadisp_Site_Bac_addC$group.distances)
-```
-
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##  0.3596  0.3912  0.4175  0.4162  0.4360  0.5076
+```
+
+\
+
+
+```
+## 
+## 	Homogeneity of multivariate dispersions
+## 
+## Call: betadisper(d = Bac_wc_sorensen_dist, group =
+## phylo2vegan_sd(Bac_wholecommunity)$Site, type = "median", bias.adjust = T,
+## sqrt.dist = FALSE, add = "lingoes")
+## 
+## No. of Positive Eigenvalues: 482
+## No. of Negative Eigenvalues: 0
+## 
+## Average distance to median:
+##    BLM    BNP    CAD    CNF    CPR    DMT    FCP    FMT    GMT    GNF    HAR    HPG 
+## 0.4160 0.4380 0.4190 0.4509 0.3763 0.4599 0.4302 0.4410 0.3890 0.3820 0.4251 0.3778 
+##    KAE    KNZ    LAR    LBJ    NWP    ONF    RNF    SEV    SFA    UHC 
+## 0.5076 0.3898 0.4232 0.4421 0.3957 0.4041 0.3596 0.4091 0.4193 0.4011 
+## 
+## Eigenvalues for PCoA axes:
+## (Showing 8 of 482 eigenvalues)
+##  PCoA1  PCoA2  PCoA3  PCoA4  PCoA5  PCoA6  PCoA7  PCoA8 
+## 17.234  9.227  5.236  5.106  3.033  2.479  1.895  1.831
 ```
 
 \
@@ -785,24 +743,57 @@ probably removing in favor of perm F test (following)
 
 ```r
 betadisp_Site_Bac.aov<-perform_anova_betadisper(betadisp_Site_Bac_addC, "Site")
-betadisp_Site_Bac.aov
 ```
 
+
+```r
+betadisp_Site_Bac.aov %>% kbl() %>% kable_styling()
+```
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Term </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> SumSq </th>
+   <th style="text-align:right;"> MeanSq </th>
+   <th style="text-align:right;"> F.statistic </th>
+   <th style="text-align:right;"> R_squared </th>
+   <th style="text-align:left;"> p.value </th>
+   <th style="text-align:left;"> P.value </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Site </td>
+   <td style="text-align:right;"> 21 </td>
+   <td style="text-align:right;"> 0.50 </td>
+   <td style="text-align:right;"> 0.024 </td>
+   <td style="text-align:right;"> 14.1 </td>
+   <td style="text-align:right;"> 39.07 </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 8.8e-38 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Residuals </td>
+   <td style="text-align:right;"> 462 </td>
+   <td style="text-align:right;"> 0.78 </td>
+   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:right;"> 60.93 </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+</tbody>
+</table>
 \
 
 #### Permutation test for F with post-hoc Tukey's HSD {.tabset}
 
 \
-\
 `vegan::permutest(betadisp_Site_Bac_addC, permutations = 999, pairwise = F)`
 
 
-```r
-## Permutation test for F
-betadisp_Site_Bac.pmod <- permutest(betadisp_Site_Bac_addC, permutations = 999, pairwise = F)
-
-bdr2Bac<-prettyNum(betadisp_Site_Bac.pmod$tab$`Sum Sq`[1]/(sum(betadisp_Site_Bac.pmod$tab$`Sum Sq`)),digits=3)
-```
 
 
 ```r
@@ -837,29 +828,23 @@ Calculated $R^2$ = 0.391\
 `stats::TukeyHSD(betadisp_Site_Bac_addC, ordered = T)`
 
 
-```r
-## Tukey's Honest Significant Differences
-(betadisp_Site_Bac_addC.HSD <- TukeyHSD(betadisp_Site_Bac_addC, ordered = T, conf.level = 0.95))
-bdHSDBacs<-subset(as.data.frame(betadisp_Site_Bac_addC.HSD$group),`p adj` < 0.05)
-# plot(betadisp_Site_Bac_addC.HSD)
-```
 
 
 
 ```r
 bdHSDBacs %>%
-  kbl(caption = "Bacteria: Tukey HSD of site beta dispersion, subset to p.adj < 0.05",
+  kbl(caption = "Bacteria: sites with significantly different beta dispersion, subset to p.adj < 0.05 (Tukey HSD)",
             align = 'c',
       digits = c(3,3,3,4)
       # col.names = c("Number of OTUs","Number of samples")
       # format.args = format(list(big.mark = ',', digit))
       ) %>%
   kable_styling() %>%
-  scroll_box(width = "60%", height = "400px")
+  scroll_box(width = "60%", height = "350px")
 ```
 
-<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; overflow-x: scroll; width:60%; "><table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-7)Bacteria: Tukey HSD of site beta dispersion, subset to p.adj &lt; 0.05</caption>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:350px; overflow-x: scroll; width:60%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-9)Bacteria: sites with significantly different beta dispersion, subset to p.adj &lt; 0.05 (Tukey HSD)</caption>
  <thead>
   <tr>
    <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">   </th>
@@ -1316,13 +1301,35 @@ bdHSDBacs %>%
 range of site dispersions:
 
 
-```r
-summary(betadisp_Site_Fun_addC$group.distances)
-```
-
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##  0.5467  0.5955  0.6675  0.6628  0.7292  0.7698
+```
+
+\
+
+
+```
+## 
+## 	Homogeneity of multivariate dispersions
+## 
+## Call: betadisper(d = Fun_wc_sorensen_dist, group =
+## phylo2vegan_sd(Fun_wholecommunity)$Site, type = "median", bias.adjust = T,
+## sqrt.dist = FALSE, add = "lingoes")
+## 
+## No. of Positive Eigenvalues: 482
+## No. of Negative Eigenvalues: 0
+## 
+## Average distance to median:
+##    BLM    BNP    CAD    CNF    CPR    DMT    FCP    FMT    GMT    GNF    HAR    HPG 
+## 0.6057 0.7496 0.7428 0.5813 0.6723 0.7698 0.7479 0.7450 0.5467 0.6628 0.7317 0.6494 
+##    KAE    KNZ    LAR    LBJ    NWP    ONF    RNF    SEV    SFA    UHC 
+## 0.7217 0.7067 0.6819 0.5967 0.5859 0.5951 0.5836 0.7140 0.6288 0.5630 
+## 
+## Eigenvalues for PCoA axes:
+## (Showing 8 of 482 eigenvalues)
+##  PCoA1  PCoA2  PCoA3  PCoA4  PCoA5  PCoA6  PCoA7  PCoA8 
+## 27.298 11.999  8.004  5.871  4.597  4.072  3.594  3.280
 ```
 
 \
@@ -1338,20 +1345,55 @@ probably removing in favor of perm F test (following)
 betadisp_Site_Fun.aov<-perform_anova_betadisper(betadisp_Site_Fun_addC, "Site")
 ```
 
+
+```r
+betadisp_Site_Fun.aov %>% kbl() %>% kable_styling()
+```
+
+<table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Term </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> SumSq </th>
+   <th style="text-align:right;"> MeanSq </th>
+   <th style="text-align:right;"> F.statistic </th>
+   <th style="text-align:right;"> R_squared </th>
+   <th style="text-align:left;"> p.value </th>
+   <th style="text-align:left;"> P.value </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Site </td>
+   <td style="text-align:right;"> 21 </td>
+   <td style="text-align:right;"> 2.46 </td>
+   <td style="text-align:right;"> 0.117 </td>
+   <td style="text-align:right;"> 68.94 </td>
+   <td style="text-align:right;"> 75.81 </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 9.5e-128 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Residuals </td>
+   <td style="text-align:right;"> 462 </td>
+   <td style="text-align:right;"> 0.79 </td>
+   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:right;"> 24.19 </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+</tbody>
+</table>
 \
 
 #### Permutation test for F with post-hoc Tukey's HSD {.tabset}
 
 \
-\
 `vegan::permutest(betadisp_Site_Fun_addC, permutations = 999, pairwise = F)`
 
 
-```r
-## Permutation test for F
-betadisp_Site_Fun.pmod <- permutest(betadisp_Site_Fun_addC, permutations = 999, pairwise = F)
-bdr2Fun<-prettyNum(betadisp_Site_Fun.pmod$tab$`Sum Sq`[1]/(sum(betadisp_Site_Fun.pmod$tab$`Sum Sq`)),digits=3)
-```
 
 
 ```r
@@ -1386,28 +1428,22 @@ Calculated $R^2$ = 0.758\
 `stats::TukeyHSD(betadisp_Site_Fun_addC, ordered = T)`
 
 
-```r
-## Tukey's Honest Significant Differences
-(betadisp_Site_Fun_addC.HSD <- TukeyHSD(betadisp_Site_Fun_addC, ordered = T, conf.level = 0.95))
-bdHSDFuns<-subset(as.data.frame(betadisp_Site_Fun_addC.HSD$group),`p adj` < 0.05)
-# plot(betadisp_Site_Fun_addC.HSD)
-```
 
 
 ```r
 bdHSDFuns %>%
-  kbl(caption = "Fungi: Tukey HSD of site beta dispersion, subset to p.adj < 0.05",
+  kbl(caption = "Fungi: sites with significantly different beta dispersion, subset to p.adj < 0.05 (Tukey HSD)",
             align = 'c',
       digits = c(3,3,3,4)
       # col.names = c("Number of OTUs","Number of samples")
       # format.args = format(list(big.mark = ',', digit))
       ) %>%
   kable_styling() %>%
-  scroll_box(width = "60%", height = "400px")
+  scroll_box(width = "60%", height = "350px")
 ```
 
-<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; overflow-x: scroll; width:60%; "><table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-12)Fungi: Tukey HSD of site beta dispersion, subset to p.adj &lt; 0.05</caption>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:350px; overflow-x: scroll; width:60%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-16)Fungi: sites with significantly different beta dispersion, subset to p.adj &lt; 0.05 (Tukey HSD)</caption>
  <thead>
   <tr>
    <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">   </th>
@@ -2457,38 +2493,6 @@ bdHSDFuns %>%
 ## Table set-up {.unnumbered .unlisted .hidden}
 
 
-```r
-Bac_gamma_Site.df <- (data.frame(
-  "Site"=rownames(Bac_gamma_Site3temp),
-  "n (# of samples per site)"=as.numeric(Bac_gamma_Site3temp$`n (# of samples per site)`),
-  "# of grass hosts per site"=as.numeric(Bac_gamma_Site3temp$ngrass_persite),
-  "Gamma (# total unique OTUs)"=as.numeric(Bac_gamma_Site3temp$`Gamma (# total unique OTUs)`),
-  "Gamma / n" = as.numeric(Bac_gamma_Site3temp$Gamma_over_n),
-  "Observed mean 𝝰" = as.numeric(Bac_gamma_Site3temp$`Observed mean 𝝰`),
-  "mean prop. of gamma detected per sample" = as.numeric(round(Bac_gamma_Site3temp$`mean prop. of gamma / sample`,3)),
-                       "SD prop. of gamma detected per sample" = as.numeric(round(Bac_gamma_Site3temp$`sd prop. of gamma / sample`,3))
-  ,check.names=F))
-
-Bac_gamma_Site.df$Site_unordered <- as.factor(Bac_gamma_Site.df$Site)
-Bac_gamma_Site.df$Site <- as.factor(Bac_gamma_Site.df$Site)
-Bac_gamma_Site.df$Site <- factor(Bac_gamma_Site.df$Site,levels=c(site_levels),ordered = T)
-
-
-Fun_gamma_Site.df <- (data.frame(
-  "Site"=rownames(Fun_gamma_Site3temp),
-  "n (# of samples per site)"=as.numeric(Fun_gamma_Site3temp$`n (# of samples per site)`),
-  "# of grass hosts per site"=as.numeric(Fun_gamma_Site3temp$ngrass_persite),
-  "Gamma (# total unique OTUs)"=as.numeric(Fun_gamma_Site3temp$`Gamma (# total unique OTUs)`),
-  "Gamma / n" = as.numeric(Fun_gamma_Site3temp$Gamma_over_n),
-  "Observed mean 𝝰" = as.numeric(Fun_gamma_Site3temp$`Observed mean 𝝰`),
-  "mean prop. of gamma detected per sample" = as.numeric(round(Fun_gamma_Site3temp$`mean prop. of gamma / sample`,3)),
-                       "SD prop. of gamma detected per sample" = as.numeric(round(Fun_gamma_Site3temp$`sd prop. of gamma / sample`,3))
-  ,check.names=F))
-
-Fun_gamma_Site.df$Site_unordered <- as.factor(Fun_gamma_Site.df$Site)
-Fun_gamma_Site.df$Site <- as.factor(Fun_gamma_Site.df$Site)
-Fun_gamma_Site.df$Site <- factor(Fun_gamma_Site.df$Site,levels=c(site_levels),ordered = T)
-```
 
 
 ## Tables: Gamma diversity and beta dispersion {.tabset}
@@ -2497,11 +2501,265 @@ Fun_gamma_Site.df$Site <- factor(Fun_gamma_Site.df$Site,levels=c(site_levels),or
 
 ### Bac
 
-
-```r
-Bac_gamma_Site.df$BetaDisp <- round(betadisp_Site_Bac_addC$group.distances,3)
-Bac_gamma_Site.df[,c(1:8,10)]
-```
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:350px; overflow-x: scroll; width:95%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> Site </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> n (# of samples per site) </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> # of grass hosts per site </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> Gamma (# total unique OTUs) </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> Gamma / n </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> Observed mean 𝝰 </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> mean prop. of gamma detected per sample </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> SD prop. of gamma detected per sample </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> BetaDisp </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> BLM </td>
+   <td style="text-align:right;"> 23 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 4689 </td>
+   <td style="text-align:right;"> 203.9 </td>
+   <td style="text-align:right;"> 924.7 </td>
+   <td style="text-align:right;"> 0.197 </td>
+   <td style="text-align:right;"> 0.029 </td>
+   <td style="text-align:right;"> 0.4160 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BNP </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 4547 </td>
+   <td style="text-align:right;"> 303.1 </td>
+   <td style="text-align:right;"> 964.1 </td>
+   <td style="text-align:right;"> 0.212 </td>
+   <td style="text-align:right;"> 0.033 </td>
+   <td style="text-align:right;"> 0.4380 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CAD </td>
+   <td style="text-align:right;"> 38 </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:right;"> 8620 </td>
+   <td style="text-align:right;"> 226.8 </td>
+   <td style="text-align:right;"> 1419.1 </td>
+   <td style="text-align:right;"> 0.165 </td>
+   <td style="text-align:right;"> 0.031 </td>
+   <td style="text-align:right;"> 0.4190 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CNF </td>
+   <td style="text-align:right;"> 27 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 5427 </td>
+   <td style="text-align:right;"> 201.0 </td>
+   <td style="text-align:right;"> 931.7 </td>
+   <td style="text-align:right;"> 0.172 </td>
+   <td style="text-align:right;"> 0.041 </td>
+   <td style="text-align:right;"> 0.4509 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CPR </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 2719 </td>
+   <td style="text-align:right;"> 247.2 </td>
+   <td style="text-align:right;"> 814.4 </td>
+   <td style="text-align:right;"> 0.300 </td>
+   <td style="text-align:right;"> 0.045 </td>
+   <td style="text-align:right;"> 0.3763 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> DMT </td>
+   <td style="text-align:right;"> 26 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 5801 </td>
+   <td style="text-align:right;"> 223.1 </td>
+   <td style="text-align:right;"> 942.7 </td>
+   <td style="text-align:right;"> 0.163 </td>
+   <td style="text-align:right;"> 0.022 </td>
+   <td style="text-align:right;"> 0.4599 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> FCP </td>
+   <td style="text-align:right;"> 27 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 6362 </td>
+   <td style="text-align:right;"> 235.6 </td>
+   <td style="text-align:right;"> 1154.5 </td>
+   <td style="text-align:right;"> 0.181 </td>
+   <td style="text-align:right;"> 0.026 </td>
+   <td style="text-align:right;"> 0.4302 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> FMT </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 4076 </td>
+   <td style="text-align:right;"> 271.7 </td>
+   <td style="text-align:right;"> 922.6 </td>
+   <td style="text-align:right;"> 0.226 </td>
+   <td style="text-align:right;"> 0.026 </td>
+   <td style="text-align:right;"> 0.4410 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GMT </td>
+   <td style="text-align:right;"> 19 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 4362 </td>
+   <td style="text-align:right;"> 229.6 </td>
+   <td style="text-align:right;"> 1010.6 </td>
+   <td style="text-align:right;"> 0.232 </td>
+   <td style="text-align:right;"> 0.034 </td>
+   <td style="text-align:right;"> 0.3890 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GNF </td>
+   <td style="text-align:right;"> 7 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 2711 </td>
+   <td style="text-align:right;"> 387.3 </td>
+   <td style="text-align:right;"> 964.9 </td>
+   <td style="text-align:right;"> 0.356 </td>
+   <td style="text-align:right;"> 0.030 </td>
+   <td style="text-align:right;"> 0.3820 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HAR </td>
+   <td style="text-align:right;"> 37 </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:right;"> 6631 </td>
+   <td style="text-align:right;"> 179.2 </td>
+   <td style="text-align:right;"> 1058.9 </td>
+   <td style="text-align:right;"> 0.160 </td>
+   <td style="text-align:right;"> 0.028 </td>
+   <td style="text-align:right;"> 0.4251 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HPG </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 4043 </td>
+   <td style="text-align:right;"> 269.5 </td>
+   <td style="text-align:right;"> 1061.3 </td>
+   <td style="text-align:right;"> 0.263 </td>
+   <td style="text-align:right;"> 0.035 </td>
+   <td style="text-align:right;"> 0.3778 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> KAE </td>
+   <td style="text-align:right;"> 32 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 6909 </td>
+   <td style="text-align:right;"> 215.9 </td>
+   <td style="text-align:right;"> 875.5 </td>
+   <td style="text-align:right;"> 0.127 </td>
+   <td style="text-align:right;"> 0.061 </td>
+   <td style="text-align:right;"> 0.5076 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> KNZ </td>
+   <td style="text-align:right;"> 42 </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:right;"> 7892 </td>
+   <td style="text-align:right;"> 187.9 </td>
+   <td style="text-align:right;"> 1390.3 </td>
+   <td style="text-align:right;"> 0.176 </td>
+   <td style="text-align:right;"> 0.019 </td>
+   <td style="text-align:right;"> 0.3898 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LAR </td>
+   <td style="text-align:right;"> 27 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 4516 </td>
+   <td style="text-align:right;"> 167.3 </td>
+   <td style="text-align:right;"> 785.2 </td>
+   <td style="text-align:right;"> 0.174 </td>
+   <td style="text-align:right;"> 0.032 </td>
+   <td style="text-align:right;"> 0.4232 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LBJ </td>
+   <td style="text-align:right;"> 34 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 7876 </td>
+   <td style="text-align:right;"> 231.6 </td>
+   <td style="text-align:right;"> 1217.4 </td>
+   <td style="text-align:right;"> 0.155 </td>
+   <td style="text-align:right;"> 0.026 </td>
+   <td style="text-align:right;"> 0.4421 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> NWP </td>
+   <td style="text-align:right;"> 20 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 5964 </td>
+   <td style="text-align:right;"> 298.2 </td>
+   <td style="text-align:right;"> 1325.1 </td>
+   <td style="text-align:right;"> 0.222 </td>
+   <td style="text-align:right;"> 0.031 </td>
+   <td style="text-align:right;"> 0.3957 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ONF </td>
+   <td style="text-align:right;"> 22 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 5569 </td>
+   <td style="text-align:right;"> 253.1 </td>
+   <td style="text-align:right;"> 1127.8 </td>
+   <td style="text-align:right;"> 0.203 </td>
+   <td style="text-align:right;"> 0.034 </td>
+   <td style="text-align:right;"> 0.4041 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> RNF </td>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 2517 </td>
+   <td style="text-align:right;"> 419.5 </td>
+   <td style="text-align:right;"> 1007.5 </td>
+   <td style="text-align:right;"> 0.400 </td>
+   <td style="text-align:right;"> 0.055 </td>
+   <td style="text-align:right;"> 0.3596 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> SEV </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 2505 </td>
+   <td style="text-align:right;"> 250.5 </td>
+   <td style="text-align:right;"> 712.3 </td>
+   <td style="text-align:right;"> 0.284 </td>
+   <td style="text-align:right;"> 0.031 </td>
+   <td style="text-align:right;"> 0.4091 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> SFA </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 5456 </td>
+   <td style="text-align:right;"> 545.6 </td>
+   <td style="text-align:right;"> 1471.5 </td>
+   <td style="text-align:right;"> 0.270 </td>
+   <td style="text-align:right;"> 0.021 </td>
+   <td style="text-align:right;"> 0.4193 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> UHC </td>
+   <td style="text-align:right;"> 21 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 8020 </td>
+   <td style="text-align:right;"> 381.9 </td>
+   <td style="text-align:right;"> 1711.6 </td>
+   <td style="text-align:right;"> 0.213 </td>
+   <td style="text-align:right;"> 0.021 </td>
+   <td style="text-align:right;"> 0.4011 </td>
+  </tr>
+</tbody>
+</table></div>
 
 \
 
@@ -2509,15 +2767,327 @@ Bac_gamma_Site.df[,c(1:8,10)]
 
 
 ```r
-Fun_gamma_Site.df$BetaDisp <- round(betadisp_Site_Fun_addC$group.distances,3)
-Fun_gamma_Site.df[,c(1:8,10)]
+Fun_gamma_Site.df$BetaDisp <- round(Fun_gamma_Site.df$Fun_Site_betadisp,4)
+Fun_gamma_Site.df[,c(1:8,11)] %>% kbl() %>% kable_styling() %>%
+  scroll_box(width = "95%", height = "350px")
 ```
+
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:350px; overflow-x: scroll; width:95%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> Site </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> n (# of samples per site) </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> # of grass hosts per site </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> Gamma (# total unique OTUs) </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> Gamma / n </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> Observed mean 𝝰 </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> mean prop. of gamma detected per sample </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> SD prop. of gamma detected per sample </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> BetaDisp </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> BLM </td>
+   <td style="text-align:right;"> 23 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 983 </td>
+   <td style="text-align:right;"> 42.7 </td>
+   <td style="text-align:right;"> 181.3 </td>
+   <td style="text-align:right;"> 0.184 </td>
+   <td style="text-align:right;"> 0.029 </td>
+   <td style="text-align:right;"> 0.6057 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BNP </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 633 </td>
+   <td style="text-align:right;"> 42.2 </td>
+   <td style="text-align:right;"> 83.2 </td>
+   <td style="text-align:right;"> 0.131 </td>
+   <td style="text-align:right;"> 0.040 </td>
+   <td style="text-align:right;"> 0.7496 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CAD </td>
+   <td style="text-align:right;"> 38 </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:right;"> 1341 </td>
+   <td style="text-align:right;"> 35.3 </td>
+   <td style="text-align:right;"> 120.0 </td>
+   <td style="text-align:right;"> 0.090 </td>
+   <td style="text-align:right;"> 0.021 </td>
+   <td style="text-align:right;"> 0.7428 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CNF </td>
+   <td style="text-align:right;"> 27 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 923 </td>
+   <td style="text-align:right;"> 34.2 </td>
+   <td style="text-align:right;"> 173.3 </td>
+   <td style="text-align:right;"> 0.188 </td>
+   <td style="text-align:right;"> 0.019 </td>
+   <td style="text-align:right;"> 0.5813 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CPR </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 430 </td>
+   <td style="text-align:right;"> 39.1 </td>
+   <td style="text-align:right;"> 94.1 </td>
+   <td style="text-align:right;"> 0.219 </td>
+   <td style="text-align:right;"> 0.031 </td>
+   <td style="text-align:right;"> 0.6723 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> DMT </td>
+   <td style="text-align:right;"> 26 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1044 </td>
+   <td style="text-align:right;"> 40.2 </td>
+   <td style="text-align:right;"> 93.3 </td>
+   <td style="text-align:right;"> 0.089 </td>
+   <td style="text-align:right;"> 0.024 </td>
+   <td style="text-align:right;"> 0.7698 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> FCP </td>
+   <td style="text-align:right;"> 27 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1169 </td>
+   <td style="text-align:right;"> 43.3 </td>
+   <td style="text-align:right;"> 120.5 </td>
+   <td style="text-align:right;"> 0.103 </td>
+   <td style="text-align:right;"> 0.030 </td>
+   <td style="text-align:right;"> 0.7479 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> FMT </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 522 </td>
+   <td style="text-align:right;"> 34.8 </td>
+   <td style="text-align:right;"> 71.4 </td>
+   <td style="text-align:right;"> 0.137 </td>
+   <td style="text-align:right;"> 0.023 </td>
+   <td style="text-align:right;"> 0.7450 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GMT </td>
+   <td style="text-align:right;"> 19 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 646 </td>
+   <td style="text-align:right;"> 34.0 </td>
+   <td style="text-align:right;"> 189.0 </td>
+   <td style="text-align:right;"> 0.293 </td>
+   <td style="text-align:right;"> 0.022 </td>
+   <td style="text-align:right;"> 0.5467 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GNF </td>
+   <td style="text-align:right;"> 7 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 256 </td>
+   <td style="text-align:right;"> 36.6 </td>
+   <td style="text-align:right;"> 74.0 </td>
+   <td style="text-align:right;"> 0.289 </td>
+   <td style="text-align:right;"> 0.059 </td>
+   <td style="text-align:right;"> 0.6628 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HAR </td>
+   <td style="text-align:right;"> 37 </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:right;"> 1315 </td>
+   <td style="text-align:right;"> 35.5 </td>
+   <td style="text-align:right;"> 129.4 </td>
+   <td style="text-align:right;"> 0.098 </td>
+   <td style="text-align:right;"> 0.025 </td>
+   <td style="text-align:right;"> 0.7317 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HPG </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 717 </td>
+   <td style="text-align:right;"> 47.8 </td>
+   <td style="text-align:right;"> 165.3 </td>
+   <td style="text-align:right;"> 0.230 </td>
+   <td style="text-align:right;"> 0.052 </td>
+   <td style="text-align:right;"> 0.6494 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> KAE </td>
+   <td style="text-align:right;"> 32 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1202 </td>
+   <td style="text-align:right;"> 37.6 </td>
+   <td style="text-align:right;"> 119.5 </td>
+   <td style="text-align:right;"> 0.099 </td>
+   <td style="text-align:right;"> 0.018 </td>
+   <td style="text-align:right;"> 0.7217 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> KNZ </td>
+   <td style="text-align:right;"> 42 </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:right;"> 1337 </td>
+   <td style="text-align:right;"> 31.8 </td>
+   <td style="text-align:right;"> 141.0 </td>
+   <td style="text-align:right;"> 0.105 </td>
+   <td style="text-align:right;"> 0.020 </td>
+   <td style="text-align:right;"> 0.7067 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LAR </td>
+   <td style="text-align:right;"> 27 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 694 </td>
+   <td style="text-align:right;"> 25.7 </td>
+   <td style="text-align:right;"> 90.8 </td>
+   <td style="text-align:right;"> 0.131 </td>
+   <td style="text-align:right;"> 0.027 </td>
+   <td style="text-align:right;"> 0.6819 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LBJ </td>
+   <td style="text-align:right;"> 34 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1442 </td>
+   <td style="text-align:right;"> 42.4 </td>
+   <td style="text-align:right;"> 218.6 </td>
+   <td style="text-align:right;"> 0.152 </td>
+   <td style="text-align:right;"> 0.025 </td>
+   <td style="text-align:right;"> 0.5967 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> NWP </td>
+   <td style="text-align:right;"> 20 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 1007 </td>
+   <td style="text-align:right;"> 50.4 </td>
+   <td style="text-align:right;"> 219.3 </td>
+   <td style="text-align:right;"> 0.218 </td>
+   <td style="text-align:right;"> 0.021 </td>
+   <td style="text-align:right;"> 0.5859 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ONF </td>
+   <td style="text-align:right;"> 22 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 1068 </td>
+   <td style="text-align:right;"> 48.5 </td>
+   <td style="text-align:right;"> 203.3 </td>
+   <td style="text-align:right;"> 0.190 </td>
+   <td style="text-align:right;"> 0.019 </td>
+   <td style="text-align:right;"> 0.5951 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> RNF </td>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 443 </td>
+   <td style="text-align:right;"> 73.8 </td>
+   <td style="text-align:right;"> 179.7 </td>
+   <td style="text-align:right;"> 0.406 </td>
+   <td style="text-align:right;"> 0.035 </td>
+   <td style="text-align:right;"> 0.5836 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> SEV </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 379 </td>
+   <td style="text-align:right;"> 37.9 </td>
+   <td style="text-align:right;"> 73.5 </td>
+   <td style="text-align:right;"> 0.194 </td>
+   <td style="text-align:right;"> 0.055 </td>
+   <td style="text-align:right;"> 0.7140 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> SFA </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 817 </td>
+   <td style="text-align:right;"> 81.7 </td>
+   <td style="text-align:right;"> 188.4 </td>
+   <td style="text-align:right;"> 0.231 </td>
+   <td style="text-align:right;"> 0.051 </td>
+   <td style="text-align:right;"> 0.6288 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> UHC </td>
+   <td style="text-align:right;"> 21 </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 936 </td>
+   <td style="text-align:right;"> 44.6 </td>
+   <td style="text-align:right;"> 212.0 </td>
+   <td style="text-align:right;"> 0.226 </td>
+   <td style="text-align:right;"> 0.024 </td>
+   <td style="text-align:right;"> 0.5630 </td>
+  </tr>
+</tbody>
+</table></div>
 
 \
 
-## ANOSIM
+## ANOSIM {.tabset}
 
-[TBD]
+\
+
+### Bac
+
+
+```r
+Bac_Site.anosim <- with(phylo2vegan_sd(Bac_wholecommunity), anosim(Bac_wc_sorensen_distmat, Site))
+Bac_Site.anosim
+```
+
+```
+## 
+## Call:
+## anosim(x = Bac_wc_sorensen_distmat, grouping = Site) 
+## Dissimilarity: user supplied square matrix 
+## 
+## ANOSIM statistic R: 0.7502 
+##       Significance: 0.001 
+## 
+## Permutation: free
+## Number of permutations: 999
+```
+
+![](../docs/figures/ANOSIM/Bacterial_Site_ANOSIM.png){width="100%"} 
+
+\
+
+### Fun
+
+
+```r
+Fun_Site.anosim <- with(phylo2vegan_sd(Fun_wholecommunity), anosim(Fun_wc_sorensen_distmat, Site))
+Fun_Site.anosim
+```
+
+```
+## 
+## Call:
+## anosim(x = Fun_wc_sorensen_distmat, grouping = Site) 
+## Dissimilarity: user supplied square matrix 
+## 
+## ANOSIM statistic R: 0.6272 
+##       Significance: 0.001 
+## 
+## Permutation: free
+## Number of permutations: 999
+```
+
+![](../docs/figures/ANOSIM/Fungal_Site_ANOSIM.png){width="100%"} 
+
+\
+
 
 
 
@@ -2526,18 +3096,535 @@ Fun_gamma_Site.df[,c(1:8,10)]
 # Tables: alpha beta gamma diversity of sites {.tabset}
 
 \
-
-
 \
 
 ## Bac
 
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:95%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-21)Bacteria: alpha beta gamma diversity of sites</caption>
+ <thead>
+  <tr>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Site </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> n (# of samples per site) </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> # of grass hosts per site </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Gamma (# total unique OTUs) </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Gamma / n </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Observed mean 𝝰 </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> mean prop. of gamma detected per sample </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> SD prop. of gamma detected per sample </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> BetaDisp </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"> BLM </td>
+   <td style="text-align:center;"> 23 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 4,689 </td>
+   <td style="text-align:center;"> 203.9 </td>
+   <td style="text-align:center;"> 924.7 </td>
+   <td style="text-align:center;"> 0.197 </td>
+   <td style="text-align:center;"> 0.029 </td>
+   <td style="text-align:center;"> 0.4160 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> BNP </td>
+   <td style="text-align:center;"> 15 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 4,547 </td>
+   <td style="text-align:center;"> 303.1 </td>
+   <td style="text-align:center;"> 964.1 </td>
+   <td style="text-align:center;"> 0.212 </td>
+   <td style="text-align:center;"> 0.033 </td>
+   <td style="text-align:center;"> 0.4380 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CAD </td>
+   <td style="text-align:center;"> 38 </td>
+   <td style="text-align:center;"> 4 </td>
+   <td style="text-align:center;"> 8,620 </td>
+   <td style="text-align:center;"> 226.8 </td>
+   <td style="text-align:center;"> 1,419.1 </td>
+   <td style="text-align:center;"> 0.165 </td>
+   <td style="text-align:center;"> 0.031 </td>
+   <td style="text-align:center;"> 0.4190 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CNF </td>
+   <td style="text-align:center;"> 27 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 5,427 </td>
+   <td style="text-align:center;"> 201.0 </td>
+   <td style="text-align:center;"> 931.7 </td>
+   <td style="text-align:center;"> 0.172 </td>
+   <td style="text-align:center;"> 0.041 </td>
+   <td style="text-align:center;"> 0.4509 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CPR </td>
+   <td style="text-align:center;"> 11 </td>
+   <td style="text-align:center;"> 1 </td>
+   <td style="text-align:center;"> 2,719 </td>
+   <td style="text-align:center;"> 247.2 </td>
+   <td style="text-align:center;"> 814.4 </td>
+   <td style="text-align:center;"> 0.300 </td>
+   <td style="text-align:center;"> 0.045 </td>
+   <td style="text-align:center;"> 0.3763 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> DMT </td>
+   <td style="text-align:center;"> 26 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 5,801 </td>
+   <td style="text-align:center;"> 223.1 </td>
+   <td style="text-align:center;"> 942.7 </td>
+   <td style="text-align:center;"> 0.163 </td>
+   <td style="text-align:center;"> 0.022 </td>
+   <td style="text-align:center;"> 0.4599 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> FCP </td>
+   <td style="text-align:center;"> 27 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 6,362 </td>
+   <td style="text-align:center;"> 235.6 </td>
+   <td style="text-align:center;"> 1,154.5 </td>
+   <td style="text-align:center;"> 0.181 </td>
+   <td style="text-align:center;"> 0.026 </td>
+   <td style="text-align:center;"> 0.4302 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> FMT </td>
+   <td style="text-align:center;"> 15 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 4,076 </td>
+   <td style="text-align:center;"> 271.7 </td>
+   <td style="text-align:center;"> 922.6 </td>
+   <td style="text-align:center;"> 0.226 </td>
+   <td style="text-align:center;"> 0.026 </td>
+   <td style="text-align:center;"> 0.4410 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> GMT </td>
+   <td style="text-align:center;"> 19 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 4,362 </td>
+   <td style="text-align:center;"> 229.6 </td>
+   <td style="text-align:center;"> 1,010.6 </td>
+   <td style="text-align:center;"> 0.232 </td>
+   <td style="text-align:center;"> 0.034 </td>
+   <td style="text-align:center;"> 0.3890 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> GNF </td>
+   <td style="text-align:center;"> 7 </td>
+   <td style="text-align:center;"> 1 </td>
+   <td style="text-align:center;"> 2,711 </td>
+   <td style="text-align:center;"> 387.3 </td>
+   <td style="text-align:center;"> 964.9 </td>
+   <td style="text-align:center;"> 0.356 </td>
+   <td style="text-align:center;"> 0.030 </td>
+   <td style="text-align:center;"> 0.3820 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> HAR </td>
+   <td style="text-align:center;"> 37 </td>
+   <td style="text-align:center;"> 4 </td>
+   <td style="text-align:center;"> 6,631 </td>
+   <td style="text-align:center;"> 179.2 </td>
+   <td style="text-align:center;"> 1,058.9 </td>
+   <td style="text-align:center;"> 0.160 </td>
+   <td style="text-align:center;"> 0.028 </td>
+   <td style="text-align:center;"> 0.4251 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> HPG </td>
+   <td style="text-align:center;"> 15 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 4,043 </td>
+   <td style="text-align:center;"> 269.5 </td>
+   <td style="text-align:center;"> 1,061.3 </td>
+   <td style="text-align:center;"> 0.263 </td>
+   <td style="text-align:center;"> 0.035 </td>
+   <td style="text-align:center;"> 0.3778 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> KAE </td>
+   <td style="text-align:center;"> 32 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 6,909 </td>
+   <td style="text-align:center;"> 215.9 </td>
+   <td style="text-align:center;"> 875.5 </td>
+   <td style="text-align:center;"> 0.127 </td>
+   <td style="text-align:center;"> 0.061 </td>
+   <td style="text-align:center;"> 0.5076 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> KNZ </td>
+   <td style="text-align:center;"> 42 </td>
+   <td style="text-align:center;"> 4 </td>
+   <td style="text-align:center;"> 7,892 </td>
+   <td style="text-align:center;"> 187.9 </td>
+   <td style="text-align:center;"> 1,390.3 </td>
+   <td style="text-align:center;"> 0.176 </td>
+   <td style="text-align:center;"> 0.019 </td>
+   <td style="text-align:center;"> 0.3898 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> LAR </td>
+   <td style="text-align:center;"> 27 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 4,516 </td>
+   <td style="text-align:center;"> 167.3 </td>
+   <td style="text-align:center;"> 785.2 </td>
+   <td style="text-align:center;"> 0.174 </td>
+   <td style="text-align:center;"> 0.032 </td>
+   <td style="text-align:center;"> 0.4232 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> LBJ </td>
+   <td style="text-align:center;"> 34 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 7,876 </td>
+   <td style="text-align:center;"> 231.6 </td>
+   <td style="text-align:center;"> 1,217.4 </td>
+   <td style="text-align:center;"> 0.155 </td>
+   <td style="text-align:center;"> 0.026 </td>
+   <td style="text-align:center;"> 0.4421 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> NWP </td>
+   <td style="text-align:center;"> 20 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 5,964 </td>
+   <td style="text-align:center;"> 298.2 </td>
+   <td style="text-align:center;"> 1,325.1 </td>
+   <td style="text-align:center;"> 0.222 </td>
+   <td style="text-align:center;"> 0.031 </td>
+   <td style="text-align:center;"> 0.3957 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> ONF </td>
+   <td style="text-align:center;"> 22 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 5,569 </td>
+   <td style="text-align:center;"> 253.1 </td>
+   <td style="text-align:center;"> 1,127.8 </td>
+   <td style="text-align:center;"> 0.203 </td>
+   <td style="text-align:center;"> 0.034 </td>
+   <td style="text-align:center;"> 0.4041 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> RNF </td>
+   <td style="text-align:center;"> 6 </td>
+   <td style="text-align:center;"> 1 </td>
+   <td style="text-align:center;"> 2,517 </td>
+   <td style="text-align:center;"> 419.5 </td>
+   <td style="text-align:center;"> 1,007.5 </td>
+   <td style="text-align:center;"> 0.400 </td>
+   <td style="text-align:center;"> 0.055 </td>
+   <td style="text-align:center;"> 0.3596 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> SEV </td>
+   <td style="text-align:center;"> 10 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 2,505 </td>
+   <td style="text-align:center;"> 250.5 </td>
+   <td style="text-align:center;"> 712.3 </td>
+   <td style="text-align:center;"> 0.284 </td>
+   <td style="text-align:center;"> 0.031 </td>
+   <td style="text-align:center;"> 0.4091 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> SFA </td>
+   <td style="text-align:center;"> 10 </td>
+   <td style="text-align:center;"> 1 </td>
+   <td style="text-align:center;"> 5,456 </td>
+   <td style="text-align:center;"> 545.6 </td>
+   <td style="text-align:center;"> 1,471.5 </td>
+   <td style="text-align:center;"> 0.270 </td>
+   <td style="text-align:center;"> 0.021 </td>
+   <td style="text-align:center;"> 0.4193 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> UHC </td>
+   <td style="text-align:center;"> 21 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 8,020 </td>
+   <td style="text-align:center;"> 381.9 </td>
+   <td style="text-align:center;"> 1,711.6 </td>
+   <td style="text-align:center;"> 0.213 </td>
+   <td style="text-align:center;"> 0.021 </td>
+   <td style="text-align:center;"> 0.4011 </td>
+  </tr>
+</tbody>
+</table></div>
 
 \
 
 ## Fun 
 
-
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:95%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:unnamed-chunk-22)Fungi: alpha beta gamma diversity of sites</caption>
+ <thead>
+  <tr>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Site </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> n (# of samples per site) </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> # of grass hosts per site </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Gamma (# total unique OTUs) </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Gamma / n </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Observed mean 𝝰 </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> mean prop. of gamma detected per sample </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> SD prop. of gamma detected per sample </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> BetaDisp </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:center;"> BLM </td>
+   <td style="text-align:center;"> 23 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 983 </td>
+   <td style="text-align:center;"> 42.7 </td>
+   <td style="text-align:center;"> 181.3 </td>
+   <td style="text-align:center;"> 0.184 </td>
+   <td style="text-align:center;"> 0.029 </td>
+   <td style="text-align:center;"> 0.6057 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> BNP </td>
+   <td style="text-align:center;"> 15 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 633 </td>
+   <td style="text-align:center;"> 42.2 </td>
+   <td style="text-align:center;"> 83.2 </td>
+   <td style="text-align:center;"> 0.131 </td>
+   <td style="text-align:center;"> 0.040 </td>
+   <td style="text-align:center;"> 0.7496 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CAD </td>
+   <td style="text-align:center;"> 38 </td>
+   <td style="text-align:center;"> 4 </td>
+   <td style="text-align:center;"> 1,341 </td>
+   <td style="text-align:center;"> 35.3 </td>
+   <td style="text-align:center;"> 120 </td>
+   <td style="text-align:center;"> 0.090 </td>
+   <td style="text-align:center;"> 0.021 </td>
+   <td style="text-align:center;"> 0.7428 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CNF </td>
+   <td style="text-align:center;"> 27 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 923 </td>
+   <td style="text-align:center;"> 34.2 </td>
+   <td style="text-align:center;"> 173.3 </td>
+   <td style="text-align:center;"> 0.188 </td>
+   <td style="text-align:center;"> 0.019 </td>
+   <td style="text-align:center;"> 0.5813 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> CPR </td>
+   <td style="text-align:center;"> 11 </td>
+   <td style="text-align:center;"> 1 </td>
+   <td style="text-align:center;"> 430 </td>
+   <td style="text-align:center;"> 39.1 </td>
+   <td style="text-align:center;"> 94.1 </td>
+   <td style="text-align:center;"> 0.219 </td>
+   <td style="text-align:center;"> 0.031 </td>
+   <td style="text-align:center;"> 0.6723 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> DMT </td>
+   <td style="text-align:center;"> 26 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 1,044 </td>
+   <td style="text-align:center;"> 40.2 </td>
+   <td style="text-align:center;"> 93.3 </td>
+   <td style="text-align:center;"> 0.089 </td>
+   <td style="text-align:center;"> 0.024 </td>
+   <td style="text-align:center;"> 0.7698 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> FCP </td>
+   <td style="text-align:center;"> 27 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 1,169 </td>
+   <td style="text-align:center;"> 43.3 </td>
+   <td style="text-align:center;"> 120.5 </td>
+   <td style="text-align:center;"> 0.103 </td>
+   <td style="text-align:center;"> 0.030 </td>
+   <td style="text-align:center;"> 0.7479 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> FMT </td>
+   <td style="text-align:center;"> 15 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 522 </td>
+   <td style="text-align:center;"> 34.8 </td>
+   <td style="text-align:center;"> 71.4 </td>
+   <td style="text-align:center;"> 0.137 </td>
+   <td style="text-align:center;"> 0.023 </td>
+   <td style="text-align:center;"> 0.7450 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> GMT </td>
+   <td style="text-align:center;"> 19 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 646 </td>
+   <td style="text-align:center;"> 34.0 </td>
+   <td style="text-align:center;"> 189 </td>
+   <td style="text-align:center;"> 0.293 </td>
+   <td style="text-align:center;"> 0.022 </td>
+   <td style="text-align:center;"> 0.5467 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> GNF </td>
+   <td style="text-align:center;"> 7 </td>
+   <td style="text-align:center;"> 1 </td>
+   <td style="text-align:center;"> 256 </td>
+   <td style="text-align:center;"> 36.6 </td>
+   <td style="text-align:center;"> 74 </td>
+   <td style="text-align:center;"> 0.289 </td>
+   <td style="text-align:center;"> 0.059 </td>
+   <td style="text-align:center;"> 0.6628 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> HAR </td>
+   <td style="text-align:center;"> 37 </td>
+   <td style="text-align:center;"> 4 </td>
+   <td style="text-align:center;"> 1,315 </td>
+   <td style="text-align:center;"> 35.5 </td>
+   <td style="text-align:center;"> 129.4 </td>
+   <td style="text-align:center;"> 0.098 </td>
+   <td style="text-align:center;"> 0.025 </td>
+   <td style="text-align:center;"> 0.7317 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> HPG </td>
+   <td style="text-align:center;"> 15 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 717 </td>
+   <td style="text-align:center;"> 47.8 </td>
+   <td style="text-align:center;"> 165.3 </td>
+   <td style="text-align:center;"> 0.230 </td>
+   <td style="text-align:center;"> 0.052 </td>
+   <td style="text-align:center;"> 0.6494 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> KAE </td>
+   <td style="text-align:center;"> 32 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 1,202 </td>
+   <td style="text-align:center;"> 37.6 </td>
+   <td style="text-align:center;"> 119.5 </td>
+   <td style="text-align:center;"> 0.099 </td>
+   <td style="text-align:center;"> 0.018 </td>
+   <td style="text-align:center;"> 0.7217 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> KNZ </td>
+   <td style="text-align:center;"> 42 </td>
+   <td style="text-align:center;"> 4 </td>
+   <td style="text-align:center;"> 1,337 </td>
+   <td style="text-align:center;"> 31.8 </td>
+   <td style="text-align:center;"> 141 </td>
+   <td style="text-align:center;"> 0.105 </td>
+   <td style="text-align:center;"> 0.020 </td>
+   <td style="text-align:center;"> 0.7067 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> LAR </td>
+   <td style="text-align:center;"> 27 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 694 </td>
+   <td style="text-align:center;"> 25.7 </td>
+   <td style="text-align:center;"> 90.8 </td>
+   <td style="text-align:center;"> 0.131 </td>
+   <td style="text-align:center;"> 0.027 </td>
+   <td style="text-align:center;"> 0.6819 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> LBJ </td>
+   <td style="text-align:center;"> 34 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 1,442 </td>
+   <td style="text-align:center;"> 42.4 </td>
+   <td style="text-align:center;"> 218.6 </td>
+   <td style="text-align:center;"> 0.152 </td>
+   <td style="text-align:center;"> 0.025 </td>
+   <td style="text-align:center;"> 0.5967 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> NWP </td>
+   <td style="text-align:center;"> 20 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 1,007 </td>
+   <td style="text-align:center;"> 50.4 </td>
+   <td style="text-align:center;"> 219.3 </td>
+   <td style="text-align:center;"> 0.218 </td>
+   <td style="text-align:center;"> 0.021 </td>
+   <td style="text-align:center;"> 0.5859 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> ONF </td>
+   <td style="text-align:center;"> 22 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 1,068 </td>
+   <td style="text-align:center;"> 48.5 </td>
+   <td style="text-align:center;"> 203.3 </td>
+   <td style="text-align:center;"> 0.190 </td>
+   <td style="text-align:center;"> 0.019 </td>
+   <td style="text-align:center;"> 0.5951 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> RNF </td>
+   <td style="text-align:center;"> 6 </td>
+   <td style="text-align:center;"> 1 </td>
+   <td style="text-align:center;"> 443 </td>
+   <td style="text-align:center;"> 73.8 </td>
+   <td style="text-align:center;"> 179.7 </td>
+   <td style="text-align:center;"> 0.406 </td>
+   <td style="text-align:center;"> 0.035 </td>
+   <td style="text-align:center;"> 0.5836 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> SEV </td>
+   <td style="text-align:center;"> 10 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 379 </td>
+   <td style="text-align:center;"> 37.9 </td>
+   <td style="text-align:center;"> 73.5 </td>
+   <td style="text-align:center;"> 0.194 </td>
+   <td style="text-align:center;"> 0.055 </td>
+   <td style="text-align:center;"> 0.7140 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> SFA </td>
+   <td style="text-align:center;"> 10 </td>
+   <td style="text-align:center;"> 1 </td>
+   <td style="text-align:center;"> 817 </td>
+   <td style="text-align:center;"> 81.7 </td>
+   <td style="text-align:center;"> 188.4 </td>
+   <td style="text-align:center;"> 0.231 </td>
+   <td style="text-align:center;"> 0.051 </td>
+   <td style="text-align:center;"> 0.6288 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> UHC </td>
+   <td style="text-align:center;"> 21 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 936 </td>
+   <td style="text-align:center;"> 44.6 </td>
+   <td style="text-align:center;"> 212 </td>
+   <td style="text-align:center;"> 0.226 </td>
+   <td style="text-align:center;"> 0.024 </td>
+   <td style="text-align:center;"> 0.5630 </td>
+  </tr>
+</tbody>
+</table></div>
 
 \
 \
@@ -2553,10 +3640,6 @@ Fun_gamma_Site.df[,c(1:8,10)]
 ### Bac
 
 
-```r
-shapiro.test(Bac_gamma_Site.df$`Gamma (# total unique OTUs)`)
-```
-
 ```
 ## 
 ## 	Shapiro-Wilk normality test
@@ -2565,24 +3648,12 @@ shapiro.test(Bac_gamma_Site.df$`Gamma (# total unique OTUs)`)
 ## W = 0.95319, p-value = 0.3648
 ```
 
-```r
-ggqqplot(Bac_gamma_Site.df$`Gamma (# total unique OTUs)`)
-ggdensity(Bac_gamma_Site.df$`Gamma (# total unique OTUs)`, 
-          main = "Density plot of site gamma diversity (Bacteria)",
-          xlab = "Size of regional species pool",
-          add = "mean",xlim = c(0, 1450),rug=T)
-```
-
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-18-1.png" width="40%" /><img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-18-2.png" width="40%" />
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-23-1.png" width="40%" /><img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-23-2.png" width="40%" />
 
 \
 
 ### Fun
 
-
-```r
-shapiro.test(Fun_gamma_Site.df$`Gamma (# total unique OTUs)`)
-```
 
 ```
 ## 
@@ -2592,15 +3663,7 @@ shapiro.test(Fun_gamma_Site.df$`Gamma (# total unique OTUs)`)
 ## W = 0.96265, p-value = 0.5447
 ```
 
-```r
-ggqqplot(Fun_gamma_Site.df$`Gamma (# total unique OTUs)`)
-ggdensity(Fun_gamma_Site.df$`Gamma (# total unique OTUs)`, 
-          main = "Density plot of site gamma diversity (Fungi)",
-          xlab = "Size of regional species pool",
-          add = "mean",xlim = c(0, 1450),rug=T)
-```
-
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-19-1.png" width="40%" /><img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-19-2.png" width="40%" />
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-24-1.png" width="40%" /><img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-24-2.png" width="40%" />
 
 \
 
@@ -2612,11 +3675,6 @@ Predictor: # of grass hosts per site
 
 
 
-```r
-# does sample alpha vary by ngrass_persite
-kruskal.test(fwc_alpha_Site$Observed~fwc_alpha_Site$ngrass_persite)
-```
-
 ```
 ## 
 ## 	Kruskal-Wallis rank sum test
@@ -2627,11 +3685,6 @@ kruskal.test(fwc_alpha_Site$Observed~fwc_alpha_Site$ngrass_persite)
 
 
 
-```r
-# does site gamma vary by ngrass_persite
-kruskal.test(Fun_gamma_Site2[,1]~Fun_gamma_Site3temp$ngrass_persite)
-```
-
 ```
 ## 
 ## 	Kruskal-Wallis rank sum test
@@ -2640,22 +3693,12 @@ kruskal.test(Fun_gamma_Site2[,1]~Fun_gamma_Site3temp$ngrass_persite)
 ## Kruskal-Wallis chi-squared = 3.1963, df = 3, p-value = 0.3623
 ```
 
-```r
-# does site gamma/n vary by ngrass_persite
-kruskal.test(Fun_gamma_Site3temp$`Gamma_over_n`~Fun_gamma_Site3temp$ngrass_persite)
-```
-
 ```
 ## 
 ## 	Kruskal-Wallis rank sum test
 ## 
 ## data:  Fun_gamma_Site3temp$Gamma_over_n by Fun_gamma_Site3temp$ngrass_persite
-## Kruskal-Wallis chi-squared = 1.2121, df = 3, p-value = 0.7501
-```
-
-```r
-# does site obs_mean_alpha vary by ngrass_persite
-kruskal.test(Fun_gamma_Site.df$`Observed mean 𝝰`~Fun_gamma_Site.df$`# of grass hosts per site`)
+## Kruskal-Wallis chi-squared = 5.9091, df = 3, p-value = 0.1161
 ```
 
 ```
@@ -2664,11 +3707,6 @@ kruskal.test(Fun_gamma_Site.df$`Observed mean 𝝰`~Fun_gamma_Site.df$`# of gras
 ## 
 ## data:  Fun_gamma_Site.df$`Observed mean 𝝰` by Fun_gamma_Site.df$`# of grass hosts per site`
 ## Kruskal-Wallis chi-squared = 0.59157, df = 3, p-value = 0.8984
-```
-
-```r
-# does site mean prop. of gamma detected per sample vary by ngrass_persite YES
-kruskal.test(Fun_gamma_Site.df$`mean prop. of gamma detected per sample`~Fun_gamma_Site.df$`# of grass hosts per site`)
 ```
 
 ```
@@ -2688,66 +3726,6 @@ kruskal.test(Fun_gamma_Site.df$`mean prop. of gamma detected per sample`~Fun_gam
 # plot alpha obs v exp {.hidden .unlisted}
 
 
-```r
-ggplot(aes(x=Bac_gamma_Site.df$`Observed mean 𝝰`,y=Fun_gamma_Site.df$`Observed mean 𝝰`,color=Site),data=Bac_gamma_Site.df)+
-  geom_point(size=3)+
-  scale_color_manual(values = latlong_cols)+
-  # geom_abline(aes(slope = 1,intercept=0),data=Fun_gamma_Site.df, color="black")+
- labs(y="Fungi: Obs mean alpha",x="Bacteria: Obs mean alpha",color="Site")+
-  theme_bw() +
-  theme(legend.position="right",
-    axis.text = element_text(color="black", size=10),
-    axis.title = element_text(color="black", size=12),
-    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
-    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
-    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
-
-ggplot(aes(x=Bac_gamma_Site.df$`Observed mean 𝝰`,y=Bac_gamma_Site.df$`Expected mean 𝝰`,color=Site),data=Bac_gamma_Site.df)+
-  geom_point(size=3)+
-  scale_color_manual(values = latlong_cols)+
-  scale_x_continuous(limits = c(0,2000))+
-  scale_y_continuous(limits = c(0,750))+
-  geom_abline(aes(slope = 1,intercept=0),data=Fun_gamma_Site.df, color="black")+
-  labs(y="Gamma_over_n",x="Observed mean alpha",color="Site",title = "Bacteria")+
-  theme_bw() +
-  theme(legend.position="right",
-    axis.text = element_text(color="black", size=10),
-    axis.title = element_text(color="black", size=12),
-    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
-    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
-    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
-
-
-ggplot(aes(x=Fun_gamma_Site.df$`Observed mean 𝝰`,y=Fun_gamma_Site.df$`Expected mean 𝝰`,color=Site),data=Fun_gamma_Site.df)+
-  geom_point(size=3)+
-  scale_x_continuous(limits = c(0,300))+
-  scale_y_continuous(limits = c(0,100))+
-  scale_color_manual(values = latlong_cols)+
-  geom_abline(aes(slope = 1,intercept=0),data=Fun_gamma_Site.df, color="black")+
-  labs(y="Gamma_over_n",x="Observed mean alpha",color="Site",title = "Fungi")+
-  theme_bw() +
-  theme(legend.position="right",
-    axis.text = element_text(color="black", size=10),
-    axis.title = element_text(color="black", size=12),
-    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
-    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
-    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
-
-ggplot(aes(x=Fun_gamma_Site.df$`Observed mean 𝝰`,y=Fun_gamma_Site.df$`Expected mean 𝝰`,color=Site),data=Fun_gamma_Site.df)+
-  geom_point(size=3)+
-  scale_x_continuous(limits = c(0,300))+
-  scale_y_continuous(limits = c(0,100))+
-  scale_color_manual(values = latlong_cols)+
-  geom_abline(aes(slope = 1,intercept=0),data=Fun_gamma_Site.df, color="black")+
-  labs(y="Gamma_over_n",x="Observed mean alpha",color="Site",title = "Fungi")+
-  theme_bw() +
-  theme(legend.position="right",
-    axis.text = element_text(color="black", size=10),
-    axis.title = element_text(color="black", size=12),
-    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
-    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
-    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
-```
 
 # beta disp by grass landscape {.hidden .unlisted}
 
