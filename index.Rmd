@@ -1,5 +1,9 @@
 ---
 title: "RAM Data Visualization"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 2
 ---
 
 ```{r render-site, include=FALSE,eval=F}
@@ -86,13 +90,11 @@ rmarkdown::render("code/AlphaBetaGamma_BySite.Rmd", output_file="/Users/L347123/
 
 ### Distribution and diversity of *Darksidea* and *Monosporascus* sp. with variable input data {.unnumbered}
 
-\
-
 -   <a href="github_darksidea_noEDGEnoMP.html" target="_blank">[Standard input data:]{.underline} EDGE samples excluded, samples with missing pairs excluded (last updated 21 July 2024)</a>
 
 -   <a href="github_darksidea_allSamplesincEDGE.html" target="_blank">Full untrimmed input data: [all samples]{.underline}; EDGE samples included, samples with missing pairs included (last updated 21 July 2024)</a>
 
-    -   changes: increased n of samples from 484 to 654, n SEV samples increased from 10 to 53
+    -   changes: increased n of samples from 484 to 654, n SEV samples increased from 10 to 53, *Monosporascus* detectedat the SEV (1 OTU found in 2.7% of *Black grama* SEV soils with mean relative abundance of 1.9%, when present)
 
 \
 \
