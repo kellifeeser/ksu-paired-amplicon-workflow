@@ -64,7 +64,7 @@ rmarkdown::render("code/ManuscriptOrganizing.Rmd", output_file="/Users/L347123/D
 rmarkdown::render("code/AlphaBetaGamma_BySite.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite")
 
 #render nestedness_sites_clusters - doesnt work from here, needs new session
-# rmarkdown::render("code/nestedness_sites_clusters.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_nestedness_sites_clusters")
+rmarkdown::render("code/nestedness_sites_clusters.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_nestedness_sites_clusters")
 
 ```
 
@@ -113,7 +113,7 @@ as a link: <a href="DistributionOfDarksideaMono.html" target="_blank">Distributi
 
 -   <a href="github_AlphaBetaGamma_BySite.html" target="_blank">Alpha- Beta- Gamma- diversity by site (last updated 23 July 2024)</a>
 
--   <a href="nestedness_sites_clusters.html" target="_blank">Partitioning beta diversity into nestedness and turnover components</a>
+-   <a href="github_nestedness_sites_clusters.html" target="_blank">Partitioning beta diversity into nestedness and turnover components</a>
 
     -   Partitioning &beta;-diversity of bacterial and fungal communities at landscape-scale, regional (site) scale, and among sub-assemblages
 
