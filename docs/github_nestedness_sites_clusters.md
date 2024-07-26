@@ -1292,7 +1292,7 @@ mtext(paste0("βsne ~ S: pseudo-R2 = ", round(decay.Fun_all.exp.sne$pseudo.r.squ
 
 ### Pure spatial effects {.tabset}
 
-#### Bacteria 
+#### Bacterial 
 
 
 ```r
@@ -1686,7 +1686,7 @@ plot.decay.pretty(decay.Bac_B13.exp.sim, col=paste(col_n14[13],"cc",sep = ""), a
 
 \
 
-#### Fungi 
+#### Fungal 
 
 
 ```r
@@ -1999,4 +1999,82 @@ plot.decay.pretty(decay.Fun_F10.exp.sim, col=paste(col_n10[10],"66",sep = ""), a
   </tr>
 </tbody>
 </table>
+
+
+
+\
+
+#### Fungal F1 vs. non-F1
+
+
+```r
+#sor
+# F1
+decay.Fun_sor_clus2F1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]], y.type="dissim", model.type="exp")
+
+# non-F1
+decay.Fun_sor_clus2nonF1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp")
+
+#sor
+# F1
+decay.Fun_sor_clus2F1.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["F1_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]], y.type="dissim", model.type="exp")
+
+# non-F1
+decay.Fun_sor_clus2nonF1.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp")
+
+#sne
+# F1
+decay.Fun_sor_clus2F1.exp.sne<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["F1_Fun"]]$beta.sne, x=env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]], y.type="dissim", model.type="exp")
+
+# non-F1
+decay.Fun_sor_clus2nonF1.exp.sne<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1_Fun"]]$beta.sne, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp")
+```
+
+
+
+```r
+par(mfrow = c(1, 2),#c(nr, nc) 
+    mar = c(2, 2, 2.5, 2),# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+    oma = (c(3, 0, 2, 0) + 0.1))
+
+plot.decay.pretty(decay.Fun_sor_clus2F1.exp.sor, col=paste(col_n10[1],"66",sep = ""), add=F, main="Total Dissimilarity (βsor)\nFungi",cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
+
+plot.decay.pretty(decay.Fun_sor_clus2nonF1.exp.sor, col="#7FBC41", add=T, main="Total Dissimilarity (βsor)\nFungi: non-F1", cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line="#276419",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext((paste("F1 - ",round(decay.Fun_sor_clus2F1.exp.sor$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2F1.exp.sor$p.value,3),")",sep = "")),side=1,line=-2,adj=0.05,outer = F,padj = 0,col=col_n10[1])
+mtext((paste("non-F1 - ",round(decay.Fun_sor_clus2nonF1.exp.sor$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2nonF1.exp.sor$p.value,3),")",sep = "")),side=1,line=-1,adj=0.05,outer = F,padj = 0, col="#7FBC41")
+mtext((paste("pseudo R2 (p-value)",sep = "")),side=1,line=-3,adj=0.05,outer = F,padj = 0, col="black")
+
+
+# sim
+plot.decay.pretty(decay.Fun_sor_clus2F1.exp.sim, col=paste(col_n10[1],"66",sep = ""), add=F, main="Total Dissimilarity (βsim)\nFungi",cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
+
+plot.decay.pretty(decay.Fun_sor_clus2nonF1.exp.sim, col="#7FBC41", add=T, main="Total Dissimilarity (βsim)\nFungi: non-F1", cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line="#276419",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext((paste("F1 - ",round(decay.Fun_sor_clus2F1.exp.sim$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2F1.exp.sim$p.value,3),")",sep = "")),side=1,line=-2,adj=0.05,outer = F,padj = 0,col=col_n10[1])
+mtext((paste("non-F1 - ",round(decay.Fun_sor_clus2nonF1.exp.sim$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2nonF1.exp.sim$p.value,3),")",sep = "")),side=1,line=-1,adj=0.05,outer = F,padj = 0, col="#7FBC41")
+mtext((paste("pseudo R2 (p-value)",sep = "")),side=1,line=-3,adj=0.05,outer = F,padj = 0, col="black")
+```
+
+![](../docs/github_nestedness_sites_clusters_figures/plot-Fun-clus2-sor-sim-geo-1.png)<!-- -->
+
+```r
+# plot.decay.pretty(decay.Fun_sor_clus2nonF1.exp.sor, col="#7FBC41", add=T, main="non-F1",
+#            xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+#            col.line="#276419",xaxp = c(0,1500,3),
+#            ylab="",xlab="")
+```
+
 
