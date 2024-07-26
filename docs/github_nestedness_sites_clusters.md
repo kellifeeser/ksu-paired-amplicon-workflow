@@ -2,7 +2,7 @@
 title: "RAM: partitioning &beta;-diversity into nestedness and turnover compoments"
 subtitle: "Comparing responses of bacterial and fungal communities by site and sub-assemblage along environmental gradients using MRM"
 author: "Kelli Feeser"
-date: "2024-07-25"
+date: "2024-07-26"
 output:
   bookdown::html_document2:
     code_folding: hide
@@ -43,7 +43,7 @@ editor_options:
 
 ------------------------------------------------------------------------
 
-Document last updated: 2024-07-25
+Document last updated: 2024-07-26
 
 ------------------------------------------------------------------------
 
@@ -1213,8 +1213,8 @@ mtext(paste0("βsne ~ S: pseudo-R2 = ", round(decay.Fun_all.exp.sne$pseudo.r.squ
 ```
 
 <div class="figure">
-<img src="../docs/github_nestedness_sites_clusters_figures/DD-BF-all-1.png" alt="(ref:DD-BF-all-fig-caption)"  />
-<p class="caption">(\#fig:DD-BF-all)(ref:DD-BF-all-fig-caption)</p>
+<img src="../docs/github_nestedness_sites_clusters_figures/plot-DD-BF-all-1.png" alt="(ref:DD-BF-all-fig-caption)"  />
+<p class="caption">(\#fig:plot-DD-BF-all)(ref:DD-BF-all-fig-caption)</p>
 </div>
 
 (ref:DD-BF-all-fig-caption) Distance decay models of pairwise bacterial (blue) and fungal (orange) community dissimilarities, across all sites and samples. Models were fit using negative exponential to describe decay of community similarity with spatial distance (in km). The first model parameter ('a') is the intercept, the second parameter ('b') is the slope, the $pseudo-R^2$ being proportion of the variation in the dependent variable that the model accounts for, calculated as []. A) Bac βsor ~ S: $pseudo-R^2$ = 0.157, a = 0.616, b = 3.042e-04, $p$-value = 0.01. B) Fungal βsor ~ S: $pseudo-R^2$ = 0.021, a = 0.772, b = 3.514e-04, $p$-value = 0.01. Both model parameters differed between domains (βsor ~ S assessed via block-site bootstrap; 'a' $p$-value = 2.298e-235, 'b' $p$-value = 6.359e-02). 
@@ -1288,11 +1288,16 @@ mtext(paste0("βsne ~ S: pseudo-R2 = ", round(decay.Fun_all.exp.sne$pseudo.r.squ
 </table>
 
 
+## Subassemblage-scale
+
+### Pure spatial effects {.tabset}
+
+#### Bacteria 
 
 
 ```r
 # B1
-decay.Bac_B1.exp.sor2<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B1_Bac"]][["beta.sor"]], x=env_dist_matrices[["Bac_sor_clusters"]][["B1_geodist"]], y.type="dissim", model.type="exp")
+decay.Bac_B1.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B1_Bac"]][["beta.sor"]], x=env_dist_matrices[["Bac_sor_clusters"]][["B1_geodist"]], y.type="dissim", model.type="exp")
 # B2 
 decay.Bac_B2.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B2_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B2_geodist"]], y.type="dissim", model.type="exp")
 # B3
@@ -1323,10 +1328,49 @@ decay.Bac_B13.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_cluster
 
 
 ```r
-plot.decay.pretty(decay.Bac_B1.exp.sor2, col=paste(col_n14[1],"cc",sep = ""), main="Total Dissimilarity (βsor)", sub="Bacteria",
+# B1
+decay.Bac_B1.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B1_Bac"]][["beta.sim"]], x=env_dist_matrices[["Bac_sor_clusters"]][["B1_geodist"]], y.type="dissim", model.type="exp")
+# B2 
+decay.Bac_B2.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B2_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B2_geodist"]], y.type="dissim", model.type="exp")
+# B3
+decay.Bac_B3.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B3_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B3_geodist"]], y.type="dissim", model.type="exp")
+# B4
+decay.Bac_B4.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B4_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B4_geodist"]], y.type="dissim", model.type="exp")
+# B5
+decay.Bac_B5.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B5_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B5_geodist"]], y.type="dissim", model.type="exp")
+# B6 - singular gradient matrix at initial parameter estimates
+# decay.Bac_B6.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B6_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B6_geodist"]], y.type="dissim", model.type="exp")
+# B7
+decay.Bac_B7.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B7_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B7_geodist"]], y.type="dissim", model.type="exp")
+# B8
+decay.Bac_B8.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B8_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B8_geodist"]], y.type="dissim", model.type="exp")
+# B9
+decay.Bac_B9.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B9_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B9_geodist"]], y.type="dissim", model.type="exp")
+# B10
+decay.Bac_B10.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B10_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B10_geodist"]], y.type="dissim", model.type="exp")
+# B11
+decay.Bac_B11.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B11_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B11_geodist"]], y.type="dissim", model.type="exp")
+# B12
+decay.Bac_B12.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B12_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B12_geodist"]], y.type="dissim", model.type="exp")
+# B13
+decay.Bac_B13.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B13_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B13_geodist"]], y.type="dissim", model.type="exp")
+# B14 - singular gradient matrix at initial parameter estimates
+# decay.Bac_B14.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B14_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B14_geodist"]], y.type="dissim", model.type="exp")
+```
+
+
+```r
+par(mfrow = c(1, 2),#c(nr, nc) 
+    mar = c(2, 2, 2.5, 2),# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+    oma = (c(3, 0, 2, 0) + 0.1))
+
+#sor
+plot.decay.pretty(decay.Bac_B1.exp.sor, col=paste(col_n14[1],"cc",sep = ""), main="Total Dissimilarity (βsor)\n Bacteria",cex.main=1,
            xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
            col.line=col_n14[1],xaxp = c(0,1500,3),
            ylab="",xlab="")
+mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
+
 plot.decay.pretty(decay.Bac_B2.exp.sor, col=paste(col_n14[2],"cc",sep = ""), add=T, main="B2", 
            xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
            col.line=col_n14[2],xaxp = c(0,1500,3),
@@ -1371,15 +1415,283 @@ plot.decay.pretty(decay.Bac_B13.exp.sor, col=paste(col_n14[13],"cc",sep = ""), a
            xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
            col.line=col_n14[13],xaxp = c(0,1500,3),
            ylab="",xlab="")
+
+#sim
+plot.decay.pretty(decay.Bac_B1.exp.sim, col=paste(col_n14[1],"cc",sep = ""), main="Turnover-Resultant Dissimilarity\n(βsim) Bacteria",cex.main=1,
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+plot.decay.pretty(decay.Bac_B2.exp.sim, col=paste(col_n14[2],"cc",sep = ""), add=T, main="B2", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[2],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B3.exp.sim, col=paste(col_n14[3],"cc",sep = ""), add=T, main="B3", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[3],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B4.exp.sim, col=paste(col_n14[4],"cc",sep = ""), add=T, main="B4", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[4],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B5.exp.sim, col=paste(col_n14[5],"cc",sep = ""), add=T, main="B5", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[5],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B7.exp.sim, col=paste(col_n14[7],"cc",sep = ""), add=T, main="B7", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[7],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B8.exp.sim, col=paste(col_n14[8],"cc",sep = ""), add=T, main="B8", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[8],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B9.exp.sim, col=paste(col_n14[9],"cc",sep = ""), add=T, main="B9", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[9],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B10.exp.sim, col=paste(col_n14[10],"cc",sep = ""), add=T, main="B10", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[10],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B11.exp.sim, col=paste(col_n14[11],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[11],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B12.exp.sim, col=paste(col_n14[12],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[12],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B13.exp.sim, col=paste(col_n14[13],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[13],xaxp = c(0,1500,3),
+           ylab="",xlab="")
 ```
 
-![](../docs/github_nestedness_sites_clusters_figures/plot-Bac-clus-sor-geo-1.png)<!-- -->
+![](../docs/github_nestedness_sites_clusters_figures/plot-Bac-clus-sor-sim-geo-1.png)<!-- -->
 
+<table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+<tr>
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="1"></th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Fungal Decay parameters</div></th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Distance Spanned</div></th>
+</tr>
+  <tr>
+   <th style="text-align:center;"> Fungal sub-assemblage </th>
+   <th style="text-align:center;"> pseudo-R2 </th>
+   <th style="text-align:center;"> intercept </th>
+   <th style="text-align:center;"> slope </th>
+   <th style="text-align:center;"> p-value </th>
+   <th style="text-align:center;"> max pairwise distance (km) </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr grouplength="12"><td colspan="6" style="border-bottom: 1px solid;"><strong>βsor</strong></td></tr>
+<tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B1 </td>
+   <td style="text-align:center;"> 0.398 </td>
+   <td style="text-align:center;"> 0.532 </td>
+   <td style="text-align:center;"> 3.72e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1158 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B2 </td>
+   <td style="text-align:center;"> 0.358 </td>
+   <td style="text-align:center;"> 0.53 </td>
+   <td style="text-align:center;"> 2.25e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 969 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B3 </td>
+   <td style="text-align:center;"> 0.312 </td>
+   <td style="text-align:center;"> 0.543 </td>
+   <td style="text-align:center;"> 1.55e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1354 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B4 </td>
+   <td style="text-align:center;"> 0.243 </td>
+   <td style="text-align:center;"> 0.531 </td>
+   <td style="text-align:center;"> 2.05e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 995 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B5 </td>
+   <td style="text-align:center;"> 0.286 </td>
+   <td style="text-align:center;"> 0.529 </td>
+   <td style="text-align:center;"> 1.36e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1354 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B7 </td>
+   <td style="text-align:center;"> 0.641 </td>
+   <td style="text-align:center;"> 0.492 </td>
+   <td style="text-align:center;"> 2.50e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1124 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B8 </td>
+   <td style="text-align:center;"> 0.149 </td>
+   <td style="text-align:center;"> 0.529 </td>
+   <td style="text-align:center;"> 2.03e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 505 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B9 </td>
+   <td style="text-align:center;"> 0.297 </td>
+   <td style="text-align:center;"> 0.568 </td>
+   <td style="text-align:center;"> 1.36e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1354 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B10 </td>
+   <td style="text-align:center;"> 0.447 </td>
+   <td style="text-align:center;"> 0.515 </td>
+   <td style="text-align:center;"> 1.70e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1155 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B11 </td>
+   <td style="text-align:center;"> 0.12 </td>
+   <td style="text-align:center;"> 0.53 </td>
+   <td style="text-align:center;"> 6.24e-04 </td>
+   <td style="text-align:center;"> 0.04 </td>
+   <td style="text-align:center;"> 203 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B12 </td>
+   <td style="text-align:center;"> 0.044 </td>
+   <td style="text-align:center;"> 0.628 </td>
+   <td style="text-align:center;"> 2.29e-04 </td>
+   <td style="text-align:center;"> 0.04 </td>
+   <td style="text-align:center;"> 533 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B13 </td>
+   <td style="text-align:center;"> 0.266 </td>
+   <td style="text-align:center;"> 0.522 </td>
+   <td style="text-align:center;"> 5.10e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 273 </td>
+  </tr>
+  <tr grouplength="12"><td colspan="6" style="border-bottom: 1px solid;"><strong>βsim</strong></td></tr>
+<tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B1 </td>
+   <td style="text-align:center;"> 0.329 </td>
+   <td style="text-align:center;"> 0.492 </td>
+   <td style="text-align:center;"> 2.70e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1158 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B2 </td>
+   <td style="text-align:center;"> 0.157 </td>
+   <td style="text-align:center;"> 0.487 </td>
+   <td style="text-align:center;"> 1.65e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 969 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B3 </td>
+   <td style="text-align:center;"> 0.314 </td>
+   <td style="text-align:center;"> 0.499 </td>
+   <td style="text-align:center;"> 1.74e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1354 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B4 </td>
+   <td style="text-align:center;"> 0.095 </td>
+   <td style="text-align:center;"> 0.504 </td>
+   <td style="text-align:center;"> 1.34e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 995 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B5 </td>
+   <td style="text-align:center;"> 0.247 </td>
+   <td style="text-align:center;"> 0.483 </td>
+   <td style="text-align:center;"> 1.39e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1354 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B7 </td>
+   <td style="text-align:center;"> 0.595 </td>
+   <td style="text-align:center;"> 0.441 </td>
+   <td style="text-align:center;"> 2.77e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1124 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B8 </td>
+   <td style="text-align:center;"> 0.04 </td>
+   <td style="text-align:center;"> 0.487 </td>
+   <td style="text-align:center;"> 1.22e-04 </td>
+   <td style="text-align:center;"> 0.14 </td>
+   <td style="text-align:center;"> 505 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B9 </td>
+   <td style="text-align:center;"> 0.179 </td>
+   <td style="text-align:center;"> 0.511 </td>
+   <td style="text-align:center;"> 1.05e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1354 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B10 </td>
+   <td style="text-align:center;"> 0.401 </td>
+   <td style="text-align:center;"> 0.48 </td>
+   <td style="text-align:center;"> 1.57e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1155 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B11 </td>
+   <td style="text-align:center;"> 0.098 </td>
+   <td style="text-align:center;"> 0.502 </td>
+   <td style="text-align:center;"> 5.63e-04 </td>
+   <td style="text-align:center;"> 0.07 </td>
+   <td style="text-align:center;"> 203 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B12 </td>
+   <td style="text-align:center;"> 0.101 </td>
+   <td style="text-align:center;"> 0.542 </td>
+   <td style="text-align:center;"> 2.50e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 533 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> B13 </td>
+   <td style="text-align:center;"> 0.047 </td>
+   <td style="text-align:center;"> 0.477 </td>
+   <td style="text-align:center;"> 2.26e-04 </td>
+   <td style="text-align:center;"> 0.16 </td>
+   <td style="text-align:center;"> 273 </td>
+  </tr>
+</tbody>
+</table>
+
+\
+
+#### Fungi 
 
 
 ```r
 # F1
-decay.Fun_F1.exp.sor2<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F1_geodist"]], y.type="dissim", model.type="exp")
+decay.Fun_F1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F1_geodist"]], y.type="dissim", model.type="exp")
 # F2 - singular gradient matrix at initial parameter estimates
 # decay.Fun_F2.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F2_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F2_geodist"]], y.type="dissim", model.type="exp")
 # F3
@@ -1400,15 +1712,45 @@ decay.Fun_F9.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters
 decay.Fun_F10.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F10_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F10_geodist"]], y.type="dissim", model.type="exp")
 
 # non-F1
-decay.Fun_nonF1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp")
+# decay.Fun_nonF1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp")
 ```
 
 
 ```r
-plot.decay.pretty(decay.Fun_F1.exp.sor2, col=paste(col_n10[1],"66",sep = ""), add=F, main="Total Dissimilarity (βsor)", sub="Fungi",
+# F1
+decay.Fun_F1.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F1_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F1_geodist"]], y.type="dissim", model.type="exp")
+# F2 - singular gradient matrix at initial parameter estimates
+# decay.Fun_F2.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F2_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F2_geodist"]], y.type="dissim", model.type="exp")
+# F3
+decay.Fun_F3.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F3_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F3_geodist"]], y.type="dissim", model.type="exp")
+# F4
+decay.Fun_F4.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F4_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F4_geodist"]], y.type="dissim", model.type="exp")
+# F5
+decay.Fun_F5.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F5_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F5_geodist"]], y.type="dissim", model.type="exp")
+# F6
+decay.Fun_F6.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F6_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F6_geodist"]], y.type="dissim", model.type="exp")
+# F7
+decay.Fun_F7.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F7_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F7_geodist"]], y.type="dissim", model.type="exp")
+# F8
+decay.Fun_F8.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F8_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F8_geodist"]], y.type="dissim", model.type="exp")
+# F9
+decay.Fun_F9.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F9_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F9_geodist"]], y.type="dissim", model.type="exp")
+# F10
+decay.Fun_F10.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F10_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F10_geodist"]], y.type="dissim", model.type="exp")
+```
+
+
+```r
+par(mfrow = c(1, 2),#c(nr, nc) 
+    mar = c(2, 2, 2.5, 2),# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+    oma = (c(3, 0, 2, 0) + 0.1))
+
+plot.decay.pretty(decay.Fun_F1.exp.sor, col=paste(col_n10[1],"66",sep = ""), add=F, main="Total Dissimilarity (βsor)\nFungi",cex.main=1,
            xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
            col.line=col_n10[1],xaxp = c(0,1500,3),
            ylab="",xlab="")
+mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
+
 plot.decay.pretty(decay.Fun_F3.exp.sor, col=paste(col_n10[3],"66",sep = ""), add=T, main="F3", 
            xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
            col.line=col_n10[3],xaxp = c(0,1500,3),
@@ -1441,9 +1783,49 @@ plot.decay.pretty(decay.Fun_F10.exp.sor, col=paste(col_n10[10],"66",sep = ""), a
            xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
            col.line=col_n10[10],xaxp = c(0,1500,3),
            ylab="",xlab="")
+
+
+#sim
+plot.decay.pretty(decay.Fun_F1.exp.sim, col=paste(col_n10[1],"66",sep = ""), add=F, main="Turnover-Resultant Dissimilarity\n(βsim) Fungi",cex.main=1,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+plot.decay.pretty(decay.Fun_F3.exp.sim, col=paste(col_n10[3],"66",sep = ""), add=T, main="F3", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[3],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F4.exp.sim, col=paste(col_n10[4],"66",sep = ""), add=T, main="F4", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[4],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F5.exp.sim, col=paste(col_n10[5],"66",sep = ""), add=T, main="F5", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[5],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F6.exp.sim, col=paste(col_n10[6],"66",sep = ""), add=T, main="F6", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[6],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F7.exp.sim, col=paste(col_n10[7],"66",sep = ""), add=T, main="F7", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[7],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F8.exp.sim, col=paste(col_n10[8],"66",sep = ""), add=T, main="F8", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[8],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F9.exp.sim, col=paste(col_n10[9],"66",sep = ""), add=T, main="F9", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[9],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F10.exp.sim, col=paste(col_n10[10],"66",sep = ""), add=T, main="F10", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[10],xaxp = c(0,1500,3),
+           ylab="",xlab="")
 ```
 
-![](../docs/github_nestedness_sites_clusters_figures/plot-Fun-clus-sor-geo-1.png)<!-- -->
+![](../docs/github_nestedness_sites_clusters_figures/plot-Fun-clus-sor-sim-geo-1.png)<!-- -->
 
 ```r
 # plot.decay.pretty(decay.Fun_nonF1.exp.sor, col="#7FBC41", add=T, main="non-F1",
@@ -1452,4 +1834,169 @@ plot.decay.pretty(decay.Fun_F10.exp.sor, col=paste(col_n10[10],"66",sep = ""), a
 #            ylab="",xlab="")
 ```
 
+<table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+<tr>
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="1"></th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Fungal Decay parameters</div></th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Distance Spanned</div></th>
+</tr>
+  <tr>
+   <th style="text-align:center;"> Fungal sub-assemblage </th>
+   <th style="text-align:center;"> pseudo-R2 </th>
+   <th style="text-align:center;"> intercept </th>
+   <th style="text-align:center;"> slope </th>
+   <th style="text-align:center;"> p-value </th>
+   <th style="text-align:center;"> max pairwise distance (km) </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr grouplength="9"><td colspan="6" style="border-bottom: 1px solid;"><strong>βsor</strong></td></tr>
+<tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> F1 </td>
+   <td style="text-align:center;"> 0.101 </td>
+   <td style="text-align:center;"> 0.476 </td>
+   <td style="text-align:center;"> 1.04e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1560 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> F3 </td>
+   <td style="text-align:center;"> 0.662 </td>
+   <td style="text-align:center;"> 0.645 </td>
+   <td style="text-align:center;"> 2.16e+00 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 0.31 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> F4 </td>
+   <td style="text-align:center;"> 0.566 </td>
+   <td style="text-align:center;"> 0.67 </td>
+   <td style="text-align:center;"> 1.31e-03 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 643 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> F5 </td>
+   <td style="text-align:center;"> 0.266 </td>
+   <td style="text-align:center;"> 0.705 </td>
+   <td style="text-align:center;"> 4.49e-04 </td>
+   <td style="text-align:center;"> 0.03 </td>
+   <td style="text-align:center;"> 1319 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> F6 </td>
+   <td style="text-align:center;"> 0.525 </td>
+   <td style="text-align:center;"> 0.7 </td>
+   <td style="text-align:center;"> 7.07e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1155 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> F7 </td>
+   <td style="text-align:center;"> 0.517 </td>
+   <td style="text-align:center;"> 0.671 </td>
+   <td style="text-align:center;"> 1.36e-03 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 478 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> F8 </td>
+   <td style="text-align:center;"> 0.511 </td>
+   <td style="text-align:center;"> 0.717 </td>
+   <td style="text-align:center;"> 8.13e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1158 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> F9 </td>
+   <td style="text-align:center;"> 0.386 </td>
+   <td style="text-align:center;"> 0.718 </td>
+   <td style="text-align:center;"> 7.08e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1323 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> F10 </td>
+   <td style="text-align:center;"> 0.237 </td>
+   <td style="text-align:center;"> 0.748 </td>
+   <td style="text-align:center;"> 9.07e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 645 </td>
+  </tr>
+  <tr grouplength="1"><td colspan="6" style="border-bottom: 1px solid;"><strong>βsim</strong></td></tr>
+<tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> F1 </td>
+   <td style="text-align:center;"> 0.059 </td>
+   <td style="text-align:center;"> 0.439 </td>
+   <td style="text-align:center;"> 7.76e-05 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1560 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> F3 </td>
+   <td style="text-align:center;"> 0.66 </td>
+   <td style="text-align:center;"> 0.609 </td>
+   <td style="text-align:center;"> 2.02e+00 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 0.31 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> F4 </td>
+   <td style="text-align:center;"> 0.519 </td>
+   <td style="text-align:center;"> 0.621 </td>
+   <td style="text-align:center;"> 1.22e-03 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 643 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> F5 </td>
+   <td style="text-align:center;"> 0.245 </td>
+   <td style="text-align:center;"> 0.674 </td>
+   <td style="text-align:center;"> 4.08e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1319 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> F6 </td>
+   <td style="text-align:center;"> 0.503 </td>
+   <td style="text-align:center;"> 0.661 </td>
+   <td style="text-align:center;"> 6.92e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1155 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> F7 </td>
+   <td style="text-align:center;"> 0.47 </td>
+   <td style="text-align:center;"> 0.636 </td>
+   <td style="text-align:center;"> 1.28e-03 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 478 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> F8 </td>
+   <td style="text-align:center;"> 0.391 </td>
+   <td style="text-align:center;"> 0.671 </td>
+   <td style="text-align:center;"> 6.92e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1158 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> F9 </td>
+   <td style="text-align:center;"> 0.346 </td>
+   <td style="text-align:center;"> 0.67 </td>
+   <td style="text-align:center;"> 6.19e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1323 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;"> F10 </td>
+   <td style="text-align:center;"> 0.192 </td>
+   <td style="text-align:center;"> 0.715 </td>
+   <td style="text-align:center;"> 8.54e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 645 </td>
+  </tr>
+</tbody>
+</table>
 
