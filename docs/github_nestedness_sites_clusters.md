@@ -2,7 +2,7 @@
 title: "RAM: partitioning &beta;-diversity into nestedness and turnover compoments"
 subtitle: "Comparing responses of bacterial and fungal communities by site and sub-assemblage along environmental gradients using MRM"
 author: "Kelli Feeser"
-date: "2024-07-26"
+date: "2025-02-13"
 output:
   bookdown::html_document2:
     code_folding: hide
@@ -43,7 +43,7 @@ editor_options:
 
 ------------------------------------------------------------------------
 
-Document last updated: 2024-07-26
+Document last updated: 2025-02-13
 
 ------------------------------------------------------------------------
 
@@ -1093,7 +1093,7 @@ saveRDS(env_dist_matrices, file = "../processed_data/clean_rds_saves/env_dist_ma
 
 \
 
-## Landscape-scale: All samples, irrespective of site 
+## Landscape-scale: All samples (agnostic to site)
 
 ### Pure spatial effects {.tabset}
 
@@ -1155,69 +1155,12 @@ zdepDDBF_All_sne<-zdep(decay.Bac_all.exp.sne, decay.Fun_all.exp.sne, resamples=5
 ```
 
 
-
-```r
-par(mfrow = c(3, 2),#c(nr, nc) 
-    mar = c(2, 5, 2.5, 0),# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
-    oma = (c(3, 2, 2, 0) + 0.1))
-
-plot.decay.pretty(decay.Bac_all.exp.sor, col="#006e90", main="Bacteria\n",
-           lty=1,lwd=5,cex.main=1.1,
-           xlim = c(0,1600),ylim = c(0,1),col.line="#004E66",
-           xaxp = c(0,1500,3),
-           ylab="Total\nDissimilarity",xlab="")
-# text(2, 0.1, paste0("a = ", round(decay.Bac_all.exp.sor$first.parameter,3),", b = ",formatC(decay.Bac_all.exp.sor$second.parameter,digits=3, format="e")),adj = c(0,0), cex=0.8)
-mtext(paste0("βsor ~ S: pseudo-R2 = ", round(decay.Bac_all.exp.sor$pseudo.r.squared,3),
-             ", p-value = ",round(decay.Bac_all.exp.sor$p.value,3)), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.7) # side 1=bottom, 2=left, 3=top, 4=right
-
-plot.decay.pretty(decay.Fun_all.exp.sor, col="#f18f01", add=F, main="Fungi\n", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,cex.main=1.1,
-           col.line="#B76E01",xaxp = c(0,1500,3),
-           ylab="",xlab="")
-mtext(paste0("βsor ~ S: pseudo-R2 = ", round(decay.Fun_all.exp.sor$pseudo.r.squared,3),
-             ", p-value = ",round(decay.Bac_all.exp.sor$p.value,3)), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.7) # side 1=bottom, 2=left, 3=top, 4=right
-mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
-
-# turnover
-plot.decay.pretty(decay.Bac_all.exp.sim, col="#006e90", 
-           lty=1,lwd=5,cex.main=1,
-           xlim = c(0,1600),ylim = c(0,1),col.line="#004E66",
-           xaxp = c(0,1500,3),
-           ylab="Turnover-Resultant\nDissim.",xlab="")
-mtext(paste0("βsim ~ S: pseudo-R2 = ", round(decay.Bac_all.exp.sim$pseudo.r.squared,3),
-             ", p-value = ",round(decay.Bac_all.exp.sim$p.value,3)), side = 3, line = 0.5, outer = F,adj = c(0,0), cex=0.7) # side 1=bottom, 2=left, 3=top, 4=right
-
-plot.decay.pretty(decay.Fun_all.exp.sim, col="#f18f01", add=F, 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line="#B76E01",xaxp = c(0,1500,3),
-           ylab="",xlab="")
-mtext(paste0("βsim ~ S: pseudo-R2 = ", round(decay.Fun_all.exp.sim$pseudo.r.squared,3),
-             ", p-value = ",round(decay.Fun_all.exp.sim$p.value,3)), side = 3, line = 0.5, outer = F,adj = c(0,0), cex=0.7) # side 1=bottom, 2=left, 3=top, 4=right
-
-
-#nestedness
-plot.decay.pretty(decay.Bac_all.exp.sne, col="#006e90", 
-           lty=1,lwd=5,cex.main=1,
-           xlim = c(0,1600),ylim = c(0,1),col.line="#004E66",
-           xaxp = c(0,1500,3),
-           ylab="Nestedness-Resultant\nDissim.",xlab="")
-mtext(paste0("βsne ~ S: pseudo-R2 = ", round(decay.Bac_all.exp.sne$pseudo.r.squared,3),
-             ", p-value = ",round(decay.Bac_all.exp.sne$p.value,3)), side = 3, line = 0.5, outer = F,adj = c(0,0), cex=0.7) # side 1=bottom, 2=left, 3=top, 4=right
-
-plot.decay.pretty(decay.Fun_all.exp.sne, col="#f18f01", add=F, 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line="#B76E01",xaxp = c(0,1500,3),
-           ylab="",xlab="")
-mtext(paste0("βsne ~ S: pseudo-R2 = ", round(decay.Fun_all.exp.sne$pseudo.r.squared,3),
-             ", p-value = ",round(decay.Fun_all.exp.sne$p.value,3)), side = 3, line = 0.5, outer = F,adj = c(0,0), cex=0.7) # side 1=bottom, 2=left, 3=top, 4=right
-```
-
 <div class="figure">
 <img src="../docs/github_nestedness_sites_clusters_figures/plot-DD-BF-all-1.png" alt="(ref:DD-BF-all-fig-caption)"  />
 <p class="caption">(\#fig:plot-DD-BF-all)(ref:DD-BF-all-fig-caption)</p>
 </div>
 
-(ref:DD-BF-all-fig-caption) Distance decay models of pairwise bacterial (blue) and fungal (orange) community dissimilarities, across all sites and samples. Models were fit using negative exponential to describe decay of community similarity with spatial distance (in km). The first model parameter ('a') is the intercept, the second parameter ('b') is the slope, the $pseudo-R^2$ being proportion of the variation in the dependent variable that the model accounts for, calculated as []. A) Bac βsor ~ S: $pseudo-R^2$ = 0.157, a = 0.616, b = 3.042e-04, $p$-value = 0.01. B) Fungal βsor ~ S: $pseudo-R^2$ = 0.021, a = 0.772, b = 3.514e-04, $p$-value = 0.01. Both model parameters differed between domains (βsor ~ S assessed via block-site bootstrap; 'a' $p$-value = 2.298e-235, 'b' $p$-value = 6.359e-02). 
+(ref:DD-BF-all-fig-caption) Distance decay models of pairwise bacterial (blue) and fungal (orange) community dissimilarities, across all sites and samples. Models were fit using negative exponential to describe decay of community similarity with spatial distance (in km). The first model parameter ('a') is the intercept, the second parameter ('b') is the slope, the $pseudo-R^2$ being proportion of the variation in the dependent variable that the model accounts for, calculated as []. A) Bac βsor ~ S: $pseudo-R^2$ = 0.157, a = 0.616, b = 3.042e-04, $p$-value = 0.01. B) Fungal βsor ~ S: $pseudo-R^2$ = 0.021, a = 0.772, b = 3.514e-04, $p$-value = 0.01. Both model parameters differed between domains (βsor ~ S assessed via block-site bootstrap; 'a' $p$-value = 9.524e-232, 'b' $p$-value = 5.187e-02). 
 
 
 
@@ -1255,8 +1198,8 @@ mtext(paste0("βsne ~ S: pseudo-R2 = ", round(decay.Fun_all.exp.sne$pseudo.r.squ
    <td style="text-align:left;"> 0.772 </td>
    <td style="text-align:left;"> 3.514e-04 </td>
    <td style="text-align:left;"> 0.01 </td>
-   <td style="text-align:left;"> 2.30e-235 </td>
-   <td style="text-align:left;"> 6.36e-02 </td>
+   <td style="text-align:left;"> 9.52e-232 </td>
+   <td style="text-align:left;"> 5.19e-02 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> βsim </td>
@@ -1268,21 +1211,21 @@ mtext(paste0("βsne ~ S: pseudo-R2 = ", round(decay.Fun_all.exp.sne$pseudo.r.squ
    <td style="text-align:left;"> 0.737 </td>
    <td style="text-align:left;"> 2.409e-04 </td>
    <td style="text-align:left;"> 0.01 </td>
-   <td style="text-align:left;"> 1.72e-283 </td>
-   <td style="text-align:left;"> 8.09e-01 </td>
+   <td style="text-align:left;"> 0.00e+00 </td>
+   <td style="text-align:left;"> 7.96e-01 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> βnes </td>
    <td style="text-align:left;"> 0 </td>
    <td style="text-align:left;"> 0.06 </td>
    <td style="text-align:left;"> 2.929e-06 </td>
-   <td style="text-align:left;"> 0.17 </td>
+   <td style="text-align:left;"> 0.18 </td>
    <td style="text-align:left;"> 0.003 </td>
    <td style="text-align:left;"> 0.039 </td>
    <td style="text-align:left;"> 6.003e-06 </td>
    <td style="text-align:left;"> 0.01 </td>
-   <td style="text-align:left;"> 1.60e-20 </td>
-   <td style="text-align:left;"> 1.91e-01 </td>
+   <td style="text-align:left;"> 3.74e-19 </td>
+   <td style="text-align:left;"> 2.02e-01 </td>
   </tr>
 </tbody>
 </table>
@@ -1358,127 +1301,17 @@ decay.Bac_B13.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_cluster
 # decay.Bac_B14.exp.sim<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B14_Bac"]]$beta.sim, x=env_dist_matrices[["Bac_sor_clusters"]][["B14_geodist"]], y.type="dissim", model.type="exp")
 ```
 
-
-```r
-par(mfrow = c(1, 2),#c(nr, nc) 
-    mar = c(2, 2, 2.5, 2),# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
-    oma = (c(3, 0, 2, 0) + 0.1))
-
-#sor
-plot.decay.pretty(decay.Bac_B1.exp.sor, col=paste(col_n14[1],"cc",sep = ""), main="Total Dissimilarity (βsor)\n Bacteria",cex.main=1,
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[1],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
-
-plot.decay.pretty(decay.Bac_B2.exp.sor, col=paste(col_n14[2],"cc",sep = ""), add=T, main="B2", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[2],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B3.exp.sor, col=paste(col_n14[3],"cc",sep = ""), add=T, main="B3", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[3],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B4.exp.sor, col=paste(col_n14[4],"cc",sep = ""), add=T, main="B4", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[4],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B5.exp.sor, col=paste(col_n14[5],"cc",sep = ""), add=T, main="B5", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[5],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B7.exp.sor, col=paste(col_n14[7],"cc",sep = ""), add=T, main="B7", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[7],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B8.exp.sor, col=paste(col_n14[8],"cc",sep = ""), add=T, main="B8", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[8],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B9.exp.sor, col=paste(col_n14[9],"cc",sep = ""), add=T, main="B9", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[9],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B10.exp.sor, col=paste(col_n14[10],"cc",sep = ""), add=T, main="B10", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[10],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B11.exp.sor, col=paste(col_n14[11],"cc",sep = ""), add=T,
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[11],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B12.exp.sor, col=paste(col_n14[12],"cc",sep = ""), add=T,
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[12],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B13.exp.sor, col=paste(col_n14[13],"cc",sep = ""), add=T,
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[13],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-
-#sim
-plot.decay.pretty(decay.Bac_B1.exp.sim, col=paste(col_n14[1],"cc",sep = ""), main="Turnover-Resultant Dissimilarity\n(βsim) Bacteria",cex.main=1,
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[1],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-
-plot.decay.pretty(decay.Bac_B2.exp.sim, col=paste(col_n14[2],"cc",sep = ""), add=T, main="B2", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[2],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B3.exp.sim, col=paste(col_n14[3],"cc",sep = ""), add=T, main="B3", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[3],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B4.exp.sim, col=paste(col_n14[4],"cc",sep = ""), add=T, main="B4", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[4],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B5.exp.sim, col=paste(col_n14[5],"cc",sep = ""), add=T, main="B5", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[5],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B7.exp.sim, col=paste(col_n14[7],"cc",sep = ""), add=T, main="B7", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[7],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B8.exp.sim, col=paste(col_n14[8],"cc",sep = ""), add=T, main="B8", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[8],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B9.exp.sim, col=paste(col_n14[9],"cc",sep = ""), add=T, main="B9", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[9],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B10.exp.sim, col=paste(col_n14[10],"cc",sep = ""), add=T, main="B10", 
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[10],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B11.exp.sim, col=paste(col_n14[11],"cc",sep = ""), add=T,
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[11],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B12.exp.sim, col=paste(col_n14[12],"cc",sep = ""), add=T,
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[12],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Bac_B13.exp.sim, col=paste(col_n14[13],"cc",sep = ""), add=T,
-           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
-           col.line=col_n14[13],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-```
-
 ![](../docs/github_nestedness_sites_clusters_figures/plot-Bac-clus-sor-sim-geo-1.png)<!-- -->
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
  <thead>
 <tr>
 <th style="empty-cells: hide;border-bottom:hidden;" colspan="1"></th>
-<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Fungal Decay parameters</div></th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Bacterial Decay parameters</div></th>
 <th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Distance Spanned</div></th>
 </tr>
   <tr>
-   <th style="text-align:center;"> Fungal sub-assemblage </th>
+   <th style="text-align:center;"> Bacterial sub-assemblage </th>
    <th style="text-align:center;"> pseudo-R2 </th>
    <th style="text-align:center;"> intercept </th>
    <th style="text-align:center;"> slope </th>
@@ -1565,7 +1398,7 @@ plot.decay.pretty(decay.Bac_B13.exp.sim, col=paste(col_n14[13],"cc",sep = ""), a
    <td style="text-align:center;"> 0.12 </td>
    <td style="text-align:center;"> 0.53 </td>
    <td style="text-align:center;"> 6.24e-04 </td>
-   <td style="text-align:center;"> 0.04 </td>
+   <td style="text-align:center;"> 0.05 </td>
    <td style="text-align:center;"> 203 </td>
   </tr>
   <tr>
@@ -1573,7 +1406,7 @@ plot.decay.pretty(decay.Bac_B13.exp.sim, col=paste(col_n14[13],"cc",sep = ""), a
    <td style="text-align:center;"> 0.044 </td>
    <td style="text-align:center;"> 0.628 </td>
    <td style="text-align:center;"> 2.29e-04 </td>
-   <td style="text-align:center;"> 0.04 </td>
+   <td style="text-align:center;"> 0.03 </td>
    <td style="text-align:center;"> 533 </td>
   </tr>
   <tr>
@@ -1638,7 +1471,7 @@ plot.decay.pretty(decay.Bac_B13.exp.sim, col=paste(col_n14[13],"cc",sep = ""), a
    <td style="text-align:center;"> 0.04 </td>
    <td style="text-align:center;"> 0.487 </td>
    <td style="text-align:center;"> 1.22e-04 </td>
-   <td style="text-align:center;"> 0.14 </td>
+   <td style="text-align:center;"> 0.12 </td>
    <td style="text-align:center;"> 505 </td>
   </tr>
   <tr>
@@ -1662,7 +1495,7 @@ plot.decay.pretty(decay.Bac_B13.exp.sim, col=paste(col_n14[13],"cc",sep = ""), a
    <td style="text-align:center;"> 0.098 </td>
    <td style="text-align:center;"> 0.502 </td>
    <td style="text-align:center;"> 5.63e-04 </td>
-   <td style="text-align:center;"> 0.07 </td>
+   <td style="text-align:center;"> 0.03 </td>
    <td style="text-align:center;"> 203 </td>
   </tr>
   <tr>
@@ -1678,7 +1511,7 @@ plot.decay.pretty(decay.Bac_B13.exp.sim, col=paste(col_n14[13],"cc",sep = ""), a
    <td style="text-align:center;"> 0.047 </td>
    <td style="text-align:center;"> 0.477 </td>
    <td style="text-align:center;"> 2.26e-04 </td>
-   <td style="text-align:center;"> 0.16 </td>
+   <td style="text-align:center;"> 0.13 </td>
    <td style="text-align:center;"> 273 </td>
   </tr>
 </tbody>
@@ -1716,123 +1549,8 @@ decay.Fun_F10.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_cluster
 ```
 
 
-```r
-# F1
-decay.Fun_F1.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F1_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F1_geodist"]], y.type="dissim", model.type="exp")
-# F2 - singular gradient matrix at initial parameter estimates
-# decay.Fun_F2.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F2_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F2_geodist"]], y.type="dissim", model.type="exp")
-# F3
-decay.Fun_F3.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F3_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F3_geodist"]], y.type="dissim", model.type="exp")
-# F4
-decay.Fun_F4.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F4_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F4_geodist"]], y.type="dissim", model.type="exp")
-# F5
-decay.Fun_F5.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F5_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F5_geodist"]], y.type="dissim", model.type="exp")
-# F6
-decay.Fun_F6.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F6_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F6_geodist"]], y.type="dissim", model.type="exp")
-# F7
-decay.Fun_F7.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F7_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F7_geodist"]], y.type="dissim", model.type="exp")
-# F8
-decay.Fun_F8.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F8_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F8_geodist"]], y.type="dissim", model.type="exp")
-# F9
-decay.Fun_F9.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F9_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F9_geodist"]], y.type="dissim", model.type="exp")
-# F10
-decay.Fun_F10.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F10_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clusters"]][["F10_geodist"]], y.type="dissim", model.type="exp")
-```
-
-
-```r
-par(mfrow = c(1, 2),#c(nr, nc) 
-    mar = c(2, 2, 2.5, 2),# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
-    oma = (c(3, 0, 2, 0) + 0.1))
-
-plot.decay.pretty(decay.Fun_F1.exp.sor, col=paste(col_n10[1],"66",sep = ""), add=F, main="Total Dissimilarity (βsor)\nFungi",cex.main=1,
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[1],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
-
-plot.decay.pretty(decay.Fun_F3.exp.sor, col=paste(col_n10[3],"66",sep = ""), add=T, main="F3", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[3],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F4.exp.sor, col=paste(col_n10[4],"66",sep = ""), add=T, main="F4", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[4],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F5.exp.sor, col=paste(col_n10[5],"66",sep = ""), add=T, main="F5", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[5],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F6.exp.sor, col=paste(col_n10[6],"66",sep = ""), add=T, main="F6", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[6],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F7.exp.sor, col=paste(col_n10[7],"66",sep = ""), add=T, main="F7", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[7],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F8.exp.sor, col=paste(col_n10[8],"66",sep = ""), add=T, main="F8", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[8],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F9.exp.sor, col=paste(col_n10[9],"66",sep = ""), add=T, main="F9", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[9],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F10.exp.sor, col=paste(col_n10[10],"66",sep = ""), add=T, main="F10", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[10],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-
-
-#sim
-plot.decay.pretty(decay.Fun_F1.exp.sim, col=paste(col_n10[1],"66",sep = ""), add=F, main="Turnover-Resultant Dissimilarity\n(βsim) Fungi",cex.main=1,
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[1],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-
-plot.decay.pretty(decay.Fun_F3.exp.sim, col=paste(col_n10[3],"66",sep = ""), add=T, main="F3", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[3],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F4.exp.sim, col=paste(col_n10[4],"66",sep = ""), add=T, main="F4", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[4],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F5.exp.sim, col=paste(col_n10[5],"66",sep = ""), add=T, main="F5", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[5],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F6.exp.sim, col=paste(col_n10[6],"66",sep = ""), add=T, main="F6", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[6],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F7.exp.sim, col=paste(col_n10[7],"66",sep = ""), add=T, main="F7", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[7],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F8.exp.sim, col=paste(col_n10[8],"66",sep = ""), add=T, main="F8", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[8],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F9.exp.sim, col=paste(col_n10[9],"66",sep = ""), add=T, main="F9", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[9],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-plot.decay.pretty(decay.Fun_F10.exp.sim, col=paste(col_n10[10],"66",sep = ""), add=T, main="F10", 
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[10],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-```
 
 ![](../docs/github_nestedness_sites_clusters_figures/plot-Fun-clus-sor-sim-geo-1.png)<!-- -->
-
-```r
-# plot.decay.pretty(decay.Fun_nonF1.exp.sor, col="#7FBC41", add=T, main="non-F1",
-#            xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-#            col.line="#276419",xaxp = c(0,1500,3),
-#            ylab="",xlab="")
-```
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
  <thead>
@@ -1881,7 +1599,7 @@ plot.decay.pretty(decay.Fun_F10.exp.sim, col=paste(col_n10[10],"66",sep = ""), a
    <td style="text-align:center;"> 0.266 </td>
    <td style="text-align:center;"> 0.705 </td>
    <td style="text-align:center;"> 4.49e-04 </td>
-   <td style="text-align:center;"> 0.03 </td>
+   <td style="text-align:center;"> 0.01 </td>
    <td style="text-align:center;"> 1319 </td>
   </tr>
   <tr>
@@ -2031,50 +1749,692 @@ decay.Fun_sor_clus2nonF1.exp.sne<-decay.model(y=betapart_results[["Fun"]][["Fun_
 ```
 
 
-
-```r
-par(mfrow = c(1, 2),#c(nr, nc) 
-    mar = c(2, 2, 2.5, 2),# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
-    oma = (c(3, 0, 2, 0) + 0.1))
-
-plot.decay.pretty(decay.Fun_sor_clus2F1.exp.sor, col=paste(col_n10[1],"66",sep = ""), add=F, main="Total Dissimilarity (βsor)\nFungi",cex.main=0.9,
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[1],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
-
-plot.decay.pretty(decay.Fun_sor_clus2nonF1.exp.sor, col="#7FBC41", add=T, main="Total Dissimilarity (βsor)\nFungi: non-F1", cex.main=0.9,
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line="#276419",xaxp = c(0,1500,3),
-           ylab="",xlab="")
-mtext((paste("F1 - ",round(decay.Fun_sor_clus2F1.exp.sor$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2F1.exp.sor$p.value,3),")",sep = "")),side=1,line=-2,adj=0.05,outer = F,padj = 0,col=col_n10[1])
-mtext((paste("non-F1 - ",round(decay.Fun_sor_clus2nonF1.exp.sor$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2nonF1.exp.sor$p.value,3),")",sep = "")),side=1,line=-1,adj=0.05,outer = F,padj = 0, col="#7FBC41")
-mtext((paste("pseudo R2 (p-value)",sep = "")),side=1,line=-3,adj=0.05,outer = F,padj = 0, col="black")
-
-
-# sim
-plot.decay.pretty(decay.Fun_sor_clus2F1.exp.sim, col=paste(col_n10[1],"66",sep = ""), add=F, main="Total Dissimilarity (βsim)\nFungi",cex.main=0.9,
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line=col_n10[1],xaxp = c(0,1500,3),
-           ylab="",xlab="")
-mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
-
-plot.decay.pretty(decay.Fun_sor_clus2nonF1.exp.sim, col="#7FBC41", add=T, main="Total Dissimilarity (βsim)\nFungi: non-F1", cex.main=0.9,
-           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-           col.line="#276419",xaxp = c(0,1500,3),
-           ylab="",xlab="")
-mtext((paste("F1 - ",round(decay.Fun_sor_clus2F1.exp.sim$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2F1.exp.sim$p.value,3),")",sep = "")),side=1,line=-2,adj=0.05,outer = F,padj = 0,col=col_n10[1])
-mtext((paste("non-F1 - ",round(decay.Fun_sor_clus2nonF1.exp.sim$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2nonF1.exp.sim$p.value,3),")",sep = "")),side=1,line=-1,adj=0.05,outer = F,padj = 0, col="#7FBC41")
-mtext((paste("pseudo R2 (p-value)",sep = "")),side=1,line=-3,adj=0.05,outer = F,padj = 0, col="black")
-```
-
 ![](../docs/github_nestedness_sites_clusters_figures/plot-Fun-clus2-sor-sim-geo-1.png)<!-- -->
 
-```r
-# plot.decay.pretty(decay.Fun_sor_clus2nonF1.exp.sor, col="#7FBC41", add=T, main="non-F1",
-#            xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
-#            col.line="#276419",xaxp = c(0,1500,3),
-#            ylab="",xlab="")
+note: different y-axis in third panel.\
+
+
+```
+## $data.y
+##             SRR13801399 SRR13801186 SRR13801171 SRR13801400 SRR13801525 SRR13800997 SRR13801246 SRR13801475 SRR13801023
+## SRR13801186   0.3903134                                                                                                
+## SRR13801171   0.5606936   0.5457227                                                                                    
+## SRR13801400   0.4425287   0.4310850   0.5833333                                                                        
+## SRR13801525   0.4417476   0.4518519   0.5500000   0.4278607                                                            
+## SRR13800997   0.4607330   0.4400000   0.5675676   0.3709677   0.3899083                                                
+##             SRR13801012 SRR13801398 SRR13801333 SRR13801311 SRR13801300 SRR13801289 SRR13801322 SRR13801278 SRR13801219
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801208 SRR13801197 SRR13801185 SRR13801126 SRR13801115 SRR13801346 SRR13801345 SRR13801344 SRR13801347
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801342 SRR13801341 SRR13801340 SRR13801339 SRR13801338 SRR13801337 SRR13801336 SRR13801335 SRR13801330
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801329 SRR13801328 SRR13801320 SRR13801319 SRR13801318 SRR13801321 SRR13801317 SRR13801316 SRR13801315
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801314 SRR13801313 SRR13801312 SRR13801310 SRR13801309 SRR13800971 SRR13800970 SRR13800969 SRR13800972
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13800968 SRR13800967 SRR13800966 SRR13800965 SRR13800964 SRR13800963 SRR13800961 SRR13800960 SRR13800935
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13800930 SRR13800929 SRR13800928 SRR13800926 SRR13800925 SRR13800924 SRR13801472 SRR13801471 SRR13801470
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801402 SRR13801469 SRR13801468 SRR13801466 SRR13801465 SRR13801464 SRR13801463 SRR13801461 SRR13801005
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801004 SRR13801003 SRR13801006 SRR13801002 SRR13801001 SRR13801000 SRR13800999 SRR13800998 SRR13800995
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13800994 SRR13800991 SRR13800990 SRR13800989 SRR13800992 SRR13800988 SRR13800987 SRR13800986 SRR13800984
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801271 SRR13801270 SRR13801269 SRR13801268 SRR13801266 SRR13801265 SRR13801264 SRR13801267 SRR13801263
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801261 SRR13801260 SRR13801259 SRR13801258 SRR13801257 SRR13801256 SRR13801254 SRR13801253 SRR13801252
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801255 SRR13801249 SRR13801103 SRR13801102 SRR13801101 SRR13801100 SRR13801099 SRR13801097 SRR13801095
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801098 SRR13801093 SRR13801092 SRR13801091 SRR13801090 SRR13801089 SRR13801088 SRR13801087 SRR13801082
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801081 SRR13801084 SRR13801080 SRR13801520 SRR13801519 SRR13801518 SRR13801517 SRR13801516 SRR13801514
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801511 SRR13801510 SRR13801509 SRR13801512 SRR13801508 SRR13801507 SRR13801506 SRR13801505 SRR13801503
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801502 SRR13801501 SRR13801500 SRR13801499 SRR13801054 SRR13801053 SRR13801051 SRR13801050 SRR13801049
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801061 SRR13801058 SRR13801062 SRR13801056 SRR13801496 SRR13801495 SRR13801494 SRR13801493 SRR13801492
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801491 SRR13801488 SRR13801487 SRR13801486 SRR13801490 SRR13801485 SRR13801484 SRR13801483 SRR13801481
+## SRR13801186                                                                                                            
+## SRR13801171                                                                                                            
+## SRR13801400                                                                                                            
+## SRR13801525                                                                                                            
+## SRR13800997                                                                                                            
+##             SRR13801480 SRR13801479
+## SRR13801186                        
+## SRR13801171                        
+## SRR13801400                        
+## SRR13801525                        
+## SRR13800997                        
+##  [ reached getOption("max.print") -- omitted 177 rows ]
+## 
+## $data.x
+##                1            2            3            4            5            6            7            8            9
+## 2      0.0000000                                                                                                        
+## 3      0.0000000    0.0000000                                                                                           
+## 4      0.0000000    0.0000000    0.0000000                                                                              
+## 5      0.0000000    0.0000000    0.0000000    0.0000000                                                                 
+## 6      0.0000000    0.0000000    0.0000000    0.0000000    0.0000000                                                    
+##               10           11           12           13           14           15           16           17           18
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##               19           20           21           22           23           24           25           26           27
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##               28           29           30           31           32           33           34           35           36
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##               37           38           39           40           41           42           43           44           45
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##               46           47           48           49           50           51           52           53           54
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##               55           56           57           58           59           60           61           62           63
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##               64           65           66           67           68           69           70           71           72
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##               73           74           75           76           77           78           79           80           81
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##               82           83           84           85           86           87           88           89           90
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##               91           92           93           94           95           96           97           98           99
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##              100          101          102          103          104          105          106          107          108
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##              109          110          111          112          113          114          115          116          117
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##              118          119          120          121          122          123          124          125          126
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##              127          128          129          130          131          132          133          134          135
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##              136          137          138          139          140          141          142          143          144
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##              145          146          147          148          149          150          151          152          153
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##              154          155          156          157          158          159          160          161          162
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##              163          164          165          166          167          168          169          170          171
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##              172          173          174          175          176          177          178          179          180
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+## 5                                                                                                                       
+## 6                                                                                                                       
+##              181          182
+## 2                            
+## 3                            
+## 4                            
+## 5                            
+## 6                            
+##  [ reached getOption("max.print") -- omitted 177 rows ]
+## 
+## $model
+## Nonlinear regression model
+##   model: ydis ~ a * exp(-b * x)
+##    data: parent.frame()
+##         a         b 
+## 0.5244699 0.0001042 
+##  residual sum-of-squares: 74.82
+## 
+## Number of iterations to convergence: 4 
+## Achieved convergence tolerance: 1.49e-08
+## 
+## $model.type
+## [1] "exponential"
+## 
+## $y.type
+## [1] "dissimilarities"
+## 
+## $first.parameter
+##         a 
+## 0.4755301 
+## 
+## $second.parameter
+##            b 
+## 0.0001042152 
+## 
+## $aic
+## [1] -42748.18
+## 
+## $pseudo.r.squared
+## [1] 0.1008844
+## 
+## $p.value
+## [1] 0.01
+## 
+## attr(,"class")
+## [1] "decay"
 ```
 
+```
+## $data.y
+##             SRR13800962 SRR13800927 SRR13800916 SRR13800973 SRR13801586 SRR13801575 SRR13801170 SRR13801159 SRR13801370
+## SRR13800927   0.6455696                                                                                                
+## SRR13800916   0.6463415   0.7042254                                                                                    
+## SRR13800973   0.7419355   0.8170732   0.7294118                                                                        
+##             SRR13801359 SRR13801423 SRR13801412 SRR13801401 SRR13801146 SRR13801135 SRR13801425 SRR13800996 SRR13800985
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801436 SRR13801262 SRR13801251 SRR13801085 SRR13801515 SRR13801504 SRR13801052 SRR13801041 SRR13801476
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801030 SRR13801029 SRR13801028 SRR13801031 SRR13801027 SRR13801026 SRR13801025 SRR13801024 SRR13801021
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801020 SRR13801019 SRR13801016 SRR13801015 SRR13801018 SRR13801014 SRR13801013 SRR13801011 SRR13801010
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801009 SRR13801008 SRR13801349 SRR13801546 SRR13801070 SRR13801059 SRR13801489 SRR13801478 SRR13801307
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801306 SRR13801305 SRR13801308 SRR13801304 SRR13801302 SRR13801301 SRR13801299 SRR13801298 SRR13801297
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801296 SRR13801294 SRR13801293 SRR13801292 SRR13801295 SRR13801291 SRR13801290 SRR13801288 SRR13801287
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801286 SRR13801285 SRR13801284 SRR13801283 SRR13801279 SRR13801282 SRR13801277 SRR13801276 SRR13801274
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801220 SRR13801221 SRR13801216 SRR13801215 SRR13801214 SRR13801213 SRR13801212 SRR13801211 SRR13801210
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801207 SRR13801203 SRR13801202 SRR13801200 SRR13801193 SRR13801192 SRR13801191 SRR13801194 SRR13801190
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801189 SRR13801188 SRR13801187 SRR13801184 SRR13801183 SRR13801182 SRR13801181 SRR13801179 SRR13801178
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801177 SRR13801176 SRR13801127 SRR13801125 SRR13801124 SRR13801123 SRR13801122 SRR13801121 SRR13801120
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801118 SRR13801116 SRR13801119 SRR13801114 SRR13801113 SRR13801112 SRR13801111 SRR13801110 SRR13801109
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801108 SRR13801107 SRR13801105 SRR13800981 SRR13800980 SRR13800978 SRR13801074 SRR13801073 SRR13801075
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801071 SRR13801069 SRR13801068 SRR13801067 SRR13801066 SRR13801065 SRR13801064 SRR13801576 SRR13801574
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801572 SRR13801569 SRR13801175 SRR13801174 SRR13801173 SRR13801168 SRR13801167 SRR13801172 SRR13801166
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801165 SRR13801164 SRR13801162 SRR13801161 SRR13801160 SRR13801158 SRR13801157 SRR13801153 SRR13801152
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801373 SRR13801372 SRR13801371 SRR13801365 SRR13801364 SRR13801366 SRR13801362 SRR13801361 SRR13801360
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801358 SRR13801356 SRR13801355 SRR13801354 SRR13801352 SRR13801351 SRR13801353 SRR13801424 SRR13801422
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801421 SRR13801420 SRR13801419 SRR13801418 SRR13801417 SRR13801416 SRR13801410 SRR13801409 SRR13801408
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801407 SRR13801459 SRR13801458 SRR13801457 SRR13801460 SRR13801456 SRR13801455 SRR13801454 SRR13801452
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801450 SRR13801449 SRR13801544 SRR13801542 SRR13801541 SRR13801540 SRR13801543 SRR13801539 SRR13801538
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801537 SRR13801535 SRR13801534 SRR13801533 SRR13801532 SRR13801531 SRR13801529 SRR13801528 SRR13801527
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801530 SRR13801526 SRR13801522 SRR13801521 SRR13800958 SRR13800956 SRR13800954 SRR13800953 SRR13800951
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13800955 SRR13800949 SRR13800948 SRR13800947 SRR13800946 SRR13800945 SRR13800944 SRR13800943 SRR13800940
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13800938 SRR13800937 SRR13800936 SRR13801151 SRR13801150 SRR13801149 SRR13801147 SRR13801145 SRR13801143
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801142 SRR13801141 SRR13801144 SRR13801140 SRR13801139 SRR13801138 SRR13801136 SRR13801134 SRR13801133
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801132 SRR13801130 SRR13801129 SRR13801128 SRR13801131 SRR13801396 SRR13801395 SRR13801393 SRR13801392
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801391 SRR13801390 SRR13801389 SRR13801387 SRR13801386 SRR13801388 SRR13801384 SRR13801382 SRR13801381
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801380 SRR13801379 SRR13801378 SRR13801377 SRR13801376 SRR13801375 SRR13801445 SRR13801444 SRR13801441
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801435 SRR13801434 SRR13801433 SRR13801437 SRR13801432 SRR13801431 SRR13801430 SRR13801429 SRR13801428
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801427 SRR13801426 SRR13801007 SRR13801565 SRR13801564 SRR13801563 SRR13801566 SRR13801561 SRR13801559
+## SRR13800927                                                                                                            
+## SRR13800916                                                                                                            
+## SRR13800973                                                                                                            
+##             SRR13801558 SRR13801556 SRR13801555
+## SRR13800927                                    
+## SRR13800916                                    
+## SRR13800973                                    
+##  [ reached getOption("max.print") -- omitted 297 rows ]
+## 
+## $data.x
+##                1            2            3            4            5            6            7            8            9
+## 2   0.000000e+00                                                                                                        
+## 3   0.000000e+00 0.000000e+00                                                                                           
+## 4   0.000000e+00 0.000000e+00 0.000000e+00                                                                              
+##               10           11           12           13           14           15           16           17           18
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##               19           20           21           22           23           24           25           26           27
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##               28           29           30           31           32           33           34           35           36
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##               37           38           39           40           41           42           43           44           45
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##               46           47           48           49           50           51           52           53           54
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##               55           56           57           58           59           60           61           62           63
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##               64           65           66           67           68           69           70           71           72
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##               73           74           75           76           77           78           79           80           81
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##               82           83           84           85           86           87           88           89           90
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##               91           92           93           94           95           96           97           98           99
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              100          101          102          103          104          105          106          107          108
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              109          110          111          112          113          114          115          116          117
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              118          119          120          121          122          123          124          125          126
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              127          128          129          130          131          132          133          134          135
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              136          137          138          139          140          141          142          143          144
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              145          146          147          148          149          150          151          152          153
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              154          155          156          157          158          159          160          161          162
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              163          164          165          166          167          168          169          170          171
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              172          173          174          175          176          177          178          179          180
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              181          182          183          184          185          186          187          188          189
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              190          191          192          193          194          195          196          197          198
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              199          200          201          202          203          204          205          206          207
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              208          209          210          211          212          213          214          215          216
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              217          218          219          220          221          222          223          224          225
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              226          227          228          229          230          231          232          233          234
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              235          236          237          238          239          240          241          242          243
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              244          245          246          247          248          249          250          251          252
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              253          254          255          256          257          258          259          260          261
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              262          263          264          265          266          267          268          269          270
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              271          272          273          274          275          276          277          278          279
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              280          281          282          283          284          285          286          287          288
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              289          290          291          292          293          294          295          296          297
+## 2                                                                                                                       
+## 3                                                                                                                       
+## 4                                                                                                                       
+##              298          299          300
+## 2                                         
+## 3                                         
+## 4                                         
+##  [ reached getOption("max.print") -- omitted 297 rows ]
+## 
+## $model
+## Nonlinear regression model
+##   model: ydis ~ a * exp(-b * x)
+##    data: parent.frame()
+##         a         b 
+## 0.2004809 0.0009226 
+##  residual sum-of-squares: 175
+## 
+## Number of iterations to convergence: 7 
+## Achieved convergence tolerance: 1.49e-08
+## 
+## $model.type
+## [1] "exponential"
+## 
+## $y.type
+## [1] "dissimilarities"
+## 
+## $first.parameter
+##         a 
+## 0.7995191 
+## 
+## $second.parameter
+##            b 
+## 0.0009226288 
+## 
+## $aic
+## [1] -122578.6
+## 
+## $pseudo.r.squared
+## [1] 0.2851397
+## 
+## $p.value
+## [1] 0.01
+## 
+## attr(,"class")
+## [1] "decay"
+```
 
+<table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+<tr>
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="1"></th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Fungal Decay parameters</div></th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="1"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Distance Spanned</div></th>
+</tr>
+  <tr>
+   <th style="text-align:center;"> Fungal sub-assemblage </th>
+   <th style="text-align:center;"> pseudo-R2 </th>
+   <th style="text-align:center;"> intercept </th>
+   <th style="text-align:center;"> slope </th>
+   <th style="text-align:center;"> p-value </th>
+   <th style="text-align:center;"> max pairwise distance (km) </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr grouplength="2"><td colspan="6" style="border-bottom: 1px solid;"><strong>βsor</strong></td></tr>
+<tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> F1 </td>
+   <td style="text-align:center;"> 0.101 </td>
+   <td style="text-align:center;"> 0.476 </td>
+   <td style="text-align:center;"> 1.04e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1560 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> non-F1 </td>
+   <td style="text-align:center;"> 0.285 </td>
+   <td style="text-align:center;"> 0.8 </td>
+   <td style="text-align:center;"> 9.23e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1444.53 </td>
+  </tr>
+  <tr grouplength="2"><td colspan="6" style="border-bottom: 1px solid;"><strong>βsim</strong></td></tr>
+<tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> F1 </td>
+   <td style="text-align:center;"> 0.059 </td>
+   <td style="text-align:center;"> 0.439 </td>
+   <td style="text-align:center;"> 7.76e-05 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1560 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> non-F1 </td>
+   <td style="text-align:center;"> 0.227 </td>
+   <td style="text-align:center;"> 0.773 </td>
+   <td style="text-align:center;"> 7.84e-04 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1444.53 </td>
+  </tr>
+  <tr grouplength="2"><td colspan="6" style="border-bottom: 1px solid;"><strong>βsne</strong></td></tr>
+<tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> F1 </td>
+   <td style="text-align:center;"> 0.014 </td>
+   <td style="text-align:center;"> 0.037 </td>
+   <td style="text-align:center;"> 1.00e-05 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1560 </td>
+  </tr>
+  <tr>
+   <td style="text-align:center;padding-left: 2em;" indentlevel="1"> non-F1 </td>
+   <td style="text-align:center;"> 0.003 </td>
+   <td style="text-align:center;"> 0.028 </td>
+   <td style="text-align:center;"> -3.84e-06 </td>
+   <td style="text-align:center;"> 0.01 </td>
+   <td style="text-align:center;"> 1444.53 </td>
+  </tr>
+</tbody>
+</table>
