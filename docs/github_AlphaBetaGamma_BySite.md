@@ -1,7 +1,7 @@
 ---
 title: "Alpha beta gamma by Site"
 author: "Kelli Feeser"
-date: "2024-07-23"
+date: "2025-03-24"
 output:
   bookdown::html_document2:
     code_folding: hide
@@ -42,7 +42,7 @@ editor_options:
 
 ------------------------------------------------------------------------
 
-Document last updated: 2024-07-23
+Document last updated: 2025-03-24
 
 ------------------------------------------------------------------------
 
@@ -66,76 +66,337 @@ Document last updated: 2024-07-23
 
 \
 
-# Mean beta dissimilarities by site
+# Mean beta dissimilarities by Site
 
 \
 
-## Bac
+## Background 
+
+\
+
+If two groups of sampling units are really different (e.g. in their species composition), then average of the within-group compositional dissimilarities should be less than the average of the dissimilarities between two random collection of sampling units drawn from the entire population.\
+
+Within group (Site) values should be < overall/global average if true difference in location (differences in mean *or* dispersion) exists.\
+
+This difference may be one of location (differences in mean) or one of spread (differences in within-group distance). That is, it may find a significant difference between two groups simply because one of those groups has a greater dissimilarities among its sampling units.\
+\
+
+
+
+
+
+
+
+
+
 
 
 
 \
 
-## Fun
+## Bacterial vs. fungal mean dissimilarity by Site
 
 
+``` r
+# Extract summaries
+sum_bac <- summary(md_bwc_Site)
+sum_fun <- summary(md_Fwc_Site)
 
-\
+# Extract key values
+mean_bac_within <- round(sum_bac$W, 4)
+mean_fun_within <- round(sum_fun$W, 4)
+mean_bac_between <- round(sum_bac$B, 4)
+mean_fun_between <- round(sum_fun$B, 4)
+mean_bac_overall <- round(sum_bac$D, 4)
+mean_fun_overall <- round(sum_fun$D, 4)
 
-# 𝛄 - Gamma diversity of sites {.tabset .tabset-pills}
+# Comparison symbol
+compare_symbol <- function(bac, fun, tol = 1e-6) {
+  if (abs(bac - fun) < tol) {
+    "="
+  } else if (bac > fun) {
+    ">"
+  } else {
+    "<"
+  }
+}
 
-\
-
-## Bac
-
-\
-
-### Calculate site gamma ($\gamma_{site}$)
-
-
-
-\
-
-#### summary stats
-
-
-```r
-# summary stats
-paste0("Sample Alpha - min: ",
-  min(bwc_alpha_Site$Observed),", max: ",max(bwc_alpha_Site$Observed),", mean: ",round(mean(bwc_alpha_Site$Observed),0),", sd: ",round(sd(bwc_alpha_Site$Observed),0)
+comp_col <- c(
+  compare_symbol(mean_bac_within, mean_fun_within),
+  compare_symbol(mean_bac_between, mean_fun_between),
+  compare_symbol(mean_bac_overall, mean_fun_overall)
 )
+
+# Build comparison table
+summary_table <- tibble(
+  Metric = c("Mean within-group", "Mean between-group", "Overall mean"),
+  Bacteria = c(mean_bac_within, mean_bac_between, mean_bac_overall),
+  `B < F` = comp_col,
+  Fungi = c(mean_fun_within, mean_fun_between, mean_fun_overall)
+)
+
+# Print side-by-side comparison table
+summary_table %>%
+  kable(format = "html", caption = "Comparison of bacterial and fungal mean within- and between-Site Sørensen pairwise dissimilarities") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
+  column_spec(2:4, extra_css = "text-align: center;")
 ```
 
-```
-## [1] "Sample Alpha - min: 187, max: 1941, mean: 1113, sd: 311"
-```
+<table class="table table-striped table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:compare-meandist-summary)Comparison of bacterial and fungal mean within- and between-Site Sørensen pairwise dissimilarities</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Metric </th>
+   <th style="text-align:right;"> Bacteria </th>
+   <th style="text-align:left;"> B &lt; F </th>
+   <th style="text-align:right;"> Fungi </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Mean within-group </td>
+   <td style="text-align:right;text-align: center;"> 0.5661 </td>
+   <td style="text-align:left;text-align: center;"> &lt; </td>
+   <td style="text-align:right;text-align: center;"> 0.6539 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Mean between-group </td>
+   <td style="text-align:right;text-align: center;"> 0.6961 </td>
+   <td style="text-align:left;text-align: center;"> &lt; </td>
+   <td style="text-align:right;text-align: center;"> 0.8302 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Overall mean </td>
+   <td style="text-align:right;text-align: center;"> 0.6892 </td>
+   <td style="text-align:left;text-align: center;"> &lt; </td>
+   <td style="text-align:right;text-align: center;"> 0.8209 </td>
+  </tr>
+</tbody>
+</table>
 
-```r
+Among all samples, fungi had the higher overall mean dissimilarity across sites, with a value of 0.8209 compared to 0.6892 for bacteria.
+
+Within-site dissimilarity (0.6539 for fungi, 0.5661 for bacteria) was greater for fungi, suggesting higher spatial turnover or within-site heterogeneity for the fungal community.
+
+For **bacteria**, the within-group dissimilarity (0.5661) was lower than the overall average (0.6892), indicating that samples from the same site were more compositionally similar than samples across all sites. This pattern suggests that site identity explains some of the bacterial compositional variation.
+
+Similarly, for **fungi**, within-site dissimilarity was lower than the overall dissimilarity, suggesting that fungal samples from the same site were more similar to each other compared to the global average.
+
+In both domains, a **between-group mean dissimilarity** (0.6961 for bacteria, 0.8302 for fungi) greater than the within-group value supports the presence of compositional structure across sites — either due to differences in **mean community composition** (location) or **dispersion** (variability within sites).
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/five-num-summary-bacteria-fungi-1.png)<!-- -->
+
+
+## strat by F1 vs non-F1 [in-progress]
+
+
+
+
+
+\
+\
+\
+
+
+# 𝛄 - Gamma diversity of sites ($\gamma_{site}$) {.tabset .tabset-pills}
+
+\
+
+## Calculate site gamma ($\gamma_{site}$) {.hidden .unlisted .unnumbered}
+
+
+
+
+
+
+\
+
+## summary stats (bac)
+
+
+``` r
+# summary stats
 paste0("Site gamma - min: ",
   min(Bac_gamma_Site),", max: ",max(Bac_gamma_Site),", mean: ",round(mean(Bac_gamma_Site),0),", sd: ",round(sd(Bac_gamma_Site),0)
 )
-```
 
-```
-## [1] "Site gamma - min: 2505, max: 8620, mean: 5328, sd: 1858"
-```
+paste0("Sample Alpha - min: ",
+  min(bwc_alpha_Site$Observed),", max: ",max(bwc_alpha_Site$Observed),", mean: ",round(mean(bwc_alpha_Site$Observed),0),", sd: ",round(sd(bwc_alpha_Site$Observed),0)
+)
 
-```r
 paste0("Site mean alpha - min: ",
   round(min(Bac_obs_mean_alpha$Observed),1),", max: ",round(max(Bac_obs_mean_alpha$Observed),1),", mean: ",round(mean(Bac_obs_mean_alpha$Observed),1),", sd: ",round(sd(Bac_obs_mean_alpha$Observed),1)
 )
 ```
 
 ```
+## [1] "Site gamma - min: 2505, max: 8620, mean: 5328, sd: 1858"
+## [1] "Sample Alpha - min: 187, max: 1941, mean: 1113, sd: 311"
 ## [1] "Site mean alpha - min: 712.3, max: 1711.6, mean: 1081.5, sd: 249.9"
 ```
 
 \
+\
 
-### Table: Bacterial Gamma Diversity By Site
+## BvF summary stats
 
 
-```r
+``` r
+compare_symbol <- function(bac, fun, tol = 1e-6) {
+  if (abs(bac - fun) < tol) "=" else if (bac > fun) ">" else "<"
+}
+
+# Raw data
+bac_vals <- list(
+  gamma = Bac_gamma_Site,
+  alpha = bwc_alpha_Site$Observed,
+  mean_alpha = Bac_obs_mean_alpha$Observed
+)
+
+fun_vals <- list(
+  gamma = Fun_gamma_Site,
+  alpha = fwc_alpha_Site$Observed,
+  mean_alpha = Fun_obs_mean_alpha$Observed
+)
+
+# Function to generate summary rows
+make_rows <- function(label, bac_vec, fun_vec, digits_range = 1, digits_mean = 1, digits_sd = 1) {
+  tibble(
+    Metric = c("min", "max", "mean ± sd"),
+    Bacteria = c(
+      round(min(bac_vec), digits_range),
+      round(max(bac_vec), digits_range),
+      paste0(round(mean(bac_vec), digits_mean), " ± ", round(sd(bac_vec), digits_sd))
+    ),
+    `B > F` = c(
+      compare_symbol(min(bac_vec), min(fun_vec)),
+      compare_symbol(max(bac_vec), max(fun_vec)),
+      compare_symbol(mean(bac_vec), mean(fun_vec))
+    ),
+    Fungi = c(
+      round(min(fun_vec), digits_range),
+      round(max(fun_vec), digits_range),
+      paste0(round(mean(fun_vec), digits_mean), " ± ", round(sd(fun_vec), digits_sd))
+    )
+  ) %>%
+    add_row(Metric = paste0("**_", label, "_**"), Bacteria = "", `B > F` = "", Fungi = "", .before = 1)
+}
+
+# Combine all rows
+diversity_table <- bind_rows(
+  make_rows("γ<sub>site</sub> diversity", bac_vals$gamma, fun_vals$gamma, digits_range = 0),
+  make_rows("Sample-level α", bac_vals$alpha, fun_vals$alpha, digits_range = 0),
+  make_rows("Site mean α", bac_vals$mean_alpha, fun_vals$mean_alpha, digits_range = 0)
+)
+
+# Final table
+diversity_table %>%
+  kable(format = "html", escape = FALSE, align = c("l", "c", "c", "c"),
+        caption = "Summary of Alpha and Gamma Diversity Metrics by Kingdom") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
+  column_spec(2:4, extra_css = "text-align: center;")
+```
+
+<table class="table table-striped table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:diversity-summary-inline-group-labels)Summary of Alpha and Gamma Diversity Metrics by Kingdom</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Metric </th>
+   <th style="text-align:center;"> Bacteria </th>
+   <th style="text-align:center;"> B &gt; F </th>
+   <th style="text-align:center;"> Fungi </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> **_γ<sub>site</sub> diversity_** </td>
+   <td style="text-align:center;text-align: center;">  </td>
+   <td style="text-align:center;text-align: center;">  </td>
+   <td style="text-align:center;text-align: center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> min </td>
+   <td style="text-align:center;text-align: center;"> 2505 </td>
+   <td style="text-align:center;text-align: center;"> &gt; </td>
+   <td style="text-align:center;text-align: center;"> 256 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> max </td>
+   <td style="text-align:center;text-align: center;"> 8620 </td>
+   <td style="text-align:center;text-align: center;"> &gt; </td>
+   <td style="text-align:center;text-align: center;"> 1442 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> mean ± sd </td>
+   <td style="text-align:center;text-align: center;"> 5327.8 ± 1857.9 </td>
+   <td style="text-align:center;text-align: center;"> &gt; </td>
+   <td style="text-align:center;text-align: center;"> 877.5 ± 348.5 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> **_Sample-level α_** </td>
+   <td style="text-align:center;text-align: center;">  </td>
+   <td style="text-align:center;text-align: center;">  </td>
+   <td style="text-align:center;text-align: center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> min </td>
+   <td style="text-align:center;text-align: center;"> 187 </td>
+   <td style="text-align:center;text-align: center;"> &gt; </td>
+   <td style="text-align:center;text-align: center;"> 41 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> max </td>
+   <td style="text-align:center;text-align: center;"> 1941 </td>
+   <td style="text-align:center;text-align: center;"> &gt; </td>
+   <td style="text-align:center;text-align: center;"> 311 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> mean ± sd </td>
+   <td style="text-align:center;text-align: center;"> 1112.6 ± 310.6 </td>
+   <td style="text-align:center;text-align: center;"> &gt; </td>
+   <td style="text-align:center;text-align: center;"> 145.6 ± 53.4 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> **_Site mean α_** </td>
+   <td style="text-align:center;text-align: center;">  </td>
+   <td style="text-align:center;text-align: center;">  </td>
+   <td style="text-align:center;text-align: center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> min </td>
+   <td style="text-align:center;text-align: center;"> 712 </td>
+   <td style="text-align:center;text-align: center;"> &gt; </td>
+   <td style="text-align:center;text-align: center;"> 71 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> max </td>
+   <td style="text-align:center;text-align: center;"> 1712 </td>
+   <td style="text-align:center;text-align: center;"> &gt; </td>
+   <td style="text-align:center;text-align: center;"> 219 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> mean ± sd </td>
+   <td style="text-align:center;text-align: center;"> 1081.5 ± 249.9 </td>
+   <td style="text-align:center;text-align: center;"> &gt; </td>
+   <td style="text-align:center;text-align: center;"> 142.8 ± 51.6 </td>
+  </tr>
+</tbody>
+</table>
+
+
+\
+\
+
+## Full Tables of gamma and alpha diversity metrics with derived measures by Site for Bacteria and Fungi {.tabset .tabset-pills}
+
+\
+
+### Bacteria-Archaea
+
+\
+
+
+``` r
 Bac_gamma_Site3 %>%
   kbl(caption = "Gamma diversity of sites: bacteria",
             align = 'c',
@@ -384,58 +645,16 @@ Bac_gamma_Site3 %>%
 </tbody>
 </table></div>
 
-\
-
-## Fun
 
 \
+\
 
-###  Calculate site gamma ($\gamma_{site}$)
-
-
+### Fungi
 
 \
 
-#### summary stats
 
-
-```r
-# summary stats
-paste0("Sample Alpha - min: ",
-  min(fwc_alpha_Site$Observed),", max: ",max(fwc_alpha_Site$Observed),", mean: ",round(mean(fwc_alpha_Site$Observed),0),", sd: ",round(sd(fwc_alpha_Site$Observed),0)
-)
-```
-
-```
-## [1] "Sample Alpha - min: 41, max: 311, mean: 146, sd: 53"
-```
-
-```r
-paste0("Site gamma - min: ",
-  min(Fun_gamma_Site),", max: ",max(Fun_gamma_Site),", mean: ",round(mean(Fun_gamma_Site),0),", sd: ",round(sd(Fun_gamma_Site),0)
-)
-```
-
-```
-## [1] "Site gamma - min: 256, max: 1442, mean: 877, sd: 348"
-```
-
-```r
-paste0("Site mean alpha - min: ",
-  round(min(Fun_obs_mean_alpha$Observed),1),", max: ",round(max(Fun_obs_mean_alpha$Observed),1),", mean: ",round(mean(Fun_obs_mean_alpha$Observed),1),", sd: ",round(sd(Fun_obs_mean_alpha$Observed),1)
-)
-```
-
-```
-## [1] "Site mean alpha - min: 71.4, max: 219.3, mean: 142.8, sd: 51.6"
-```
-
-\
-
-### Table: Fungal Gamma Diversity By Site
-
-
-```r
+``` r
 Fun_gamma_Site3 %>%
   kbl(caption = "Gamma diversity of sites: fungi",
             align = 'c',
@@ -686,20 +905,114 @@ Fun_gamma_Site3 %>%
 </table></div>
 
 \
+\
+
+
+
+
+``` r
+# summary stats
+paste0("Sample Alpha - min: ",
+  min(fwc_alpha_Site$Observed),", max: ",max(fwc_alpha_Site$Observed),", mean: ",round(mean(fwc_alpha_Site$Observed),0),", sd: ",round(sd(fwc_alpha_Site$Observed),0)
+)
+
+paste0("Site gamma - min: ",
+  min(Fun_gamma_Site),", max: ",max(Fun_gamma_Site),", mean: ",round(mean(Fun_gamma_Site),0),", sd: ",round(sd(Fun_gamma_Site),0)
+)
+
+paste0("Site mean alpha - min: ",
+  round(min(Fun_obs_mean_alpha$Observed),1),", max: ",round(max(Fun_obs_mean_alpha$Observed),1),", mean: ",round(mean(Fun_obs_mean_alpha$Observed),1),", sd: ",round(sd(Fun_obs_mean_alpha$Observed),1)
+)
+```
+
+\
+
+### Full Table: Fungal Gamma and alpha diversity with derived measures by Site
+
+
+\
 
 # Beta dispersion by site
 
 ## Calculate multivariate dispersions {.tabset}
 
 
+``` r
+# Fun
+Fun_wc_sorensen_distmat <- as.matrix(sor.dist.list$Fun_wholecommunity)
+
+Fun_wc_sorensen_dist<-as.dist(Fun_wc_sorensen_distmat)
+
+## Calculate multivariate dispersions
+betadisp_Site_Fun_addC <- betadisper(Fun_wc_sorensen_dist,
+                            group = phylo2vegan_sd(Fun_wholecommunity)$Site,
+                            type = "median", # type = "median" (distance from each sample unit to the spatial median of its group)
+                            bias.adjust = T, # adjust for small sample bias in beta div estimates?
+                            sqrt.dist = FALSE,
+                            add = "lingoes")
+
+# Bac
+Bac_wc_sorensen_distmat <- as.matrix(beta.pair(decostand(phylo2vegan_OTU(Bac_wholecommunity), method = "pa"), index.family = "sorensen")$beta.sor)
+
+Bac_wc_sorensen_dist<-as.dist(Bac_wc_sorensen_distmat)
+
+## Calculate multivariate dispersions
+betadisp_Site_Bac_addC <- betadisper(Bac_wc_sorensen_dist,
+                            group = phylo2vegan_sd(Bac_wholecommunity)$Site,
+                            type = "median", # type = "median" (distance from each sample unit to the spatial median of its group)
+                            bias.adjust = T, # adjust for small sample bias in beta div estimates?
+                            sqrt.dist = FALSE,
+                            add = "lingoes")
+```
 
 
+``` r
+perform_anova_betadisper <- function(betadisper_object, grouping) {
+
+  # Perform ANOVA 
+  anova_result <- anova(betadisper_object)
+  
+  tidy_aov <- tidy(anova_result)
+  tidy_df <- as.data.frame(tidy_aov)
+  
+  tidy_df$term[1] <- paste0(grouping)
+
+  sum_squares_regression <- tidy_df$sumsq[1]
+  sum_squares_residuals <- tidy_df$sumsq[2]
+
+  R_squared <- sum_squares_regression /
+            (sum_squares_regression + sum_squares_residuals)*100
+
+  tidier_df <- data.frame(Term = character(),df = numeric(),
+                          SumSq = numeric(),MeanSq = numeric(),
+                          F.statistic = numeric(),
+                          R_squared = numeric(),p.value = character(),
+                          stringsAsFactors = FALSE)
+  
+  tidier_df[1,"Term"] <- tidy_df$term[1]
+  tidier_df[2,"Term"] <- tidy_df$term[2]
+  tidier_df[1:2,2] <- (tidy_df$df)[1:2]
+  tidier_df$SumSq <- round(tidy_df$sumsq[1:2],2)
+  tidier_df$MeanSq <- round(tidy_df$meansq[1:2],3)
+  tidier_df$F.statistic <- round(tidy_df$statistic,2)
+  tidier_df[1,"R_squared"] <- round(R_squared,2)
+  tidier_df[2,"R_squared"] <- 100-(round(R_squared,2))
+  tidier_df[1,"P.value"] <- prettyNum(tidy_df$p.value[1],digits=2)
+
+  # Return ANOVA results for the specified taxa_of_interest
+  return(tidier_df)
+}
+```
 
 ### Bac {.unnumbered}
 
 \
 range of site dispersions:
 
+
+``` r
+summary(betadisp_Site_Bac_addC$group.distances)
+```
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
@@ -708,6 +1021,10 @@ range of site dispersions:
 
 \
 
+
+``` r
+betadisp_Site_Bac_addC
+```
 
 ```
 ## 
@@ -741,12 +1058,12 @@ probably removing in favor of perm F test (following)
 `betadisp_Site_Bac.aov <- perform_anova_betadisper(betadisp_Site_Bac_addC, "Site")`
 
 
-```r
+``` r
 betadisp_Site_Bac.aov<-perform_anova_betadisper(betadisp_Site_Bac_addC, "Site")
 ```
 
 
-```r
+``` r
 betadisp_Site_Bac.aov %>% kbl() %>% kable_styling()
 ```
 
@@ -794,9 +1111,15 @@ betadisp_Site_Bac.aov %>% kbl() %>% kable_styling()
 `vegan::permutest(betadisp_Site_Bac_addC, permutations = 999, pairwise = F)`
 
 
+``` r
+## Permutation test for F
+betadisp_Site_Bac.pmod <- permutest(betadisp_Site_Bac_addC, permutations = 999, pairwise = F)
+
+bdr2Bac<-prettyNum(betadisp_Site_Bac.pmod$tab$`Sum Sq`[1]/(sum(betadisp_Site_Bac.pmod$tab$`Sum Sq`)),digits=3)
+```
 
 
-```r
+``` r
 betadisp_Site_Bac.pmod
 ```
 
@@ -828,10 +1151,16 @@ Calculated $R^2$ = 0.391\
 `stats::TukeyHSD(betadisp_Site_Bac_addC, ordered = T)`
 
 
+``` r
+## Tukey's Honest Significant Differences
+(betadisp_Site_Bac_addC.HSD <- TukeyHSD(betadisp_Site_Bac_addC, ordered = T, conf.level = 0.95))
+bdHSDBacs<-subset(as.data.frame(betadisp_Site_Bac_addC.HSD$group),`p adj` < 0.05)
+# plot(betadisp_Site_Bac_addC.HSD)
+```
 
 
 
-```r
+``` r
 bdHSDBacs %>%
   kbl(caption = "Bacteria: sites with significantly different beta dispersion, subset to p.adj < 0.05 (Tukey HSD)",
             align = 'c',
@@ -1301,6 +1630,10 @@ bdHSDBacs %>%
 range of site dispersions:
 
 
+``` r
+summary(betadisp_Site_Fun_addC$group.distances)
+```
+
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##  0.5467  0.5955  0.6675  0.6628  0.7292  0.7698
@@ -1308,6 +1641,10 @@ range of site dispersions:
 
 \
 
+
+``` r
+betadisp_Site_Fun_addC
+```
 
 ```
 ## 
@@ -1341,12 +1678,12 @@ probably removing in favor of perm F test (following)
 `betadisp_Site_Fun.aov <- perform_anova_betadisper(betadisp_Site_Fun_addC, "Site")`
 
 
-```r
+``` r
 betadisp_Site_Fun.aov<-perform_anova_betadisper(betadisp_Site_Fun_addC, "Site")
 ```
 
 
-```r
+``` r
 betadisp_Site_Fun.aov %>% kbl() %>% kable_styling()
 ```
 
@@ -1394,9 +1731,14 @@ betadisp_Site_Fun.aov %>% kbl() %>% kable_styling()
 `vegan::permutest(betadisp_Site_Fun_addC, permutations = 999, pairwise = F)`
 
 
+``` r
+## Permutation test for F
+betadisp_Site_Fun.pmod <- permutest(betadisp_Site_Fun_addC, permutations = 999, pairwise = F)
+bdr2Fun<-prettyNum(betadisp_Site_Fun.pmod$tab$`Sum Sq`[1]/(sum(betadisp_Site_Fun.pmod$tab$`Sum Sq`)),digits=3)
+```
 
 
-```r
+``` r
 betadisp_Site_Fun.pmod
 ```
 
@@ -1428,9 +1770,15 @@ Calculated $R^2$ = 0.758\
 `stats::TukeyHSD(betadisp_Site_Fun_addC, ordered = T)`
 
 
+``` r
+## Tukey's Honest Significant Differences
+(betadisp_Site_Fun_addC.HSD <- TukeyHSD(betadisp_Site_Fun_addC, ordered = T, conf.level = 0.95))
+bdHSDFuns<-subset(as.data.frame(betadisp_Site_Fun_addC.HSD$group),`p adj` < 0.05)
+# plot(betadisp_Site_Fun_addC.HSD)
+```
 
 
-```r
+``` r
 bdHSDFuns %>%
   kbl(caption = "Fungi: sites with significantly different beta dispersion, subset to p.adj < 0.05 (Tukey HSD)",
             align = 'c',
@@ -2493,6 +2841,47 @@ bdHSDFuns %>%
 ## Table set-up {.unnumbered .unlisted .hidden}
 
 
+``` r
+Bac_gamma_Site.df <- (data.frame(
+  "Site"=rownames(Bac_gamma_Site3temp),
+  "n (# of samples per site)"=as.numeric(Bac_gamma_Site3temp$`n (# of samples per site)`),
+  "# of grass hosts per site"=as.numeric(Bac_gamma_Site3temp$ngrass_persite),
+  "Gamma (# total unique OTUs)"=as.numeric(Bac_gamma_Site3temp$`Gamma (# total unique OTUs)`),
+  "Gamma / n" = as.numeric(Bac_gamma_Site3temp$Gamma_over_n),
+  "Observed mean 𝝰" = as.numeric(Bac_gamma_Site3temp$`Observed mean 𝝰`),
+  "mean prop. of gamma detected per sample" = as.numeric(round(Bac_gamma_Site3temp$`mean prop. of gamma / sample`,3)),
+                       "SD prop. of gamma detected per sample" = as.numeric(round(Bac_gamma_Site3temp$`sd prop. of gamma / sample`,3))
+  ,check.names=F))
+
+Bac_gamma_Site.df$Bac_Site_betadisp<-betadisp_Site_Bac_addC$group.distances
+
+Bac_gamma_Site.df$Site_unordered <- as.factor(Bac_gamma_Site.df$Site)
+Bac_gamma_Site.df$Site <- as.factor(Bac_gamma_Site.df$Site)
+Bac_gamma_Site.df$Site <- factor(Bac_gamma_Site.df$Site,levels=c(site_levels),ordered = T)
+
+
+Fun_gamma_Site.df <- (data.frame(
+  "Site"=rownames(Fun_gamma_Site3temp),
+  "n (# of samples per site)"=as.numeric(Fun_gamma_Site3temp$`n (# of samples per site)`),
+  "# of grass hosts per site"=as.numeric(Fun_gamma_Site3temp$ngrass_persite),
+  "Gamma (# total unique OTUs)"=as.numeric(Fun_gamma_Site3temp$`Gamma (# total unique OTUs)`),
+  "Gamma / n" = as.numeric(Fun_gamma_Site3temp$Gamma_over_n),
+  "Observed mean 𝝰" = as.numeric(Fun_gamma_Site3temp$`Observed mean 𝝰`),
+  "mean prop. of gamma detected per sample" = as.numeric(round(Fun_gamma_Site3temp$`mean prop. of gamma / sample`,3)),
+                       "SD prop. of gamma detected per sample" = as.numeric(round(Fun_gamma_Site3temp$`sd prop. of gamma / sample`,3))
+  ,check.names=F))
+
+Fun_gamma_Site.df$Fun_Site_betadisp<-betadisp_Site_Fun_addC$group.distances
+
+Fun_gamma_Site.df$Site_unordered <- as.factor(Fun_gamma_Site.df$Site)
+Fun_gamma_Site.df$Site <- as.factor(Fun_gamma_Site.df$Site)
+Fun_gamma_Site.df$Site <- factor(Fun_gamma_Site.df$Site,levels=c(site_levels),ordered = T)
+
+# saveRDS(Fun_gamma_Site.df,file="../processed_data/clean_rds_saves/Fun_gamma_Site.df.rds")
+# saveRDS(Bac_gamma_Site.df,file="../processed_data/clean_rds_saves/Bac_gamma_Site.df.rds")
+# saveRDS(fwc_alpha_Site,file="../processed_data/clean_rds_saves/fwc_alpha_Site.rds")
+# saveRDS(bwc_alpha_Site,file="../processed_data/clean_rds_saves/bwc_alpha_Site.rds")
+```
 
 
 ## Tables: Gamma diversity and beta dispersion {.tabset}
@@ -2500,6 +2889,13 @@ bdHSDFuns %>%
 \
 
 ### Bac
+
+
+``` r
+Bac_gamma_Site.df$BetaDisp <- round(Bac_gamma_Site.df$Bac_Site_betadisp,4)
+Bac_gamma_Site.df[,c(1:8,11)] %>% kbl() %>% kable_styling() %>%
+  scroll_box(width = "95%", height = "350px")
+```
 
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:350px; overflow-x: scroll; width:95%; "><table class="table" style="margin-left: auto; margin-right: auto;">
  <thead>
@@ -2766,7 +3162,7 @@ bdHSDFuns %>%
 ### Fun
 
 
-```r
+``` r
 Fun_gamma_Site.df$BetaDisp <- round(Fun_gamma_Site.df$Fun_Site_betadisp,4)
 Fun_gamma_Site.df[,c(1:8,11)] %>% kbl() %>% kable_styling() %>%
   scroll_box(width = "95%", height = "350px")
@@ -3041,7 +3437,7 @@ Fun_gamma_Site.df[,c(1:8,11)] %>% kbl() %>% kable_styling() %>%
 ### Bac
 
 
-```r
+``` r
 Bac_Site.anosim <- with(phylo2vegan_sd(Bac_wholecommunity), anosim(Bac_wc_sorensen_distmat, Site))
 Bac_Site.anosim
 ```
@@ -3066,7 +3462,7 @@ Bac_Site.anosim
 ### Fun
 
 
-```r
+``` r
 Fun_Site.anosim <- with(phylo2vegan_sd(Fun_wholecommunity), anosim(Fun_wc_sorensen_distmat, Site))
 Fun_Site.anosim
 ```
@@ -3099,6 +3495,21 @@ Fun_Site.anosim
 \
 
 ## Bac
+
+
+``` r
+Bac_gamma_Site.dfclean<-Bac_gamma_Site.df[,c(1:8,11)]
+Bac_gamma_Site.dfclean$`Gamma (# total unique OTUs)`<-prettyNum(Bac_gamma_Site.dfclean$`Gamma (# total unique OTUs)`, big.mark=",")
+
+Bac_gamma_Site.dfclean$`Observed mean 𝝰`<-prettyNum(Bac_gamma_Site.dfclean$`Observed mean 𝝰`, big.mark=",")
+
+Bac_gamma_Site.dfclean%>% kbl(caption = "Bacteria: alpha beta gamma diversity of sites",
+            align = 'c'
+      # col.names = c("Number of OTUs","Number of samples")
+      # ,format.args = list(format(c(Fun_gamma_Site.df[,4]),big.mark = ','))
+      ) %>% kable_styling() %>%
+  scroll_box(width = "95%", height = "500px")
+```
 
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:95%; "><table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:unnamed-chunk-21)Bacteria: alpha beta gamma diversity of sites</caption>
@@ -3364,6 +3775,21 @@ Fun_Site.anosim
 \
 
 ## Fun 
+
+
+``` r
+Fun_gamma_Site.dfclean<-Fun_gamma_Site.df[,c(1:8,11)]
+Fun_gamma_Site.dfclean$`Gamma (# total unique OTUs)`<-prettyNum(Fun_gamma_Site.dfclean$`Gamma (# total unique OTUs)`, big.mark=",")
+
+Fun_gamma_Site.dfclean$`Observed mean 𝝰`<-prettyNum(Fun_gamma_Site.dfclean$`Observed mean 𝝰`, big.mark=",")
+
+Fun_gamma_Site.dfclean%>% kbl(caption = "Fungi: alpha beta gamma diversity of sites",
+            align = 'c'
+      # col.names = c("Number of OTUs","Number of samples")
+      # ,format.args = list(format(c(Fun_gamma_Site.df[,4]),big.mark = ','))
+      ) %>% kable_styling() %>%
+  scroll_box(width = "95%", height = "500px")
+```
 
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:95%; "><table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:unnamed-chunk-22)Fungi: alpha beta gamma diversity of sites</caption>
@@ -3640,12 +4066,24 @@ Fun_Site.anosim
 ### Bac
 
 
+``` r
+shapiro.test(Bac_gamma_Site.df$`Gamma (# total unique OTUs)`)
+```
+
 ```
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  Bac_gamma_Site.df$`Gamma (# total unique OTUs)`
 ## W = 0.95319, p-value = 0.3648
+```
+
+``` r
+ggqqplot(Bac_gamma_Site.df$`Gamma (# total unique OTUs)`)
+ggdensity(Bac_gamma_Site.df$`Gamma (# total unique OTUs)`, 
+          main = "Density plot of site gamma diversity (Bacteria)",
+          xlab = "Size of regional species pool",
+          add = "mean",xlim = c(2000, 9000),rug=T)
 ```
 
 <img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-23-1.png" width="40%" /><img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-23-2.png" width="40%" />
@@ -3655,12 +4093,24 @@ Fun_Site.anosim
 ### Fun
 
 
+``` r
+shapiro.test(Fun_gamma_Site.df$`Gamma (# total unique OTUs)`)
+```
+
 ```
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
 ## data:  Fun_gamma_Site.df$`Gamma (# total unique OTUs)`
 ## W = 0.96265, p-value = 0.5447
+```
+
+``` r
+ggqqplot(Fun_gamma_Site.df$`Gamma (# total unique OTUs)`)
+ggdensity(Fun_gamma_Site.df$`Gamma (# total unique OTUs)`, 
+          main = "Density plot of site gamma diversity (Fungi)",
+          xlab = "Size of regional species pool",
+          add = "mean",xlim = c(0, 1450),rug=T)
 ```
 
 <img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-24-1.png" width="40%" /><img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-24-2.png" width="40%" />
@@ -3675,6 +4125,11 @@ Predictor: # of grass hosts per site
 
 
 
+``` r
+# does sample alpha vary by ngrass_persite
+kruskal.test(fwc_alpha_Site$Observed~fwc_alpha_Site$ngrass_persite)
+```
+
 ```
 ## 
 ## 	Kruskal-Wallis rank sum test
@@ -3685,12 +4140,22 @@ Predictor: # of grass hosts per site
 
 
 
+``` r
+# does site gamma vary by ngrass_persite
+kruskal.test(Fun_gamma_Site2[,1]~Fun_gamma_Site3temp$ngrass_persite)
+```
+
 ```
 ## 
 ## 	Kruskal-Wallis rank sum test
 ## 
 ## data:  Fun_gamma_Site2[, 1] by Fun_gamma_Site3temp$ngrass_persite
 ## Kruskal-Wallis chi-squared = 3.1963, df = 3, p-value = 0.3623
+```
+
+``` r
+# does site gamma/n vary by ngrass_persite
+kruskal.test(Fun_gamma_Site3temp$`Gamma_over_n`~Fun_gamma_Site3temp$ngrass_persite)
 ```
 
 ```
@@ -3701,12 +4166,22 @@ Predictor: # of grass hosts per site
 ## Kruskal-Wallis chi-squared = 5.9091, df = 3, p-value = 0.1161
 ```
 
+``` r
+# does site obs_mean_alpha vary by ngrass_persite
+kruskal.test(Fun_gamma_Site.df$`Observed mean 𝝰`~Fun_gamma_Site.df$`# of grass hosts per site`)
+```
+
 ```
 ## 
 ## 	Kruskal-Wallis rank sum test
 ## 
 ## data:  Fun_gamma_Site.df$`Observed mean 𝝰` by Fun_gamma_Site.df$`# of grass hosts per site`
 ## Kruskal-Wallis chi-squared = 0.59157, df = 3, p-value = 0.8984
+```
+
+``` r
+# does site mean prop. of gamma detected per sample vary by ngrass_persite YES
+kruskal.test(Fun_gamma_Site.df$`mean prop. of gamma detected per sample`~Fun_gamma_Site.df$`# of grass hosts per site`)
 ```
 
 ```
@@ -3726,6 +4201,66 @@ Predictor: # of grass hosts per site
 # plot alpha obs v exp {.hidden .unlisted}
 
 
+``` r
+ggplot(aes(x=Bac_gamma_Site.df$`Observed mean 𝝰`,y=Fun_gamma_Site.df$`Observed mean 𝝰`,color=Site),data=Bac_gamma_Site.df)+
+  geom_point(size=3)+
+  scale_color_manual(values = latlong_cols)+
+  # geom_abline(aes(slope = 1,intercept=0),data=Fun_gamma_Site.df, color="black")+
+ labs(y="Fungi: Obs mean alpha",x="Bacteria: Obs mean alpha",color="Site")+
+  theme_bw() +
+  theme(legend.position="right",
+    axis.text = element_text(color="black", size=10),
+    axis.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
+    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+
+ggplot(aes(x=Bac_gamma_Site.df$`Observed mean 𝝰`,y=Bac_gamma_Site.df$`Expected mean 𝝰`,color=Site),data=Bac_gamma_Site.df)+
+  geom_point(size=3)+
+  scale_color_manual(values = latlong_cols)+
+  scale_x_continuous(limits = c(0,2000))+
+  scale_y_continuous(limits = c(0,750))+
+  geom_abline(aes(slope = 1,intercept=0),data=Fun_gamma_Site.df, color="black")+
+  labs(y="Gamma_over_n",x="Observed mean alpha",color="Site",title = "Bacteria")+
+  theme_bw() +
+  theme(legend.position="right",
+    axis.text = element_text(color="black", size=10),
+    axis.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
+    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+
+
+ggplot(aes(x=Fun_gamma_Site.df$`Observed mean 𝝰`,y=Fun_gamma_Site.df$`Expected mean 𝝰`,color=Site),data=Fun_gamma_Site.df)+
+  geom_point(size=3)+
+  scale_x_continuous(limits = c(0,300))+
+  scale_y_continuous(limits = c(0,100))+
+  scale_color_manual(values = latlong_cols)+
+  geom_abline(aes(slope = 1,intercept=0),data=Fun_gamma_Site.df, color="black")+
+  labs(y="Gamma_over_n",x="Observed mean alpha",color="Site",title = "Fungi")+
+  theme_bw() +
+  theme(legend.position="right",
+    axis.text = element_text(color="black", size=10),
+    axis.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
+    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+
+ggplot(aes(x=Fun_gamma_Site.df$`Observed mean 𝝰`,y=Fun_gamma_Site.df$`Expected mean 𝝰`,color=Site),data=Fun_gamma_Site.df)+
+  geom_point(size=3)+
+  scale_x_continuous(limits = c(0,300))+
+  scale_y_continuous(limits = c(0,100))+
+  scale_color_manual(values = latlong_cols)+
+  geom_abline(aes(slope = 1,intercept=0),data=Fun_gamma_Site.df, color="black")+
+  labs(y="Gamma_over_n",x="Observed mean alpha",color="Site",title = "Fungi")+
+  theme_bw() +
+  theme(legend.position="right",
+    axis.text = element_text(color="black", size=10),
+    axis.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
+    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+```
 
 # beta disp by grass landscape {.hidden .unlisted}
 
