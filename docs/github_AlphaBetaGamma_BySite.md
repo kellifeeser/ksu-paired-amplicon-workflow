@@ -66,140 +66,9 @@ Document last updated: 2025-03-24
 
 \
 
-# Mean beta dissimilarities by Site
+# Regional species pool: 𝛄 - Gamma diversity of sites ($\gamma_{site}$) and species richness ($\alpha_{site}$)
 
 \
-
-## Background 
-
-\
-
-If two groups of sampling units are really different (e.g. in their species composition), then average of the within-group compositional dissimilarities should be less than the average of the dissimilarities between two random collection of sampling units drawn from the entire population.\
-
-Within group (Site) values should be < overall/global average if true difference in location (differences in mean *or* dispersion) exists.\
-
-This difference may be one of location (differences in mean) or one of spread (differences in within-group distance). That is, it may find a significant difference between two groups simply because one of those groups has a greater dissimilarities among its sampling units.\
-\
-
-
-
-
-
-
-
-
-
-
-
-
-\
-
-## Bacterial vs. fungal mean dissimilarity by Site
-
-
-``` r
-# Extract summaries
-sum_bac <- summary(md_bwc_Site)
-sum_fun <- summary(md_Fwc_Site)
-
-# Extract key values
-mean_bac_within <- round(sum_bac$W, 4)
-mean_fun_within <- round(sum_fun$W, 4)
-mean_bac_between <- round(sum_bac$B, 4)
-mean_fun_between <- round(sum_fun$B, 4)
-mean_bac_overall <- round(sum_bac$D, 4)
-mean_fun_overall <- round(sum_fun$D, 4)
-
-# Comparison symbol
-compare_symbol <- function(bac, fun, tol = 1e-6) {
-  if (abs(bac - fun) < tol) {
-    "="
-  } else if (bac > fun) {
-    ">"
-  } else {
-    "<"
-  }
-}
-
-comp_col <- c(
-  compare_symbol(mean_bac_within, mean_fun_within),
-  compare_symbol(mean_bac_between, mean_fun_between),
-  compare_symbol(mean_bac_overall, mean_fun_overall)
-)
-
-# Build comparison table
-summary_table <- tibble(
-  Metric = c("Mean within-group", "Mean between-group", "Overall mean"),
-  Bacteria = c(mean_bac_within, mean_bac_between, mean_bac_overall),
-  `B < F` = comp_col,
-  Fungi = c(mean_fun_within, mean_fun_between, mean_fun_overall)
-)
-
-# Print side-by-side comparison table
-summary_table %>%
-  kable(format = "html", caption = "Comparison of bacterial and fungal mean within- and between-Site Sørensen pairwise dissimilarities") %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
-  column_spec(2:4, extra_css = "text-align: center;")
-```
-
-<table class="table table-striped table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
-<caption>(\#tab:compare-meandist-summary)Comparison of bacterial and fungal mean within- and between-Site Sørensen pairwise dissimilarities</caption>
- <thead>
-  <tr>
-   <th style="text-align:left;"> Metric </th>
-   <th style="text-align:right;"> Bacteria </th>
-   <th style="text-align:left;"> B &lt; F </th>
-   <th style="text-align:right;"> Fungi </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Mean within-group </td>
-   <td style="text-align:right;text-align: center;"> 0.5661 </td>
-   <td style="text-align:left;text-align: center;"> &lt; </td>
-   <td style="text-align:right;text-align: center;"> 0.6539 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Mean between-group </td>
-   <td style="text-align:right;text-align: center;"> 0.6961 </td>
-   <td style="text-align:left;text-align: center;"> &lt; </td>
-   <td style="text-align:right;text-align: center;"> 0.8302 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Overall mean </td>
-   <td style="text-align:right;text-align: center;"> 0.6892 </td>
-   <td style="text-align:left;text-align: center;"> &lt; </td>
-   <td style="text-align:right;text-align: center;"> 0.8209 </td>
-  </tr>
-</tbody>
-</table>
-
-Among all samples, fungi had the higher overall mean dissimilarity across sites, with a value of 0.8209 compared to 0.6892 for bacteria.
-
-Within-site dissimilarity (0.6539 for fungi, 0.5661 for bacteria) was greater for fungi, suggesting higher spatial turnover or within-site heterogeneity for the fungal community.
-
-For **bacteria**, the within-group dissimilarity (0.5661) was lower than the overall average (0.6892), indicating that samples from the same site were more compositionally similar than samples across all sites. This pattern suggests that site identity explains some of the bacterial compositional variation.
-
-Similarly, for **fungi**, within-site dissimilarity was lower than the overall dissimilarity, suggesting that fungal samples from the same site were more similar to each other compared to the global average.
-
-In both domains, a **between-group mean dissimilarity** (0.6961 for bacteria, 0.8302 for fungi) greater than the within-group value supports the presence of compositional structure across sites — either due to differences in **mean community composition** (location) or **dispersion** (variability within sites).
-
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/five-num-summary-bacteria-fungi-1.png)<!-- -->
-
-
-## strat by F1 vs non-F1 [in-progress]
-
-
-
-
-
-\
-\
-\
-
-
-# 𝛄 - Gamma diversity of sites ($\gamma_{site}$) {.tabset .tabset-pills}
-
 \
 
 ## Calculate site gamma ($\gamma_{site}$) {.hidden .unlisted .unnumbered}
@@ -208,94 +77,9 @@ In both domains, a **between-group mean dissimilarity** (0.6961 for bacteria, 0.
 
 
 
-
-\
-
-## summary stats (bac)
-
-
-``` r
-# summary stats
-paste0("Site gamma - min: ",
-  min(Bac_gamma_Site),", max: ",max(Bac_gamma_Site),", mean: ",round(mean(Bac_gamma_Site),0),", sd: ",round(sd(Bac_gamma_Site),0)
-)
-
-paste0("Sample Alpha - min: ",
-  min(bwc_alpha_Site$Observed),", max: ",max(bwc_alpha_Site$Observed),", mean: ",round(mean(bwc_alpha_Site$Observed),0),", sd: ",round(sd(bwc_alpha_Site$Observed),0)
-)
-
-paste0("Site mean alpha - min: ",
-  round(min(Bac_obs_mean_alpha$Observed),1),", max: ",round(max(Bac_obs_mean_alpha$Observed),1),", mean: ",round(mean(Bac_obs_mean_alpha$Observed),1),", sd: ",round(sd(Bac_obs_mean_alpha$Observed),1)
-)
-```
-
-```
-## [1] "Site gamma - min: 2505, max: 8620, mean: 5328, sd: 1858"
-## [1] "Sample Alpha - min: 187, max: 1941, mean: 1113, sd: 311"
-## [1] "Site mean alpha - min: 712.3, max: 1711.6, mean: 1081.5, sd: 249.9"
-```
-
-\
 \
 
 ## BvF summary stats
-
-
-``` r
-compare_symbol <- function(bac, fun, tol = 1e-6) {
-  if (abs(bac - fun) < tol) "=" else if (bac > fun) ">" else "<"
-}
-
-# Raw data
-bac_vals <- list(
-  gamma = Bac_gamma_Site,
-  alpha = bwc_alpha_Site$Observed,
-  mean_alpha = Bac_obs_mean_alpha$Observed
-)
-
-fun_vals <- list(
-  gamma = Fun_gamma_Site,
-  alpha = fwc_alpha_Site$Observed,
-  mean_alpha = Fun_obs_mean_alpha$Observed
-)
-
-# Function to generate summary rows
-make_rows <- function(label, bac_vec, fun_vec, digits_range = 1, digits_mean = 1, digits_sd = 1) {
-  tibble(
-    Metric = c("min", "max", "mean ± sd"),
-    Bacteria = c(
-      round(min(bac_vec), digits_range),
-      round(max(bac_vec), digits_range),
-      paste0(round(mean(bac_vec), digits_mean), " ± ", round(sd(bac_vec), digits_sd))
-    ),
-    `B > F` = c(
-      compare_symbol(min(bac_vec), min(fun_vec)),
-      compare_symbol(max(bac_vec), max(fun_vec)),
-      compare_symbol(mean(bac_vec), mean(fun_vec))
-    ),
-    Fungi = c(
-      round(min(fun_vec), digits_range),
-      round(max(fun_vec), digits_range),
-      paste0(round(mean(fun_vec), digits_mean), " ± ", round(sd(fun_vec), digits_sd))
-    )
-  ) %>%
-    add_row(Metric = paste0("**_", label, "_**"), Bacteria = "", `B > F` = "", Fungi = "", .before = 1)
-}
-
-# Combine all rows
-diversity_table <- bind_rows(
-  make_rows("γ<sub>site</sub> diversity", bac_vals$gamma, fun_vals$gamma, digits_range = 0),
-  make_rows("Sample-level α", bac_vals$alpha, fun_vals$alpha, digits_range = 0),
-  make_rows("Site mean α", bac_vals$mean_alpha, fun_vals$mean_alpha, digits_range = 0)
-)
-
-# Final table
-diversity_table %>%
-  kable(format = "html", escape = FALSE, align = c("l", "c", "c", "c"),
-        caption = "Summary of Alpha and Gamma Diversity Metrics by Kingdom") %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
-  column_spec(2:4, extra_css = "text-align: center;")
-```
 
 <table class="table table-striped table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <caption>(\#tab:diversity-summary-inline-group-labels)Summary of Alpha and Gamma Diversity Metrics by Kingdom</caption>
@@ -328,9 +112,9 @@ diversity_table %>%
   </tr>
   <tr>
    <td style="text-align:left;"> mean ± sd </td>
-   <td style="text-align:center;text-align: center;"> 5327.8 ± 1857.9 </td>
+   <td style="text-align:center;text-align: center;"> 5328 ± 1858 </td>
    <td style="text-align:center;text-align: center;"> &gt; </td>
-   <td style="text-align:center;text-align: center;"> 877.5 ± 348.5 </td>
+   <td style="text-align:center;text-align: center;"> 877 ± 348 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> **_Sample-level α_** </td>
@@ -352,9 +136,9 @@ diversity_table %>%
   </tr>
   <tr>
    <td style="text-align:left;"> mean ± sd </td>
-   <td style="text-align:center;text-align: center;"> 1112.6 ± 310.6 </td>
+   <td style="text-align:center;text-align: center;"> 1113 ± 311 </td>
    <td style="text-align:center;text-align: center;"> &gt; </td>
-   <td style="text-align:center;text-align: center;"> 145.6 ± 53.4 </td>
+   <td style="text-align:center;text-align: center;"> 146 ± 53 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> **_Site mean α_** </td>
@@ -376,9 +160,9 @@ diversity_table %>%
   </tr>
   <tr>
    <td style="text-align:left;"> mean ± sd </td>
-   <td style="text-align:center;text-align: center;"> 1081.5 ± 249.9 </td>
+   <td style="text-align:center;text-align: center;"> 1082 ± 250 </td>
    <td style="text-align:center;text-align: center;"> &gt; </td>
-   <td style="text-align:center;text-align: center;"> 142.8 ± 51.6 </td>
+   <td style="text-align:center;text-align: center;"> 143 ± 52 </td>
   </tr>
 </tbody>
 </table>
@@ -387,7 +171,7 @@ diversity_table %>%
 \
 \
 
-## Full Tables of gamma and alpha diversity metrics with derived measures by Site for Bacteria and Fungi {.tabset .tabset-pills}
+## Tables of gamma and alpha diversity metrics with derived measures by Site for Bacteria and Fungi {.tabset .tabset-pills}
 
 \
 
@@ -404,10 +188,10 @@ Bac_gamma_Site3 %>%
       # ,format.args = format(list(big.mark = ',', digit))
       ) %>%
   kable_styling() %>%
-  scroll_box(width = "90%", height = "550px")
+  scroll_box(width = "90%", height = "250px")
 ```
 
-<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:550px; overflow-x: scroll; width:90%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:250px; overflow-x: scroll; width:90%; "><table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:unnamed-chunk-1)Gamma diversity of sites: bacteria</caption>
  <thead>
   <tr>
@@ -663,10 +447,10 @@ Fun_gamma_Site3 %>%
       # ,format.args = format(list(big.mark = ',', digit))
       ) %>%
   kable_styling() %>%
-  scroll_box(width = "90%", height = "550px")
+  scroll_box(width = "90%", height = "250px")
 ```
 
-<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:550px; overflow-x: scroll; width:90%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:250px; overflow-x: scroll; width:90%; "><table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:unnamed-chunk-2)Gamma diversity of sites: fungi</caption>
  <thead>
   <tr>
@@ -908,33 +692,153 @@ Fun_gamma_Site3 %>%
 \
 
 
+# Mean beta dissimilarities by Site
+
+\
+
+## Background 
+
+\
+
+If two groups of sampling units are truly different (e.g. in their species composition), then average of the within-group compositional dissimilarities should be less than the average of the dissimilarities between two random collection of sampling units drawn from the entire population.\
+
+**Within-group (Site) values should be << the overall/global average if true difference in location (differences in mean *or* dispersion) exists.**\
+
+This difference may be one of location (differences in mean) or one of spread (differences in within-group distance). That is, it may find a significant difference between two groups simply because one of those groups has a greater dissimilarities among its sampling units.\
+\
+
+
+
+
+
+
+
+
+
+
+
+
+\
+
+## Bacterial vs. fungal mean dissimilarity by Site
 
 
 ``` r
-# summary stats
-paste0("Sample Alpha - min: ",
-  min(fwc_alpha_Site$Observed),", max: ",max(fwc_alpha_Site$Observed),", mean: ",round(mean(fwc_alpha_Site$Observed),0),", sd: ",round(sd(fwc_alpha_Site$Observed),0)
+# Extract summaries
+sum_bac <- summary(md_bwc_Site)
+sum_fun <- summary(md_Fwc_Site)
+
+# Extract key values
+mean_bac_within <- round(sum_bac$W, 4)
+mean_fun_within <- round(sum_fun$W, 4)
+mean_bac_between <- round(sum_bac$B, 4)
+mean_fun_between <- round(sum_fun$B, 4)
+mean_bac_overall <- round(sum_bac$D, 4)
+mean_fun_overall <- round(sum_fun$D, 4)
+
+# Comparison symbol
+compare_symbol <- function(bac, fun, tol = 1e-6) {
+  if (abs(bac - fun) < tol) {
+    "="
+  } else if (bac > fun) {
+    ">"
+  } else {
+    "<"
+  }
+}
+
+comp_col <- c(
+  compare_symbol(mean_bac_within, mean_fun_within),
+  compare_symbol(mean_bac_between, mean_fun_between),
+  compare_symbol(mean_bac_overall, mean_fun_overall)
 )
 
-paste0("Site gamma - min: ",
-  min(Fun_gamma_Site),", max: ",max(Fun_gamma_Site),", mean: ",round(mean(Fun_gamma_Site),0),", sd: ",round(sd(Fun_gamma_Site),0)
+# Build comparison table
+summary_table <- tibble(
+  Metric = c("Mean within-group", "Mean between-group", "Overall mean"),
+  Bacteria = c(mean_bac_within, mean_bac_between, mean_bac_overall),
+  `B < F` = comp_col,
+  Fungi = c(mean_fun_within, mean_fun_between, mean_fun_overall)
 )
 
-paste0("Site mean alpha - min: ",
-  round(min(Fun_obs_mean_alpha$Observed),1),", max: ",round(max(Fun_obs_mean_alpha$Observed),1),", mean: ",round(mean(Fun_obs_mean_alpha$Observed),1),", sd: ",round(sd(Fun_obs_mean_alpha$Observed),1)
-)
+# Print side-by-side comparison table
+summary_table %>%
+  kable(format = "html", caption = "Comparison of bacterial and fungal mean within- and between-Site Sørensen pairwise dissimilarities") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
+  column_spec(2:4, extra_css = "text-align: center;")
 ```
 
+<table class="table table-striped table-condensed" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>(\#tab:compare-meandist-summary)Comparison of bacterial and fungal mean within- and between-Site Sørensen pairwise dissimilarities</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Metric </th>
+   <th style="text-align:right;"> Bacteria </th>
+   <th style="text-align:left;"> B &lt; F </th>
+   <th style="text-align:right;"> Fungi </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Mean within-group </td>
+   <td style="text-align:right;text-align: center;"> 0.5661 </td>
+   <td style="text-align:left;text-align: center;"> &lt; </td>
+   <td style="text-align:right;text-align: center;"> 0.6539 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Mean between-group </td>
+   <td style="text-align:right;text-align: center;"> 0.6961 </td>
+   <td style="text-align:left;text-align: center;"> &lt; </td>
+   <td style="text-align:right;text-align: center;"> 0.8302 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Overall mean </td>
+   <td style="text-align:right;text-align: center;"> 0.6892 </td>
+   <td style="text-align:left;text-align: center;"> &lt; </td>
+   <td style="text-align:right;text-align: center;"> 0.8209 </td>
+  </tr>
+</tbody>
+</table>
+
+[*Between-Kingdom Comparisons*]{.underline}
+
+Among all samples, fungi had the higher overall mean Sørensen dissimilarity value across all sites and samples, with a value of 0.8209 compared to 0.6892 for bacteria.
+
+Within-site dissimilarity (0.6539 for fungi, 0.5661 for bacteria) was greater for fungi, suggesting higher spatial turnover or within-site heterogeneity for the fungal community.
+
+[*Among-Kingdom Comparisons*]{.underline}
+
+For **bacteria**, the within-group dissimilarity (0.5661) was lower than the overall average (0.6892), indicating that samples from the same site were more compositionally similar than samples across all sites. This pattern suggests that site identity explains some of the bacterial compositional variation.
+
+Similarly, for **fungi**, within-site dissimilarity was lower than the overall dissimilarity, suggesting that fungal samples from the same site were more similar to each other compared to the global average.
+
+In both domains, a **between-group mean dissimilarity** (0.6961 for bacteria, 0.8302 for fungi) greater than the within-group value suggests that Site did influence the presence/absence-based of compositional structure of communities — either due to differences in **mean community composition** (location) or **dispersion** (variability within sites).
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/five-num-summary-bacteria-fungi-1.png)<!-- -->
+
+
+## strat by F1 vs non-F1 [in-progress]
+
+
+
+
+
+\
+\
 \
 
-### Full Table: Fungal Gamma and alpha diversity with derived measures by Site
 
 
 \
 
-# Beta dispersion by site
+\
 
-## Calculate multivariate dispersions {.tabset}
+
+# Beta dispersion (variance) by site
+
+Implementation of Marti Anderson's PERMDISP2 procedure for the analysis of multivariate homogeneity of group dispersions (variances). `vegan::betadisper()` is a multivariate analogue of Levene's test for homogeneity of variances.  
+
+## Calculate betadisp dispersions by site {.hidden .unlisted .unnumbered}
 
 
 ``` r
@@ -1004,7 +908,10 @@ perform_anova_betadisper <- function(betadisper_object, grouping) {
 }
 ```
 
-### Bac {.unnumbered}
+## Results: Homogeneity of multivariate dispersions - site dispersions {.tabset}
+
+
+### Bac 
 
 \
 range of site dispersions:
@@ -1038,10 +945,10 @@ betadisp_Site_Bac_addC
 ## No. of Negative Eigenvalues: 0
 ## 
 ## Average distance to median:
-##    BLM    BNP    CAD    CNF    CPR    DMT    FCP    FMT    GMT    GNF    HAR    HPG 
-## 0.4160 0.4380 0.4190 0.4509 0.3763 0.4599 0.4302 0.4410 0.3890 0.3820 0.4251 0.3778 
-##    KAE    KNZ    LAR    LBJ    NWP    ONF    RNF    SEV    SFA    UHC 
-## 0.5076 0.3898 0.4232 0.4421 0.3957 0.4041 0.3596 0.4091 0.4193 0.4011 
+##    BLM    BNP    CAD    CNF    CPR    DMT    FCP    FMT    GMT    GNF    HAR    HPG    KAE 
+## 0.4160 0.4380 0.4190 0.4509 0.3763 0.4599 0.4302 0.4410 0.3890 0.3820 0.4251 0.3778 0.5076 
+##    KNZ    LAR    LBJ    NWP    ONF    RNF    SEV    SFA    UHC 
+## 0.3898 0.4232 0.4421 0.3957 0.4041 0.3596 0.4091 0.4193 0.4011 
 ## 
 ## Eigenvalues for PCoA axes:
 ## (Showing 8 of 482 eigenvalues)
@@ -1051,7 +958,7 @@ betadisp_Site_Bac_addC
 
 \
 
-#### Perform ANOVA
+#### Perform ANOVA {.hidden .unlisted .unnumbered}
 
 probably removing in favor of perm F test (following)
 
@@ -1066,62 +973,15 @@ betadisp_Site_Bac.aov<-perform_anova_betadisper(betadisp_Site_Bac_addC, "Site")
 ``` r
 betadisp_Site_Bac.aov %>% kbl() %>% kable_styling()
 ```
-
-<table class="table" style="margin-left: auto; margin-right: auto;">
- <thead>
-  <tr>
-   <th style="text-align:left;"> Term </th>
-   <th style="text-align:right;"> df </th>
-   <th style="text-align:right;"> SumSq </th>
-   <th style="text-align:right;"> MeanSq </th>
-   <th style="text-align:right;"> F.statistic </th>
-   <th style="text-align:right;"> R_squared </th>
-   <th style="text-align:left;"> p.value </th>
-   <th style="text-align:left;"> P.value </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Site </td>
-   <td style="text-align:right;"> 21 </td>
-   <td style="text-align:right;"> 0.50 </td>
-   <td style="text-align:right;"> 0.024 </td>
-   <td style="text-align:right;"> 14.1 </td>
-   <td style="text-align:right;"> 39.07 </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;"> 8.8e-38 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Residuals </td>
-   <td style="text-align:right;"> 462 </td>
-   <td style="text-align:right;"> 0.78 </td>
-   <td style="text-align:right;"> 0.002 </td>
-   <td style="text-align:right;">  </td>
-   <td style="text-align:right;"> 60.93 </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;">  </td>
-  </tr>
-</tbody>
-</table>
 \
 
 #### Permutation test for F with post-hoc Tukey's HSD {.tabset}
 
 \
-`vegan::permutest(betadisp_Site_Bac_addC, permutations = 999, pairwise = F)`
+`vegan::permutest(betadisp_Site_Bac_addC, permutations = 999)`
 
 
-``` r
-## Permutation test for F
-betadisp_Site_Bac.pmod <- permutest(betadisp_Site_Bac_addC, permutations = 999, pairwise = F)
 
-bdr2Bac<-prettyNum(betadisp_Site_Bac.pmod$tab$`Sum Sq`[1]/(sum(betadisp_Site_Bac.pmod$tab$`Sum Sq`)),digits=3)
-```
-
-
-``` r
-betadisp_Site_Bac.pmod
-```
 
 ```
 ## 
@@ -1137,13 +997,17 @@ betadisp_Site_Bac.pmod
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
+
 \
 \
+
 [Impact of site on explainable variability of beta dispersions:]{.underline}
 
 Permuted $F$ = 14.104\
 
 Calculated $R^2$ = 0.391\
+
+Site had a significant influence on bacterial community variance, explaining a calculated 39.1% of the beta dispersion variability (permuted $F$ = 14.104).\
 \
 
 [**Post-hoc: compute Tukey HSD**]{.underline}\
@@ -1622,6 +1486,10 @@ bdHSDBacs %>%
 </table></div>
 
 \
+
+Of a total of 231 pairwise site-site comparisons, only 62 were significantly different.
+
+\
 \
 
 ### Fun {.unnumbered}
@@ -1658,10 +1526,10 @@ betadisp_Site_Fun_addC
 ## No. of Negative Eigenvalues: 0
 ## 
 ## Average distance to median:
-##    BLM    BNP    CAD    CNF    CPR    DMT    FCP    FMT    GMT    GNF    HAR    HPG 
-## 0.6057 0.7496 0.7428 0.5813 0.6723 0.7698 0.7479 0.7450 0.5467 0.6628 0.7317 0.6494 
-##    KAE    KNZ    LAR    LBJ    NWP    ONF    RNF    SEV    SFA    UHC 
-## 0.7217 0.7067 0.6819 0.5967 0.5859 0.5951 0.5836 0.7140 0.6288 0.5630 
+##    BLM    BNP    CAD    CNF    CPR    DMT    FCP    FMT    GMT    GNF    HAR    HPG    KAE 
+## 0.6057 0.7496 0.7428 0.5813 0.6723 0.7698 0.7479 0.7450 0.5467 0.6628 0.7317 0.6494 0.7217 
+##    KNZ    LAR    LBJ    NWP    ONF    RNF    SEV    SFA    UHC 
+## 0.7067 0.6819 0.5967 0.5859 0.5951 0.5836 0.7140 0.6288 0.5630 
 ## 
 ## Eigenvalues for PCoA axes:
 ## (Showing 8 of 482 eigenvalues)
@@ -1671,64 +1539,11 @@ betadisp_Site_Fun_addC
 
 \
 
-#### Perform ANOVA
-
-probably removing in favor of perm F test (following)
-
-`betadisp_Site_Fun.aov <- perform_anova_betadisper(betadisp_Site_Fun_addC, "Site")`
-
-
-``` r
-betadisp_Site_Fun.aov<-perform_anova_betadisper(betadisp_Site_Fun_addC, "Site")
-```
-
-
-``` r
-betadisp_Site_Fun.aov %>% kbl() %>% kable_styling()
-```
-
-<table class="table" style="margin-left: auto; margin-right: auto;">
- <thead>
-  <tr>
-   <th style="text-align:left;"> Term </th>
-   <th style="text-align:right;"> df </th>
-   <th style="text-align:right;"> SumSq </th>
-   <th style="text-align:right;"> MeanSq </th>
-   <th style="text-align:right;"> F.statistic </th>
-   <th style="text-align:right;"> R_squared </th>
-   <th style="text-align:left;"> p.value </th>
-   <th style="text-align:left;"> P.value </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> Site </td>
-   <td style="text-align:right;"> 21 </td>
-   <td style="text-align:right;"> 2.46 </td>
-   <td style="text-align:right;"> 0.117 </td>
-   <td style="text-align:right;"> 68.94 </td>
-   <td style="text-align:right;"> 75.81 </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;"> 9.5e-128 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Residuals </td>
-   <td style="text-align:right;"> 462 </td>
-   <td style="text-align:right;"> 0.79 </td>
-   <td style="text-align:right;"> 0.002 </td>
-   <td style="text-align:right;">  </td>
-   <td style="text-align:right;"> 24.19 </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;">  </td>
-  </tr>
-</tbody>
-</table>
-\
 
 #### Permutation test for F with post-hoc Tukey's HSD {.tabset}
 
 \
-`vegan::permutest(betadisp_Site_Fun_addC, permutations = 999, pairwise = F)`
+`vegan::permutest(betadisp_Site_Fun_addC, permutations = 999)`
 
 
 ``` r
@@ -1758,11 +1573,15 @@ betadisp_Site_Fun.pmod
 
 \
 \
+
 [Impact of site on explainable variability of beta dispersions:]{.underline}
 
 Permuted $F$ = 68.943\
 
 Calculated $R^2$ = 0.758\
+\
+
+Site had a very large influence on fungal community variance, explaining a calculated 75.8% of the beta dispersion variability (permuted $F$ = 68.943).
 \
 
 [**Post-hoc: compute Tukey HSD**]{.underline}\
@@ -1777,21 +1596,8 @@ bdHSDFuns<-subset(as.data.frame(betadisp_Site_Fun_addC.HSD$group),`p adj` < 0.05
 # plot(betadisp_Site_Fun_addC.HSD)
 ```
 
-
-``` r
-bdHSDFuns %>%
-  kbl(caption = "Fungi: sites with significantly different beta dispersion, subset to p.adj < 0.05 (Tukey HSD)",
-            align = 'c',
-      digits = c(3,3,3,4)
-      # col.names = c("Number of OTUs","Number of samples")
-      # format.args = format(list(big.mark = ',', digit))
-      ) %>%
-  kable_styling() %>%
-  scroll_box(width = "60%", height = "350px")
-```
-
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:350px; overflow-x: scroll; width:60%; "><table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-16)Fungi: sites with significantly different beta dispersion, subset to p.adj &lt; 0.05 (Tukey HSD)</caption>
+<caption>(\#tab:unnamed-chunk-14)Fungi: sites with significantly different beta dispersion, subset to p.adj &lt; 0.05 (Tukey HSD)</caption>
  <thead>
   <tr>
    <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">   </th>
@@ -2836,6 +2642,11 @@ bdHSDFuns %>%
 
 \
 
+Of a total of 231 pairwise site-site comparisons, 147 were significantly different.
+
+\
+\
+
 
 
 ## Table set-up {.unnumbered .unlisted .hidden}
@@ -3434,6 +3245,10 @@ Fun_gamma_Site.df[,c(1:8,11)] %>% kbl() %>% kable_styling() %>%
 
 \
 
+
+
+
+
 ### Bac
 
 
@@ -3485,8 +3300,6 @@ Fun_Site.anosim
 \
 
 
-
-
 \
 
 # Tables: alpha beta gamma diversity of sites {.tabset}
@@ -3512,7 +3325,7 @@ Bac_gamma_Site.dfclean%>% kbl(caption = "Bacteria: alpha beta gamma diversity of
 ```
 
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:95%; "><table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-21)Bacteria: alpha beta gamma diversity of sites</caption>
+<caption>(\#tab:unnamed-chunk-19)Bacteria: alpha beta gamma diversity of sites</caption>
  <thead>
   <tr>
    <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Site </th>
@@ -3792,7 +3605,7 @@ Fun_gamma_Site.dfclean%>% kbl(caption = "Fungi: alpha beta gamma diversity of si
 ```
 
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:95%; "><table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-22)Fungi: alpha beta gamma diversity of sites</caption>
+<caption>(\#tab:unnamed-chunk-20)Fungi: alpha beta gamma diversity of sites</caption>
  <thead>
   <tr>
    <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Site </th>
@@ -4086,7 +3899,7 @@ ggdensity(Bac_gamma_Site.df$`Gamma (# total unique OTUs)`,
           add = "mean",xlim = c(2000, 9000),rug=T)
 ```
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-23-1.png" width="40%" /><img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-23-2.png" width="40%" />
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-21-1.png" width="40%" /><img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-21-2.png" width="40%" />
 
 \
 
@@ -4113,15 +3926,126 @@ ggdensity(Fun_gamma_Site.df$`Gamma (# total unique OTUs)`,
           add = "mean",xlim = c(0, 1450),rug=T)
 ```
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-24-1.png" width="40%" /><img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-24-2.png" width="40%" />
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-22-1.png" width="40%" /><img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_AlphaBetaGamma_BySite_files/figure-html/unnamed-chunk-22-2.png" width="40%" />
 
 \
 
-## kruskal.test
+## kruskal.tests
 
 [in-progress]
 
-Predictor: # of grass hosts per site
+### Predictor: Size of Contra-kingdom Regional Species Pool (Response contra-kindgom gamma)
+
+Does bacterial gamma influence fungal gamma? yes
+
+
+``` r
+# does fun gamma vary by gamma of bac
+kruskal.test(fwc_alpha_Site$Fun_gamma_Site~bwc_alpha_Site$Bac_gamma_Site)
+```
+
+```
+## 
+## 	Kruskal-Wallis rank sum test
+## 
+## data:  fwc_alpha_Site$Fun_gamma_Site by bwc_alpha_Site$Bac_gamma_Site
+## Kruskal-Wallis chi-squared = 483, df = 21, p-value < 2.2e-16
+```
+
+    - after normalizing by nsamples per site?
+
+``` r
+# does fun gamma vary by gamma of bac
+kruskal.test(fwc_alpha_Site$Fun_Gamma_over_n~bwc_alpha_Site$Bac_Gamma_over_n)
+```
+
+```
+## 
+## 	Kruskal-Wallis rank sum test
+## 
+## data:  fwc_alpha_Site$Fun_Gamma_over_n by bwc_alpha_Site$Bac_Gamma_over_n
+## Kruskal-Wallis chi-squared = 483, df = 21, p-value < 2.2e-16
+```
+        - still yes
+
+
+Does fungal gamma influence bacterial gamma? yes
+
+
+``` r
+# does bac gamma vary by gamma of fun
+kruskal.test(bwc_alpha_Site$Bac_gamma_Site~fwc_alpha_Site$Fun_gamma_Site)
+```
+
+```
+## 
+## 	Kruskal-Wallis rank sum test
+## 
+## data:  bwc_alpha_Site$Bac_gamma_Site by fwc_alpha_Site$Fun_gamma_Site
+## Kruskal-Wallis chi-squared = 483, df = 21, p-value < 2.2e-16
+```
+
+    - after normalizing by nsamples per site?
+
+``` r
+# does bac gamma vary by gamma of fun
+kruskal.test(bwc_alpha_Site$Bac_Gamma_over_n~fwc_alpha_Site$Fun_Gamma_over_n)
+```
+
+```
+## 
+## 	Kruskal-Wallis rank sum test
+## 
+## data:  bwc_alpha_Site$Bac_Gamma_over_n by fwc_alpha_Site$Fun_Gamma_over_n
+## Kruskal-Wallis chi-squared = 483, df = 21, p-value < 2.2e-16
+```
+        - still yes
+
+
+
+
+\
+\
+
+### Predictor: Contra-kingdom Richness (Response Richness)
+
+Does bacterial richness influence fungal richness? no
+
+
+``` r
+# does sample alpha vary by Observed of bac
+kruskal.test(fwc_alpha_Site$Observed~bwc_alpha_Site$Observed)
+```
+
+```
+## 
+## 	Kruskal-Wallis rank sum test
+## 
+## data:  fwc_alpha_Site$Observed by bwc_alpha_Site$Observed
+## Kruskal-Wallis chi-squared = 404.16, df = 390, p-value = 0.2999
+```
+
+Does fungal richness influence bacterial richness? YES
+
+
+``` r
+# does bac sample alpha vary by Observed of fun
+kruskal.test(bwc_alpha_Site$Observed~fwc_alpha_Site$Observed)
+```
+
+```
+## 
+## 	Kruskal-Wallis rank sum test
+## 
+## data:  bwc_alpha_Site$Observed by fwc_alpha_Site$Observed
+## Kruskal-Wallis chi-squared = 236.23, df = 184, p-value = 0.005623
+```
+
+
+
+
+
+### Predictor: # of grass hosts per site
 
 
 
