@@ -78,6 +78,11 @@ rmarkdown::render("code/nestedness_sites_clusters.Rmd", output_file="/Users/L347
 #render nestedness_sites_clusters - doesnt work from here, needs new session
 rmarkdown::render("code/nestedness_clusters_v2.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_nestedness_clusters_v2")
 
+
+
+#render F1_vs_nonF1_v2
+rmarkdown::render("code/F1_vs_nonF1_v2.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1")
+
 ```
 
 \
@@ -109,11 +114,11 @@ as a link: <a href="DistributionOfDarksideaMono.html" target="_blank">Distributi
 
 -   <a href="github_darksidea_allSamplesincEDGE.html" target="_blank">Full untrimmed input data: [all samples]{.underline}; EDGE samples included, samples with missing pairs included (last updated 21 July 2024)</a>
 
-    -   changes: increased n of samples from 484 to 654, n SEV samples increased from 10 to 53, *Monosporascus* detectedat the SEV (1 OTU found in 2.7% of *Black grama* SEV soils with mean relative abundance of 1.9%, when present)
+    -   changes: increased n of samples from 484 to 654, n SEV samples increased from 10 to 53, *Monosporascus* detected at the SEV (1 OTU found in 2.7% of *Black grama* SEV soils with mean relative abundance of 1.9%, when present)
 
-\
-\
-\
+        \
+        \
+        \
 
 ## Pulling story elements for manuscript {.unnumbered}
 
@@ -130,6 +135,12 @@ as a link: <a href="DistributionOfDarksideaMono.html" target="_blank">Distributi
     -   Partitioning β-diversity of bacterial and fungal communities at landscape-scale, regional (site) scale, and among sub-assemblages
 
     -   working on some fixes still, current as of 7/26/24
+
+<!-- -->
+
+-   Spatial Origins and Cross-Kingdom Congruence in Bacterial and Fungal Communities
+
+    -   <a href="github_F1_vs_nonF1.html" target="_blank">Contrasting fungal F1 subassemblage vs. non-F1 subassemblages and associated bacterial communities</a> (last updated 24 Mar 2025)
 
 \
 \
