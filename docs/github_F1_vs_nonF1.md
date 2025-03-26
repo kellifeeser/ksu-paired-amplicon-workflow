@@ -1,8 +1,8 @@
 ---
 title: "RAM: Spatial Origins and Cross-Kingdom Congruence in Bacterial and Fungal Communities"
-subtitle: "Constrasting fungal F1 subassemblage vs. non-F1 subassemblages and associated bacterial communities"
+subtitle: "Contrasting fungal F1 subassemblage vs. non-F1 subassemblages and associated bacterial communities"
 author: "Kelli Feeser"
-date: "2025-03-24"
+date: "2025-03-25"
 output:
   bookdown::html_document2:
     code_folding: hide
@@ -46,7 +46,7 @@ notes:
 
 ------------------------------------------------------------------------
 
-Document last updated: 2025-03-24
+Document last updated: 2025-03-25
 
 ------------------------------------------------------------------------
 
@@ -71,18 +71,17 @@ Document last updated: 2025-03-24
 ## Baseline Model: Spatial Origins of Compositional Structure
 
 - A spatial structure in a response matrix Y can emerge from:
-  - (i) **Spatial autocorrelation**: biotic processes internal to communities
-  - (ii) **Induced spatial dependence**: spatially structured external environmental gradients
+  (i) **Spatial autocorrelation**: biotic processes internal to communities
+  (ii) **Induced spatial dependence**: spatially structured external environmental gradients
 - We follow the framework of [@lichstein2007plant] and [@borcard2018numerical] to disentangle these components.
 
-## Geographic and Community Dissimilarity Matrices
+## Geographic and Community Dissimilarity Matrices {.hidden}
 
+# Results
 
+## Spatial distance distributions
 
-# not integrated
-# Spatial distance
-
-## Fungal F1 vs. non-F1 - comparisons of pairwise geographic distances between samples within each subassemblage group
+### Fungal F1 vs. non-F1 - comparisons of pairwise geographic distances between samples within each subassemblage group
 
 
 
@@ -134,21 +133,14 @@ if (ad_f1$p.value > 0.05 & ad_nonf1$p.value > 0.05 &
   test_label <- "Wilcoxon rank-sum test"
 }
 
-# Add flags to summary table
-summary_stats <- summary_stats %>%
-  mutate(
-    Normality = c(ifelse(ad_f1$p.value < 0.05, "No", "Yes"),
-                  ifelse(ad_nonf1$p.value < 0.05, "No", "Yes"))
-  )
-
 var_p <- var_test$`Pr(>F)`[1]
 mean_p <- mean_test$p.value
 
-summary_stats <- summary_stats %>%
-  mutate(
-    Var_Differs = ifelse(var_p < 0.05, "Yes", "No"),
-    Mean_Differs = ifelse(mean_p < 0.05, "Yes", "No")
-  )
+# summary_stats <- summary_stats %>%
+#   mutate(
+#     Var_Differs = ifelse(var_p < 0.05, "Yes", "No"),
+#     Mean_Differs = ifelse(mean_p < 0.05, "Yes", "No")
+#   )
 
 # Custom colors
 col_f1 <- "#8E0152"; col_f1_line <- "#8E015266"
@@ -165,7 +157,7 @@ black_theme <- theme_minimal(base_size = 14) +
     strip.text = element_text(color = "black")
   )
 
-# Q–Q plots
+# Q–Q plots ----
 qq_f1 <- ggplot(data.frame(Distance = vec1), aes(sample = Distance)) +
   stat_qq(color = col_f1) + stat_qq_line(color = col_f1_line) +
   labs(title = "Q–Q Plot: F1") +
@@ -176,7 +168,7 @@ qq_nonf1 <- ggplot(data.frame(Distance = vec2), aes(sample = Distance)) +
   labs(title = "Q–Q Plot: non-F1") +
   black_theme
 
-# Violin + boxplot
+# Violin + boxplot ----
 p_dist <- ggplot(dist_df, aes(x = Group, y = Distance, fill = Group)) +
   geom_violin(trim = FALSE, alpha = 0.3) +
   geom_boxplot(width = 0.18, outlier.shape = NA, alpha = 0.9) +
@@ -186,7 +178,7 @@ p_dist <- ggplot(dist_df, aes(x = Group, y = Distance, fill = Group)) +
   black_theme +
   theme(legend.position = "none")
 
-# Combine plots
+# Combine plots ----
 plot_grid(
   plot_grid(qq_f1, qq_nonf1, labels = c("A", "B"), ncol = 2),
   p_dist,
@@ -201,9 +193,17 @@ plot_grid(
 
 
 
+
+
+
+
+
+
+
+
 ``` r
 library(spam)
-
+library(moments)
 # Convert dist objects to vectors
 vec1 <- as.numeric(dist1)
 vec2 <- as.numeric(dist2)
@@ -219,35 +219,40 @@ summary_stats <- dist_df %>%
   dplyr::group_by(Group) %>%
   dplyr::summarise(
     N = n(),
-    Mean = mean(Distance),
-    SD = sd(Distance),
-    Median = median(Distance),
+    Mean = round(mean(Distance),1),
+    SD = round(sd(Distance),1),
+    Median = round(median(Distance),1),
     Min = min(Distance),
-    Max = max(Distance),
-    Variance = var(Distance),
-    Skewness = skewness(Distance),
-    Kurtosis = kurtosis(Distance),
+    Max = round(max(Distance),1),
+    Variance = round(var(Distance),1),
+    Skewness = round(skewness(Distance),3),
+    Kurtosis = round(kurtosis(Distance),3),
     .groups = "drop"
+  )
+
+# Add flags to summary table for Normality
+summary_stats <- summary_stats %>%
+  mutate(
+    Normality = c(
+      glue::glue("{ifelse(ad_f1$p.value < 0.05, 'No', 'Yes')} (A = {round(ad_f1$statistic, 1)}, p = {signif(ad_f1$p.value, 3)})"),
+      glue::glue("{ifelse(ad_nonf1$p.value < 0.05, 'No', 'Yes')} (A = {round(ad_nonf1$statistic, 1)}, p = {signif(ad_nonf1$p.value, 3)})")
+    )
   )
 
 # Extended stats
 f1_ext <- data.frame(
   Group = "F1",
-  IQR = IQR(vec1),
-  Range = diff(range(vec1)),
-  CV = sd(vec1) / mean(vec1)
+  IQR = round(IQR(vec1),1),
+  Range = round(diff(range(vec1)),1),
+  CV = round(sd(vec1) / mean(vec1),4)
 )
 nf1_ext <- data.frame(
   Group = "non-F1",
-  IQR = IQR(vec2),
-  Range = diff(range(vec2)),
-  CV = sd(vec2) / mean(vec2)
+  IQR = round(IQR(vec2),1),
+  Range = round(diff(range(vec2)),1),
+  CV = round(sd(vec2) / mean(vec2),4)
 )
 
-
-# Convert all numeric columns in summary_stats to character
-summary_stats <- summary_stats %>%
-  mutate(across(where(is.numeric), ~ format(round(.x, 2), nsmall = 2)))
 
 
 # Merge
@@ -259,11 +264,11 @@ summary_stats <- summary_stats %>%
 ad_f1 <- nortest::ad.test(vec1)
 ad_nf1 <- nortest::ad.test(vec2)
 
-## Variance test
-var_test <- leveneTest(Distance ~ Group, data = dist_df)
+## Variance test ----
+var_test <- car::leveneTest(Distance ~ Group, data = dist_df)
 var_p <- var_test$`Pr(>F)`[1]
 
-## Mean test
+## Mean test ----
 mean_test <- if (ad_f1$p.value > 0.05 && ad_nf1$p.value > 0.05 &&
                  abs(var(vec1) - var(vec2)) < 0.5 * max(var(vec1), var(vec2))) {
   t.test(Distance ~ Group, data = dist_df)
@@ -272,17 +277,17 @@ mean_test <- if (ad_f1$p.value > 0.05 && ad_nf1$p.value > 0.05 &&
 }
 mean_p <- mean_test$p.value
 
-## Median test
+## Median test ----
 median_test_res <- coin::median_test(Distance ~ Group, data = dist_df, exact = FALSE)
 median_p <- coin::pvalue(median_test_res)
 
-## Effect size: Cohen's d
+## Effect size: Cohen's d ----
 cohen_d <- abs(mean(vec1) - mean(vec2)) / sqrt(((sd(vec1)^2 + sd(vec2)^2) / 2))
 
-## Log-response ratio
+## Log-response ratio ----
 log_ratio <- log(mean(vec1) / mean(vec2))
 
-# Bootstrapped CI: Cohen's d
+# Bootstrapped CI: Cohen's d ----
 cohen_d_boot <- function(x, y, R = 1000) {
   data <- c(x, y)
   boot_fun <- function(d, i) {
@@ -296,7 +301,7 @@ cohen_d_boot <- function(x, y, R = 1000) {
 }
 ci_d <- cohen_d_boot(vec1, vec2)
 
-# Bootstrapped CI: Log-response
+# Bootstrapped CI: Log-response ----
 log_ratio_boot <- function(x, y, R = 1000) {
   data <- c(x, y)
   boot_fun <- function(d, i) {
@@ -310,7 +315,7 @@ log_ratio_boot <- function(x, y, R = 1000) {
 }
 ci_lr <- log_ratio_boot(vec1, vec2)
 
-# Boot CI for skewness & kurtosis
+# Boot CI for skewness & kurtosis ----
 boot_ci_metric <- function(x, metric_fun, R = 1000) {
   boot_obj <- boot::boot(x, function(data, i) metric_fun(data[i]), R = R)
   boot::boot.ci(boot_obj, type = "perc")$percent[4:5]
@@ -324,43 +329,165 @@ kurt_ci_f1 <- round(boot_ci_metric(vec1, kurtosis), 2)
 kurt_ci_nf1 <- round(boot_ci_metric(vec2, kurtosis), 2)
 kurt_differs <- ifelse(kurt_ci_f1[2] < kurt_ci_nf1[1] || kurt_ci_nf1[2] < kurt_ci_f1[1], "different", "not different")
 
-# Create comparison row
+
+# Pre-calculate the directional comparisons for comparison row ----
+# Sample sizes/n pairwise comparisons
+n_f1 <- sum(dist_df$Group == "F1")
+n_nf1 <- sum(dist_df$Group != "F1")
+n_direction <- ifelse(
+  n_f1 == n_nf1,
+  "F1 = non-F1",
+  ifelse(n_f1 > n_nf1, "F1 > non-F1", "F1 < non-F1")
+)
+
+# Standard deviation
+sd_direction <- ifelse(
+  stddev_f1 == stddev_nf1,
+  "F1 = non-F1",
+  ifelse(stddev_f1 > stddev_nf1, "F1 > non-F1", "F1 < non-F1")
+)
+# Optional: Use a numerical tolerance to treat nearly equal values as equal
+  # You might want to treat values as equal if the absolute difference is smaller than a threshold, e.g., 1e-8. In that case:
+  # sd_direction <- ifelse(
+  #   abs(stddev_f1 - stddev_nf1) < 1e-8,
+  #   "F1 = non-F1",
+  #   ifelse(stddev_f1 > stddev_nf1, "F1 > non-F1", "F1 < non-F1")
+  # )
+
+# Min
+min_f1 <- min(dist_df$Distance[dist_df$Group == "F1"])
+min_nf1 <- min(dist_df$Distance[dist_df$Group != "F1"])
+min_direction <- ifelse(
+  min_f1 == min_nf1,
+  "F1 = non-F1",
+  ifelse(min_f1 > min_nf1, "F1 > non-F1", "F1 < non-F1")
+)
+
+
+# Max
+max_f1 <- max(dist_df$Distance[dist_df$Group == "F1"])
+max_nf1 <- max(dist_df$Distance[dist_df$Group != "F1"])
+max_direction <- ifelse(
+  max_f1 == max_nf1,
+  "F1 = non-F1",
+  ifelse(max_f1 > max_nf1, "F1 > non-F1", "F1 < non-F1")
+)
+
+# IQR
+iqr_f1 <- IQR(dist_df$Distance[dist_df$Group == "F1"])
+iqr_nf1 <- IQR(dist_df$Distance[dist_df$Group != "F1"])
+iqr_direction <- ifelse(
+  iqr_f1 == iqr_nf1,
+  "F1 = non-F1",
+  ifelse(iqr_f1 > iqr_nf1, "F1 > non-F1", "F1 < non-F1")
+)
+
+# Range
+range_f1 <- diff(range(dist_df$Distance[dist_df$Group == "F1"]))
+range_nf1 <- diff(range(dist_df$Distance[dist_df$Group != "F1"]))
+range_direction <- ifelse(
+  range_f1 == range_nf1,
+  "F1 = non-F1",
+  ifelse(range_f1 > range_nf1, "F1 > non-F1", "F1 < non-F1")
+)
+
+# CV
+cv_f1 <- stddev_f1 / mean(dist_df$Distance[dist_df$Group == "F1"])
+cv_nf1 <- stddev_nf1 / mean(dist_df$Distance[dist_df$Group != "F1"])
+cv_direction <- ifelse(
+  cv_f1 == cv_nf1,
+  "F1 = non-F1",
+  ifelse(cv_f1 > cv_nf1, "F1 > non-F1", "F1 < non-F1")
+)
+
+# Create comparison row ----
 comparison_row <- data.frame(
   Group = "Comparison",
-  N = NA,
-  Mean = as.character(glue::glue("{ifelse(mean_p < 0.05, 'different', 'not different')} (p = {signif(mean_p, 3)})")),
-  SD = NA,
-  Median = as.character(glue::glue("{ifelse(median_p < 0.05, 'different', 'not different')} (p = {signif(median_p, 3)})")),
-  Min = NA,
-  Max = NA,
-  Variance = as.character(glue::glue("{ifelse(var_p < 0.05, 'different', 'not different')} (p = {signif(var_p, 3)})")),
-  Skewness = as.character(glue::glue("{skew_differs} (CI F1: {skew_ci_f1[1]}–{skew_ci_f1[2]}, non-F1: {skew_ci_nf1[1]}–{skew_ci_nf1[2]})")),
-  Kurtosis = as.character(glue::glue("{kurt_differs} (CI F1: {kurt_ci_f1[1]}–{kurt_ci_f1[2]}, non-F1: {kurt_ci_nf1[1]}–{kurt_ci_nf1[2]})")),
-  IQR = NA,
-  Range = NA,
-  CV = NA,
+  
+  # Now includes total sample size as "F1 = n, non-F1 = n"
+  N = glue::glue("F1 = {n_f1}, non-F1 = {n_nf1}"),
+  
+  Mean = as.character(glue::glue("{ifelse(mean_p < 0.05, 'different', 'not different')} (Anderson–Darling; p = {signif(mean_p, 3)})")),
+  
+  SD = sd_direction,  # Based on stddev_f1 / stddev_nf1
+  
+  Median = as.character(glue::glue("{ifelse(median_p < 0.05, 'different', 'not different')} (Mood's median test; p = {signif(median_p, 3)})")),
+  
+  Min = min_direction,
+  Max = max_direction,
+  
+  Variance = as.character(glue::glue("{ifelse(var_p < 0.05, 'different', 'not different')} (Levene's test; p = {signif(var_p, 3)})")),
+  
+  Skewness = as.character(glue::glue("{skew_differs} (Bootstrap CI, F1: {round(skew_ci_f1[1], 2)}–{round(skew_ci_f1[2], 2)}, non-F1: {round(skew_ci_nf1[1], 2)}–{round(skew_ci_nf1[2], 2)})")),
+  
+  Kurtosis = as.character(glue::glue("{kurt_differs} (Bootstrap CI, F1: {round(kurt_ci_f1[1], 2)}–{round(kurt_ci_f1[2], 2)}, non-F1: {round(kurt_ci_nf1[1], 2)}–{round(kurt_ci_nf1[2], 2)})")),
+  
+  Normality = as.character(" "),
+  IQR = iqr_direction,
+  Range = range_direction,
+  CV = cv_direction,
+  
   Cohens_d = round(cohen_d, 2),
+  Cohens_d_CI = as.character(glue::glue("{round(ci_d[1], 2)}–{round(ci_d[2], 2)}")),
+  
   Log_Response_Ratio = round(log_ratio, 2),
-  Cohens_d_CI = as.character(glue::glue("{ci_d[1]}–{ci_d[2]}")),
-  Log_Response_CI = as.character(glue::glue("{ci_lr[1]}–{ci_lr[2]}")),
+  Log_Response_CI = as.character(glue::glue("{round(ci_lr[1], 2)}–{round(ci_lr[2], 2)}")),
+  
   stringsAsFactors = FALSE
 )
 
-summary_stats_aligned <- summary_stats %>%
-  mutate(
-    IQR = NA_character_,
-    Range = NA_character_,
-    CV = NA_character_,
-    Cohens_d = NA,
-    Log_Response_Ratio = NA,
-    Cohens_d_CI = NA_character_,
-    Log_Response_CI = NA_character_
-  ) %>%
-  mutate(across(everything(), as.character))
+
+# OLDcomparison_row <- data.frame(
+#   Group = "Comparison",
+#   N = NA,
+#   Mean = as.character(glue::glue("{ifelse(mean_p < 0.05, 'different', 'not different')} (p = {signif(mean_p, 3)})")),
+#   SD = NA,
+#   Median = as.character(glue::glue("{ifelse(median_p < 0.05, 'different', 'not different')} (p = {signif(median_p, 3)})")),
+#   Min = NA,
+#   Max = NA,
+#   Variance = as.character(glue::glue("{ifelse(var_p < 0.05, 'different', 'not different')} (p = {signif(var_p, 3)})")),
+#   Skewness = as.character(glue::glue("{skew_differs} (CI F1: {skew_ci_f1[1]}–{skew_ci_f1[2]}, non-F1: {skew_ci_nf1[1]}–{skew_ci_nf1[2]})")),
+#   Kurtosis = as.character(glue::glue("{kurt_differs} (CI F1: {kurt_ci_f1[1]}–{kurt_ci_f1[2]}, non-F1: {kurt_ci_nf1[1]}–{kurt_ci_nf1[2]})")),
+#   Normality = NA,
+#   IQR = NA,
+#   Range = NA,
+#   CV = NA,
+#   Cohens_d = round(cohen_d, 2),
+#   Cohens_d_CI = as.character(glue::glue("{ci_d[1]}–{ci_d[2]}")),
+#   Log_Response_Ratio = round(log_ratio, 2),
+#   Log_Response_CI = as.character(glue::glue("{ci_lr[1]}–{ci_lr[2]}")),
+#   stringsAsFactors = FALSE
+# )
+
+# Build final group summary df----
+
+summary_stats$Cohens_d <- c(" "," ")
+summary_stats$Cohens_d_CI <- c(" "," ")
+summary_stats$Log_Response_Ratio <- c(" "," ")
+summary_stats$Log_Response_CI <- c(" "," ")
+
+# testing removal
+# summary_stats <- summary_stats %>%
+#   mutate(across(where(is.numeric), ~ format(round(.x, 2), nsmall = 2)))
+
+
+
+
+# summary_stats_aligned <- summary_stats %>%
+#   mutate(
+#     IQR = NA_character_,
+#     Range = NA_character_,
+#     CV = NA_character_,
+#     Cohens_d = NA,
+#     Log_Response_Ratio = NA,
+#     Cohens_d_CI = NA_character_,
+#     Log_Response_CI = NA_character_
+#   ) %>%
+#   mutate(across(everything(), as.character))
 
 
 # Coerce all columns in both data frames to character
-summary_stats_chr <- summary_stats_aligned
+summary_stats_chr <- summary_stats #_aligned
 summary_stats_chr[] <- lapply(summary_stats_chr, as.character)
 
 comparison_row_chr <- comparison_row
@@ -369,10 +496,31 @@ comparison_row_chr[] <- lapply(comparison_row_chr, as.character)
 # Now bind Final table
 final_stats <- bind_rows(summary_stats_chr, comparison_row_chr)
 
+# # Number of summary rows (before the "Comparison" row)
+# n_summary <- nrow(summary_stats_chr)
+# 
+# # Round selected columns in only those rows
+# cols_to_round <- c("Mean", "SD", "Median", "Min", "Max", "Variance", "Skewness","Kurtosis"
+#                    )
+# 
+# final_stats[1:n_summary, cols_to_round] <- lapply(
+#   final_stats[1:n_summary, cols_to_round],
+#   function(x) formatC(as.numeric(x), format = "f", digits = 1)
+# )
+# 
+# final_stats[is.na(final_stats) | final_stats == "NA"] <- ""
+
+final_stats$Kurtosis[1:2] <- ifelse(
+  is.na(final_stats$Kurtosis[1:2]),
+  NA_character_,
+  formatC(as.numeric(final_stats$Kurtosis[1:2]), format = "f", digits = 2)
+)
+
+
 # Display table with descriptive caption
-kable(final_stats, digits = 2,
-      caption = "Table 1. Summary statistics for spatial distances within F1 and non-F1 groups. 
-      We compared group means using a t-test or Wilcoxon test based on normality and variance homogeneity. 
+kable(final_stats, #digits = 2,
+      caption = "Table 1. Summary statistics for pairwise spatial distances (in km) within F1 and non-F1 groups. 
+      We compared group means using a Wilcoxon test based on normality and variance homogeneity. 
       Medians were compared using Mood’s median test. 
       Variance was tested using Levene’s test. 
       We investigated effect size using Cohen’s d (Cohens_d) and the log-response ratio (Log_Response_Ratio), each with 95% bootstrapped confidence intervals. 
@@ -381,8 +529,8 @@ kable(final_stats, digits = 2,
 ```
 
 <table class="table table-striped table-hover" style="font-size: 10px; width: auto !important; margin-left: auto; margin-right: auto;">
-<caption style="font-size: initial !important;">(\#tab:fig1-summary-table)(\#tab:fig1-summary-table)Table 1. Summary statistics for spatial distances within F1 and non-F1 groups. 
-      We compared group means using a t-test or Wilcoxon test based on normality and variance homogeneity. 
+<caption style="font-size: initial !important;">(\#tab:fig1-summary-table)(\#tab:fig1-summary-table)Table 1. Summary statistics for pairwise spatial distances (in km) within F1 and non-F1 groups. 
+      We compared group means using a Wilcoxon test based on normality and variance homogeneity. 
       Medians were compared using Mood’s median test. 
       Variance was tested using Levene’s test. 
       We investigated effect size using Cohen’s d (Cohens_d) and the log-response ratio (Log_Response_Ratio), each with 95% bootstrapped confidence intervals. 
@@ -399,12 +547,13 @@ kable(final_stats, digits = 2,
    <th style="text-align:left;"> Variance </th>
    <th style="text-align:left;"> Skewness </th>
    <th style="text-align:left;"> Kurtosis </th>
+   <th style="text-align:left;"> Normality </th>
    <th style="text-align:left;"> IQR </th>
    <th style="text-align:left;"> Range </th>
    <th style="text-align:left;"> CV </th>
    <th style="text-align:left;"> Cohens_d </th>
-   <th style="text-align:left;"> Log_Response_Ratio </th>
    <th style="text-align:left;"> Cohens_d_CI </th>
+   <th style="text-align:left;"> Log_Response_Ratio </th>
    <th style="text-align:left;"> Log_Response_CI </th>
   </tr>
  </thead>
@@ -412,17 +561,18 @@ kable(final_stats, digits = 2,
   <tr>
    <td style="text-align:left;"> F1 </td>
    <td style="text-align:left;"> 16653 </td>
-   <td style="text-align:left;"> 740.382594018701 </td>
-   <td style="text-align:left;"> 442.944273364031 </td>
-   <td style="text-align:left;"> 709.757034012749 </td>
+   <td style="text-align:left;"> 740.4 </td>
+   <td style="text-align:left;"> 442.9 </td>
+   <td style="text-align:left;"> 709.8 </td>
    <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> 1560.05496626967 </td>
-   <td style="text-align:left;"> 196199.629305989 </td>
-   <td style="text-align:left;"> -0.321095637790914 </td>
-   <td style="text-align:left;"> -1.08153375527334 </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 1560.1 </td>
+   <td style="text-align:left;"> 196199.6 </td>
+   <td style="text-align:left;"> -0.321 </td>
+   <td style="text-align:left;"> 1.92 </td>
+   <td style="text-align:left;"> No (A = 459.5, p = 3.7e-24) </td>
+   <td style="text-align:left;"> 753 </td>
+   <td style="text-align:left;"> 1560.1 </td>
+   <td style="text-align:left;"> 0.5983 </td>
    <td style="text-align:left;">  </td>
    <td style="text-align:left;">  </td>
    <td style="text-align:left;">  </td>
@@ -431,17 +581,18 @@ kable(final_stats, digits = 2,
   <tr>
    <td style="text-align:left;"> non-F1 </td>
    <td style="text-align:left;"> 45150 </td>
-   <td style="text-align:left;"> 640.336103102797 </td>
-   <td style="text-align:left;"> 380.144152765119 </td>
-   <td style="text-align:left;"> 646.181563446685 </td>
+   <td style="text-align:left;"> 640.3 </td>
+   <td style="text-align:left;"> 380.1 </td>
+   <td style="text-align:left;"> 646.2 </td>
    <td style="text-align:left;"> 0 </td>
-   <td style="text-align:left;"> 1444.52845708873 </td>
-   <td style="text-align:left;"> 144509.57688151 </td>
-   <td style="text-align:left;"> 0.00311661431198584 </td>
-   <td style="text-align:left;"> -1.00006721302135 </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 1444.5 </td>
+   <td style="text-align:left;"> 144509.6 </td>
+   <td style="text-align:left;"> 0.003 </td>
+   <td style="text-align:left;"> 2.00 </td>
+   <td style="text-align:left;"> No (A = 347.2, p = 3.7e-24) </td>
+   <td style="text-align:left;"> 604.6 </td>
+   <td style="text-align:left;"> 1444.5 </td>
+   <td style="text-align:left;"> 0.5937 </td>
    <td style="text-align:left;">  </td>
    <td style="text-align:left;">  </td>
    <td style="text-align:left;">  </td>
@@ -449,32 +600,30 @@ kable(final_stats, digits = 2,
   </tr>
   <tr>
    <td style="text-align:left;"> Comparison </td>
+   <td style="text-align:left;"> F1 = 16653, non-F1 = 45150 </td>
+   <td style="text-align:left;"> different (Anderson–Darling; p = 2.75e-157) </td>
+   <td style="text-align:left;"> F1 &gt; non-F1 </td>
+   <td style="text-align:left;"> different (Mood's median test; p = 0) </td>
+   <td style="text-align:left;"> F1 = non-F1 </td>
+   <td style="text-align:left;"> F1 &gt; non-F1 </td>
+   <td style="text-align:left;"> different (Levene's test; p = 1.7e-223) </td>
+   <td style="text-align:left;"> different (Bootstrap CI, F1: -0.34–-0.3, non-F1: -0.01–0.02) </td>
+   <td style="text-align:left;"> different (Bootstrap CI, F1: 1.89–1.95, non-F1: 1.99–2.01) </td>
    <td style="text-align:left;">  </td>
-   <td style="text-align:left;"> different (p = 2.75e-157) </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;"> different (p = 0) </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;"> different (p = 1.7e-223) </td>
-   <td style="text-align:left;"> different (CI F1: -0.35–-0.3, non-F1: -0.01–0.02) </td>
-   <td style="text-align:left;"> different (CI F1: -1.11–-1.05, non-F1: -1.01–-0.99) </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> F1 &gt; non-F1 </td>
+   <td style="text-align:left;"> F1 &gt; non-F1 </td>
+   <td style="text-align:left;"> F1 &gt; non-F1 </td>
    <td style="text-align:left;"> 0.24 </td>
-   <td style="text-align:left;"> 0.15 </td>
    <td style="text-align:left;"> -0.02–0.02 </td>
+   <td style="text-align:left;"> 0.15 </td>
    <td style="text-align:left;"> -0.01–0.01 </td>
   </tr>
 </tbody>
 </table>
 
-
-
-
-
-
-
+``` r
+detach("package:spam", unload = TRUE)
+```
 
 
 ``` r
@@ -615,10 +764,10 @@ This may reflect differing dispersal constraints, landscape heterogeneity, or sp
 
 F1 mean ± SD: 740.4 ± 442.9 km  
 non-F1 mean ± SD: 640.3 ± 380.1 km  
-Group means: different (p = 2.75e-157) → **F1** had the greater mean  
-Medians: different (p < 0.001) → **F1** had the higher median  
-Variance: different (p = 1.7e-223) → **F1** had greater variability  
-CV and IQR were greater in **NA** and **NA**
+Group means: different (Anderson–Darling; p = 2.75e-157) → **F1** had the greater mean  
+Medians: different (Mood's median test; p < 0.001) → **F1** had the higher median  
+Variance: different (Levene's test; p = 1.7e-223) → **F1** had greater variability  
+CV and IQR were greater in **F1** and **F1**
 
 ### Distribution Shape
 
@@ -635,7 +784,7 @@ This suggests that **F1** had a heavier upper tail and more long-distance pairin
 
 ### Relative Dispersion
 
-CV ratio (F1 / non-F1): NA  
+CV ratio (F1 / non-F1): 1.01  
 Range ratio (F1 / non-F1): 1.08  
 Dispersion varied across metrics, with no consistent trend.
 
@@ -648,8 +797,8 @@ Cliff’s delta = 0.14 (CI: 0.13–0.15)
 
 ### Ecological Interpretation: Spatial Clustering & Heterogeneity
 
-Based on these results, **NA** appears more spatially clustered — i.e., sample pairs are generally closer geographically.  
-Dispersion metrics were similar across groups, providing no clear evidence of tighter clustering.  
+Based on these results, **non-F1** appears more spatially clustered — i.e., sample pairs are generally closer geographically.  
+This is supported by consistently lower dispersion metrics in non-F1.  
 Skewness and kurtosis suggest differences in spatial structure, with **non-F1** more asymmetrically dispersed and **non-F1** showing more extreme values or outliers.  
 This may reflect differing dispersal constraints, landscape heterogeneity, or spatial sampling extent between groups.
 
@@ -674,35 +823,43 @@ map_plot <- ggplot(sd, aes(x = Longitude, y = Latitude, color = Fun_sor_clus2)) 
 
 ### Sample Map + Convex Hulls
 
-
-``` r
-# Convex hulls by group
-hull_df <- sd %>%
-  group_by(Fun_sor_clus2) %>%
-  dplyr::slice(chull(Longitude, Latitude))
-
-ggplot(sd, aes(x = Longitude, y = Latitude, color = Fun_sor_clus2, fill = Fun_sor_clus2)) +
-  geom_polygon(data = hull_df, aes(group = Fun_sor_clus2), alpha = 0.2, color = NA) +
-  geom_point(size = 2, alpha = 0.9) +
-  scale_color_manual(values = c("F1" = "#8E0152", "non-F1" = "#7FBC41")) +
-  scale_fill_manual(values = c("F1" = "#8E0152", "non-F1" = "#7FBC41")) +
-  theme_minimal(base_size = 12) +
-  coord_fixed() +
-  labs(
-    title = "Sample Locations with Convex Hulls",
-    subtitle = "Group-specific spatial extent",
-    x = "Longitude", y = "Latitude",
-    color = "Group", fill = "Group"
-  )
-```
-
 ![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_files/figure-html/fig-map-hulls-1.png)<!-- -->
+
+\
+\
+\
+
+# Proportion of metadata factors in F1 vs non-F1
+
+\
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_files/figure-html/plot-grass-metadata-distributions-by-F1-1.png)<!-- -->
+
+
+
+
+Filtered 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+
+
+
+Unfiltered 
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+
+
+
 
 ## Distance–Decay Plots
 Pairwise spatial vs ecological distance
 Regression (linear or exponential decay or loess)
 
 ### Spatial distance matrices and decay modeling
+
+
 
 #### Methods
 
