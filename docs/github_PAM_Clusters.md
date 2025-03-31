@@ -1,7 +1,7 @@
 ---
-title: '**KSU paired amplicons: PAM Clustering**'
+title: '**RAM paired amplicons: PAM Clustering**'
 author: "Kelli Feeser"
-date: "2024-05-15"
+date: "2025-03-30"
 output:
   bookdown::html_document2:
     code_folding: hide
@@ -42,7 +42,7 @@ editor_options:
 
 ------------------------------------------------------------------------
 
-Document last updated: 2024-05-15
+Document last updated: 2025-03-30
 
 ------------------------------------------------------------------------
 
@@ -62,11 +62,7 @@ Document last updated: 2024-05-15
 
 
 
-## load rds
-
-
-
-
+## load rds - remove?
 
 
 
@@ -94,8 +90,8 @@ Document last updated: 2024-05-15
 
 -   Unsupervised clustering of the fungal community data revealed 14 sub-assemblages of communities. These resultant sub-assemblages are a good representation of the data:
 
-    -   Across the whole dataset, the fungal PAM clustering explained 33.99% of the community composition, in terms of the presence/absence of OTUs (adonis2/permANOVA; $P$-value \< 0.001) and 20.72% of the abundance-weighted community composition  ($P$-value \< 0.001)\*
-    
+    -   Across the whole dataset, the fungal PAM clustering explained 33.99% of the community composition, in terms of the presence/absence of OTUs (adonis2/permANOVA; $P$-value \< 0.001) and 20.72% of the abundance-weighted community composition ($P$-value \< 0.001)\*
+
     -   However, these sub-assemblages are a better representation of fungal community [*dispersal*]{.underline}, indicating that variability in the dispersal patterns of fungi is the primary driver in sub-assemblage differentiation. Variation in the dispersion of communities (distance to spatial median) accounted for 68.46% of the differences observed among fungal sub-assemblages (Permutation test for homogeneity of multivariate dispersions; $P$-value \< 8.1e-113).
 
 -   Hierarchical clustering of fungal communities using Sørensen dissimilarities closely aligned with PAM clustering results, evidenced by concordance between PAM clusters and the dendrograms created using five different agglomeration methods ("average", "single", "complete", "median", and "centroid").
@@ -249,7 +245,7 @@ Per Broberg (2006). SAGx: Statistical Analysis of the GeneChip. R package versio
 \
 We found the optimal number of clusters for the Sørensen-based dissimilarities of the fungal communities to be 10.\
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/plot_gs_Fun-1.png" height="70%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/plot_gs_Fun-1.png" height="70%" />
 
 \
 \
@@ -261,7 +257,7 @@ We found the optimal number of clusters for the Sørensen-based dissimilarities 
 \
 We found the optimal number of clusters for the Sørensen-based dissimilarities of the bacterial communities to be 14.\
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/plot_gs_Bac-1.png" height="70%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/plot_gs_Bac-1.png" height="70%" />
 
 \
 \
@@ -278,7 +274,7 @@ We found the optimal number of clusters for the Sørensen-based dissimilarities 
 
 #### Fun {.unnumbered .tabset}
 
-Note the density of cluster 1 (now F1) - I'll investigate that further below. Fungal clusters have now been relabeled in an intuitive order based on decreasing similiarities to F1.\
+Note the density of cluster 1 (now F1) - I'll investigate that further below. Fungal clusters have now been relabeled in an intuitive order based on decreasing mean similiarity to F1.\
 
 
 
@@ -287,7 +283,7 @@ Note the density of cluster 1 (now F1) - I'll investigate that further below. Fu
 (ref:Fun-NMDS-Sor-PAM-all-fig-caption) NMDS plot showing variation in the presence/absence-based composition of root-associated fungi in relation to PAM cluster designations. NMDS plot based on Sørensen dissimilarities: k = 4, 2-dimensional stress = 0.122, non-metric fit R^2^ = 0.985, linear fit R^2^ = 0.908.
 
 <div class="figure">
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-1-1.png" alt="(ref:Fun-NMDS-Sor-PAM-all-fig-caption)" height="90%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-1-1.png" alt="(ref:Fun-NMDS-Sor-PAM-all-fig-caption)" height="90%" />
 <p class="caption">(\#fig:unnamed-chunk-1)(ref:Fun-NMDS-Sor-PAM-all-fig-caption)</p>
 </div>
 
@@ -295,19 +291,19 @@ Note the density of cluster 1 (now F1) - I'll investigate that further below. Fu
 
 ##### All samples (labeled by Site) {.unnumbered .unlisted}
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
 
 \
 
 ##### Facet by Lat {.unnumbered .unlisted}
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 \
 
 ##### Facet by Long {.unnumbered .unlisted}
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 \
 
@@ -315,7 +311,41 @@ Note the density of cluster 1 (now F1) - I'll investigate that further below. Fu
 
 We do see clusters with only 1 site and others with multiple sites.\
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-5-1.png" width="75%" />
+```         
+- F2 has only Site = SFA, and all SFA site samples are exclusive to F3\
+
+- F3 has only Site = KAE, however 3 KAE site samples belong to other clusters (F4, F7, F9 - all 3 were BUDA grass samples, but the other 9 BUDA samples clustered with F3) \
+
+- F4 is mostly site LAR (and all LAR site samples are exclusive to F4) and 2 samples from 2 other sites: 1 from KAE and 1 from FCP. Those 2 samples were both BUDA, however no BUDA grasses were present at LAR.
+
+- F5 has samples from 5 sites, (BNP - all BOGR, n=2; CPR - all BOER, n=11; DMT - SCSC, n=1; FCP & HPG - all BOGR, n=1 & 2, respectively). \
+
+- F6 was mostly KNZ samples (25/32 samples in cluster)
+    - KNZ was exclusive to F6 and F7. In F6, KNZ had 10 ANGE grass samples (of 11, the other is in F7), 3 BOGR (of 9, the others are in F7), 1 BUDA (of 11, the others are in F7), and all of the 11 SCSC samples (of 11). \
+  
+- F7 was mostly KNZ (n=17), HAR (n=13), and FCP (n=7). 1 KAE BUDA sample also clustered with F7.
+    - By Grass
+        - 13 (of 38) samples were from BOGR grasses at sites FCP, HAR, and KNZ.\
+        - 21 (of 38) samples were from BUDA grasses at sites FCP, HAR, and KNZ.\
+        - 3 (of 38) samples were from SCSC grasses, all at site FCP.\
+        - 1 (of 38) sample was from ANGE grasses at site KNZ\
+    - Site-by-grass exclusivity
+        - 9 of 10 BUDA samlpes from site HAR were in F7 (1 other was in F9)
+        - 4 of 6 BOGR samlpes from site HAR were in F7 (1 other was in F8 and F9)\
+        - 10 of 11 BUDA samlpes from site KNZ were in F7 (1 other was in F6)
+        - 6 of 9 BOGR samlpes from site KNZ were in F7 (3 others were in F6)
+        - 1 of 11 ANGE samlpes from site KNZ were in F7 (all 10 others were in F6)\
+        - 1 of 12 BUDA samlpes from site FCP were in F7 (1 other was in F4 and F8, 9 were in F9)
+        - 3 of 4 BOGR samlpes from site FCP were in F7 (1 other was in F5)
+        - 3 of 11 SCSC samlpes from site FCP were in F7 (all 8 others were in F9)
+        
+- F8 was mostly ANGE and SCSC grasses (18 and 32 of 53 samples, respectively). 2 BOGR (from HAR and HPG) and 1 BUDA (FCP) samples were also in this cluster. This cluster was comprised primarily of sites HAR (n=22), CAD (n=15), DMT (n=7), DMT (n=7), and 1 sample each from FCP and HPG.
+    - KNZ was exclusive to F6 and F7. In F6, KNZ had 10 ANGE grass samples (of 11, the other is in F7), 3 BOGR (of 9, the others are in F7), 1 BUDA (of 11, the others are in F7), and all of the 11 SCSC samples (of 11). \
+```
+
+All ANGE and SCSC grasses at site HAR were exclusive to F8 8 of 11 CAD ANGE were in F8 (all 3 others were in F6) 7 of 10 CAD SCSC were in F8 (all 3 others were in F6)
+
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-5-1.png" width="75%" />
 
 \
 \
@@ -335,7 +365,7 @@ We do see clusters with only 1 site and others with multiple sites.\
 (ref:Bac-NMDS-Sor-PAM-all-fig-caption) NMDS plot showing variation in the presence/absence-based composition of root-associated fungi in relation to PAM cluster designations. NMDS plot based on Sørensen dissimilarities: k = 5, 2-dimensional stress = 0.055, non-metric fit R^2^ = 0.997, linear fit R^2^ = 0.981.
 
 <div class="figure">
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-6-1.png" alt="(ref:Bac-NMDS-Sor-PAM-all-fig-caption)" height="90%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-6-1.png" alt="(ref:Bac-NMDS-Sor-PAM-all-fig-caption)" height="90%" />
 <p class="caption">(\#fig:unnamed-chunk-6)(ref:Bac-NMDS-Sor-PAM-all-fig-caption)</p>
 </div>
 
@@ -343,19 +373,19 @@ We do see clusters with only 1 site and others with multiple sites.\
 
 ##### All samples (labeled by Site) {.unnumbered .unlisted}
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 \
 
 ##### Facet by Lat {.unnumbered .unlisted}
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 \
 
 ##### Facet by Long {.unnumbered .unlisted}
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 \
 
@@ -363,21 +393,35 @@ We do see clusters with only 1 site and others with multiple sites.\
 
 We do see some clusters with only 1 site and others with multiple sites.\
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-10-1.png" width="75%" />
+```         
+- B6: only site CNF (n=12, all SCSC). The remainng samples from CNF clustered in B2 (4 BOER and 11 BOER)
+
+- B7: Site CPR samples clustered only in B7 (n=11, all BOER). B7 was also comprised of an additional sample from site DMT (SCSC). \
+
+- B13: Site NWP samples clustered only in B13 (n=20, 10 ANGE and 10 SCSC). B13 was also comprised of an additional sample from site KAE (SCSC). \
+
+- B14: B14 was comprised of only site ONF samples (n=20, 9 ANGE and 11 SCSC). Site ONF samples clustered mainly in B14 (20 of 22 samples), however 2 of the 12 SCSC clustered with other groups (1 each in B9 and B10). \
+```
+
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-10-1.png" width="75%" />
 
 \
 \
 
-#### Bac clus on Fun ord {.unnumbered .tabset}
+#### TO_DO: FACET BY FUN_SOR_CLUS2 - Bac clus on Fun ord {.unnumbered .tabset}
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+B12 \<-\> F3
+
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 \
 \
 
 #### Fun clus on Bac ord {.unnumbered .tabset}
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-12-1.png)<!-- -->![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-12-2.png)<!-- -->
+F5 \<-\> B7
+
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-12-1.png)<!-- -->![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-12-2.png)<!-- -->![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-12-3.png)<!-- -->![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-12-4.png)<!-- -->
 
 \
 \
@@ -387,6 +431,8 @@ We do see some clusters with only 1 site and others with multiple sites.\
 #  {.unnumbered .unlisted}
 
 ------------------------------------------------------------------------
+
+\
 
 # Explanatory power of metadata - adonis2(. \~ metadata, strata = clusters)
 
@@ -404,11 +450,11 @@ Caveat: PERMANOVA often produces significant p-values testing PAM clustering. "T
 \
 
 
-                    Df     SumOfSqs     R2       F      Pr(>F) 
------------------  -----  ----------  ------  -------  --------
-Fun_sor_clusters     9       56.9      0.34    27.12    0.001  
-Residual            474     110.5      0.66                    
-Total               483     167.4      1.00                    
+            Df     SumOfSqs     R2       F      Pr(>F) 
+---------  -----  ----------  ------  -------  --------
+Model        9       56.9      0.34    27.12    0.001  
+Residual    474     110.5      0.66                    
+Total       483     167.4      1.00                    
 
 \
 
@@ -423,11 +469,11 @@ Total               483     167.4      1.00
 \
 
 
-                    Df     SumOfSqs     R2        F      Pr(>F) 
------------------  -----  ----------  -------  -------  --------
-Bac_sor_clusters    13       42.0      0.361    20.42    0.001  
-Residual            470      74.4      0.639                    
-Total               483     116.5      1.000                    
+            Df     SumOfSqs     R2        F      Pr(>F) 
+---------  -----  ----------  -------  -------  --------
+Model       13       42.0      0.361    20.42    0.001  
+Residual    470      74.4      0.639                    
+Total       483     116.5      1.000                    
 
 \
 
@@ -467,9 +513,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 5.766 </td>
    <td style="text-align:right;"> 0.034 </td>
@@ -479,7 +525,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 5.695 </td>
    <td style="text-align:right;"> 0.034 </td>
@@ -489,7 +535,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 5.695 </td>
+   <td style="text-align:right;"> 0.034 </td>
+   <td style="text-align:right;"> 16.969 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wholecommunity </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 6.082 </td>
    <td style="text-align:right;"> 0.036 </td>
@@ -499,7 +555,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 6.447 </td>
    <td style="text-align:right;"> 0.039 </td>
@@ -509,7 +565,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 6.447 </td>
+   <td style="text-align:right;"> 0.039 </td>
+   <td style="text-align:right;"> 19.303 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wholecommunity </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 6.227 </td>
    <td style="text-align:right;"> 0.037 </td>
@@ -518,9 +584,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wholecommunity </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 6.046 </td>
    <td style="text-align:right;"> 0.036 </td>
@@ -530,7 +596,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 5.198 </td>
+   <td style="text-align:right;"> 0.031 </td>
+   <td style="text-align:right;"> 15.442 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wholecommunity </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 2.574 </td>
    <td style="text-align:right;"> 0.015 </td>
@@ -539,9 +615,29 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wholecommunity </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 3.037 </td>
+   <td style="text-align:right;"> 0.018 </td>
+   <td style="text-align:right;"> 8.903 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wholecommunity </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 5.632 </td>
+   <td style="text-align:right;"> 0.034 </td>
+   <td style="text-align:right;"> 16.777 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wholecommunity </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.847 </td>
    <td style="text-align:right;"> 0.011 </td>
@@ -551,7 +647,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 3.154 </td>
    <td style="text-align:right;"> 0.019 </td>
@@ -561,7 +657,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wholecommunity.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 2.380 </td>
    <td style="text-align:right;"> 0.014 </td>
@@ -592,9 +688,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.537 </td>
    <td style="text-align:right;"> 0.063 </td>
@@ -604,7 +700,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.203 </td>
    <td style="text-align:right;"> 0.049 </td>
@@ -614,7 +710,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.203 </td>
+   <td style="text-align:right;"> 0.049 </td>
+   <td style="text-align:right;"> 9.347 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F1 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.529 </td>
    <td style="text-align:right;"> 0.062 </td>
@@ -624,7 +730,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.193 </td>
    <td style="text-align:right;"> 0.049 </td>
@@ -634,7 +740,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.193 </td>
+   <td style="text-align:right;"> 0.049 </td>
+   <td style="text-align:right;"> 9.271 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F1 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.230 </td>
    <td style="text-align:right;"> 0.050 </td>
@@ -643,9 +759,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wc_F1 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.863 </td>
    <td style="text-align:right;"> 0.076 </td>
@@ -655,7 +771,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.772 </td>
+   <td style="text-align:right;"> 0.072 </td>
+   <td style="text-align:right;"> 14.115 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F1 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.677 </td>
    <td style="text-align:right;"> 0.068 </td>
@@ -664,9 +790,29 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wc_F1 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.812 </td>
+   <td style="text-align:right;"> 0.074 </td>
+   <td style="text-align:right;"> 14.462 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F1 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.520 </td>
+   <td style="text-align:right;"> 0.062 </td>
+   <td style="text-align:right;"> 11.978 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F1 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.655 </td>
    <td style="text-align:right;"> 0.027 </td>
@@ -676,7 +822,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.076 </td>
    <td style="text-align:right;"> 0.044 </td>
@@ -686,7 +832,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F1.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.578 </td>
    <td style="text-align:right;"> 0.024 </td>
@@ -717,9 +863,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.664 </td>
    <td style="text-align:right;"> 0.223 </td>
@@ -729,17 +875,27 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model1 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.759 </td>
+   <td style="text-align:right;"> 0.102 </td>
+   <td style="text-align:right;"> 3.059 </td>
+   <td style="text-align:right;"> 0.003 </td>
+   <td style="text-align:left;"> Fun_wc_F3 </td>
+   <td style="text-align:left;"> soil_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model2 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.759 </td>
    <td style="text-align:right;"> 0.102 </td>
    <td style="text-align:right;"> 3.059 </td>
    <td style="text-align:right;"> 0.001 </td>
    <td style="text-align:left;"> Fun_wc_F3 </td>
-   <td style="text-align:left;"> soil_moisture </td>
+   <td style="text-align:left;"> perc_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.627 </td>
    <td style="text-align:right;"> 0.218 </td>
@@ -749,17 +905,27 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.426 </td>
    <td style="text-align:right;"> 0.057 </td>
    <td style="text-align:right;"> 1.636 </td>
-   <td style="text-align:right;"> 0.044 </td>
+   <td style="text-align:right;"> 0.055 </td>
    <td style="text-align:left;"> Fun_wc_F3 </td>
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.426 </td>
+   <td style="text-align:right;"> 0.057 </td>
+   <td style="text-align:right;"> 1.636 </td>
+   <td style="text-align:right;"> 0.052 </td>
+   <td style="text-align:left;"> Fun_wc_F3 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.948 </td>
    <td style="text-align:right;"> 0.127 </td>
@@ -768,9 +934,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wc_F3 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.676 </td>
    <td style="text-align:right;"> 0.225 </td>
@@ -780,7 +946,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.676 </td>
+   <td style="text-align:right;"> 0.225 </td>
+   <td style="text-align:right;"> 7.827 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F3 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.676 </td>
    <td style="text-align:right;"> 0.225 </td>
@@ -789,9 +965,29 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wc_F3 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model10 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:left;"> Fun_wc_F3 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model11 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:left;"> Fun_wc_F3 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.488 </td>
    <td style="text-align:right;"> 0.200 </td>
@@ -801,7 +997,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.670 </td>
    <td style="text-align:right;"> 0.224 </td>
@@ -811,12 +1007,12 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F3.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.645 </td>
    <td style="text-align:right;"> 0.087 </td>
    <td style="text-align:right;"> 2.557 </td>
-   <td style="text-align:right;"> 0.005 </td>
+   <td style="text-align:right;"> 0.001 </td>
    <td style="text-align:left;"> Fun_wc_F3 </td>
    <td style="text-align:left;"> herbivory_perc </td>
   </tr>
@@ -842,9 +1038,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.455 </td>
    <td style="text-align:right;"> 0.067 </td>
@@ -854,37 +1050,57 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.soil_moisture_m.std </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.352 </td>
-   <td style="text-align:right;"> 0.052 </td>
-   <td style="text-align:right;"> 1.469 </td>
-   <td style="text-align:right;"> 0.014 </td>
-   <td style="text-align:left;"> Fun_wc_F4 </td>
-   <td style="text-align:left;"> soil_moisture </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.SOM_m.std </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.483 </td>
-   <td style="text-align:right;"> 0.071 </td>
-   <td style="text-align:right;"> 2.060 </td>
-   <td style="text-align:right;"> 0.003 </td>
-   <td style="text-align:left;"> Fun_wc_F4 </td>
-   <td style="text-align:left;"> SOM </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.352 </td>
    <td style="text-align:right;"> 0.052 </td>
    <td style="text-align:right;"> 1.469 </td>
    <td style="text-align:right;"> 0.013 </td>
    <td style="text-align:left;"> Fun_wc_F4 </td>
+   <td style="text-align:left;"> soil_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.352 </td>
+   <td style="text-align:right;"> 0.052 </td>
+   <td style="text-align:right;"> 1.469 </td>
+   <td style="text-align:right;"> 0.009 </td>
+   <td style="text-align:left;"> Fun_wc_F4 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model3 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.483 </td>
+   <td style="text-align:right;"> 0.071 </td>
+   <td style="text-align:right;"> 2.060 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F4 </td>
+   <td style="text-align:left;"> SOM </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model4 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.352 </td>
+   <td style="text-align:right;"> 0.052 </td>
+   <td style="text-align:right;"> 1.469 </td>
+   <td style="text-align:right;"> 0.011 </td>
+   <td style="text-align:left;"> Fun_wc_F4 </td>
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.352 </td>
+   <td style="text-align:right;"> 0.052 </td>
+   <td style="text-align:right;"> 1.469 </td>
+   <td style="text-align:right;"> 0.011 </td>
+   <td style="text-align:left;"> Fun_wc_F4 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.358 </td>
    <td style="text-align:right;"> 0.052 </td>
@@ -893,30 +1109,60 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wc_F4 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.409 </td>
    <td style="text-align:right;"> 0.060 </td>
    <td style="text-align:right;"> 1.724 </td>
-   <td style="text-align:right;"> 0.045 </td>
+   <td style="text-align:right;"> 0.054 </td>
    <td style="text-align:left;"> Fun_wc_F4 </td>
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.396 </td>
+   <td style="text-align:right;"> 0.058 </td>
+   <td style="text-align:right;"> 1.663 </td>
+   <td style="text-align:right;"> 0.010 </td>
+   <td style="text-align:left;"> Fun_wc_F4 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.396 </td>
    <td style="text-align:right;"> 0.058 </td>
    <td style="text-align:right;"> 1.666 </td>
-   <td style="text-align:right;"> 0.018 </td>
+   <td style="text-align:right;"> 0.017 </td>
    <td style="text-align:left;"> Fun_wc_F4 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.543 </td>
+   <td style="text-align:right;"> 0.080 </td>
+   <td style="text-align:right;"> 2.339 </td>
+   <td style="text-align:right;"> 0.003 </td>
+   <td style="text-align:left;"> Fun_wc_F4 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.451 </td>
+   <td style="text-align:right;"> 0.066 </td>
+   <td style="text-align:right;"> 1.912 </td>
+   <td style="text-align:right;"> 0.069 </td>
+   <td style="text-align:left;"> Fun_wc_F4 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.468 </td>
    <td style="text-align:right;"> 0.069 </td>
@@ -926,22 +1172,22 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.379 </td>
    <td style="text-align:right;"> 0.056 </td>
    <td style="text-align:right;"> 1.590 </td>
-   <td style="text-align:right;"> 0.004 </td>
+   <td style="text-align:right;"> 0.008 </td>
    <td style="text-align:left;"> Fun_wc_F4 </td>
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F4.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.430 </td>
    <td style="text-align:right;"> 0.063 </td>
    <td style="text-align:right;"> 1.820 </td>
-   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:right;"> 0.003 </td>
    <td style="text-align:left;"> Fun_wc_F4 </td>
    <td style="text-align:left;"> herbivory_perc </td>
   </tr>
@@ -967,9 +1213,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.720 </td>
    <td style="text-align:right;"> 0.156 </td>
@@ -979,7 +1225,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.645 </td>
    <td style="text-align:right;"> 0.140 </td>
@@ -989,7 +1235,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.645 </td>
+   <td style="text-align:right;"> 0.140 </td>
+   <td style="text-align:right;"> 2.442 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F5 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.707 </td>
    <td style="text-align:right;"> 0.154 </td>
@@ -999,59 +1255,99 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.673 </td>
    <td style="text-align:right;"> 0.146 </td>
    <td style="text-align:right;"> 2.565 </td>
-   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:right;"> 0.001 </td>
    <td style="text-align:left;"> Fun_wc_F5 </td>
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.673 </td>
+   <td style="text-align:right;"> 0.146 </td>
+   <td style="text-align:right;"> 2.565 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F5 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.651 </td>
    <td style="text-align:right;"> 0.141 </td>
    <td style="text-align:right;"> 2.467 </td>
-   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:right;"> 0.001 </td>
    <td style="text-align:left;"> Fun_wc_F5 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.368 </td>
    <td style="text-align:right;"> 0.080 </td>
    <td style="text-align:right;"> 1.303 </td>
-   <td style="text-align:right;"> 0.113 </td>
+   <td style="text-align:right;"> 0.135 </td>
    <td style="text-align:left;"> Fun_wc_F5 </td>
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.674 </td>
+   <td style="text-align:right;"> 0.146 </td>
+   <td style="text-align:right;"> 2.571 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F5 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.402 </td>
    <td style="text-align:right;"> 0.087 </td>
    <td style="text-align:right;"> 1.435 </td>
-   <td style="text-align:right;"> 0.042 </td>
+   <td style="text-align:right;"> 0.065 </td>
    <td style="text-align:left;"> Fun_wc_F5 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.492 </td>
+   <td style="text-align:right;"> 0.107 </td>
+   <td style="text-align:right;"> 1.795 </td>
+   <td style="text-align:right;"> 0.011 </td>
+   <td style="text-align:left;"> Fun_wc_F5 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.510 </td>
+   <td style="text-align:right;"> 0.111 </td>
+   <td style="text-align:right;"> 1.870 </td>
+   <td style="text-align:right;"> 0.014 </td>
+   <td style="text-align:left;"> Fun_wc_F5 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.397 </td>
    <td style="text-align:right;"> 0.086 </td>
    <td style="text-align:right;"> 1.414 </td>
-   <td style="text-align:right;"> 0.068 </td>
+   <td style="text-align:right;"> 0.053 </td>
    <td style="text-align:left;"> Fun_wc_F5 </td>
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.691 </td>
    <td style="text-align:right;"> 0.150 </td>
@@ -1061,12 +1357,12 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F5.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.399 </td>
    <td style="text-align:right;"> 0.087 </td>
    <td style="text-align:right;"> 1.422 </td>
-   <td style="text-align:right;"> 0.072 </td>
+   <td style="text-align:right;"> 0.061 </td>
    <td style="text-align:left;"> Fun_wc_F5 </td>
    <td style="text-align:left;"> herbivory_perc </td>
   </tr>
@@ -1092,9 +1388,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.738 </td>
    <td style="text-align:right;"> 0.085 </td>
@@ -1104,7 +1400,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.551 </td>
    <td style="text-align:right;"> 0.064 </td>
@@ -1114,17 +1410,27 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.551 </td>
+   <td style="text-align:right;"> 0.064 </td>
+   <td style="text-align:right;"> 2.039 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F6 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.496 </td>
    <td style="text-align:right;"> 0.057 </td>
    <td style="text-align:right;"> 1.822 </td>
-   <td style="text-align:right;"> 0.004 </td>
+   <td style="text-align:right;"> 0.005 </td>
    <td style="text-align:left;"> Fun_wc_F6 </td>
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.538 </td>
    <td style="text-align:right;"> 0.062 </td>
@@ -1134,18 +1440,28 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.538 </td>
+   <td style="text-align:right;"> 0.062 </td>
+   <td style="text-align:right;"> 1.989 </td>
+   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:left;"> Fun_wc_F6 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.395 </td>
    <td style="text-align:right;"> 0.046 </td>
    <td style="text-align:right;"> 1.435 </td>
-   <td style="text-align:right;"> 0.042 </td>
+   <td style="text-align:right;"> 0.029 </td>
    <td style="text-align:left;"> Fun_wc_F6 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.594 </td>
    <td style="text-align:right;"> 0.069 </td>
@@ -1155,7 +1471,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.520 </td>
+   <td style="text-align:right;"> 0.060 </td>
+   <td style="text-align:right;"> 1.915 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F6 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.088 </td>
    <td style="text-align:right;"> 0.126 </td>
@@ -1164,9 +1490,29 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wc_F6 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.073 </td>
+   <td style="text-align:right;"> 0.124 </td>
+   <td style="text-align:right;"> 4.242 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F6 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.925 </td>
+   <td style="text-align:right;"> 0.107 </td>
+   <td style="text-align:right;"> 3.589 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F6 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.703 </td>
    <td style="text-align:right;"> 0.081 </td>
@@ -1176,17 +1522,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.395 </td>
    <td style="text-align:right;"> 0.046 </td>
    <td style="text-align:right;"> 1.435 </td>
-   <td style="text-align:right;"> 0.025 </td>
+   <td style="text-align:right;"> 0.039 </td>
    <td style="text-align:left;"> Fun_wc_F6 </td>
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F6.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.561 </td>
    <td style="text-align:right;"> 0.065 </td>
@@ -1217,9 +1563,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.035 </td>
    <td style="text-align:right;"> 0.099 </td>
@@ -1229,7 +1575,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.753 </td>
    <td style="text-align:right;"> 0.072 </td>
@@ -1239,7 +1585,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.753 </td>
+   <td style="text-align:right;"> 0.072 </td>
+   <td style="text-align:right;"> 2.802 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F7 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.198 </td>
    <td style="text-align:right;"> 0.115 </td>
@@ -1249,28 +1605,38 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.582 </td>
    <td style="text-align:right;"> 0.056 </td>
    <td style="text-align:right;"> 2.125 </td>
-   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:right;"> 0.002 </td>
    <td style="text-align:left;"> Fun_wc_F7 </td>
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.582 </td>
+   <td style="text-align:right;"> 0.056 </td>
+   <td style="text-align:right;"> 2.125 </td>
+   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:left;"> Fun_wc_F7 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.362 </td>
    <td style="text-align:right;"> 0.035 </td>
    <td style="text-align:right;"> 1.293 </td>
-   <td style="text-align:right;"> 0.100 </td>
+   <td style="text-align:right;"> 0.097 </td>
    <td style="text-align:left;"> Fun_wc_F7 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.199 </td>
    <td style="text-align:right;"> 0.115 </td>
@@ -1280,7 +1646,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.255 </td>
+   <td style="text-align:right;"> 0.120 </td>
+   <td style="text-align:right;"> 4.920 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F7 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.008 </td>
    <td style="text-align:right;"> 0.097 </td>
@@ -1289,9 +1665,29 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wc_F7 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.794 </td>
+   <td style="text-align:right;"> 0.076 </td>
+   <td style="text-align:right;"> 2.964 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F7 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.166 </td>
+   <td style="text-align:right;"> 0.112 </td>
+   <td style="text-align:right;"> 4.529 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F7 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.801 </td>
    <td style="text-align:right;"> 0.077 </td>
@@ -1301,7 +1697,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.790 </td>
    <td style="text-align:right;"> 0.076 </td>
@@ -1311,7 +1707,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F7.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.622 </td>
    <td style="text-align:right;"> 0.060 </td>
@@ -1342,9 +1738,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.317 </td>
    <td style="text-align:right;"> 0.076 </td>
@@ -1354,7 +1750,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.244 </td>
    <td style="text-align:right;"> 0.071 </td>
@@ -1364,7 +1760,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.244 </td>
+   <td style="text-align:right;"> 0.071 </td>
+   <td style="text-align:right;"> 3.927 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F8 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.586 </td>
    <td style="text-align:right;"> 0.091 </td>
@@ -1374,7 +1780,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.038 </td>
    <td style="text-align:right;"> 0.060 </td>
@@ -1384,7 +1790,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.038 </td>
+   <td style="text-align:right;"> 0.060 </td>
+   <td style="text-align:right;"> 3.235 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F8 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.135 </td>
    <td style="text-align:right;"> 0.065 </td>
@@ -1393,9 +1809,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wc_F8 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.924 </td>
    <td style="text-align:right;"> 0.111 </td>
@@ -1405,7 +1821,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.807 </td>
+   <td style="text-align:right;"> 0.104 </td>
+   <td style="text-align:right;"> 5.912 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F8 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.370 </td>
    <td style="text-align:right;"> 0.079 </td>
@@ -1414,9 +1840,29 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wc_F8 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.814 </td>
+   <td style="text-align:right;"> 0.104 </td>
+   <td style="text-align:right;"> 5.935 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F8 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.138 </td>
+   <td style="text-align:right;"> 0.065 </td>
+   <td style="text-align:right;"> 3.570 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F8 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.891 </td>
    <td style="text-align:right;"> 0.051 </td>
@@ -1426,7 +1872,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.066 </td>
    <td style="text-align:right;"> 0.061 </td>
@@ -1436,7 +1882,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F8.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.116 </td>
    <td style="text-align:right;"> 0.064 </td>
@@ -1467,9 +1913,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.727 </td>
    <td style="text-align:right;"> 0.041 </td>
@@ -1479,7 +1925,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.928 </td>
    <td style="text-align:right;"> 0.053 </td>
@@ -1489,7 +1935,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.928 </td>
+   <td style="text-align:right;"> 0.053 </td>
+   <td style="text-align:right;"> 3.005 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F9 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.340 </td>
    <td style="text-align:right;"> 0.076 </td>
@@ -1499,7 +1955,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.914 </td>
    <td style="text-align:right;"> 0.052 </td>
@@ -1509,7 +1965,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.914 </td>
+   <td style="text-align:right;"> 0.052 </td>
+   <td style="text-align:right;"> 2.957 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F9 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.808 </td>
    <td style="text-align:right;"> 0.046 </td>
@@ -1518,9 +1984,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wc_F9 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.227 </td>
    <td style="text-align:right;"> 0.070 </td>
@@ -1530,7 +1996,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.201 </td>
+   <td style="text-align:right;"> 0.068 </td>
+   <td style="text-align:right;"> 3.954 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F9 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.064 </td>
    <td style="text-align:right;"> 0.060 </td>
@@ -1539,19 +2015,39 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wc_F9 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.918 </td>
+   <td style="text-align:right;"> 0.052 </td>
+   <td style="text-align:right;"> 2.970 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F9 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.125 </td>
+   <td style="text-align:right;"> 0.064 </td>
+   <td style="text-align:right;"> 3.687 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F9 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.650 </td>
    <td style="text-align:right;"> 0.037 </td>
    <td style="text-align:right;"> 2.071 </td>
-   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:right;"> 0.002 </td>
    <td style="text-align:left;"> Fun_wc_F9 </td>
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.703 </td>
    <td style="text-align:right;"> 0.040 </td>
@@ -1561,7 +2057,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F9.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.789 </td>
    <td style="text-align:right;"> 0.045 </td>
@@ -1592,9 +2088,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.868 </td>
    <td style="text-align:right;"> 0.074 </td>
@@ -1604,7 +2100,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.072 </td>
    <td style="text-align:right;"> 0.092 </td>
@@ -1614,7 +2110,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.072 </td>
+   <td style="text-align:right;"> 0.092 </td>
+   <td style="text-align:right;"> 3.541 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F10 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.970 </td>
    <td style="text-align:right;"> 0.083 </td>
@@ -1624,7 +2130,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.097 </td>
    <td style="text-align:right;"> 0.094 </td>
@@ -1634,7 +2140,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.097 </td>
+   <td style="text-align:right;"> 0.094 </td>
+   <td style="text-align:right;"> 3.635 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F10 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.113 </td>
    <td style="text-align:right;"> 0.095 </td>
@@ -1643,9 +2159,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wc_F10 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.753 </td>
    <td style="text-align:right;"> 0.065 </td>
@@ -1655,7 +2171,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.144 </td>
+   <td style="text-align:right;"> 0.098 </td>
+   <td style="text-align:right;"> 3.806 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F10 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.797 </td>
    <td style="text-align:right;"> 0.068 </td>
@@ -1664,9 +2190,29 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Fun_wc_F10 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.756 </td>
+   <td style="text-align:right;"> 0.065 </td>
+   <td style="text-align:right;"> 2.427 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F10 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.164 </td>
+   <td style="text-align:right;"> 0.100 </td>
+   <td style="text-align:right;"> 3.879 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Fun_wc_F10 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.738 </td>
    <td style="text-align:right;"> 0.063 </td>
@@ -1676,7 +2222,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.768 </td>
    <td style="text-align:right;"> 0.066 </td>
@@ -1686,7 +2232,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Fun_wc_F10.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.814 </td>
    <td style="text-align:right;"> 0.070 </td>
@@ -1728,9 +2274,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 11.789 </td>
    <td style="text-align:right;"> 0.101 </td>
@@ -1740,7 +2286,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 5.988 </td>
    <td style="text-align:right;"> 0.051 </td>
@@ -1750,7 +2296,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 5.988 </td>
+   <td style="text-align:right;"> 0.051 </td>
+   <td style="text-align:right;"> 26.126 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wholecommunity </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 8.171 </td>
    <td style="text-align:right;"> 0.070 </td>
@@ -1760,7 +2316,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 5.018 </td>
    <td style="text-align:right;"> 0.043 </td>
@@ -1770,7 +2326,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 5.018 </td>
+   <td style="text-align:right;"> 0.043 </td>
+   <td style="text-align:right;"> 21.706 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wholecommunity </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 5.252 </td>
    <td style="text-align:right;"> 0.045 </td>
@@ -1779,9 +2345,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wholecommunity </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 10.064 </td>
    <td style="text-align:right;"> 0.086 </td>
@@ -1791,7 +2357,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 11.108 </td>
+   <td style="text-align:right;"> 0.095 </td>
+   <td style="text-align:right;"> 50.821 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wholecommunity </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 4.576 </td>
    <td style="text-align:right;"> 0.039 </td>
@@ -1800,9 +2376,29 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wholecommunity </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 5.519 </td>
+   <td style="text-align:right;"> 0.047 </td>
+   <td style="text-align:right;"> 23.978 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wholecommunity </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 2.199 </td>
+   <td style="text-align:right;"> 0.019 </td>
+   <td style="text-align:right;"> 9.277 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wholecommunity </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.327 </td>
    <td style="text-align:right;"> 0.011 </td>
@@ -1812,7 +2408,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.382 </td>
    <td style="text-align:right;"> 0.012 </td>
@@ -1822,7 +2418,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wholecommunity.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 1.179 </td>
    <td style="text-align:right;"> 0.010 </td>
@@ -1853,29 +2449,39 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.351 </td>
    <td style="text-align:right;"> 0.055 </td>
    <td style="text-align:right;"> 2.163 </td>
-   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:right;"> 0.001 </td>
    <td style="text-align:left;"> Bac_wc_B1 </td>
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.221 </td>
    <td style="text-align:right;"> 0.035 </td>
    <td style="text-align:right;"> 1.333 </td>
-   <td style="text-align:right;"> 0.071 </td>
+   <td style="text-align:right;"> 0.079 </td>
    <td style="text-align:left;"> Bac_wc_B1 </td>
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.221 </td>
+   <td style="text-align:right;"> 0.035 </td>
+   <td style="text-align:right;"> 1.333 </td>
+   <td style="text-align:right;"> 0.081 </td>
+   <td style="text-align:left;"> Bac_wc_B1 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.478 </td>
    <td style="text-align:right;"> 0.075 </td>
@@ -1885,28 +2491,38 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.165 </td>
    <td style="text-align:right;"> 0.026 </td>
    <td style="text-align:right;"> 0.985 </td>
-   <td style="text-align:right;"> 0.429 </td>
+   <td style="text-align:right;"> 0.459 </td>
    <td style="text-align:left;"> Bac_wc_B1 </td>
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.165 </td>
+   <td style="text-align:right;"> 0.026 </td>
+   <td style="text-align:right;"> 0.985 </td>
+   <td style="text-align:right;"> 0.438 </td>
+   <td style="text-align:left;"> Bac_wc_B1 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.152 </td>
    <td style="text-align:right;"> 0.024 </td>
    <td style="text-align:right;"> 0.908 </td>
-   <td style="text-align:right;"> 0.638 </td>
+   <td style="text-align:right;"> 0.612 </td>
    <td style="text-align:left;"> Bac_wc_B1 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.583 </td>
    <td style="text-align:right;"> 0.092 </td>
@@ -1916,7 +2532,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.504 </td>
+   <td style="text-align:right;"> 0.079 </td>
+   <td style="text-align:right;"> 3.190 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B1 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.454 </td>
    <td style="text-align:right;"> 0.072 </td>
@@ -1925,9 +2551,29 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wc_B1 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.480 </td>
+   <td style="text-align:right;"> 0.076 </td>
+   <td style="text-align:right;"> 3.027 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B1 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.508 </td>
+   <td style="text-align:right;"> 0.080 </td>
+   <td style="text-align:right;"> 3.217 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B1 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.530 </td>
    <td style="text-align:right;"> 0.084 </td>
@@ -1937,7 +2583,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.453 </td>
    <td style="text-align:right;"> 0.071 </td>
@@ -1947,7 +2593,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B1.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.579 </td>
    <td style="text-align:right;"> 0.091 </td>
@@ -1978,9 +2624,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.374 </td>
    <td style="text-align:right;"> 0.033 </td>
@@ -1990,7 +2636,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.401 </td>
    <td style="text-align:right;"> 0.035 </td>
@@ -2000,7 +2646,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.401 </td>
+   <td style="text-align:right;"> 0.035 </td>
+   <td style="text-align:right;"> 2.539 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B2 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.534 </td>
    <td style="text-align:right;"> 0.047 </td>
@@ -2010,17 +2666,27 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model4 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.296 </td>
+   <td style="text-align:right;"> 0.026 </td>
+   <td style="text-align:right;"> 1.856 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B2 </td>
+   <td style="text-align:left;"> ammonium </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model5 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.296 </td>
    <td style="text-align:right;"> 0.026 </td>
    <td style="text-align:right;"> 1.856 </td>
    <td style="text-align:right;"> 0.002 </td>
    <td style="text-align:left;"> Bac_wc_B2 </td>
-   <td style="text-align:left;"> ammonium </td>
+   <td style="text-align:left;"> nitrate </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.336 </td>
    <td style="text-align:right;"> 0.030 </td>
@@ -2029,9 +2695,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wc_B2 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.580 </td>
    <td style="text-align:right;"> 0.051 </td>
@@ -2041,7 +2707,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.609 </td>
+   <td style="text-align:right;"> 0.054 </td>
+   <td style="text-align:right;"> 3.931 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B2 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.737 </td>
    <td style="text-align:right;"> 0.065 </td>
@@ -2050,9 +2726,29 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wc_B2 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.770 </td>
+   <td style="text-align:right;"> 0.068 </td>
+   <td style="text-align:right;"> 5.044 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B2 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.441 </td>
+   <td style="text-align:right;"> 0.039 </td>
+   <td style="text-align:right;"> 2.803 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B2 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.534 </td>
    <td style="text-align:right;"> 0.047 </td>
@@ -2062,7 +2758,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.780 </td>
    <td style="text-align:right;"> 0.069 </td>
@@ -2072,7 +2768,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B2.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.341 </td>
    <td style="text-align:right;"> 0.030 </td>
@@ -2103,19 +2799,19 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.181 </td>
    <td style="text-align:right;"> 0.028 </td>
    <td style="text-align:right;"> 1.096 </td>
-   <td style="text-align:right;"> 0.229 </td>
+   <td style="text-align:right;"> 0.231 </td>
    <td style="text-align:left;"> Bac_wc_B3 </td>
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.429 </td>
    <td style="text-align:right;"> 0.066 </td>
@@ -2125,17 +2821,27 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.429 </td>
+   <td style="text-align:right;"> 0.066 </td>
+   <td style="text-align:right;"> 2.696 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B3 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.199 </td>
    <td style="text-align:right;"> 0.031 </td>
    <td style="text-align:right;"> 1.207 </td>
-   <td style="text-align:right;"> 0.111 </td>
+   <td style="text-align:right;"> 0.119 </td>
    <td style="text-align:left;"> Bac_wc_B3 </td>
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.406 </td>
    <td style="text-align:right;"> 0.063 </td>
@@ -2145,7 +2851,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.406 </td>
+   <td style="text-align:right;"> 0.063 </td>
+   <td style="text-align:right;"> 2.541 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B3 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.405 </td>
    <td style="text-align:right;"> 0.063 </td>
@@ -2154,9 +2870,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wc_B3 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.430 </td>
    <td style="text-align:right;"> 0.066 </td>
@@ -2166,7 +2882,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.381 </td>
+   <td style="text-align:right;"> 0.059 </td>
+   <td style="text-align:right;"> 2.375 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B3 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.466 </td>
    <td style="text-align:right;"> 0.072 </td>
@@ -2175,34 +2901,54 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wc_B3 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.434 </td>
+   <td style="text-align:right;"> 0.067 </td>
+   <td style="text-align:right;"> 2.729 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B3 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.405 </td>
+   <td style="text-align:right;"> 0.063 </td>
+   <td style="text-align:right;"> 2.536 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B3 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.242 </td>
    <td style="text-align:right;"> 0.037 </td>
    <td style="text-align:right;"> 1.474 </td>
-   <td style="text-align:right;"> 0.006 </td>
+   <td style="text-align:right;"> 0.009 </td>
    <td style="text-align:left;"> Bac_wc_B3 </td>
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.304 </td>
    <td style="text-align:right;"> 0.047 </td>
    <td style="text-align:right;"> 1.874 </td>
-   <td style="text-align:right;"> 0.003 </td>
+   <td style="text-align:right;"> 0.001 </td>
    <td style="text-align:left;"> Bac_wc_B3 </td>
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B3.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.264 </td>
    <td style="text-align:right;"> 0.041 </td>
    <td style="text-align:right;"> 1.615 </td>
-   <td style="text-align:right;"> 0.005 </td>
+   <td style="text-align:right;"> 0.007 </td>
    <td style="text-align:left;"> Bac_wc_B3 </td>
    <td style="text-align:left;"> herbivory_perc </td>
   </tr>
@@ -2228,9 +2974,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.378 </td>
    <td style="text-align:right;"> 0.048 </td>
@@ -2240,7 +2986,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.389 </td>
    <td style="text-align:right;"> 0.049 </td>
@@ -2250,7 +2996,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.389 </td>
+   <td style="text-align:right;"> 0.049 </td>
+   <td style="text-align:right;"> 2.541 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B4 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.608 </td>
    <td style="text-align:right;"> 0.077 </td>
@@ -2260,7 +3016,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.383 </td>
    <td style="text-align:right;"> 0.049 </td>
@@ -2270,7 +3026,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.383 </td>
+   <td style="text-align:right;"> 0.049 </td>
+   <td style="text-align:right;"> 2.499 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B4 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.375 </td>
    <td style="text-align:right;"> 0.047 </td>
@@ -2279,9 +3045,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wc_B4 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.400 </td>
    <td style="text-align:right;"> 0.051 </td>
@@ -2291,7 +3057,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.502 </td>
+   <td style="text-align:right;"> 0.064 </td>
+   <td style="text-align:right;"> 3.326 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B4 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.363 </td>
    <td style="text-align:right;"> 0.046 </td>
@@ -2300,9 +3076,29 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wc_B4 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.352 </td>
+   <td style="text-align:right;"> 0.045 </td>
+   <td style="text-align:right;"> 2.286 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B4 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.305 </td>
+   <td style="text-align:right;"> 0.039 </td>
+   <td style="text-align:right;"> 1.971 </td>
+   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:left;"> Bac_wc_B4 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.474 </td>
    <td style="text-align:right;"> 0.060 </td>
@@ -2312,7 +3108,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.512 </td>
    <td style="text-align:right;"> 0.065 </td>
@@ -2322,7 +3118,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B4.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.340 </td>
    <td style="text-align:right;"> 0.043 </td>
@@ -2353,9 +3149,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.321 </td>
    <td style="text-align:right;"> 0.042 </td>
@@ -2365,7 +3161,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.289 </td>
    <td style="text-align:right;"> 0.037 </td>
@@ -2375,7 +3171,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.289 </td>
+   <td style="text-align:right;"> 0.037 </td>
+   <td style="text-align:right;"> 1.868 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B5 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.325 </td>
    <td style="text-align:right;"> 0.042 </td>
@@ -2385,7 +3191,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.282 </td>
    <td style="text-align:right;"> 0.037 </td>
@@ -2395,18 +3201,28 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.282 </td>
+   <td style="text-align:right;"> 0.037 </td>
+   <td style="text-align:right;"> 1.819 </td>
+   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:left;"> Bac_wc_B5 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.261 </td>
    <td style="text-align:right;"> 0.034 </td>
    <td style="text-align:right;"> 1.681 </td>
-   <td style="text-align:right;"> 0.003 </td>
+   <td style="text-align:right;"> 0.002 </td>
    <td style="text-align:left;"> Bac_wc_B5 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.472 </td>
    <td style="text-align:right;"> 0.061 </td>
@@ -2416,7 +3232,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.485 </td>
+   <td style="text-align:right;"> 0.063 </td>
+   <td style="text-align:right;"> 3.212 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B5 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.398 </td>
    <td style="text-align:right;"> 0.051 </td>
@@ -2425,9 +3251,29 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wc_B5 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.559 </td>
+   <td style="text-align:right;"> 0.072 </td>
+   <td style="text-align:right;"> 3.743 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B5 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.312 </td>
+   <td style="text-align:right;"> 0.040 </td>
+   <td style="text-align:right;"> 2.020 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B5 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.350 </td>
    <td style="text-align:right;"> 0.045 </td>
@@ -2437,7 +3283,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.370 </td>
    <td style="text-align:right;"> 0.048 </td>
@@ -2447,7 +3293,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B5.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.308 </td>
    <td style="text-align:right;"> 0.040 </td>
@@ -2478,7 +3324,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
    <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B6.Model </td>
    <td style="text-align:right;"> 0 </td>
@@ -2507,7 +3353,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;">  </td>
    <td style="text-align:left;"> Bac_wc_B6 </td>
-   <td style="text-align:left;"> SOM </td>
+   <td style="text-align:left;"> perc_moisture </td>
   </tr>
   <tr>
    <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B6.Model3 </td>
@@ -2517,7 +3363,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;">  </td>
    <td style="text-align:left;"> Bac_wc_B6 </td>
-   <td style="text-align:left;"> ammonium </td>
+   <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
    <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B6.Model4 </td>
@@ -2527,10 +3373,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;">  </td>
    <td style="text-align:left;"> Bac_wc_B6 </td>
-   <td style="text-align:left;"> phos </td>
+   <td style="text-align:left;"> ammonium </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
-<tr>
+  <tr>
    <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B6.Model5 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0 </td>
@@ -2538,7 +3383,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;">  </td>
    <td style="text-align:left;"> Bac_wc_B6 </td>
-   <td style="text-align:left;"> ppt3yr </td>
+   <td style="text-align:left;"> nitrate </td>
   </tr>
   <tr>
    <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B6.Model6 </td>
@@ -2548,9 +3393,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;">  </td>
    <td style="text-align:left;"> Bac_wc_B6 </td>
-   <td style="text-align:left;"> GDD3yr </td>
+   <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
    <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B6.Model7 </td>
    <td style="text-align:right;"> 0 </td>
@@ -2559,7 +3404,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;">  </td>
    <td style="text-align:left;"> Bac_wc_B6 </td>
-   <td style="text-align:left;"> avg_SRL </td>
+   <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
    <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B6.Model8 </td>
@@ -2569,10 +3414,61 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;">  </td>
    <td style="text-align:left;"> Bac_wc_B6 </td>
-   <td style="text-align:left;"> avg_SLA </td>
+   <td style="text-align:left;"> ppt30yr </td>
   </tr>
   <tr>
    <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B6.Model9 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:left;"> Bac_wc_B6 </td>
+   <td style="text-align:left;"> GDD3yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B6.Model10 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:left;"> Bac_wc_B6 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B6.Model11 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:left;"> Bac_wc_B6 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
+  <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
+<tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B6.Model12 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:left;"> Bac_wc_B6 </td>
+   <td style="text-align:left;"> avg_SRL </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B6.Model13 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:left;"> Bac_wc_B6 </td>
+   <td style="text-align:left;"> avg_SLA </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B6.Model14 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0 </td>
@@ -2603,106 +3499,156 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.248 </td>
    <td style="text-align:right;"> 0.17 </td>
    <td style="text-align:right;"> 2.041 </td>
-   <td style="text-align:right;"> 0.087 </td>
+   <td style="text-align:right;"> 0.069 </td>
    <td style="text-align:left;"> Bac_wc_B7 </td>
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.soil_moisture_m.std </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.248 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> 2.041 </td>
-   <td style="text-align:right;"> 0.097 </td>
-   <td style="text-align:left;"> Bac_wc_B7 </td>
-   <td style="text-align:left;"> soil_moisture </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.SOM_m.std </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.248 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> 2.041 </td>
-   <td style="text-align:right;"> 0.085 </td>
-   <td style="text-align:left;"> Bac_wc_B7 </td>
-   <td style="text-align:left;"> SOM </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.ammonium_m.std </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.248 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> 2.041 </td>
-   <td style="text-align:right;"> 0.075 </td>
-   <td style="text-align:left;"> Bac_wc_B7 </td>
-   <td style="text-align:left;"> ammonium </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.phos_m.std </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.248 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> 2.041 </td>
-   <td style="text-align:right;"> 0.086 </td>
-   <td style="text-align:left;"> Bac_wc_B7 </td>
-   <td style="text-align:left;"> phos </td>
-  </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
-<tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.ppt3yr_m.std </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.248 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> 2.041 </td>
-   <td style="text-align:right;"> 0.088 </td>
-   <td style="text-align:left;"> Bac_wc_B7 </td>
-   <td style="text-align:left;"> ppt3yr </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.GDD3yr_m.std </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.248 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> 2.041 </td>
-   <td style="text-align:right;"> 0.090 </td>
-   <td style="text-align:left;"> Bac_wc_B7 </td>
-   <td style="text-align:left;"> GDD3yr </td>
-  </tr>
-  <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
-<tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.avg_SRL_m.std </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.248 </td>
-   <td style="text-align:right;"> 0.17 </td>
-   <td style="text-align:right;"> 2.041 </td>
-   <td style="text-align:right;"> 0.085 </td>
-   <td style="text-align:left;"> Bac_wc_B7 </td>
-   <td style="text-align:left;"> avg_SRL </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.248 </td>
    <td style="text-align:right;"> 0.17 </td>
    <td style="text-align:right;"> 2.041 </td>
    <td style="text-align:right;"> 0.081 </td>
    <td style="text-align:left;"> Bac_wc_B7 </td>
-   <td style="text-align:left;"> avg_SLA </td>
+   <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model2 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.248 </td>
    <td style="text-align:right;"> 0.17 </td>
    <td style="text-align:right;"> 2.041 </td>
-   <td style="text-align:right;"> 0.088 </td>
+   <td style="text-align:right;"> 0.090 </td>
+   <td style="text-align:left;"> Bac_wc_B7 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model3 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.248 </td>
+   <td style="text-align:right;"> 0.17 </td>
+   <td style="text-align:right;"> 2.041 </td>
+   <td style="text-align:right;"> 0.083 </td>
+   <td style="text-align:left;"> Bac_wc_B7 </td>
+   <td style="text-align:left;"> SOM </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model4 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.248 </td>
+   <td style="text-align:right;"> 0.17 </td>
+   <td style="text-align:right;"> 2.041 </td>
+   <td style="text-align:right;"> 0.089 </td>
+   <td style="text-align:left;"> Bac_wc_B7 </td>
+   <td style="text-align:left;"> ammonium </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.248 </td>
+   <td style="text-align:right;"> 0.17 </td>
+   <td style="text-align:right;"> 2.041 </td>
+   <td style="text-align:right;"> 0.069 </td>
+   <td style="text-align:left;"> Bac_wc_B7 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model6 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.248 </td>
+   <td style="text-align:right;"> 0.17 </td>
+   <td style="text-align:right;"> 2.041 </td>
+   <td style="text-align:right;"> 0.083 </td>
+   <td style="text-align:left;"> Bac_wc_B7 </td>
+   <td style="text-align:left;"> phos </td>
+  </tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+<tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model7 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.248 </td>
+   <td style="text-align:right;"> 0.17 </td>
+   <td style="text-align:right;"> 2.041 </td>
+   <td style="text-align:right;"> 0.078 </td>
+   <td style="text-align:left;"> Bac_wc_B7 </td>
+   <td style="text-align:left;"> ppt3yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.248 </td>
+   <td style="text-align:right;"> 0.17 </td>
+   <td style="text-align:right;"> 2.041 </td>
+   <td style="text-align:right;"> 0.094 </td>
+   <td style="text-align:left;"> Bac_wc_B7 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model9 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.248 </td>
+   <td style="text-align:right;"> 0.17 </td>
+   <td style="text-align:right;"> 2.041 </td>
+   <td style="text-align:right;"> 0.075 </td>
+   <td style="text-align:left;"> Bac_wc_B7 </td>
+   <td style="text-align:left;"> GDD3yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.248 </td>
+   <td style="text-align:right;"> 0.17 </td>
+   <td style="text-align:right;"> 2.041 </td>
+   <td style="text-align:right;"> 0.081 </td>
+   <td style="text-align:left;"> Bac_wc_B7 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.248 </td>
+   <td style="text-align:right;"> 0.17 </td>
+   <td style="text-align:right;"> 2.041 </td>
+   <td style="text-align:right;"> 0.095 </td>
+   <td style="text-align:left;"> Bac_wc_B7 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
+  <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
+<tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model12 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.248 </td>
+   <td style="text-align:right;"> 0.17 </td>
+   <td style="text-align:right;"> 2.041 </td>
+   <td style="text-align:right;"> 0.094 </td>
+   <td style="text-align:left;"> Bac_wc_B7 </td>
+   <td style="text-align:left;"> avg_SRL </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model13 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.248 </td>
+   <td style="text-align:right;"> 0.17 </td>
+   <td style="text-align:right;"> 2.041 </td>
+   <td style="text-align:right;"> 0.072 </td>
+   <td style="text-align:left;"> Bac_wc_B7 </td>
+   <td style="text-align:left;"> avg_SLA </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B7.Model14 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.248 </td>
+   <td style="text-align:right;"> 0.17 </td>
+   <td style="text-align:right;"> 2.041 </td>
+   <td style="text-align:right;"> 0.082 </td>
    <td style="text-align:left;"> Bac_wc_B7 </td>
    <td style="text-align:left;"> herbivory_perc </td>
   </tr>
@@ -2728,9 +3674,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.269 </td>
    <td style="text-align:right;"> 0.093 </td>
@@ -2740,7 +3686,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.248 </td>
    <td style="text-align:right;"> 0.086 </td>
@@ -2750,38 +3696,58 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.248 </td>
+   <td style="text-align:right;"> 0.086 </td>
+   <td style="text-align:right;"> 1.694 </td>
+   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:left;"> Bac_wc_B8 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.255 </td>
    <td style="text-align:right;"> 0.089 </td>
    <td style="text-align:right;"> 1.752 </td>
-   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:right;"> 0.001 </td>
    <td style="text-align:left;"> Bac_wc_B8 </td>
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.239 </td>
    <td style="text-align:right;"> 0.083 </td>
    <td style="text-align:right;"> 1.632 </td>
-   <td style="text-align:right;"> 0.003 </td>
+   <td style="text-align:right;"> 0.005 </td>
    <td style="text-align:left;"> Bac_wc_B8 </td>
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.239 </td>
+   <td style="text-align:right;"> 0.083 </td>
+   <td style="text-align:right;"> 1.632 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B8 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.242 </td>
    <td style="text-align:right;"> 0.084 </td>
    <td style="text-align:right;"> 1.650 </td>
-   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:right;"> 0.003 </td>
    <td style="text-align:left;"> Bac_wc_B8 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.303 </td>
    <td style="text-align:right;"> 0.105 </td>
@@ -2791,7 +3757,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.241 </td>
+   <td style="text-align:right;"> 0.084 </td>
+   <td style="text-align:right;"> 1.642 </td>
+   <td style="text-align:right;"> 0.005 </td>
+   <td style="text-align:left;"> Bac_wc_B8 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.299 </td>
    <td style="text-align:right;"> 0.104 </td>
@@ -2800,9 +3776,29 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wc_B8 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.286 </td>
+   <td style="text-align:right;"> 0.099 </td>
+   <td style="text-align:right;"> 1.984 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B8 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.236 </td>
+   <td style="text-align:right;"> 0.082 </td>
+   <td style="text-align:right;"> 1.605 </td>
+   <td style="text-align:right;"> 0.004 </td>
+   <td style="text-align:left;"> Bac_wc_B8 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.260 </td>
    <td style="text-align:right;"> 0.090 </td>
@@ -2812,7 +3808,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.300 </td>
    <td style="text-align:right;"> 0.104 </td>
@@ -2822,12 +3818,12 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B8.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.295 </td>
    <td style="text-align:right;"> 0.102 </td>
    <td style="text-align:right;"> 2.055 </td>
-   <td style="text-align:right;"> 0.002 </td>
+   <td style="text-align:right;"> 0.001 </td>
    <td style="text-align:left;"> Bac_wc_B8 </td>
    <td style="text-align:left;"> herbivory_perc </td>
   </tr>
@@ -2853,9 +3849,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.420 </td>
    <td style="text-align:right;"> 0.052 </td>
@@ -2865,7 +3861,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.464 </td>
    <td style="text-align:right;"> 0.057 </td>
@@ -2875,7 +3871,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.464 </td>
+   <td style="text-align:right;"> 0.057 </td>
+   <td style="text-align:right;"> 2.666 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B9 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.518 </td>
    <td style="text-align:right;"> 0.064 </td>
@@ -2885,7 +3891,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.463 </td>
    <td style="text-align:right;"> 0.057 </td>
@@ -2895,7 +3901,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.463 </td>
+   <td style="text-align:right;"> 0.057 </td>
+   <td style="text-align:right;"> 2.657 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B9 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.422 </td>
    <td style="text-align:right;"> 0.052 </td>
@@ -2904,40 +3920,70 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wc_B9 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.243 </td>
    <td style="text-align:right;"> 0.030 </td>
    <td style="text-align:right;"> 1.355 </td>
-   <td style="text-align:right;"> 0.034 </td>
+   <td style="text-align:right;"> 0.051 </td>
    <td style="text-align:left;"> Bac_wc_B9 </td>
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.384 </td>
+   <td style="text-align:right;"> 0.047 </td>
+   <td style="text-align:right;"> 2.182 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B9 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.228 </td>
    <td style="text-align:right;"> 0.028 </td>
    <td style="text-align:right;"> 1.268 </td>
-   <td style="text-align:right;"> 0.078 </td>
+   <td style="text-align:right;"> 0.063 </td>
    <td style="text-align:left;"> Bac_wc_B9 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.499 </td>
+   <td style="text-align:right;"> 0.061 </td>
+   <td style="text-align:right;"> 2.875 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B9 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.328 </td>
+   <td style="text-align:right;"> 0.040 </td>
+   <td style="text-align:right;"> 1.850 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B9 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.396 </td>
    <td style="text-align:right;"> 0.049 </td>
    <td style="text-align:right;"> 2.252 </td>
-   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:right;"> 0.002 </td>
    <td style="text-align:left;"> Bac_wc_B9 </td>
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.321 </td>
    <td style="text-align:right;"> 0.040 </td>
@@ -2947,7 +3993,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B9.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.554 </td>
    <td style="text-align:right;"> 0.068 </td>
@@ -2978,9 +4024,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.355 </td>
    <td style="text-align:right;"> 0.040 </td>
@@ -2990,7 +4036,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.680 </td>
    <td style="text-align:right;"> 0.077 </td>
@@ -3000,7 +4046,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.680 </td>
+   <td style="text-align:right;"> 0.077 </td>
+   <td style="text-align:right;"> 4.853 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B10 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.583 </td>
    <td style="text-align:right;"> 0.066 </td>
@@ -3010,7 +4066,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.555 </td>
    <td style="text-align:right;"> 0.063 </td>
@@ -3020,7 +4076,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.555 </td>
+   <td style="text-align:right;"> 0.063 </td>
+   <td style="text-align:right;"> 3.902 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B10 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.606 </td>
    <td style="text-align:right;"> 0.069 </td>
@@ -3029,9 +4095,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wc_B10 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.496 </td>
    <td style="text-align:right;"> 0.056 </td>
@@ -3041,7 +4107,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model8 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.424 </td>
+   <td style="text-align:right;"> 0.048 </td>
+   <td style="text-align:right;"> 2.929 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B10 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model9 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.714 </td>
    <td style="text-align:right;"> 0.081 </td>
@@ -3050,19 +4126,39 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wc_B10 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.680 </td>
+   <td style="text-align:right;"> 0.077 </td>
+   <td style="text-align:right;"> 4.851 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B10 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.660 </td>
+   <td style="text-align:right;"> 0.075 </td>
+   <td style="text-align:right;"> 4.693 </td>
+   <td style="text-align:right;"> 0.001 </td>
+   <td style="text-align:left;"> Bac_wc_B10 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.224 </td>
    <td style="text-align:right;"> 0.025 </td>
    <td style="text-align:right;"> 1.511 </td>
-   <td style="text-align:right;"> 0.009 </td>
+   <td style="text-align:right;"> 0.015 </td>
    <td style="text-align:left;"> Bac_wc_B10 </td>
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.332 </td>
    <td style="text-align:right;"> 0.038 </td>
@@ -3072,7 +4168,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B10.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.251 </td>
    <td style="text-align:right;"> 0.029 </td>
@@ -3103,60 +4199,80 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.153 </td>
    <td style="text-align:right;"> 0.050 </td>
    <td style="text-align:right;"> 1.060 </td>
-   <td style="text-align:right;"> 0.238 </td>
+   <td style="text-align:right;"> 0.271 </td>
    <td style="text-align:left;"> Bac_wc_B11 </td>
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.196 </td>
    <td style="text-align:right;"> 0.065 </td>
    <td style="text-align:right;"> 1.386 </td>
-   <td style="text-align:right;"> 0.071 </td>
+   <td style="text-align:right;"> 0.053 </td>
    <td style="text-align:left;"> Bac_wc_B11 </td>
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.196 </td>
+   <td style="text-align:right;"> 0.065 </td>
+   <td style="text-align:right;"> 1.386 </td>
+   <td style="text-align:right;"> 0.068 </td>
+   <td style="text-align:left;"> Bac_wc_B11 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.177 </td>
    <td style="text-align:right;"> 0.058 </td>
    <td style="text-align:right;"> 1.238 </td>
-   <td style="text-align:right;"> 0.082 </td>
+   <td style="text-align:right;"> 0.088 </td>
    <td style="text-align:left;"> Bac_wc_B11 </td>
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.174 </td>
    <td style="text-align:right;"> 0.057 </td>
    <td style="text-align:right;"> 1.219 </td>
-   <td style="text-align:right;"> 0.086 </td>
+   <td style="text-align:right;"> 0.084 </td>
    <td style="text-align:left;"> Bac_wc_B11 </td>
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.174 </td>
+   <td style="text-align:right;"> 0.057 </td>
+   <td style="text-align:right;"> 1.219 </td>
+   <td style="text-align:right;"> 0.097 </td>
+   <td style="text-align:left;"> Bac_wc_B11 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model6 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.174 </td>
    <td style="text-align:right;"> 0.057 </td>
    <td style="text-align:right;"> 1.220 </td>
-   <td style="text-align:right;"> 0.102 </td>
+   <td style="text-align:right;"> 0.104 </td>
    <td style="text-align:left;"> Bac_wc_B11 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.200 </td>
    <td style="text-align:right;"> 0.066 </td>
@@ -3166,43 +4282,73 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model8 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.200 </td>
    <td style="text-align:right;"> 0.066 </td>
    <td style="text-align:right;"> 1.411 </td>
-   <td style="text-align:right;"> 0.106 </td>
+   <td style="text-align:right;"> 0.093 </td>
+   <td style="text-align:left;"> Bac_wc_B11 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model9 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.200 </td>
+   <td style="text-align:right;"> 0.066 </td>
+   <td style="text-align:right;"> 1.411 </td>
+   <td style="text-align:right;"> 0.094 </td>
    <td style="text-align:left;"> Bac_wc_B11 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.200 </td>
+   <td style="text-align:right;"> 0.066 </td>
+   <td style="text-align:right;"> 1.411 </td>
+   <td style="text-align:right;"> 0.090 </td>
+   <td style="text-align:left;"> Bac_wc_B11 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.200 </td>
+   <td style="text-align:right;"> 0.066 </td>
+   <td style="text-align:right;"> 1.411 </td>
+   <td style="text-align:right;"> 0.092 </td>
+   <td style="text-align:left;"> Bac_wc_B11 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.184 </td>
    <td style="text-align:right;"> 0.061 </td>
    <td style="text-align:right;"> 1.292 </td>
-   <td style="text-align:right;"> 0.084 </td>
+   <td style="text-align:right;"> 0.081 </td>
    <td style="text-align:left;"> Bac_wc_B11 </td>
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.176 </td>
    <td style="text-align:right;"> 0.058 </td>
    <td style="text-align:right;"> 1.236 </td>
-   <td style="text-align:right;"> 0.094 </td>
+   <td style="text-align:right;"> 0.079 </td>
    <td style="text-align:left;"> Bac_wc_B11 </td>
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B11.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.200 </td>
    <td style="text-align:right;"> 0.066 </td>
    <td style="text-align:right;"> 1.409 </td>
-   <td style="text-align:right;"> 0.062 </td>
+   <td style="text-align:right;"> 0.072 </td>
    <td style="text-align:left;"> Bac_wc_B11 </td>
    <td style="text-align:left;"> herbivory_perc </td>
   </tr>
@@ -3228,106 +4374,156 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.257 </td>
    <td style="text-align:right;"> 0.067 </td>
    <td style="text-align:right;"> 1.293 </td>
-   <td style="text-align:right;"> 0.070 </td>
+   <td style="text-align:right;"> 0.072 </td>
    <td style="text-align:left;"> Bac_wc_B12 </td>
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.238 </td>
    <td style="text-align:right;"> 0.062 </td>
    <td style="text-align:right;"> 1.190 </td>
-   <td style="text-align:right;"> 0.141 </td>
+   <td style="text-align:right;"> 0.133 </td>
    <td style="text-align:left;"> Bac_wc_B12 </td>
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model2 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.238 </td>
+   <td style="text-align:right;"> 0.062 </td>
+   <td style="text-align:right;"> 1.190 </td>
+   <td style="text-align:right;"> 0.133 </td>
+   <td style="text-align:left;"> Bac_wc_B12 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model3 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.259 </td>
    <td style="text-align:right;"> 0.067 </td>
    <td style="text-align:right;"> 1.302 </td>
-   <td style="text-align:right;"> 0.056 </td>
+   <td style="text-align:right;"> 0.075 </td>
    <td style="text-align:left;"> Bac_wc_B12 </td>
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.238 </td>
    <td style="text-align:right;"> 0.062 </td>
    <td style="text-align:right;"> 1.190 </td>
-   <td style="text-align:right;"> 0.126 </td>
+   <td style="text-align:right;"> 0.120 </td>
    <td style="text-align:left;"> Bac_wc_B12 </td>
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model5 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.238 </td>
    <td style="text-align:right;"> 0.062 </td>
    <td style="text-align:right;"> 1.190 </td>
-   <td style="text-align:right;"> 0.140 </td>
+   <td style="text-align:right;"> 0.117 </td>
+   <td style="text-align:left;"> Bac_wc_B12 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model6 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.238 </td>
+   <td style="text-align:right;"> 0.062 </td>
+   <td style="text-align:right;"> 1.190 </td>
+   <td style="text-align:right;"> 0.125 </td>
    <td style="text-align:left;"> Bac_wc_B12 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.250 </td>
    <td style="text-align:right;"> 0.065 </td>
    <td style="text-align:right;"> 1.253 </td>
-   <td style="text-align:right;"> 0.122 </td>
+   <td style="text-align:right;"> 0.119 </td>
    <td style="text-align:left;"> Bac_wc_B12 </td>
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model8 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.250 </td>
    <td style="text-align:right;"> 0.065 </td>
    <td style="text-align:right;"> 1.253 </td>
-   <td style="text-align:right;"> 0.095 </td>
+   <td style="text-align:right;"> 0.089 </td>
+   <td style="text-align:left;"> Bac_wc_B12 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model9 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.250 </td>
+   <td style="text-align:right;"> 0.065 </td>
+   <td style="text-align:right;"> 1.253 </td>
+   <td style="text-align:right;"> 0.108 </td>
    <td style="text-align:left;"> Bac_wc_B12 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.250 </td>
+   <td style="text-align:right;"> 0.065 </td>
+   <td style="text-align:right;"> 1.253 </td>
+   <td style="text-align:right;"> 0.104 </td>
+   <td style="text-align:left;"> Bac_wc_B12 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.250 </td>
+   <td style="text-align:right;"> 0.065 </td>
+   <td style="text-align:right;"> 1.253 </td>
+   <td style="text-align:right;"> 0.100 </td>
+   <td style="text-align:left;"> Bac_wc_B12 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.260 </td>
    <td style="text-align:right;"> 0.068 </td>
    <td style="text-align:right;"> 1.308 </td>
-   <td style="text-align:right;"> 0.079 </td>
+   <td style="text-align:right;"> 0.056 </td>
    <td style="text-align:left;"> Bac_wc_B12 </td>
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.240 </td>
    <td style="text-align:right;"> 0.063 </td>
    <td style="text-align:right;"> 1.203 </td>
-   <td style="text-align:right;"> 0.125 </td>
+   <td style="text-align:right;"> 0.114 </td>
    <td style="text-align:left;"> Bac_wc_B12 </td>
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B12.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.261 </td>
    <td style="text-align:right;"> 0.068 </td>
    <td style="text-align:right;"> 1.315 </td>
-   <td style="text-align:right;"> 0.037 </td>
+   <td style="text-align:right;"> 0.054 </td>
    <td style="text-align:left;"> Bac_wc_B12 </td>
    <td style="text-align:left;"> herbivory_perc </td>
   </tr>
@@ -3353,9 +4549,9 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.163 </td>
    <td style="text-align:right;"> 0.058 </td>
@@ -3365,94 +4561,144 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.193 </td>
    <td style="text-align:right;"> 0.069 </td>
    <td style="text-align:right;"> 1.411 </td>
-   <td style="text-align:right;"> 0.022 </td>
+   <td style="text-align:right;"> 0.014 </td>
    <td style="text-align:left;"> Bac_wc_B13 </td>
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.SOM_m.std </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.201 </td>
-   <td style="text-align:right;"> 0.072 </td>
-   <td style="text-align:right;"> 1.475 </td>
-   <td style="text-align:right;"> 0.021 </td>
-   <td style="text-align:left;"> Bac_wc_B13 </td>
-   <td style="text-align:left;"> SOM </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.ammonium_m.std </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.176 </td>
-   <td style="text-align:right;"> 0.063 </td>
-   <td style="text-align:right;"> 1.274 </td>
-   <td style="text-align:right;"> 0.055 </td>
-   <td style="text-align:left;"> Bac_wc_B13 </td>
-   <td style="text-align:left;"> ammonium </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model2 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.193 </td>
    <td style="text-align:right;"> 0.069 </td>
    <td style="text-align:right;"> 1.411 </td>
-   <td style="text-align:right;"> 0.021 </td>
+   <td style="text-align:right;"> 0.011 </td>
+   <td style="text-align:left;"> Bac_wc_B13 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model3 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.201 </td>
+   <td style="text-align:right;"> 0.072 </td>
+   <td style="text-align:right;"> 1.475 </td>
+   <td style="text-align:right;"> 0.025 </td>
+   <td style="text-align:left;"> Bac_wc_B13 </td>
+   <td style="text-align:left;"> SOM </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model4 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.176 </td>
+   <td style="text-align:right;"> 0.063 </td>
+   <td style="text-align:right;"> 1.274 </td>
+   <td style="text-align:right;"> 0.040 </td>
+   <td style="text-align:left;"> Bac_wc_B13 </td>
+   <td style="text-align:left;"> ammonium </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model5 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.176 </td>
+   <td style="text-align:right;"> 0.063 </td>
+   <td style="text-align:right;"> 1.274 </td>
+   <td style="text-align:right;"> 0.050 </td>
+   <td style="text-align:left;"> Bac_wc_B13 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model6 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.193 </td>
+   <td style="text-align:right;"> 0.069 </td>
+   <td style="text-align:right;"> 1.411 </td>
+   <td style="text-align:right;"> 0.027 </td>
    <td style="text-align:left;"> Bac_wc_B13 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.ppt3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model7 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.201 </td>
    <td style="text-align:right;"> 0.072 </td>
    <td style="text-align:right;"> 1.474 </td>
-   <td style="text-align:right;"> 0.042 </td>
+   <td style="text-align:right;"> 0.062 </td>
    <td style="text-align:left;"> Bac_wc_B13 </td>
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.GDD3yr_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model8 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.201 </td>
    <td style="text-align:right;"> 0.072 </td>
    <td style="text-align:right;"> 1.474 </td>
-   <td style="text-align:right;"> 0.054 </td>
+   <td style="text-align:right;"> 0.056 </td>
+   <td style="text-align:left;"> Bac_wc_B13 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model9 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.201 </td>
+   <td style="text-align:right;"> 0.072 </td>
+   <td style="text-align:right;"> 1.474 </td>
+   <td style="text-align:right;"> 0.035 </td>
    <td style="text-align:left;"> Bac_wc_B13 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model10 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.201 </td>
+   <td style="text-align:right;"> 0.072 </td>
+   <td style="text-align:right;"> 1.474 </td>
+   <td style="text-align:right;"> 0.068 </td>
+   <td style="text-align:left;"> Bac_wc_B13 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model11 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.201 </td>
+   <td style="text-align:right;"> 0.072 </td>
+   <td style="text-align:right;"> 1.474 </td>
+   <td style="text-align:right;"> 0.056 </td>
+   <td style="text-align:left;"> Bac_wc_B13 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.162 </td>
    <td style="text-align:right;"> 0.058 </td>
    <td style="text-align:right;"> 1.171 </td>
-   <td style="text-align:right;"> 0.095 </td>
+   <td style="text-align:right;"> 0.096 </td>
    <td style="text-align:left;"> Bac_wc_B13 </td>
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.191 </td>
    <td style="text-align:right;"> 0.068 </td>
    <td style="text-align:right;"> 1.390 </td>
-   <td style="text-align:right;"> 0.032 </td>
+   <td style="text-align:right;"> 0.035 </td>
    <td style="text-align:left;"> Bac_wc_B13 </td>
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B13.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.168 </td>
    <td style="text-align:right;"> 0.060 </td>
    <td style="text-align:right;"> 1.215 </td>
-   <td style="text-align:right;"> 0.069 </td>
+   <td style="text-align:right;"> 0.054 </td>
    <td style="text-align:left;"> Bac_wc_B13 </td>
    <td style="text-align:left;"> herbivory_perc </td>
   </tr>
@@ -3478,60 +4724,80 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
   </tr>
  </thead>
 <tbody>
-  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
+  <tr grouplength="7"><td colspan="8" style="border-bottom: 1px solid;"><strong>Edaphic</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.pH_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.125 </td>
    <td style="text-align:right;"> 0.052 </td>
    <td style="text-align:right;"> 0.997 </td>
-   <td style="text-align:right;"> 0.394 </td>
+   <td style="text-align:right;"> 0.391 </td>
    <td style="text-align:left;"> Bac_wc_B14 </td>
    <td style="text-align:left;"> pH </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.soil_moisture_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model1 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.125 </td>
    <td style="text-align:right;"> 0.052 </td>
    <td style="text-align:right;"> 0.997 </td>
-   <td style="text-align:right;"> 0.379 </td>
+   <td style="text-align:right;"> 0.369 </td>
    <td style="text-align:left;"> Bac_wc_B14 </td>
    <td style="text-align:left;"> soil_moisture </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.SOM_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model2 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.125 </td>
    <td style="text-align:right;"> 0.052 </td>
    <td style="text-align:right;"> 0.997 </td>
-   <td style="text-align:right;"> 0.380 </td>
+   <td style="text-align:right;"> 0.392 </td>
+   <td style="text-align:left;"> Bac_wc_B14 </td>
+   <td style="text-align:left;"> perc_moisture </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model3 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.125 </td>
+   <td style="text-align:right;"> 0.052 </td>
+   <td style="text-align:right;"> 0.997 </td>
+   <td style="text-align:right;"> 0.404 </td>
    <td style="text-align:left;"> Bac_wc_B14 </td>
    <td style="text-align:left;"> SOM </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.ammonium_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model4 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.125 </td>
    <td style="text-align:right;"> 0.052 </td>
    <td style="text-align:right;"> 0.997 </td>
-   <td style="text-align:right;"> 0.376 </td>
+   <td style="text-align:right;"> 0.387 </td>
    <td style="text-align:left;"> Bac_wc_B14 </td>
    <td style="text-align:left;"> ammonium </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.phos_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model5 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.125 </td>
    <td style="text-align:right;"> 0.052 </td>
    <td style="text-align:right;"> 0.997 </td>
-   <td style="text-align:right;"> 0.380 </td>
+   <td style="text-align:right;"> 0.368 </td>
+   <td style="text-align:left;"> Bac_wc_B14 </td>
+   <td style="text-align:left;"> nitrate </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model6 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.125 </td>
+   <td style="text-align:right;"> 0.052 </td>
+   <td style="text-align:right;"> 0.997 </td>
+   <td style="text-align:right;"> 0.391 </td>
    <td style="text-align:left;"> Bac_wc_B14 </td>
    <td style="text-align:left;"> phos </td>
   </tr>
-  <tr grouplength="2"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
+  <tr grouplength="5"><td colspan="8" style="border-bottom: 1px solid;"><strong>Climate</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model7 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0.000 </td>
    <td style="text-align:right;"> 0.000 </td>
@@ -3541,7 +4807,17 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> ppt3yr </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model1 </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model8 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:left;"> Bac_wc_B14 </td>
+   <td style="text-align:left;"> ppt30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model9 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0.000 </td>
    <td style="text-align:right;"> 0.000 </td>
@@ -3550,34 +4826,54 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
    <td style="text-align:left;"> Bac_wc_B14 </td>
    <td style="text-align:left;"> GDD3yr </td>
   </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model10 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:left;"> Bac_wc_B14 </td>
+   <td style="text-align:left;"> GDD30yr </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model11 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;"> 0.000 </td>
+   <td style="text-align:right;">  </td>
+   <td style="text-align:left;"> Bac_wc_B14 </td>
+   <td style="text-align:left;"> coll_GDD </td>
+  </tr>
   <tr grouplength="3"><td colspan="8" style="border-bottom: 1px solid;"><strong>Plant</strong></td></tr>
 <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.avg_SRL_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model12 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.125 </td>
    <td style="text-align:right;"> 0.052 </td>
    <td style="text-align:right;"> 0.997 </td>
-   <td style="text-align:right;"> 0.401 </td>
+   <td style="text-align:right;"> 0.361 </td>
    <td style="text-align:left;"> Bac_wc_B14 </td>
    <td style="text-align:left;"> avg_SRL </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.avg_SLA_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model13 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.125 </td>
    <td style="text-align:right;"> 0.052 </td>
    <td style="text-align:right;"> 0.997 </td>
-   <td style="text-align:right;"> 0.409 </td>
+   <td style="text-align:right;"> 0.379 </td>
    <td style="text-align:left;"> Bac_wc_B14 </td>
    <td style="text-align:left;"> avg_SLA </td>
   </tr>
   <tr>
-   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.herbivory_perc_m.std </td>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Bac_wc_B14.Model14 </td>
    <td style="text-align:right;"> 1 </td>
    <td style="text-align:right;"> 0.125 </td>
    <td style="text-align:right;"> 0.052 </td>
    <td style="text-align:right;"> 0.997 </td>
-   <td style="text-align:right;"> 0.412 </td>
+   <td style="text-align:right;"> 0.380 </td>
    <td style="text-align:left;"> Bac_wc_B14 </td>
    <td style="text-align:left;"> herbivory_perc </td>
   </tr>
@@ -3653,9 +4949,9 @@ Hierarchical clustering of Sørensen dissimilarities supports PAM results, as ca
 
 Rationale for comparing dissimilarities within and among groups (clusters) - If two groups of sampling units are really different (e.g. in their species composition), then average of the within-group compositional dissimilarities ought to be less than the average of the dissimilarities between two random collection of sampling units drawn from the entire population.
 
--   Within-cluster average pairwise Sørensen dissimilarities ranged from 0.514 (F1-F2) to 0.813 (F6-F10).
+-   Within-cluster average pairwise Sørensen dissimilarities ranged from 0.514 (F1) to 0.813 (F8).
 
--   Between-cluster average dissimilarities ranged from 0.808 (F1-F2) to 0.964 (F6-F10).\
+-   Between-cluster average dissimilarities ranged from a minimum of 0.808 (F1 - F2) to a maximum of 0.964 (F6 - F10).\
     \
 
 #### Within-cluster variation {.unnumbered}
@@ -3710,6 +5006,17 @@ This was followed by *post-hoc* testing of pairwise comparisons of group mean di
 #### beta disp ANOVA {.unnumbered .unlisted}
 
 
+```{=html}
+<table class="huxtable" data-quarto-disable-processing="true" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:betadisp-aov-Fun">
+<caption style="caption-side: top; text-align: center;">(#tab:betadisp-aov-Fun) </caption><col><col><col><col><col><col><col><col><tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Term</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">df</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">SumSq</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">MeanSq</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">F.statistic</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">R_squared</th><th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">p.value</th><th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">P.value</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">Fun_sor_clusters</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">9</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">1.82</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">0.202</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">114</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">68.5</td><td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;"></td><td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">8.1e-113</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">Residuals</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">474</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.84</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.002</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">31.5</td><td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></td><td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;"></td></tr>
+</table>
+
+```
 
 \
 \
@@ -3731,30 +5038,29 @@ This was followed by *post-hoc* testing of pairwise comparisons of group mean di
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Pairwise comparisons:
-## (Observed p-value below diagonal, permuted p-value above
-## diagonal)
-##             F1         F2         F3         F4         F5         F6
-## F1             1.0700e-01 1.0000e-03 1.0000e-03 1.0000e-03 1.0000e-03
-## F2  1.2507e-01            1.0000e-03 2.0000e-03 2.0000e-03 1.0000e-03
-## F3  2.5328e-27 1.2525e-04            2.3900e-01 4.6000e-01 4.8200e-01
-## F4  3.2333e-22 3.7834e-04 2.5565e-01            1.1200e-01 4.6000e-02
-## F5  7.2957e-23 4.0695e-04 4.5623e-01 9.2443e-02            7.9100e-01
-## F6  2.1206e-35 7.6164e-07 4.6365e-01 3.8658e-02 7.8743e-01           
-## F7  3.4076e-42 5.5876e-09 3.0383e-01 1.0575e-02 8.8197e-01 8.1765e-01
-## F8  7.3088e-69 1.2861e-13 3.4321e-05 1.6406e-08 1.7125e-02 1.5253e-04
-## F9  2.2326e-63 3.0729e-11 1.2530e-03 2.5367e-06 1.0477e-01 6.5446e-03
-## F10 1.1762e-55 1.3085e-12 7.3921e-04 1.0511e-06 6.9818e-02 2.4854e-03
-##             F7         F8         F9   F10
-## F1  1.0000e-03 1.0000e-03 1.0000e-03 0.001
-## F2  1.0000e-03 1.0000e-03 1.0000e-03 0.001
-## F3  2.8100e-01 1.0000e-03 3.0000e-03 0.002
-## F4  6.0000e-03 1.0000e-03 1.0000e-03 0.001
-## F5  8.8000e-01 2.3000e-02 1.2200e-01 0.081
-## F6  8.3100e-01 2.0000e-03 7.0000e-03 0.002
-## F7             1.0000e-03 4.0000e-03 0.002
-## F8  5.6996e-05            2.3300e-01 0.398
-## F9  4.9074e-03 2.2773e-01            0.731
-## F10 1.2825e-03 4.1545e-01 7.2237e-01
+## (Observed p-value below diagonal, permuted p-value above diagonal)
+##             F1         F2         F3         F4         F5         F6         F7
+## F1             1.1300e-01 1.0000e-03 1.0000e-03 1.0000e-03 1.0000e-03 1.0000e-03
+## F2  1.2507e-01            1.0000e-03 2.0000e-03 1.0000e-03 1.0000e-03 1.0000e-03
+## F3  2.5328e-27 1.2525e-04            2.5100e-01 4.7900e-01 4.7500e-01 3.0900e-01
+## F4  3.2333e-22 3.7834e-04 2.5565e-01            1.0100e-01 4.7000e-02 1.2000e-02
+## F5  7.2957e-23 4.0695e-04 4.5623e-01 9.2443e-02            7.9300e-01 8.6800e-01
+## F6  2.1206e-35 7.6164e-07 4.6365e-01 3.8658e-02 7.8743e-01            8.1100e-01
+## F7  3.4076e-42 5.5876e-09 3.0383e-01 1.0575e-02 8.8197e-01 8.1765e-01           
+## F8  7.3088e-69 1.2861e-13 3.4321e-05 1.6406e-08 1.7125e-02 1.5253e-04 5.6996e-05
+## F9  2.2326e-63 3.0729e-11 1.2530e-03 2.5367e-06 1.0477e-01 6.5446e-03 4.9074e-03
+## F10 1.1762e-55 1.3085e-12 7.3921e-04 1.0511e-06 6.9818e-02 2.4854e-03 1.2825e-03
+##             F8         F9   F10
+## F1  1.0000e-03 1.0000e-03 0.001
+## F2  1.0000e-03 1.0000e-03 0.001
+## F3  1.0000e-03 2.0000e-03 0.001
+## F4  1.0000e-03 1.0000e-03 0.001
+## F5  1.8000e-02 1.1900e-01 0.080
+## F6  1.0000e-03 8.0000e-03 0.003
+## F7  1.0000e-03 7.0000e-03 0.002
+## F8             2.2000e-01 0.413
+## F9  2.2773e-01            0.732
+## F10 4.1545e-01 7.2237e-01
 ```
 
 \
@@ -3764,14 +5070,14 @@ This was followed by *post-hoc* testing of pairwise comparisons of group mean di
 
 PCoA represents dispersion (distance of group members to the spatial median in multivariate space, reduced to principal coordinates).
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-39-1.png)<!-- -->
 
 \
 \
 
 #### Boxplots {.unnumbered .unlisted}
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/betadisp-boxplot-Fun-1.png)<!-- -->
+![](../docs/github_PAM_clustering_files/figure-html/betadisp-boxplot-Fun-1.png)<!-- -->
 
 \
 \
@@ -3853,12 +5159,16 @@ PCoA represents dispersion (distance of group members to the spatial median in m
 \
 [I still need to update the cluster numbering here]\
 
-**Mean Sørensen dissimilarity between Clusters F1 & 2:** 0.920 (unweighted) / 0.903 (weighted by sample size)\
+**Mean Sørensen dissimilarity between Clusters F1 & F10:** 0.920 (unweighted) / 0.903 (weighted by sample size)\
 
 *Mean within-cluster similarities*\
 - Cluster F1: 0.514\
-- Cluster 2: 0.557\
+- Cluster F2: 0.557\
+- Cluster F10: 0.802\
 \
+
+
+
 
 
 
@@ -109910,20 +111220,30 @@ PCoA represents dispersion (distance of group members to the spatial median in m
 # Cluster descriptions
 
 \
+
+## Area of clusters
+
+\
+
+
+
+## Table of fungal clusters
+
+\
 [in-progress]\
 
-| Cluster | total n | Within-cluster mean dissimilarity (𝝱-div) | Mean cluster 𝝰-diversity (SD) | Cluster 𝛄-diversity | Site(s) | Grass(es) | Characteristics† | Exclusive features |     |
+| Cluster | total n | Within-cluster mean dissimilarity (𝝱-div) | Mean cluster 𝝰-diversity (SD) | Cluster 𝛄-diversity | Site(s) | Grass(es) | Characteristics† | Exclusive features |   |
 |:-------|:------:|:------:|:------:|:------:|:-------|:-------|--------|--------|--------|
-| F1      |   183   |            0.514             |  198 (30)  |  4,167  |                   |                           | spans pH range                         |                                                                       |     |
-| F2      |   10    |            0.557             |  188 (41)  |  817  | SFA               | SCSC (only grass present) |                                        | Site=SFA                                                              |     |
-| F3      |   29    |            0.722             |  120 (23)  |  1,084  | KAE               |                           | lower pH\*\*\*\* (5.9 - 7.2, mean 6.3) | Site=KAE (of the 32 KAE samples, only 3 others were in diff clusters) |     |
-| F4      |   29    |            0.693             |  91 (19)  |  791  | mostly LAR (n=27) |                           | high pH\*\*\*\* (7.2 - 8.2, mean 8.0)  |                                                                       |     |
-| F5      |   17    |            0.751             |  92 (18)  |  685  |                   |                           | lower pH\*\*\*\* (5.6 - 7.6, mean 6.2) |                                                                       |     |
-| F6      |   32    |            0.743             |  138 (29)  |  1,315  |                   |                           | lower pH\*\*\*\* (5.1 - 7.8, mean 6.2) |                                                                       |     |
-| F7      |   38    |            0.747             |  126 (23)  |  1,328  |                   |                           |                                        |                                                                       |     |
-| F8      |   53    |            0.813             |  121 (37)  |  1,840  |                   |                           | high pH\*\* (7.1 - 7.8, mean 7.6)      |                                                                       |     |
-| F9      |   56    |            0.796             |  110 (35)  |  1,719  |                   |                           | high pH\*\*\*\* (6.8 - 8.3, mean 7.8)  |                                                                       |     |
-| F10     |   37    |            0.802            | 76 (17) | 954  | BNP,DMT,FMT,SEV   | BOER (n=33), BOGR (n=4)   | high pH\* (6.8 - 8.3, mean 7.5)        |                                                                       |     |
+| F1 | 183 | 0.514 | 198 (30) | 4,167 |  |  | spans pH range |  |  |
+| F2 | 10 | 0.557 | 188 (41) | 817 | SFA | SCSC (only grass present) |  | Site=SFA |  |
+| F3 | 29 | 0.722 | 120 (23) | 1,084 | KAE |  | lower pH\*\*\*\* (5.9 - 7.2, mean 6.3) | Site=KAE (of the 32 KAE samples, only 3 others were in diff clusters) |  |
+| F4 | 29 | 0.693 | 91 (19) | 791 | mostly LAR (n=27) |  | high pH\*\*\*\* (7.2 - 8.2, mean 8.0) |  |  |
+| F5 | 17 | 0.751 | 92 (18) | 685 |  |  | lower pH\*\*\*\* (5.6 - 7.6, mean 6.2) |  |  |
+| F6 | 32 | 0.743 | 138 (29) | 1,315 |  |  | lower pH\*\*\*\* (5.1 - 7.8, mean 6.2) |  |  |
+| F7 | 38 | 0.747 | 126 (23) | 1,328 |  |  |  |  |  |
+| F8 | 53 | 0.813 | 121 (37) | 1,840 |  |  | high pH\*\* (7.1 - 7.8, mean 7.6) |  |  |
+| F9 | 56 | 0.796 | 110 (35) | 1,719 |  |  | high pH\*\*\*\* (6.8 - 8.3, mean 7.8) |  |  |
+| F10 | 37 | 0.802 | 76 (17) | 954 | BNP,DMT,FMT,SEV | BOER (n=33), BOGR (n=4) | high pH\* (6.8 - 8.3, mean 7.5) |  |  |
 
 : Descriptions of fungal Sørensen distance-based clusters. Cluster 𝝰-diversity values are reported as mean number of observed OTUs (SD). Cluster 𝛄-diversity values are reported as number of observed OTUs.†variables listed are significant in all vs. base-mean Wilcox test with BH p-value corrections. \* p-value \< 0.05, \*\* \< 0.001, \*\*\* \< 0.0001, \*\*\*\* \< 1e-5.
 
@@ -109985,25 +111305,46 @@ OOB estimate of error rate: 6.40%
 **adonis2**\
 Bray-Curtis\
 
+Fungal:
+
+
+```{=html}
+<table class="huxtable" data-quarto-disable-processing="true" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  ">
+<col><col><col><col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Df</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">SumOfSqs</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">R2</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">F</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Pr(&gt;F)</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">9</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">40.5</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">0.207</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">13.8</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">0.001</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">474</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">155&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.793</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">483</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">195&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">1&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+</table>
 
 ```
-## Permutation test for adonis under reduced model
-## Terms added sequentially (first to last)
-## Permutation: free
-## Number of permutations: 999
-## 
-## adonis2(formula = phyloseq::distance(Fun_wholecommunity, method = "bray") ~ Fun_sor_clusters, data = (as(sample_data(Fun_wholecommunity), "data.frame")))
-##                   Df SumOfSqs      R2      F Pr(>F)    
-## Fun_sor_clusters   9   40.489 0.20715 13.761  0.001 ***
-## Residual         474  154.968 0.79285                  
-## Total            483  195.457 1.00000                  
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+\
+
+Bacterial:
+
+
+```{=html}
+<table class="huxtable" data-quarto-disable-processing="true" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  ">
+<col><col><col><col><col><tr>
+<th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Df</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">SumOfSqs</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">R2</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">F</th><th style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: bold;">Pr(&gt;F)</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">13</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">48&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">0.377</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">21.9</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0.4pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">0.001</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">470</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">79.2</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">0.623</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0pt 0pt;    padding: 6pt 6pt 6pt 6pt; font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0.4pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">483</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">127&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">1&nbsp;&nbsp;&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">&nbsp;&nbsp;</td><td style="vertical-align: top; text-align: right; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0.4pt 0.4pt 0pt;    padding: 6pt 6pt 6pt 6pt; background-color: rgb(242, 242, 242); font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+</table>
+
 ```
 
 \
 \
 \
+
 
 # 𝝰 - Relationships between clusters and community alpha diversity {.tabset .tabset-pills}
 
@@ -110044,7 +111385,7 @@ The naming conventions of alpha (and beta) diversity measures vary between sourc
 [*Key takeaway:*]{.underline}\
 F1 and F2 had the highest species richness values (mean of 198 and 188 observed species per community, respectively.), significantly higher than the global mean of 146 (KW; p \< 0.001).
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-43-1.png" width="70%" height="70%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-45-1.png" width="70%" height="70%" />
 
 \
 
@@ -110053,7 +111394,7 @@ F1 and F2 had the highest species richness values (mean of 198 and 188 observed 
 [*Key takeaway:*]{.underline}\
 F1 and F2 had the highest Chao1 diversity (mean values of 266 and 251.3, respectively), significantly high than the global mean of 197.4 (KW; p \< 0.001).
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-44-1.png" width="80%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-46-1.png" width="80%" />
 
 ### Dominance ($D_{simpson}$) {.unnumbered}
 
@@ -110077,7 +111418,7 @@ Higher values $D_{simpson}$ indicate that communities are increasingly dominated
 [*Key takeaway:*]{.underline}\
 F1 and F2 had the lowest dominance (mean $D_{simpson}$ values of 0.112 and 0.109, respectively), significantly lower than the global mean of 0.155 (KW; p \< 0.001).\
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-46-1.png" width="80%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-48-1.png" width="80%" />
 
 \
 
@@ -110100,7 +111441,7 @@ Higher values indicate that communities are increasingly more even and less domi
 [*Key takeaway:*]{.underline}\
 F1 and F2 had the highest Simpson index values (mean $1 - D_{simpson}$ values of 0.888 and 0.891, respectively), significantly lower than the global mean of 0.845 (KW; p \< 0.001), indicating that these communities had the most even distribution of OTU abundances.\
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-47-1.png" width="80%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-49-1.png" width="80%" />
 
 \
 
@@ -110121,7 +111462,7 @@ Lower values indicate that communities are increasingly dominated by a few speci
 [*Key takeaway:*]{.underline}\
 F1 and F2 had the highest inverse Simpson index values (mean $1 - D_{simpson_inv}$ values of 12.23 and 11.12, respectively), significantly lower than the global mean of 9.03 (KW; p \< 0.001), again indicating that these communities had the most even distribution of OTU abundances.\
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-48-1.png" width="80%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-50-1.png" width="80%" />
 
 \
 
@@ -110141,7 +111482,7 @@ F1 and F2 had the highest inverse Simpson index values (mean $1 - D_{simpson_inv
 [*Key takeaway:*]{.underline}\
 F1 and F2 had below average Simpson evenness (mean values of 0.0603 and 0.0585, respectively). F1 had significantly lower than the global mean of 0.0619 (KW; p \< 0.001). - This takes into account observed species.. and we see a diminished effect.\
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-49-1.png" width="80%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-51-1.png" width="80%" />
 
 \
 
@@ -110158,7 +111499,7 @@ F1 and F2 had below average Simpson evenness (mean values of 0.0603 and 0.0585, 
         -   `diversity()` in R package `vegan 2.6-4` with `index = "shannon"`
         -   `estimate_richness()` R package `vegan 2.6-4` with `measures = "Shannon"` (I used this)
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-50-1.png" width="80%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-52-1.png" width="80%" />
 
 \
 
@@ -110175,7 +111516,7 @@ F1 and F2 had below average Simpson evenness (mean values of 0.0603 and 0.0585, 
             -   In R, $E_{shannon} = H_{shannon}/log(S_{obs})$
                 -   note that in R, `log` is the natural logarithm, the typical base 10 logarithm is invoked with `log10`
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-51-1.png" width="80%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-53-1.png" width="80%" />
 
 \
 
@@ -110211,7 +111552,7 @@ F1 and F2 had below average Simpson evenness (mean values of 0.0603 and 0.0585, 
 [*Key takeaway:*]{.underline}\
 B4, B10, and B11 had the highest species richness values (mean of 1480 (182), 1363 (162) and 1703 (169) observed species per community, respectively.), significantly higher than the global mean of 1113 (wilcox.test; all p \< 0.001). B12 had the lowest species richness values (mean of 579 (165)).
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-52-1.png" width="80%" height="70%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-54-1.png" width="80%" height="70%" />
 
 \
 
@@ -110220,7 +111561,7 @@ B4, B10, and B11 had the highest species richness values (mean of 1480 (182), 13
 [*Key takeaway:*]{.underline}\
 B4, B10, and B11 had the highest species richness values (mean of 2489 (333), 2306 (283) and 2884 (348) observed species per community, respectively.), significantly higher than the global mean of 1872 (wilcox.test; all p \< 0.001). B12 had the lowest species richness values (mean of 1144 (270)).
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-53-1.png" width="80%" height="70%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-55-1.png" width="80%" height="70%" />
 
 ### Dominance ($D_{simpson}$) {.unnumbered}
 
@@ -110244,7 +111585,7 @@ Higher values $D_{simpson}$ indicate that communities are increasingly dominated
 [*Key takeaway:*]{.underline}\
 B12 had the highest dominance (mean $D_{simpson}$ values of 0.168 (0.161), significantly higher the global mean of 0.028 (0.049) (wilcox.test; p \< 0.001), indicating these communities were dominated by certain OTUs.\
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-55-1.png" width="80%" height="70%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-57-1.png" width="80%" height="70%" />
 
 \
 
@@ -110267,7 +111608,7 @@ Higher values indicate that communities are increasingly more even and less domi
 [*Key takeaway:*]{.underline}\
 ~~\_\_\_ had the highest Simpson index values (mean~~ $1 - D_{simpson}$ values of  and , respectively), significantly lower than the global mean of 0.972 (KW; p \< 0.001), indicating that these communities had the most even distribution of OTU abundances.\
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-56-1.png" width="80%" height="70%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-58-1.png" width="80%" height="70%" />
 
 \
 
@@ -110288,7 +111629,7 @@ Lower values indicate that communities are increasingly dominated by a few speci
 [*Key takeaway:*]{.underline}\
 B4, B10, and B11 had the highest inverse Simpson index values (mean (SD) $1 - D_{simpson_inv}$ values of 119 (58), 88 (39) and 165 (69), respectively), significantly higher than the global mean of 69 (wilcox.test; all p \< 0.001), indicating that these communities had the most even distribution of OTU abundances. B12 had the lowest inverse Simpson index values with a mean of 11 (8)), indicating that these communities had the most uneven distribution of OTU abundances.\
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-57-1.png" width="80%" height="70%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-59-1.png" width="80%" height="70%" />
 
 \
 
@@ -110308,7 +111649,7 @@ B4, B10, and B11 had the highest inverse Simpson index values (mean (SD) $1 - D_
 [*Key takeaway:*]{.underline}\
 ABC\
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-58-1.png" width="80%" height="70%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-60-1.png" width="80%" height="70%" />
 
 \
 
@@ -110325,7 +111666,7 @@ ABC\
         -   `diversity()` in R package `vegan 2.6-4` with `index = "shannon"`
         -   `estimate_richness()` R package `vegan 2.6-4` with `measures = "Shannon"` (I used this)
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-59-1.png" width="80%" height="70%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-61-1.png" width="80%" height="70%" />
 
 \
 
@@ -110342,7 +111683,7 @@ ABC\
             -   In R, $E_{shannon} = H_{shannon}/log(S_{obs})$
                 -   note that in R, `log` is the natural logarithm, the typical base 10 logarithm is invoked with `log10`
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-60-1.png" width="80%" height="70%" />
+<img src="../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-62-1.png" width="80%" height="70%" />
 
 \
 
@@ -110593,7 +111934,7 @@ ABC\
 
 \
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-61-1.png)<!-- -->
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-63-1.png)<!-- -->
 
 \
 
@@ -110605,7 +111946,7 @@ ABC\
 
 \
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-62-1.png)<!-- -->
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-64-1.png)<!-- -->
 
 \
 
@@ -110613,7 +111954,7 @@ ABC\
 
 \
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-63-1.png)<!-- -->
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-65-1.png)<!-- -->
 
 \
 
@@ -110621,7 +111962,7 @@ ABC\
 
 \
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-64-1.png)<!-- -->
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-66-1.png)<!-- -->
 
 \
 \
@@ -110760,26 +112101,17 @@ ABC\
 
 ## Chord diagram {.tabset}
 
-### fungal emphasis 
+### fungal emphasis
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-65-1.png)<!-- -->![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-65-2.png)<!-- -->![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-65-3.png)<!-- -->
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-67-1.png)<!-- -->![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-67-2.png)<!-- -->![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-67-3.png)<!-- -->
 
+### bacterial emphasis
 
-
-
-### bacterial emphasis 
-
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-66-1.png)<!-- -->![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_PAM_Clusters_files/figure-html/unnamed-chunk-66-2.png)<!-- -->
-
-
-
+![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-68-1.png)<!-- -->![](../docs/github_PAM_clustering_files/figure-html/unnamed-chunk-68-2.png)<!-- -->
 
 ## Computing multiple categorical factor pairwise comparisons
 
 We used `supernova::pairwise` for generating and testing all pairwise comparisons of categorical terms (BFC) in a linear model. This function computes the pooled standard error by using the mean squared error (MSE) from the full model fit (not of each group) and then weighting it based on the size of the groups in question (divide by n).\
-
-
-
 
 
 
