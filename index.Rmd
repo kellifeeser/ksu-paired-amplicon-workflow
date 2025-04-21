@@ -82,7 +82,7 @@ rmarkdown::render("code/PAM_Clusters.Rmd", output_file="/Users/L347123/Desktop/k
 
 
 #render F1_vs_nonF1_v2
-rmarkdown::render("code/F1_vs_nonF1_v2.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1")
+rmarkdown::render("code/F1_vs_nonF1_v2.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2")
 
 ```
 
@@ -101,11 +101,11 @@ On this GitHub Pages site, you can find:
 
 ------------------------------------------------------------------------
 
-#### Miscellaneous Links   {.unnumbered}
+#### Miscellaneous Links {.unnumbered}
 
-##### <a href="github_darksidea.html" target="_blank">Darksidea stats for Aaron</a>  {.unnumbered}
+##### <a href="github_darksidea.html" target="_blank">Darksidea stats for Aaron</a> {.unnumbered}
 
-#####   <a href="github_Comparison_Rudgers2021.html" target="_blank">Comparison to subset of Rudgers 2021 results (with bacteria) </a>  {.unnumbered}
+##### <a href="github_Comparison_Rudgers2021.html" target="_blank">Comparison to subset of Rudgers 2021 results (with bacteria) </a> {.unnumbered}
 
 Previous manuscript: Rudgers, J.A., Fox, S., Porras‐Alfaro, A., Herrera, J., Reazin, C., Kent, D.R., Souza, L., Chung, Y.A., & Jumpponen, A. (2022). Biogeography of root‐associated fungi in foundation grasses of North American plains. Journal of Biogeography, 49(1), 22-37. doi/10.1111/jbi.14260\
 <object data="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/JournalofBiogeography2021_Rudgers_BiogeographyOfRootAssociatedFungiInFoundationGrassesOfNorthAmericanPlains.pdf" type="application/pdf" width="100%" height="500px">
@@ -125,7 +125,7 @@ Previous manuscript: Rudgers, J.A., Fox, S., Porras‐Alfaro, A., Herrera, J., R
 
 links:
 
-##### <a href="DistributionOfDarksideaMono.html" target="_blank">Distribution of *Darksidea* and *Monosporascus*</a>  {.unnumbered}
+##### <a href="DistributionOfDarksideaMono.html" target="_blank">Distribution of *Darksidea* and *Monosporascus*</a> {.unnumbered}
 
 ### Distribution and diversity of *Darksidea* and *Monosporascus* sp. with variable input data {.unnumbered}
 
@@ -152,6 +152,8 @@ links:
 
 -   <a href="github_PAM_Clusters.html" target="_blank">Subassemblage (PAM) Clustering of Bacteria and Fungi</a> (last updated 31 May 2025)
 
+    -   has *by-subassemblage* stats for metadata, 𝛼-, 𝛽-, and 𝛾-div, beta dispersion (homogeneity vs. heterogeneity), and taxonomy
+
 -   <a href="github_nestedness_sites_clusters.html" target="_blank">Partitioning beta diversity into nestedness and turnover components</a>
 
     -   Partitioning β-diversity of bacterial and fungal communities at landscape-scale, regional (site) scale, and among sub-assemblages
@@ -162,7 +164,7 @@ links:
 
 -   Spatial Origins and Cross-Kingdom Congruence in Bacterial and Fungal Communities
 
-    -   <a href="github_F1_vs_nonF1.html" target="_blank">Contrasting fungal F1 subassemblage vs. non-F1 subassemblages and associated bacterial communities</a> (last updated 24 Mar 2025)
+    -   <a href="github_F1_vs_nonF1.html" target="_blank">Contrasting fungal F1 subassemblage vs. non-F1 subassemblages and associated bacterial communities</a> (last updated 19 April 2025 - see <a href="github_F1_vs_nonF1_v2.html" target="_blank">version 2</a>)
 
 \
 \

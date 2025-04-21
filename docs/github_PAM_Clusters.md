@@ -1,7 +1,7 @@
 ---
 title: '**RAM paired amplicons: PAM Clustering**'
 author: "Kelli Feeser"
-date: "2025-03-30"
+date: "2025-03-31"
 output:
   bookdown::html_document2:
     code_folding: hide
@@ -42,7 +42,7 @@ editor_options:
 
 ------------------------------------------------------------------------
 
-Document last updated: 2025-03-30
+Document last updated: 2025-03-31
 
 ------------------------------------------------------------------------
 
@@ -4892,6 +4892,7 @@ Note that in fungal cluster "F2" there were only 10 samples (all site=SFA, grass
 # Hierarchical clustering of Sørensen dissimilarities (Approach 2)
 
 \
+
 
 ## Dendrograms of Sørensen-based clusters {.tabset .tabset-pills}
 
@@ -111705,13 +111706,13 @@ ABC\
 
 \
 
-<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:550px; overflow-x: scroll; width:70%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:550px; overflow-x: scroll; width:110%; "><table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:gamma-fun-calc)Gamma diversity of fungal clusters</caption>
  <thead>
   <tr>
    <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">   </th>
    <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Number of OTUs </th>
-   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Number of samples </th>
+   <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Number of samples (n) </th>
    <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Expected mean 𝝰 </th>
    <th style="text-align:center;position: sticky; top:0; background-color: #FFFFFF;"> Observed mean 𝝰 </th>
   </tr>
@@ -111796,7 +111797,7 @@ ABC\
 
 \
 
-<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:550px; overflow-x: scroll; width:70%; "><table class="table" style="margin-left: auto; margin-right: auto;">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:550px; overflow-x: scroll; width:110%; "><table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:gamma-bac-calc)Gamma diversity of bacterial clusters</caption>
  <thead>
   <tr>
@@ -111883,28 +111884,28 @@ ABC\
    <td style="text-align:center;"> 8,220 </td>
    <td style="text-align:center;"> 22 </td>
    <td style="text-align:center;"> 373.6 </td>
-   <td style="text-align:center;"> 954.3 </td>
+   <td style="text-align:center;"> 1703.4 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> B12 </td>
    <td style="text-align:center;"> 3,536 </td>
    <td style="text-align:center;"> 20 </td>
    <td style="text-align:center;"> 176.8 </td>
-   <td style="text-align:center;"> 906.9 </td>
+   <td style="text-align:center;"> 579.3 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> B13 </td>
    <td style="text-align:center;"> 6,073 </td>
    <td style="text-align:center;"> 21 </td>
    <td style="text-align:center;"> 289.2 </td>
-   <td style="text-align:center;"> 1057.4 </td>
+   <td style="text-align:center;"> 1308.4 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> B14 </td>
    <td style="text-align:center;"> 4,781 </td>
    <td style="text-align:center;"> 20 </td>
    <td style="text-align:center;"> 239.1 </td>
-   <td style="text-align:center;"> 1479.9 </td>
+   <td style="text-align:center;"> 1114.2 </td>
   </tr>
 </tbody>
 </table></div>
