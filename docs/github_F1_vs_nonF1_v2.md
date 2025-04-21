@@ -2,7 +2,7 @@
 title: "RAM: Spatial Origins and Cross-Kingdom Congruence in Bacterial and Fungal Communities"
 subtitle: "Contrasting fungal F1 subassemblage vs. non-F1 subassemblages and associated bacterial communities"
 author: "Kelli Feeser"
-date: "2025-04-20"
+date: "2025-04-21"
 output:
   bookdown::html_document2:
     code_folding: hide
@@ -49,7 +49,7 @@ notes:
 
 ------------------------------------------------------------------------
 
-Document last updated: 2025-04-20
+Document last updated: 2025-04-21
 
 ------------------------------------------------------------------------
 
@@ -284,10 +284,16 @@ With distance-based shading or clustering option
 \
 \
 
-# Site specificity of fungal clusters
+# Site specificity of clusters {.tabset}
 
 \
 
+## counts of samples per bacterial cluster within F1 vs non-F1
+
+
+```
+## sample counts per bacterial cluster within F1:
+```
 
 ```
 ##  B1  B2  B3  B4  B5  B6  B9 B10 B11 B12 B13 B14 
@@ -295,9 +301,18 @@ With distance-based shading or clustering option
 ```
 
 ```
+## 
+## sample counts per bacterial cluster within non-F1:
+```
+
+```
 ##  B1  B2  B3  B4  B5  B7  B8  B9 B10 B11 B12 B13 
 ##   6  35  33  41  43  12  20  41  49   1  19   1
 ```
+
+
+## counts of samples by site and fungal cluster
+
 
 ```
 ##      
@@ -326,6 +341,10 @@ With distance-based shading or clustering option
 ##   UHC 21  0  0  0  0  0  0  0  0   0
 ```
 
+
+## Association Statistics of sites and fungal clusters
+
+
 ```
 ##                     X^2  df P(> X^2)
 ## Likelihood Ratio 1488.8 189        0
@@ -336,8 +355,13 @@ With distance-based shading or clustering option
 ## Cramer's V        : 0.815
 ```
 
+
+"Cramer's V is a standardized measure of association between categorical variables, allowing for comparisons across datasets or studies. Because it runs from 0 to 1, with 0 indicating no linkage and 1 showing perfect correlation, it provides a straightforward and understandable statistic."
+
+## Table: F1 vs non-F1 distribution by Site
+
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:table-Site-by-Fun-sor-clusters)(\#tab:table-Site-by-Fun-sor-clusters)F1 vs non-F1 distribution by Site</caption>
+<caption>(\#tab:unnamed-chunk-4)(\#tab:unnamed-chunk-4)F1 vs non-F1 distribution by Site</caption>
  <thead>
   <tr>
    <th style="text-align:left;"> Site </th>
@@ -553,36 +577,17 @@ With distance-based shading or clustering option
 
 
 
+## Decision Tree: sites by fungal clusters
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/tree-with-site-labels-1.png" width="50%" height="50%" />
-
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/attempt-to-add-grassribbon-tree-with-site-labels-1.png" width="50%" height="50%" />
-
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/MAYBE-final-grass-bar-tree-1.png)<!-- -->
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/tree-with-site-labels-1.png" width="40%" height="40%" />
 
 
-```
-## Warning in data.frame(Class = class, Site = raw_sites, label = sites, x = x, : row names were
-## found from a short variable and have been discarded
-## Warning in data.frame(Class = class, Site = raw_sites, label = sites, x = x, : row names were
-## found from a short variable and have been discarded
-```
+
+## Decision Tree: sites by fungal clusters with host grass bar plot annotations and bacterial subassemblage assignments
 
 ![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/final-aligned-bar-tree-1.png)<!-- -->
 
-
-
-
-
-
-```
-## Warning in data.frame(Class = class, Site = sites, x = x, y = y): row names were found from a
-## short variable and have been discarded
-## Warning in data.frame(Class = class, Site = sites, x = x, y = y): row names were found from a
-## short variable and have been discarded
-```
-
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/tree-sitewise-bac-split-1.png)<!-- -->
+## Decision Tree: sites by fungal clusters with bacterial cluster branches
 
 
 ```
@@ -592,7 +597,21 @@ With distance-based shading or clustering option
 ## found from a short variable and have been discarded
 ```
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/tree-with-cleaned-bac-1.png)<!-- -->
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/tree-with-cleaned-bac-1.png" width="40%" height="40%" />
+
+
+
+
+## cut code {.hidden}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -602,7 +621,7 @@ With distance-based shading or clustering option
 
 \
 
-## Consistent subassemblage associations among corresponding samples
+## Consistent subassemblage associations among corresponding samples {.tabset}
 
 \
 
@@ -620,223 +639,12 @@ Are any fungal subassemblages paired consistently with a bacterial subassemblage
 
 
 
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:prop-Fun_sor_clus2-by-Site)(\#tab:prop-Fun_sor_clus2-by-Site)F1 vs non-F1 distribution by Site</caption>
- <thead>
-  <tr>
-   <th style="text-align:left;"> Site </th>
-   <th style="text-align:right;"> F1 </th>
-   <th style="text-align:right;"> non-F1 </th>
-   <th style="text-align:right;"> total </th>
-   <th style="text-align:right;"> F1_prop </th>
-   <th style="text-align:right;"> nonF1_prop </th>
-   <th style="text-align:left;"> F1_status </th>
-  </tr>
- </thead>
-<tbody>
-  <tr>
-   <td style="text-align:left;"> BLM </td>
-   <td style="text-align:right;"> 23 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 23 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:left;"> Only F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> BNP </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 15 </td>
-   <td style="text-align:right;"> 15 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:left;"> Only non-F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> CAD </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 38 </td>
-   <td style="text-align:right;"> 38 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:left;"> Only non-F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> CNF </td>
-   <td style="text-align:right;"> 27 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 27 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:left;"> Only F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> CPR </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 11 </td>
-   <td style="text-align:right;"> 11 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:left;"> Only non-F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> DMT </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 26 </td>
-   <td style="text-align:right;"> 26 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:left;"> Only non-F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> FCP </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 27 </td>
-   <td style="text-align:right;"> 27 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:left;"> Only non-F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> FMT </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 15 </td>
-   <td style="text-align:right;"> 15 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:left;"> Only non-F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> GMT </td>
-   <td style="text-align:right;"> 19 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 19 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:left;"> Only F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> GNF </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 7 </td>
-   <td style="text-align:right;"> 7 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:left;"> Only non-F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> HAR </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 37 </td>
-   <td style="text-align:right;"> 37 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:left;"> Only non-F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> HPG </td>
-   <td style="text-align:right;"> 11 </td>
-   <td style="text-align:right;"> 4 </td>
-   <td style="text-align:right;"> 15 </td>
-   <td style="text-align:right;"> 0.73 </td>
-   <td style="text-align:right;"> 0.27 </td>
-   <td style="text-align:left;"> Mixed </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> KAE </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 32 </td>
-   <td style="text-align:right;"> 32 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:left;"> Only non-F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> KNZ </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 42 </td>
-   <td style="text-align:right;"> 42 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:left;"> Only non-F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> LAR </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 27 </td>
-   <td style="text-align:right;"> 27 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:left;"> Only non-F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> LBJ </td>
-   <td style="text-align:right;"> 34 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 34 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:left;"> Only F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> NWP </td>
-   <td style="text-align:right;"> 20 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 20 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:left;"> Only F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> ONF </td>
-   <td style="text-align:right;"> 22 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 22 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:left;"> Only F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> RNF </td>
-   <td style="text-align:right;"> 6 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 6 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:left;"> Only F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> SEV </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:left;"> Only non-F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> SFA </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:right;"> 10 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:left;"> Only non-F1 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> UHC </td>
-   <td style="text-align:right;"> 21 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 21 </td>
-   <td style="text-align:right;"> 1.00 </td>
-   <td style="text-align:right;"> 0.00 </td>
-   <td style="text-align:left;"> Only F1 </td>
-  </tr>
-</tbody>
-</table>
+### Table: F1 vs non-F1 distribution by Site
 
 
-## congruency
+
+
+### Congruency table: Bacterial Congruence Within Sites (F1 vs non-F1)
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:congruence-site)(\#tab:congruence-site)Bacterial Congruence Within Sites (F1 vs non-F1)</caption>
@@ -1062,6 +870,7 @@ Are any fungal subassemblages paired consistently with a bacterial subassemblage
 </tbody>
 </table>
 
+## Summary table: Bacterial Congruence Proportions by Group (F1 vs non-F1)
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:summary-congruence)(\#tab:summary-congruence)Summary: Bacterial Congruence Proportions by Group (F1 vs non-F1)</caption>
@@ -1095,8 +904,10 @@ Are any fungal subassemblages paired consistently with a bacterial subassemblage
 </tbody>
 </table>
 
+### Table: Bacterial Cluster Congruence by Site × Grass (F1 vs non-F1)
+
 <table class="table" style="margin-left: auto; margin-right: auto;">
-<caption>(\#tab:unnamed-chunk-3)(\#tab:unnamed-chunk-3)Bacterial Cluster Congruence by Site × Grass (F1 vs non-F1)</caption>
+<caption>(\#tab:unnamed-chunk-6)(\#tab:unnamed-chunk-6)Bacterial Cluster Congruence by Site × Grass (F1 vs non-F1)</caption>
  <thead>
   <tr>
    <th style="text-align:left;">  </th>
@@ -1633,7 +1444,7 @@ Are any fungal subassemblages paired consistently with a bacterial subassemblage
 </tbody>
 </table>
 
-\
+### Dominant Bacterial Clusters by Site × Grass × Fungal Type {.hidden}
 
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>(\#tab:bacterial-pairing-congruence)(\#tab:bacterial-pairing-congruence)Dominant Bacterial Clusters by Site × Grass × Fungal Type</caption>
@@ -2187,13 +1998,17 @@ Are any fungal subassemblages paired consistently with a bacterial subassemblage
 library(nnet)  # for multinom()
 library(broom) # for tidy() summaries
 
-# Make sure sd data is correctly factored
-# sd$Fun_sor_clus2 <- factor(sd$Fun_sor_clus2, levels = c("F1", "non-F1"))
-# sd$Bac_sor_clusters <- factor(sd$Bac_sor_clusters, levels = paste0("B", 1:14))
-sd$Fun_sor_clus2_flipped <- relevel(sd$Fun_sor_clus2, ref = "non-F1")
+df <- sd
+# levels(df$Fun_sor_clus2)
+
+# Make sure df data is correctly factored
+# df$Fun_sor_clus2 <- factor(df$Fun_sor_clus2, levels = c("F1", "non-F1"))
+# df$Bac_sor_clusters <- factor(df$Bac_sor_clusters, levels = paste0("B", 1:14))
+df$Fun_sor_clus2_flipped <- relevel(df$Fun_sor_clus2, ref = "non-F1")
+# levels(df$Fun_sor_clus2_flipped)
 
 # 1. F1 → Bac_sor_clusters (multinomial)
-model_bac_predicted_by_fun <- multinom(Bac_sor_clusters ~ Fun_sor_clus2, data = sd)
+model_bac_predicted_by_fun <- multinom(Bac_sor_clusters ~ Fun_sor_clus2, data = df)
 ```
 
 ```
@@ -2211,11 +2026,11 @@ model_bac_predicted_by_fun <- multinom(Bac_sor_clusters ~ Fun_sor_clus2, data = 
 res_bac_by_fun <- tidy(model_bac_predicted_by_fun, exponentiate = TRUE, conf.int = TRUE)
 
 # 2. Bac_sor_clusters → F1 (binary)
-model_fun_predicted_by_bac <- glm(Fun_sor_clus2 ~ Bac_sor_clusters, data = sd, family = binomial)
+model_fun_predicted_by_bac <- glm(Fun_sor_clus2 ~ Bac_sor_clusters, data = df, family = binomial)
 res_fun_by_bac <- tidy(model_fun_predicted_by_bac, exponentiate = TRUE, conf.int = TRUE)
 
 # 3. non-F1 → Bac_sor_clusters (multinomial)
-model_bac_by_nonF1 <- multinom(Bac_sor_clusters ~ Fun_sor_clus2_flipped, data = sd)
+model_bac_by_nonF1 <- multinom(Bac_sor_clusters ~ Fun_sor_clus2_flipped, data = df)
 ```
 
 ```
@@ -2233,7 +2048,7 @@ model_bac_by_nonF1 <- multinom(Bac_sor_clusters ~ Fun_sor_clus2_flipped, data = 
 res_bac_by_nonF1 <- tidy(model_bac_by_nonF1, exponentiate = TRUE, conf.int = TRUE)
 
 # 4. Bac_sor_clusters → non-F1 (binary)
-model_nonF1_by_bac <- glm(Fun_sor_clus2_flipped ~ Bac_sor_clusters, data = sd, family = binomial)
+model_nonF1_by_bac <- glm(Fun_sor_clus2_flipped ~ Bac_sor_clusters, data = df, family = binomial)
 res_nonF1_by_bac <- tidy(model_nonF1_by_bac, exponentiate = TRUE, conf.int = TRUE)
 ```
 
@@ -2250,28 +2065,50 @@ Bacterial clusters significantly predicted non-F1 membership in 8 terms. Signifi
 
 \
 
+## F1 vs non-F1
+
 ![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/plot-grass-metadata-distributions-by-F1-1.png)<!-- -->
 
 
 
+## All Fungal Subassemblages
 
-## Filtered 
-
-
-
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/plot-latlong-metadata-distributions-by-Fun_sor_clusters-1.png)<!-- -->
 
 
+## Wilcoxon rank-sum results - Filtered 
 
-## Unfiltered 
-
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 
 
 
+## Wilcoxon rank-sum results - Unfiltered 
 
-## Categorical
 
 
+
+
+
+## Categorical {.tabset}
+
+
+
+### Proportions of F1 vs non-F1 among Grasses
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
+### Proportions of F1 vs non-F1 among Grasslands
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
+### Proportions of F1 vs non-F1 among grass hosts present per site
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
+
+### Proportions of F1 vs non-F1 among Site_Grass
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
 
 # Mean annual precipitation data extractions and interpolation
@@ -2297,10 +2134,42 @@ All raster data were processed using R (v4.4.3) with the raster (v3.6.31) and da
 
 
 
-# PCA of env data
+# PCA of env data {.tabset}
+
+## PCA - biplot
+
+Elevation_m, ppt3yr, ppt30yr,pH, SOM,  perc_moisture,  phos,  nitrate,  ammonium,  herbivory_perc,  avg_SLA,  avg_SRL
+
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
+
+## PCA - colored by contributions to the PC
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
+
+## PCA - colored by quality of representation {hidden}
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
+
+
+## determining optimal number of clusters by average silhouette width (kmeans)
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
+
+## Cluster dendrogram
+
+Environmental data only
+Compute hierarchical clustering and cut into 7 clusters
+
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-20-1.png" width="50%" height="50%" />
+
+## Partitioning Clusters (PCA with site_grass kmeans clusters)
+
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-21-1.png" 110% />
 
 
 
+## Visualize distance matrix
 
 
 
