@@ -2,7 +2,7 @@
 title: "RAM: Spatial Origins and Cross-Kingdom Congruence in Bacterial and Fungal Communities"
 subtitle: "Contrasting fungal F1 subassemblage vs. non-F1 subassemblages and associated bacterial communities"
 author: "Kelli Feeser"
-date: "2025-04-21"
+date: "2025-04-22"
 output:
   bookdown::html_document2:
     code_folding: hide
@@ -49,7 +49,7 @@ notes:
 
 ------------------------------------------------------------------------
 
-Document last updated: 2025-04-21
+Document last updated: 2025-04-22
 
 ------------------------------------------------------------------------
 
@@ -193,87 +193,133 @@ With distance-based shading or clustering option
 
 
 ```
-##  [1] "SampleID"                                 "X16S_ID"                                 
-##  [3] "sample_name"                              "Replicate"                               
-##  [5] "Site"                                     "Site_Grass"                              
-##  [7] "Site.Rep"                                 "Grass"                                   
-##  [9] "Grass_Rep"                                "Edge"                                    
-## [11] "SiteName"                                 "MAT_degC"                                
-## [13] "MAP_mm"                                   "CollectionDate"                          
-## [15] "Latitude"                                 "Longitude"                               
-## [17] "Elevation_m"                              "Grassland"                               
-## [19] "Gradient"                                 "Bin"                                     
-## [21] "julianday"                                "coll_GDD"                                
-## [23] "GDD30yr"                                  "GDD3yr"                                  
-## [25] "GDD2015"                                  "ppt30yr"                                 
-## [27] "ppt3yr"                                   "ppt2015"                                 
-## [29] "soil_moisture"                            "GWC"                                     
-## [31] "perc_moisture"                            "pH"                                      
-## [33] "phos"                                     "ammonium"                                
-## [35] "nitrate"                                  "SOM"                                     
-## [37] "herbivory_perc"                           "avg_SLA"                                 
-## [39] "avg_SRL"                                  "coll_GDD_m.std"                          
-## [41] "GDD30yr_m.std"                            "GDD3yr_m.std"                            
-## [43] "GDD2015_m.std"                            "ppt30yr_m.std"                           
-## [45] "ppt3yr_m.std"                             "ppt2015_m.std"                           
-## [47] "soil_moisture_m.std"                      "GWC_m.std"                               
-## [49] "perc_moisture_m.std"                      "pH_m.std"                                
-## [51] "phos_m.std"                               "ammonium_m.std"                          
-## [53] "nitrate_m.std"                            "SOM_m.std"                               
-## [55] "herbivory_perc_m.std"                     "avg_SLA_m.std"                           
-## [57] "avg_SRL_m.std"                            "clus_sor_k10"                            
-## [59] "clus_sor_k10_new"                         "Fun_sor_clusters"                        
-## [61] "bac_clus_sor_k10_og"                      "Bac_sor_clusters"                        
-## [63] "Fun_sor_clus2"                            "ngrass_persite"                          
-## [65] "ngrass_perFun_sor_clusters"               "ngrass_perBac_sor_clusters"              
-## [67] "Bac_gamma_Site"                           "Fun_gamma_Site"                          
-## [69] "nsamples_per_Site"                        "nsamples_perBac_sor_clusters"            
-## [71] "nsamples_perFun_sor_clusters"             "soil_dry_perc"                           
-## [73] "soil_water_content"                       "soil_water_content_m.std"                
-## [75] "nsamples_at_site_within_Fun_sor_clus2"    "ngrasses_at_site_within_Fun_sor_clus2"   
-## [77] "nsamples_at_site_within_Bac_sor_clusters" "nsamples_at_site_within_Fun_sor_clusters"
-## [79] "ngrasses_at_site_within_Bac_sor_clusters" "ngrasses_at_site_within_Fun_sor_clusters"
+##  [1] "SampleID"                                
+##  [2] "X16S_ID"                                 
+##  [3] "sample_name"                             
+##  [4] "Replicate"                               
+##  [5] "Site"                                    
+##  [6] "Site_Grass"                              
+##  [7] "Site.Rep"                                
+##  [8] "Grass"                                   
+##  [9] "Grass_Rep"                               
+## [10] "Edge"                                    
+## [11] "SiteName"                                
+## [12] "MAT_degC"                                
+## [13] "MAP_mm"                                  
+## [14] "CollectionDate"                          
+## [15] "Latitude"                                
+## [16] "Longitude"                               
+## [17] "Elevation_m"                             
+## [18] "Grassland"                               
+## [19] "Gradient"                                
+## [20] "Bin"                                     
+## [21] "julianday"                               
+## [22] "coll_GDD"                                
+## [23] "GDD30yr"                                 
+## [24] "GDD3yr"                                  
+## [25] "GDD2015"                                 
+## [26] "ppt30yr"                                 
+## [27] "ppt3yr"                                  
+## [28] "ppt2015"                                 
+## [29] "soil_moisture"                           
+## [30] "GWC"                                     
+## [31] "perc_moisture"                           
+## [32] "pH"                                      
+## [33] "phos"                                    
+## [34] "ammonium"                                
+## [35] "nitrate"                                 
+## [36] "SOM"                                     
+## [37] "herbivory_perc"                          
+## [38] "avg_SLA"                                 
+## [39] "avg_SRL"                                 
+## [40] "coll_GDD_m.std"                          
+## [41] "GDD30yr_m.std"                           
+## [42] "GDD3yr_m.std"                            
+## [43] "GDD2015_m.std"                           
+## [44] "ppt30yr_m.std"                           
+## [45] "ppt3yr_m.std"                            
+## [46] "ppt2015_m.std"                           
+## [47] "soil_moisture_m.std"                     
+## [48] "GWC_m.std"                               
+## [49] "perc_moisture_m.std"                     
+## [50] "pH_m.std"                                
+## [51] "phos_m.std"                              
+## [52] "ammonium_m.std"                          
+## [53] "nitrate_m.std"                           
+## [54] "SOM_m.std"                               
+## [55] "herbivory_perc_m.std"                    
+## [56] "avg_SLA_m.std"                           
+## [57] "avg_SRL_m.std"                           
+## [58] "clus_sor_k10"                            
+## [59] "clus_sor_k10_new"                        
+## [60] "Fun_sor_clusters"                        
+## [61] "bac_clus_sor_k10_og"                     
+## [62] "Bac_sor_clusters"                        
+## [63] "Fun_sor_clus2"                           
+## [64] "ngrass_persite"                          
+## [65] "ngrass_perFun_sor_clusters"              
+## [66] "ngrass_perBac_sor_clusters"              
+## [67] "Bac_gamma_Site"                          
+## [68] "Fun_gamma_Site"                          
+## [69] "nsamples_per_Site"                       
+## [70] "nsamples_perBac_sor_clusters"            
+## [71] "nsamples_perFun_sor_clusters"            
+## [72] "soil_dry_perc"                           
+## [73] "soil_water_content"                      
+## [74] "soil_water_content_m.std"                
+## [75] "nsamples_at_site_within_Fun_sor_clus2"   
+## [76] "ngrasses_at_site_within_Fun_sor_clus2"   
+## [77] "nsamples_at_site_within_Bac_sor_clusters"
+## [78] "nsamples_at_site_within_Fun_sor_clusters"
+## [79] "ngrasses_at_site_within_Bac_sor_clusters"
+## [80] "ngrasses_at_site_within_Fun_sor_clusters"
 ```
 
 ```
-##   [1] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-##  [14] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     non-F1 non-F1 non-F1
-##  [27] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-##  [40] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-##  [53] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-##  [66] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 F1     F1    
-##  [79] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-##  [92] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     non-F1
-## [105] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [118] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [131] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [144] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [157] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [170] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [183] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 F1     F1     F1    
-## [196] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [209] F1     F1     F1     non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [222] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [235] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [248] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 F1    
-## [261] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     non-F1 non-F1 non-F1
-## [274] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [287] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [300] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [313] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [326] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [339] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [352] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [365] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 F1     F1     F1     F1     F1     F1    
-## [378] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [391] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [404] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [417] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [430] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [443] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     non-F1 non-F1
-## [456] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 F1     F1     F1     F1     F1    
-## [469] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [482] F1     F1     F1    
+##   [1] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
+##  [12] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
+##  [23] F1     non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+##  [34] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+##  [45] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+##  [56] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+##  [67] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 F1    
+##  [78] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
+##  [89] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
+## [100] F1     F1     F1     F1     non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [111] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [122] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [133] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [144] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [155] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [166] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [177] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [188] non-F1 non-F1 non-F1 non-F1 non-F1 F1     F1     F1     F1     F1     F1    
+## [199] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
+## [210] F1     F1     non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [221] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [232] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [243] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [254] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 F1     F1     F1     F1     F1    
+## [265] F1     F1     F1     F1     F1     F1     non-F1 non-F1 non-F1 non-F1 non-F1
+## [276] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [287] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [298] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [309] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [320] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [331] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [342] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [353] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [364] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 F1     F1     F1    
+## [375] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
+## [386] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
+## [397] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
+## [408] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
+## [419] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
+## [430] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
+## [441] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
+## [452] F1     F1     non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
+## [463] non-F1 F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
+## [474] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
 ## Levels: F1 non-F1
 ```
 
@@ -591,10 +637,10 @@ With distance-based shading or clustering option
 
 
 ```
-## Warning in data.frame(Class = class, Site = raw_sites, label = sites, x = x, : row names were
-## found from a short variable and have been discarded
-## Warning in data.frame(Class = class, Site = raw_sites, label = sites, x = x, : row names were
-## found from a short variable and have been discarded
+## Warning in data.frame(Class = class, Site = raw_sites, label = sites, x = x, : row
+## names were found from a short variable and have been discarded
+## Warning in data.frame(Class = class, Site = raw_sites, label = sites, x = x, : row
+## names were found from a short variable and have been discarded
 ```
 
 <img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/tree-with-cleaned-bac-1.png" width="40%" height="40%" />
@@ -2174,9 +2220,19 @@ Compute hierarchical clustering and cut into 7 clusters
 
 
 
+# Comparing OTUs present in F1 vs non-F1
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/venn-F1-vs-non-F1-1.png)<!-- -->
+
+## Comparing OTUs present among grasses in F1 vs non-F1
+
+
+
+![](../docs/figures/venn_diagrams/F1_byGrass_venn.png){width='100%'}
 
 
 # Distance–Decay Plots
+
 Pairwise spatial vs ecological distance
 Regression (linear or exponential decay or loess)
 
