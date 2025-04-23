@@ -164,7 +164,7 @@ links:
 
 -   Spatial Origins and Cross-Kingdom Congruence in Bacterial and Fungal Communities
 
-    -   <a href="github_F1_vs_nonF1.html" target="_blank">Contrasting fungal F1 subassemblage vs. non-F1 subassemblages and associated bacterial communities</a> (last updated 22 April 2025 - see <a href="github_F1_vs_nonF1_v2.html" target="_blank">version 2</a>)
+    -   <a href="github_F1_vs_nonF1.html" target="_blank">Contrasting fungal F1 subassemblage vs. non-F1 subassemblages and associated bacterial communities</a> (last updated 23 April 2025 - see <a href="github_F1_vs_nonF1_v2.html" target="_blank">version 2</a>)
 
 \
 \

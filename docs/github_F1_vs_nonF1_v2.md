@@ -2,7 +2,7 @@
 title: "RAM: Spatial Origins and Cross-Kingdom Congruence in Bacterial and Fungal Communities"
 subtitle: "Contrasting fungal F1 subassemblage vs. non-F1 subassemblages and associated bacterial communities"
 author: "Kelli Feeser"
-date: "2025-04-22"
+date: "2025-04-23"
 output:
   bookdown::html_document2:
     code_folding: hide
@@ -38,7 +38,6 @@ notes:
 
 
 
-
 \
 
 ::: homelink
@@ -49,7 +48,7 @@ notes:
 
 ------------------------------------------------------------------------
 
-Document last updated: 2025-04-22
+Document last updated: 2025-04-23
 
 ------------------------------------------------------------------------
 
@@ -59,24 +58,24 @@ Document last updated: 2025-04-22
 
 # Introduction
 
-- Microbial communities are spatially structured due to both intrinsic (biotic) and extrinsic (environmental) factors.
-- Bacteria and fungi co-occur but may exhibit divergent spatial regimes.
-- This study investigates spatial dependence in paired bacterial and fungal communities.
-- We evaluate:
-  - Spatial distance distributions between [SUBGROUPS]
-  - Spatial decay of community dissimilarity within and across [GROUPS]
-  - Spatial structure in explanatory dissimilarity matrices
-  - Spatial detrending of explanatory matrices
-  - Cross-kingdom associations (bacteria ↔ fungi)
+-   Microbial communities are spatially structured due to both intrinsic (biotic) and extrinsic (environmental) factors.
+-   Bacteria and fungi co-occur but may exhibit divergent spatial regimes.
+-   This study investigates spatial dependence in paired bacterial and fungal communities.
+-   We evaluate:
+    -   Spatial distance distributions between [SUBGROUPS]
+    -   Spatial decay of community dissimilarity within and across [GROUPS]
+    -   Spatial structure in explanatory dissimilarity matrices
+    -   Spatial detrending of explanatory matrices
+    -   Cross-kingdom associations (bacteria ↔ fungi)
 
 # Methods
 
 ## Baseline Model: Spatial Origins of Compositional Structure
 
-- A spatial structure in a response matrix Y can emerge from:
-  (i) **Spatial autocorrelation**: biotic processes internal to communities
-  (ii) **Induced spatial dependence**: spatially structured external environmental gradients
-- We follow the framework of [@lichstein2007plant] and [@borcard2018numerical] to disentangle these components.
+-   A spatial structure in a response matrix Y can emerge from:
+    (i) **Spatial autocorrelation**: biotic processes internal to communities
+    (ii) **Induced spatial dependence**: spatially structured external environmental gradients
+-   We follow the framework of [@lichstein2007plant] and [@borcard2018numerical] to disentangle these components.
 
 ## Geographic and Community Dissimilarity Matrices {.hidden}
 
@@ -88,20 +87,17 @@ F1 is the most abundant subassemblage (n = 183 samples), encompasses the most si
 
 However, it has the most species-rich communities and it has the largest spared species pool (), even after accounting for the high sample number (). Why?
 
-Are non-F1 communities just subsets of F1?
-How diverse are environmental conditions within F1 and in comparison to non-F1?
+Are non-F1 communities just subsets of F1? How diverse are environmental conditions within F1 and in comparison to non-F1?
 
 Which, if any, bacterial community characteristics/emergent properties are also reflected within and among F1 and non-F1 samples?\
 \
 
 Are these fungi the archectets of bacterial community structure? What influences do the regional species pool have, or the host grass species identity?
 
-
 \
 \
 
-cut/draft text:
-of a limited narrowly selected subset of all..\
+cut/draft text: of a limited narrowly selected subset of all..\
 \
 
 ## Spatial distance distributions
@@ -110,15 +106,10 @@ of a limited narrowly selected subset of all..\
 
 
 
-
-
 <div class="figure">
 <img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/fig-spatial-dist-1.png" alt="Figure 1. Q–Q plots and distribution of spatial distances within F1 and non-F1 groups."  />
 <p class="caption">(\#fig:fig-spatial-dist)Figure 1. Q–Q plots and distribution of spatial distances within F1 and non-F1 groups.</p>
 </div>
-
-
-
 
 
 
@@ -171,17 +162,14 @@ Skewness and kurtosis suggest differences in spatial structure, with **non-F1** 
 This may reflect differing dispersal constraints, landscape heterogeneity, or spatial sampling extent between groups.
 
 ## Map of Sample Locations
-Colored by "F1" vs "non-F1" (sd$Fun_sor_clus2)
-With distance-based shading or clustering option
 
-
+Colored by "F1" vs "non-F1" (sd\$Fun_sor_clus2) With distance-based shading or clustering option
 
 
 
 ### Sample Map + Convex Hulls
 
 ![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/fig-map-hulls-1.png)<!-- -->
-
 
 \
 \
@@ -191,141 +179,7 @@ With distance-based shading or clustering option
 
 \
 
-
-```
-##  [1] "SampleID"                                
-##  [2] "X16S_ID"                                 
-##  [3] "sample_name"                             
-##  [4] "Replicate"                               
-##  [5] "Site"                                    
-##  [6] "Site_Grass"                              
-##  [7] "Site.Rep"                                
-##  [8] "Grass"                                   
-##  [9] "Grass_Rep"                               
-## [10] "Edge"                                    
-## [11] "SiteName"                                
-## [12] "MAT_degC"                                
-## [13] "MAP_mm"                                  
-## [14] "CollectionDate"                          
-## [15] "Latitude"                                
-## [16] "Longitude"                               
-## [17] "Elevation_m"                             
-## [18] "Grassland"                               
-## [19] "Gradient"                                
-## [20] "Bin"                                     
-## [21] "julianday"                               
-## [22] "coll_GDD"                                
-## [23] "GDD30yr"                                 
-## [24] "GDD3yr"                                  
-## [25] "GDD2015"                                 
-## [26] "ppt30yr"                                 
-## [27] "ppt3yr"                                  
-## [28] "ppt2015"                                 
-## [29] "soil_moisture"                           
-## [30] "GWC"                                     
-## [31] "perc_moisture"                           
-## [32] "pH"                                      
-## [33] "phos"                                    
-## [34] "ammonium"                                
-## [35] "nitrate"                                 
-## [36] "SOM"                                     
-## [37] "herbivory_perc"                          
-## [38] "avg_SLA"                                 
-## [39] "avg_SRL"                                 
-## [40] "coll_GDD_m.std"                          
-## [41] "GDD30yr_m.std"                           
-## [42] "GDD3yr_m.std"                            
-## [43] "GDD2015_m.std"                           
-## [44] "ppt30yr_m.std"                           
-## [45] "ppt3yr_m.std"                            
-## [46] "ppt2015_m.std"                           
-## [47] "soil_moisture_m.std"                     
-## [48] "GWC_m.std"                               
-## [49] "perc_moisture_m.std"                     
-## [50] "pH_m.std"                                
-## [51] "phos_m.std"                              
-## [52] "ammonium_m.std"                          
-## [53] "nitrate_m.std"                           
-## [54] "SOM_m.std"                               
-## [55] "herbivory_perc_m.std"                    
-## [56] "avg_SLA_m.std"                           
-## [57] "avg_SRL_m.std"                           
-## [58] "clus_sor_k10"                            
-## [59] "clus_sor_k10_new"                        
-## [60] "Fun_sor_clusters"                        
-## [61] "bac_clus_sor_k10_og"                     
-## [62] "Bac_sor_clusters"                        
-## [63] "Fun_sor_clus2"                           
-## [64] "ngrass_persite"                          
-## [65] "ngrass_perFun_sor_clusters"              
-## [66] "ngrass_perBac_sor_clusters"              
-## [67] "Bac_gamma_Site"                          
-## [68] "Fun_gamma_Site"                          
-## [69] "nsamples_per_Site"                       
-## [70] "nsamples_perBac_sor_clusters"            
-## [71] "nsamples_perFun_sor_clusters"            
-## [72] "soil_dry_perc"                           
-## [73] "soil_water_content"                      
-## [74] "soil_water_content_m.std"                
-## [75] "nsamples_at_site_within_Fun_sor_clus2"   
-## [76] "ngrasses_at_site_within_Fun_sor_clus2"   
-## [77] "nsamples_at_site_within_Bac_sor_clusters"
-## [78] "nsamples_at_site_within_Fun_sor_clusters"
-## [79] "ngrasses_at_site_within_Bac_sor_clusters"
-## [80] "ngrasses_at_site_within_Fun_sor_clusters"
-```
-
-```
-##   [1] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-##  [12] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-##  [23] F1     non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-##  [34] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-##  [45] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-##  [56] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-##  [67] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 F1    
-##  [78] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-##  [89] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [100] F1     F1     F1     F1     non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [111] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [122] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [133] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [144] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [155] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [166] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [177] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [188] non-F1 non-F1 non-F1 non-F1 non-F1 F1     F1     F1     F1     F1     F1    
-## [199] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [210] F1     F1     non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [221] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [232] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [243] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [254] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 F1     F1     F1     F1     F1    
-## [265] F1     F1     F1     F1     F1     F1     non-F1 non-F1 non-F1 non-F1 non-F1
-## [276] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [287] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [298] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [309] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [320] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [331] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [342] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [353] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [364] non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 F1     F1     F1    
-## [375] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [386] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [397] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [408] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [419] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [430] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [441] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [452] F1     F1     non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1 non-F1
-## [463] non-F1 F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## [474] F1     F1     F1     F1     F1     F1     F1     F1     F1     F1     F1    
-## Levels: F1 non-F1
-```
-
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/violin-numeric-metadata-1.png)<!-- -->
-
-
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/violin-numeric-metadata-1.png" width="120%" height="120%" />
 
 \
 \
@@ -355,7 +209,6 @@ With distance-based shading or clustering option
 ##  B1  B2  B3  B4  B5  B7  B8  B9 B10 B11 B12 B13 
 ##   6  35  33  41  43  12  20  41  49   1  19   1
 ```
-
 
 ## counts of samples by site and fungal cluster
 
@@ -387,7 +240,6 @@ With distance-based shading or clustering option
 ##   UHC 21  0  0  0  0  0  0  0  0   0
 ```
 
-
 ## Association Statistics of sites and fungal clusters
 
 
@@ -400,7 +252,6 @@ With distance-based shading or clustering option
 ## Contingency Coeff.: 0.926 
 ## Cramer's V        : 0.815
 ```
-
 
 "Cramer's V is a standardized measure of association between categorical variables, allowing for comparisons across datasets or studies. Because it runs from 0 to 1, with 0 indicating no linkage and 1 showing perfect correlation, it provides a straightforward and understandable statistic."
 
@@ -625,9 +476,7 @@ With distance-based shading or clustering option
 
 ## Decision Tree: sites by fungal clusters
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/tree-with-site-labels-1.png" width="40%" height="40%" />
-
-
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/tree-with-site-labels-1.png" width="60%" height="60%" />
 
 ## Decision Tree: sites by fungal clusters with host grass bar plot annotations and bacterial subassemblage assignments
 
@@ -635,21 +484,9 @@ With distance-based shading or clustering option
 
 ## Decision Tree: sites by fungal clusters with bacterial cluster branches
 
-
-```
-## Warning in data.frame(Class = class, Site = raw_sites, label = sites, x = x, : row
-## names were found from a short variable and have been discarded
-## Warning in data.frame(Class = class, Site = raw_sites, label = sites, x = x, : row
-## names were found from a short variable and have been discarded
-```
-
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/tree-with-cleaned-bac-1.png" width="40%" height="40%" />
-
-
-
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/tree-with-cleaned-bac-1.png" width="70%" height="70%" />
 
 ## cut code {.hidden}
-
 
 
 
@@ -673,22 +510,236 @@ With distance-based shading or clustering option
 
 Are any fungal subassemblages paired consistently with a bacterial subassemblage or vice versa? Do those relationships change among sites, grass hosts, or a combination thereof?
 
-    - B2 samples are about half (n = 36 of 71, 51%) F1, half F9/F10 (F9: n = 16, 22.5%; F10: n = 18, 25.4%), and 1 samples in F5 (1.4%)
-        - however, all the F1 samples were at a latitude of 34.05433 while non-F1 were at 30.63087
-        - 57 were BOER (F1: 23/non-F1: 24), 23 were BOGR (13/10), and 1 was BUDA (0/1).
-        - non-overlapping sites 
-            - F1: BLM (2 all BOGR), CNF (15 - BOGR and BOER), GMT (19 - BOGR and BOER); 
-            - non-F1: 
-                F5: BNP (1 BOGR); 
-                F9: BNP (8 BOER), CAD (1 BUDA), DMT (4 BOGR), FMT (1 BOGR), SEV (2 BOER); 
-                F10: BNP (4 BOER), DMT (10 - BOGR and BOER), FMT (2 BOGR), SEV (2 - BOGR and BOER)
+```         
+- B2 samples are about half (n = 36 of 71, 51%) F1, half F9/F10 (F9: n = 16, 22.5%; F10: n = 18, 25.4%), and 1 samples in F5 (1.4%)
+    - however, all the F1 samples were at a latitude of 34.05433 while non-F1 were at 30.63087
+    - 57 were BOER (F1: 23/non-F1: 24), 23 were BOGR (13/10), and 1 was BUDA (0/1).
+    - non-overlapping sites 
+        - F1: BLM (2 all BOGR), CNF (15 - BOGR and BOER), GMT (19 - BOGR and BOER); 
+        - non-F1: 
+            F5: BNP (1 BOGR); 
+            F9: BNP (8 BOER), CAD (1 BUDA), DMT (4 BOGR), FMT (1 BOGR), SEV (2 BOER); 
+            F10: BNP (4 BOER), DMT (10 - BOGR and BOER), FMT (2 BOGR), SEV (2 - BOGR and BOER)
+```
 
 
 
 ### Table: F1 vs non-F1 distribution by Site
 
-
-
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<caption>(\#tab:prop-Fun_sor_clus2-by-Site)(\#tab:prop-Fun_sor_clus2-by-Site)F1 vs non-F1 distribution by Site</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Site </th>
+   <th style="text-align:right;"> F1 </th>
+   <th style="text-align:right;"> non-F1 </th>
+   <th style="text-align:right;"> total </th>
+   <th style="text-align:right;"> F1_prop </th>
+   <th style="text-align:right;"> nonF1_prop </th>
+   <th style="text-align:left;"> F1_status </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> BLM </td>
+   <td style="text-align:right;"> 23 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 23 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:left;"> Only F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BNP </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:left;"> Only non-F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CAD </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 38 </td>
+   <td style="text-align:right;"> 38 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:left;"> Only non-F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CNF </td>
+   <td style="text-align:right;"> 27 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 27 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:left;"> Only F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CPR </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:left;"> Only non-F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> DMT </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 26 </td>
+   <td style="text-align:right;"> 26 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:left;"> Only non-F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> FCP </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 27 </td>
+   <td style="text-align:right;"> 27 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:left;"> Only non-F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> FMT </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:left;"> Only non-F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GMT </td>
+   <td style="text-align:right;"> 19 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 19 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:left;"> Only F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GNF </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 7 </td>
+   <td style="text-align:right;"> 7 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:left;"> Only non-F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HAR </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 37 </td>
+   <td style="text-align:right;"> 37 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:left;"> Only non-F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HPG </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:right;"> 0.73 </td>
+   <td style="text-align:right;"> 0.27 </td>
+   <td style="text-align:left;"> Mixed </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> KAE </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 32 </td>
+   <td style="text-align:right;"> 32 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:left;"> Only non-F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> KNZ </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 42 </td>
+   <td style="text-align:right;"> 42 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:left;"> Only non-F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LAR </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 27 </td>
+   <td style="text-align:right;"> 27 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:left;"> Only non-F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> LBJ </td>
+   <td style="text-align:right;"> 34 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 34 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:left;"> Only F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> NWP </td>
+   <td style="text-align:right;"> 20 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 20 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:left;"> Only F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ONF </td>
+   <td style="text-align:right;"> 22 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 22 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:left;"> Only F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> RNF </td>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:left;"> Only F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> SEV </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:left;"> Only non-F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> SFA </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:left;"> Only non-F1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> UHC </td>
+   <td style="text-align:right;"> 21 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 21 </td>
+   <td style="text-align:right;"> 1.00 </td>
+   <td style="text-align:right;"> 0.00 </td>
+   <td style="text-align:left;"> Only F1 </td>
+  </tr>
+</tbody>
+</table>
 
 ### Congruency table: Bacterial Congruence Within Sites (F1 vs non-F1)
 
@@ -2030,12 +2081,6 @@ Are any fungal subassemblages paired consistently with a bacterial subassemblage
 </tbody>
 </table>
 
-
-
-
-
-
-
 ## Predictive
 
 
@@ -2052,57 +2097,53 @@ df <- sd
 # df$Bac_sor_clusters <- factor(df$Bac_sor_clusters, levels = paste0("B", 1:14))
 df$Fun_sor_clus2_flipped <- relevel(df$Fun_sor_clus2, ref = "non-F1")
 # levels(df$Fun_sor_clus2_flipped)
+```
 
+\
+
+**1. F1 → Bac_sor_clusters (multinomial)**
+
+
+
+
+``` r
 # 1. F1 → Bac_sor_clusters (multinomial)
-model_bac_predicted_by_fun <- multinom(Bac_sor_clusters ~ Fun_sor_clus2, data = df)
+sig1 <- res_bac_by_fun %>% filter(p.value < 0.05)
+if (nrow(sig1) > 0) {
+  cat(glue("Fungal group F1 significantly predicted bacterial cluster membership in {length(unique(sig1$y.level))} out of 14 clusters. ",
+           "Significant clusters include: {paste(unique(sig1$y.level), collapse = ', ')}.\n\n"))
+} else {
+  cat("No significant associations were found between F1 and bacterial clusters in the multinomial model.\n\n")
+}
 ```
 
-```
-## # weights:  42 (26 variable)
-## initial  value 1277.303748 
-## iter  10 value 1100.842653
-## iter  20 value 1076.770645
-## iter  30 value 1075.387040
-## iter  40 value 1075.314982
-## final  value 1075.314894 
-## converged
-```
+Fungal group F1 significantly predicted bacterial cluster membership in 10 out of 14 clusters. Significant clusters include: B2, B3, B4, B5, B6, B7, B8, B9, B10, B12.
 
-``` r
-res_bac_by_fun <- tidy(model_bac_predicted_by_fun, exponentiate = TRUE, conf.int = TRUE)
+\
+\
 
-# 2. Bac_sor_clusters → F1 (binary)
-model_fun_predicted_by_bac <- glm(Fun_sor_clus2 ~ Bac_sor_clusters, data = df, family = binomial)
-res_fun_by_bac <- tidy(model_fun_predicted_by_bac, exponentiate = TRUE, conf.int = TRUE)
+**2. Bac_sor_clusters → F1 (binary)**
 
-# 3. non-F1 → Bac_sor_clusters (multinomial)
-model_bac_by_nonF1 <- multinom(Bac_sor_clusters ~ Fun_sor_clus2_flipped, data = df)
-```
 
-```
-## # weights:  42 (26 variable)
-## initial  value 1277.303748 
-## iter  10 value 1089.173573
-## iter  20 value 1077.071782
-## iter  30 value 1075.411321
-## iter  40 value 1075.315112
-## final  value 1075.314898 
-## converged
-```
 
-``` r
-res_bac_by_nonF1 <- tidy(model_bac_by_nonF1, exponentiate = TRUE, conf.int = TRUE)
+Bacterial subassemblage significantly predicted F1 membership in 7 cluster terms. Significant clusters include: Bac_sor_clustersB2, Bac_sor_clustersB3, Bac_sor_clustersB4, Bac_sor_clustersB5, Bac_sor_clustersB9, Bac_sor_clustersB10, Bac_sor_clustersB12.
 
-# 4. Bac_sor_clusters → non-F1 (binary)
-model_nonF1_by_bac <- glm(Fun_sor_clus2_flipped ~ Bac_sor_clusters, data = df, family = binomial)
-res_nonF1_by_bac <- tidy(model_nonF1_by_bac, exponentiate = TRUE, conf.int = TRUE)
-```
+**\
+\
+3. non-F1 → Bac_sor_clusters (multinomial)**
 
-Fungal group F1 significantly predicted bacterial cluster membership in 18 out of 14 clusters. Significant clusters include: B2, B3, B4, B5, B6, B7, B8, B9, B10, B12.
-Bacterial subassemblage significantly predicted F1 membership in 8 cluster terms. Significant clusters include: (Intercept), Bac_sor_clustersB2, Bac_sor_clustersB3, Bac_sor_clustersB4, Bac_sor_clustersB5, Bac_sor_clustersB9, Bac_sor_clustersB10, Bac_sor_clustersB12.
-non-F1 fungal samples significantly predicted bacterial cluster membership in 15 out of 14 clusters. Significant clusters include: B2, B3, B4, B5, B8, B9, B10, B12.
-Bacterial clusters significantly predicted non-F1 membership in 8 terms. Significant clusters include: (Intercept), Bac_sor_clustersB2, Bac_sor_clustersB3, Bac_sor_clustersB4, Bac_sor_clustersB5, Bac_sor_clustersB9, Bac_sor_clustersB10, Bac_sor_clustersB12.
 
+
+non-F1 fungal samples significantly predicted bacterial cluster membership in 8 out of 14 clusters. Significant clusters include: B2, B3, B4, B5, B8, B9, B10, B12.
+
+\
+\
+
+**4. Bac_sor_clusters → non-F1 (binary)**
+
+
+
+Bacterial clusters significantly predicted non-F1 membership in 7 terms. Significant clusters include: Bac_sor_clustersB2, Bac_sor_clustersB3, Bac_sor_clustersB4, Bac_sor_clustersB5, Bac_sor_clustersB9, Bac_sor_clustersB10, Bac_sor_clustersB12.
 
 \
 \
@@ -2119,18 +2160,13 @@ Bacterial clusters significantly predicted non-F1 membership in 8 terms. Signifi
 
 ## All Fungal Subassemblages
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/plot-latlong-metadata-distributions-by-Fun_sor_clusters-1.png)<!-- -->
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/plot-latlong-metadata-distributions-by-Fun_sor_clusters-1.png" width="120%" />
 
-
-## Wilcoxon rank-sum results - Filtered 
+## Wilcoxon rank-sum results - Filtered
 
 ![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
-
-
-
-## Wilcoxon rank-sum results - Unfiltered 
-
+## Wilcoxon rank-sum results - Unfiltered
 
 
 
@@ -2156,25 +2192,16 @@ Bacterial clusters significantly predicted non-F1 membership in 8 terms. Signifi
 
 ![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
-
 # Mean annual precipitation data extractions and interpolation
 
-[Assigning 2015 Mean Annual Precipitation (MAP) to each sampling site’s coordinates]{.underline} 
-\
+[Assigning 2015 Mean Annual Precipitation (MAP) to each sampling site’s coordinates]{.underline}\
 Some sites had grass samples with nearby coordinates measured.\
 
-Only (LTER?) certain sites had MAP (in mm) previously measured. To fill in the remaining data (and cross-referencing the congruence of the overlapping data), we integrated spatial point data (geographic coordinates) with CHELSA precipitation rasters. 
+Only (LTER?) certain sites had MAP (in mm) previously measured. To fill in the remaining data (and cross-referencing the congruence of the overlapping data), we integrated spatial point data (geographic coordinates) with CHELSA precipitation rasters.
 
-Mean Annual Precipitation (MAP) for the year 2015 was derived from the CHELSAcruts dataset (Climatologies at High resolution for the Earth's Land Surface Areas), which provides high-resolution (~1 km, 30 arc-second) monthly precipitation data. We downloaded the full set of 12 monthly precipitation rasters (GeoTIFF format) for the year 2015 from the CHELSA data repository (https://www.envidat.ch/dataset/chelsacruts/resource/26958a2a-c7fa-4f16-82ce-57f2bbac59c8; Identifier
-chelsacruts.26958a2a-c7fa-4f16-82ce-57f2bbac59c8, Issued date: June 23, 2020; Modified date: June 23, 2020). 
-CHELSAcruts is a delta change monthly climate dataset for the years 1901-2016 for mean monthly maximum temperatures, mean monthly minimum temperatures, and monthly precipitation sum.
-The data was accessed using the URL (https://envicloud.wsl.ch/#/?bucket=https%3A%2F%2Fos.zhdk.cloud.switch.ch%2Fchelsav1%2F&prefix=chelsa_cruts%2F (Metadata last updated: September 19, 2024; Data last updated: October 29, 2018; Created: October 29, 2018; Accessed: March 26, 2025). 
+Mean Annual Precipitation (MAP) for the year 2015 was derived from the CHELSAcruts dataset (Climatologies at High resolution for the Earth's Land Surface Areas), which provides high-resolution (\~1 km, 30 arc-second) monthly precipitation data. We downloaded the full set of 12 monthly precipitation rasters (GeoTIFF format) for the year 2015 from the CHELSA data repository (<https://www.envidat.ch/dataset/chelsacruts/resource/26958a2a-c7fa-4f16-82ce-57f2bbac59c8>; Identifier chelsacruts.26958a2a-c7fa-4f16-82ce-57f2bbac59c8, Issued date: June 23, 2020; Modified date: June 23, 2020). CHELSAcruts is a delta change monthly climate dataset for the years 1901-2016 for mean monthly maximum temperatures, mean monthly minimum temperatures, and monthly precipitation sum. The data was accessed using the URL (<https://envicloud.wsl.ch/#/?bucket=https%3A%2F%2Fos.zhdk.cloud.switch.ch%2Fchelsav1%2F&prefix=chelsa_cruts%2F> (Metadata last updated: September 19, 2024; Data last updated: October 29, 2018; Created: October 29, 2018; Accessed: March 26, 2025).
 
 All raster data were processed using R (v4.4.3) with the raster (v3.6.31) and data.table (v1.17.0) packages. The 12 monthly CHELSA precipitation rasters for 2015 were loaded and stacked into a multilayer raster object. Annual precipitation for 2015 was computed by summing the 12 monthly layers using calc(..., sum) with na.rm = TRUE. Point-based extraction of precipitation values was performed using the extract() function from the raster package, which interpolates cell values at each sampling coordinate.
-
-
-
-
 
 
 
@@ -2184,8 +2211,7 @@ All raster data were processed using R (v4.4.3) with the raster (v3.6.31) and da
 
 ## PCA - biplot
 
-Elevation_m, ppt3yr, ppt30yr,pH, SOM,  perc_moisture,  phos,  nitrate,  ammonium,  herbivory_perc,  avg_SLA,  avg_SRL
-
+Elevation_m, ppt3yr, ppt30yr,pH, SOM, perc_moisture, phos, nitrate, ammonium, herbivory_perc, avg_SLA, avg_SRL
 
 ![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
 
@@ -2193,10 +2219,9 @@ Elevation_m, ppt3yr, ppt30yr,pH, SOM,  perc_moisture,  phos,  nitrate,  ammonium
 
 ![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
 
-## PCA - colored by quality of representation {hidden}
+## PCA - colored by quality of representation {.hidden .unlisted}
 
 ![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
-
 
 ## determining optimal number of clusters by average silhouette width (kmeans)
 
@@ -2204,25 +2229,23 @@ Elevation_m, ppt3yr, ppt30yr,pH, SOM,  perc_moisture,  phos,  nitrate,  ammonium
 
 ## Cluster dendrogram
 
-Environmental data only
-Compute hierarchical clustering and cut into 7 clusters
+Environmental data only Compute hierarchical clustering and cut into 7 clusters
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-20-1.png" width="50%" height="50%" />
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-20-1.png" width="90%" height="60%" />
 
 ## Partitioning Clusters (PCA with site_grass kmeans clusters)
 
-<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-21-1.png" 110% />
-
-
+<img src="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-21-1.png" height="110%" />
 
 ## Visualize distance matrix
 
-
-
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
 
 # Comparing OTUs present in F1 vs non-F1
 
-![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/venn-F1-vs-non-F1-1.png)<!-- -->
+
+
+![](../docs/figures/venn_diagrams/Fun_sor_clus2_venn.png){width="80%"}
 
 ## Comparing OTUs present among grasses in F1 vs non-F1
 
@@ -2232,6 +2255,7 @@ Compute hierarchical clustering and cut into 7 clusters
 
 
 
+![](../docs/figures/venn_diagrams/F1_and_nonF1_byGrass_venn.png){width="70%"}
 
 
 
@@ -2248,41 +2272,27 @@ Compute hierarchical clustering and cut into 7 clusters
 
 
 
-
-
-
-
-
-
-
-![](../docs/figures/venn_diagrams/F1_byGrass_venn.png){width='100%'}
-
-![](../docs/figures/venn_diagrams/nonF1_byGrass_venn.png){width='100%'}
 
 **Fungal subassemblage F2 only has 1 grass species (SCSC)**\
 \
 
-![](../docs/figures/venn_diagrams/F3_byGrass_venn.png){width='100%'}
+![](../docs/figures/venn_diagrams/F3_byGrass_venn.png){width="80%"}
 
-![](../docs/figures/venn_diagrams/F5_byGrass_venn.png){width='100%'}
+![](../docs/figures/venn_diagrams/F5_byGrass_venn.png){width="80%"}
 
-![](../docs/figures/venn_diagrams/F6_byGrass_venn.png){width='49%'}
+![](../docs/figures/venn_diagrams/F6_byGrass_venn.png){width="69%"}
 
-![](../docs/figures/venn_diagrams/F7_byGrass_venn.png){width='49%'}
+![](../docs/figures/venn_diagrams/F7_byGrass_venn.png){width="69%"}
 
-![](../docs/figures/venn_diagrams/F8_byGrass_venn.png){width='49%'}
+![](../docs/figures/venn_diagrams/F8_byGrass_venn.png){width="69%"}
 
-![](../docs/figures/venn_diagrams/F9_byGrass_venn.png){width='49%'}
+![](../docs/figures/venn_diagrams/F9_byGrass_venn.png){width="69%"}
 
-![](../docs/figures/venn_diagrams/F10_byGrass_venn.png){width='100%'}
-
+![](../docs/figures/venn_diagrams/F10_byGrass_venn.png){width="70%"}
 
 # Fungal vs. bacterial dissimilarity {.tabset}
 
 ## Scatterplots of fungal vs. bacterial dissimilarities
-
-
-
 
 
 
@@ -2392,7 +2402,6 @@ n/a
 ## F-statistic:  1701 on 25 and 53450 DF,  p-value: < 2.2e-16
 ```
 
-
 We’ve just shown:
 
 Fungal β<sub>sor</sub> predicts bacterial β<sub>sor</sub> (weakly in F1, strongly in non-F1)
@@ -2413,16 +2422,13 @@ Better question to test: Is fungal turnover (β<sub>sim</sub>) more predictive o
 
 
 
-
-
-
-1. Fungal turnover in F1 is decoupled from bacterial community structure
+1.  Fungal turnover in F1 is decoupled from bacterial community structure
 
 The fungi that vary in F1 aren’t influencing bacterial composition
 
 Or: bacteria are structured by other factors in these samples (e.g. environment, host, site)
 
-2. Fungal variation in F1 may be functionally irrelevant to bacteria
+2.  Fungal variation in F1 may be functionally irrelevant to bacteria
 
 Even if turnover occurs, it could be:
 
@@ -2432,14 +2438,13 @@ Within functionally equivalent guilds
 
 Not enough to change niches, resources, or microenvironments for bacteria
 
-3. Fungal influence on bacterial structure may require broader compositional shifts
+3.  Fungal influence on bacterial structure may require broader compositional shifts
 
 Like those in non-F1, where fungal turnover is higher and more ecologically distinct
 
 Suggesting threshold-like or nonlinear effects — below a certain fungal shift, bacteria don’t respond
 
-...
-There is a decoupling threshold: below a certain level of fungal community differentiation — even if it’s real turnover — bacterial communities do not track those changes.?
+... There is a decoupling threshold: below a certain level of fungal community differentiation — even if it’s real turnover — bacterial communities do not track those changes.?
 
 How much of bacterial compositional turnover is explained by:
 
@@ -2453,7 +2458,7 @@ Can fungal identity predict bacterial community structure beyond regional contex
 
 --
 
-2. Account for the pool explicitly using γ-diversity or incidence matrices
+2.  Account for the pool explicitly using γ-diversity or incidence matrices
 
 Use site-level γ-diversity (total taxa observed) as a covariate
 
@@ -2463,18 +2468,18 @@ Or subtract site-level effects by modeling residuals of bacterial composition fr
 
 ## Regression using residuals
 
-If fungal cluster identity explains bacterial dissimilarity even after accounting for pool similarity, it strongly supports the idea that fungal communities locally structure bacterial assembly beyond what's available regionally.
-    - By controlling for both the regional bacterial pool (site-level shared species) and fungal dissimilarity (i.e., how different the fungal communities are) — and test whether fungal subassemblage identity still explains bacterial dissimilarity.
-    
-    - Do fungal subassemblage assignments explain bacterial β-diversity above and beyond what’s expected from fungal compositional distance and shared regional pool?\
+If fungal cluster identity explains bacterial dissimilarity even after accounting for pool similarity, it strongly supports the idea that fungal communities locally structure bacterial assembly beyond what's available regionally. - By controlling for both the regional bacterial pool (site-level shared species) and fungal dissimilarity (i.e., how different the fungal communities are) — and test whether fungal subassemblage identity still explains bacterial dissimilarity.
+
+```         
+- Do fungal subassemblage assignments explain bacterial β-diversity above and beyond what’s expected from fungal compositional distance and shared regional pool?\
+```
+
 \
 
-Modeling bacterial dissimilarity as a function of:
-Fun_beta_sim (fungal turnover)
-Pool_dist (bacterial regional pool difference between sites)\
+Modeling bacterial dissimilarity as a function of: Fun_beta_sim (fungal turnover) Pool_dist (bacterial regional pool difference between sites)\
 \
 
-bacterial turnover ~ fungal + regional pool + cluster identity:
+bacterial turnover \~ fungal + regional pool + cluster identity:
 
 
 ```
@@ -2629,25 +2634,20 @@ isolate the residuals and test the contribution of fungal subassemblages after c
 ## F-statistic: 159.6 on 52 and 54418 DF,  p-value: < 2.2e-16
 ```
 
-- We modeled bacterial turnover (β<sub>sim</sub>) residuals, controlling for: 1) fungal turnover (β<sub>sim</sub>) and 2) regional bacterial species pool similarity, then we tested whether fungal cluster pair identity (i.e. transitions between fungal community states) still explains residual variation in bacterial turnover.
+-   We modeled bacterial turnover (β<sub>sim</sub>) residuals, controlling for: 1) fungal turnover (β<sub>sim</sub>) and 2) regional bacterial species pool similarity, then we tested whether fungal cluster pair identity (i.e. transitions between fungal community states) still explains residual variation in bacterial turnover.
 
-- We calculated R² = 13.2% of the residual variation is still explained by fungal cluster pairing (p < 2e-16, highly significant overall). We also found many specific cluster pair coefficients are strongly negative and highly significant.
+-   We calculated R² = 13.2% of the residual variation is still explained by fungal cluster pairing (p \< 2e-16, highly significant overall). We also found many specific cluster pair coefficients are strongly negative and highly significant.
 
-- Discussion points: 
-These coefficients are the expected change in bacterial turnover (after controlling for fungal β<sub>sim</sub> and regional pool similarity) for each fungal subassemblages pair, compared to the reference level (the intercept), i.e., they quantify the additional, identity-specific effect of transitioning between fungal subassemblages.
+-   Discussion points: These coefficients are the expected change in bacterial turnover (after controlling for fungal β<sub>sim</sub> and regional pool similarity) for each fungal subassemblages pair, compared to the reference level (the intercept), i.e., they quantify the additional, identity-specific effect of transitioning between fungal subassemblages.
 
-Fungal cluster identity still predicts bacterial turnover, even when:
-- Fungal compositional turnover is already accounted for
-- Regional species pool differences are already accounted for 
+Fungal cluster identity still predicts bacterial turnover, even when: - Fungal compositional turnover is already accounted for - Regional species pool differences are already accounted for
 
-This implies that:
-Not all fungal turnover is equivalent in its effects on bacterial structure
+This implies that: Not all fungal turnover is equivalent in its effects on bacterial structure
 
 What fungal state the bacterial community in (e.g., F1 vs F3 vs F7) matters beyond how different the fungal communities are compositionally
 
 There's something about the identity of the fungal clusters/emergent properties of their constituent communities — beyond just their dissimilarity — that influences how bacteria assemble.\
 \
-
 
 Now comparing those results those when controlling for fungal total dissimilarity ( as opposed to turnover) and bacterial regional pool total dissimilarity:
 
@@ -2724,13 +2724,7 @@ Now comparing those results those when controlling for fungal total dissimilarit
 ## F-statistic: 175.2 on 52 and 54418 DF,  p-value: < 2.2e-16
 ```
 
-Total fungal dissimilarity is slightly more influential over bacterial turnover than fungal turnover. Still, not all fungal compositional dissimilarity is equal.
-The identity of the fungal community state (i.e., subassemblage membership) has predictive power over bacterial turnover beyond what is explained by simple differences in fungal composition or site-level species availability. Said differently: Transitions between specific fungal states leave distinct bacterial signatures, even if the fungal communities are equally dissimilar in total composition or shared taxa. Example: F1_F2 vs F1_F5
-Both may have similar β<sub>sor</sub>, but the transition F1 → F2 has a much stronger effect on bacterial turnover than F1 → F5. But this might be where we are seeing a host effect - F2 is only SCSC and F5 has SCSC, BOER, and BOGR. 
-
-
-
-
+Total fungal dissimilarity is slightly more influential over bacterial turnover than fungal turnover. Still, not all fungal compositional dissimilarity is equal. The identity of the fungal community state (i.e., subassemblage membership) has predictive power over bacterial turnover beyond what is explained by simple differences in fungal composition or site-level species availability. Said differently: Transitions between specific fungal states leave distinct bacterial signatures, even if the fungal communities are equally dissimilar in total composition or shared taxa. Example: F1_F2 vs F1_F5 Both may have similar β<sub>sor</sub>, but the transition F1 → F2 has a much stronger effect on bacterial turnover than F1 → F5. But this might be where we are seeing a host effect - F2 is only SCSC and F5 has SCSC, BOER, and BOGR.
 
 What about bacterial total dissimilarity?
 
@@ -2882,110 +2876,100 @@ higher, cool. Controlling for host-effect now:
 ## F-statistic: 315.6 on 52 and 54418 DF,  p-value: < 2.2e-16
 ```
 
-After controlling for:
-    - Fungal compositional dissimilarity (β<sub>sor</sub>)
-    - Regional bacterial species pool similarity (pool β<sub>sor</sub>)
-    - Plant host identity (Grass_pair)
+After controlling for: - Fungal compositional dissimilarity (β<sub>sor</sub>) - Regional bacterial species pool similarity (pool β<sub>sor</sub>) - Plant host identity (Grass_pair)
 
 We modeled the residual bacterial dissimilarity (β<sub>sor</sub>) and asked:
 
-Does fungal subassemblage identity (cluster pairing) still explain variation?
-- A: yes! 23.1%!\
+Does fungal subassemblage identity (cluster pairing) still explain variation? - A: yes! 23.1%!\
 
-Emergent properties of fungal subassemblages reveal how fungal communities serve as the architects of bacterial community structure, even after controlling for fungal compositional dissimilarity, the regional species of bacteria, and the plant host identity. 
+Emergent properties of fungal subassemblages reveal how fungal communities serve as the architects of bacterial community structure, even after controlling for fungal compositional dissimilarity, the regional species of bacteria, and the plant host identity.
 
-This means:
-- The identity of the fungal community state, not just its composition or distance, matters for bacterial assembly
-- Some transitions between fungal clusters lead to consistently greater bacterial restructuring, others to less
-- This is not explained by host plant or species pool availability
+This means: - The identity of the fungal community state, not just its composition or distance, matters for bacterial assembly - Some transitions between fungal clusters lead to consistently greater bacterial restructuring, others to less - This is not explained by host plant or species pool availability
 
 What remains is fungal subassemblage-specific filtering of bacterial turnover
 
-This is our BFI angle... a cross-site, compositional and identity-level signal in bacterial community outcomes.
-What do we mean by an "identity-level signal"?
-In this context, we’re distinguishing between:
+This is our BFI angle... a cross-site, compositional and identity-level signal in bacterial community outcomes. What do we mean by an "identity-level signal"? In this context, we’re distinguishing between:
 
-1. Compositional dissimilarity (β<sub>sor</sub>)
-How different are two fungal communities based on species presence/absence?
+1.  Compositional dissimilarity (β<sub>sor</sub>) How different are two fungal communities based on species presence/absence?
 
 This tells us how much communities differ, but not who they are.
 
-2. Subassemblage identity (e.g., F1, F2, F3...)
-What discrete community state (cluster) is a sample in?
+2.  Subassemblage identity (e.g., F1, F2, F3...) What discrete community state (cluster) is a sample in?
 
 This is a qualitative label that groups communities with similar structure and presumed function or assembly history.
 
--> Does the identity of the fungal cluster pair (e.g., F1 vs F3) explain bacterial turnover after controlling for how different those communities are compositionally?
+-\> Does the identity of the fungal cluster pair (e.g., F1 vs F3) explain bacterial turnover after controlling for how different those communities are compositionally?
 
-And the answer is yes — substantially so.
-This is not just a beta-diversity correlation. This is a much stronger ecological statement:
+And the answer is yes — substantially so. This is not just a beta-diversity correlation. This is a much stronger ecological statement:
 
-🔹 Two fungal sample pairs with the same β<sub>sor</sub> can have:
-Very different fungal cluster pairings (e.g., F1 vs F2 vs F3 vs F7)
+🔹 Two fungal sample pairs with the same β<sub>sor</sub> can have: Very different fungal cluster pairings (e.g., F1 vs F2 vs F3 vs F7)
 
 Very different impacts on bacterial turnover
 
 → That means the community state itself matters, not just the dissimilarity.
 
-Why fungal identity might matter beyond composition:
-1. Functional differences among clusters
-F1 and F3 may have distinct dominant guilds (e.g., symbionts, decomposers, pathogens)
+Why fungal identity might matter beyond composition: 1. Functional differences among clusters F1 and F3 may have distinct dominant guilds (e.g., symbionts, decomposers, pathogens)
 
 → Even if two clusters are equally dissimilar, transitions involving functionally distinct states will have different effects on bacteria.
 
-2. Differences in ecological assembly rules
-One cluster might be dispersal-limited, another environmentally filtered
+2.  Differences in ecological assembly rules One cluster might be dispersal-limited, another environmentally filtered
 
 Or one is a stable attractor state, the other a transient stage
 
 These properties can influence how predictable and structured the associated bacterial community is.
 
-3. Fungal clusters as habitat templates
-Fungal communities aren’t just biomass — they structure the rhizosphere
+3.  Fungal clusters as habitat templates Fungal communities aren’t just biomass — they structure the rhizosphere
 
 They influence carbon flow, exudates, hyphal networks, redox microenvironments
 
 Different fungal states = different bacterial niches, even if compositionally similar
 
-Implications: 
-Bacterial community assembly is sensitive to the identity of the fungal biotic environment, not just to compositional gradients or environmental/host context.
+**Implications**: Bacterial community assembly is sensitive to the identity of the fungal biotic environment, not just to compositional gradients or environmental/host context.
 
 This supports the idea that fungal clusters act as filtering regimes — discrete, recognizable, and functionally important community states that structure bacterial turnover.
 
-This identity-level structuring effect is:
-    - Cross-site
-    - Host-independent (controlled for Grass)
-    - Not a compositional artifact (controlled for β<sub>sor</sub>)
-    - Not a biogeographic artifact (controlled for species pool)
-\
+This identity-level structuring effect is: - Cross-site - Host-independent (controlled for Grass) - Not a compositional artifact (controlled for β<sub>sor</sub>) - Not a biogeographic artifact (controlled for species pool)\
 \
 
+What about F1?
 
+-   F1 is:
+    -   Widespread
+
+    -   Species-rich
+
+    -   Compositionally homogeneous
+-   Despite compositional turnover (β\<sub\>sim\</sub\> ≈ 0.68), it doesn’t drive bacterial turnover as strongly as many other clusters
+-   Thoughts:
+    -   F1 may be compositionally rich but functionally narrow. The taxa turning over within F1 may be doing the same thing ecologically
+        -   → → Bacterial niches remain stable
+    -   F1 may lack “driver” fungi - F1 might lack taxa that have strong co-occurrence patterns or ecosystem roles (e.g., ECM, pathogens, strong root-associates)
+    -   F1 may dominate in environments that constrain bacterial assembly. Bacterial turnover may be saturated by abiotic structure where F1 dominates
+        -   → Less room for fungal variation to matter
+    -   F1 may act as a core biome. A stable fungal state with high internal redundancy, widespread across gradients
+        -   → Doesn’t *initiate* bacterial change, but might maintain bacterial stability
 
 # Distance–Decay Plots
 
-Pairwise spatial vs ecological distance
-Regression (linear or exponential decay or loess)
+Pairwise spatial vs ecological distance Regression (linear or exponential decay or loess)
 
 ### Spatial distance matrices and decay modeling
-
-
 
 #### Methods
 
 To assess **isolation by distance**, we constructed a geographic distance matrix (`GeoDist`) representing the pairwise Euclidean distances (in kilometers) between all sample locations, derived from sample coordinates.
 
-We evaluated **spatial structure in ecological dissimilarity** by modeling pairwise community dissimilarity (e.g., Bray–Curtis) as a function of geographic distance. This framework quantifies spatial dependence in compositional variation, consistent with expectations under dispersal limitation or spatially structured environmental filtering.
+We evaluated spatial structure in ecological dissimilarity by modeling pairwise community dissimilarity (e.g., Bray–Curtis) as a function of geographic distance. This framework quantifies spatial dependence in compositional variation, consistent with expectations under dispersal limitation or spatially structured environmental filtering.
 
-To characterize the form of spatial decay, we fit multiple models, including **linear regression**, **log-linear regression** (exponential decay), and **non-parametric LOESS smoothing**. Model performance was compared visually, and significance of spatial structure was assessed using **Mantel tests**, which evaluate global correlation between distance matrices [@borcard2018numerical].
+To characterize the form of spatial decay, we fit multiple models, including linear regression, log-linear regression (exponential decay), and non-parametric LOESS smoothing. Model performance was compared visually, and significance of spatial structure was assessed using Mantel tests, which evaluate global correlation between distance matrices [@borcard2018numerical].
 
-Because geographic distance is often correlated with other spatially structured variables (e.g., climate, edaphic gradients, host identity), we first tested the spatial structure of each **explanatory distance matrix** by modeling it as a function of geographic distance. Where spatial autocorrelation was present, we applied **spatial detrending**: the explanatory distance matrix was regressed against geographic distance, and the residuals were retained. These **spatially detrended explanatory matrices** represent the variation independent of spatial position, following recommended procedures for controlling spatial structure in distance-based modeling [@borcard2018numerical].
+Because geographic distance is often correlated with other spatially structured variables (e.g., climate, edaphic gradients, host identity), we first tested the spatial structure of each explanatory distance matrix by modeling it as a function of geographic distance. Where spatial autocorrelation was present, we applied spatial detrending: the explanatory distance matrix was regressed against geographic distance, and the residuals were retained. These spatially detrended explanatory matrices represent the variation independent of spatial position, following recommended procedures for controlling spatial structure in distance-based modeling [@borcard2018numerical].
 
-These detrended explanatory matrices (e.g., climatic dissimilarity, environmental gradients, trait distances) were then used in place of geographic distance to model ecological dissimilarity. This allowed us to test whether **non-spatial drivers** explain variation in community structure after accounting for the spatial component.
+These detrended explanatory matrices (e.g., climatic dissimilarity, environmental gradients, trait distances) were then used in place of geographic distance to model ecological dissimilarity. This allowed us to test whether non-spatial drivers explain variation in community structure after accounting for the spatial component.
 
 #### Results: Spatial dependence and explanatory dissimilarity
 
-Pairwise ecological dissimilarity increased with geographic distance, consistent with **spatially structured variation** in community composition.  
+Pairwise ecological dissimilarity increased with geographic distance, consistent with **spatially structured variation** in community composition.\
 Mantel tests confirmed significant associations between ecological and geographic distances across all groups (*r* = [...], *p* = [...]), indicating spatial autocorrelation in community dissimilarity.
 
 Decay model fits revealed [linear / exponential / non-linear] patterns depending on group, with [group A] showing [steeper / flatter] decay relative to [group B]. The fitted LOESS models suggested [continuous / threshold-like / saturating] decay in ecological dissimilarity with spatial separation.
@@ -2996,20 +2980,16 @@ To account for this, each explanatory distance matrix was **spatially detrended*
 
 When these detrended matrices were used to model ecological dissimilarity, we observed [stronger / weaker / similar] patterns relative to models using raw explanatory distances. This suggests that [spatial autocorrelation / non-spatial environmental gradients] explain a substantial portion of the observed ecological variation.
 
-
 #### Figures and Tables
 
 
 
 ## Spatial Correlogram
-Moran’s I or Mantel-based correlogram
-Evaluate autocorrelation over distance lags
+
+Moran’s I or Mantel-based correlogram Evaluate autocorrelation over distance lags
 
 ## maybe? aes_group_order, aes_position, isoreg {stats} Isotonic / Monotone Regression
-Description
-Compute the isotonic (monotonically increasing nonparametric) least squares regression which is piecewise constant.
 
-
-
+Description Compute the isotonic (monotonically increasing nonparametric) least squares regression which is piecewise constant.
 
 
