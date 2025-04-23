@@ -2228,7 +2228,738 @@ Compute hierarchical clustering and cut into 7 clusters
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ![](../docs/figures/venn_diagrams/F1_byGrass_venn.png){width='100%'}
+
+![](../docs/figures/venn_diagrams/nonF1_byGrass_venn.png){width='100%'}
+
+**Fungal subassemblage F2 only has 1 grass species (SCSC)**\
+\
+
+![](../docs/figures/venn_diagrams/F3_byGrass_venn.png){width='100%'}
+
+![](../docs/figures/venn_diagrams/F5_byGrass_venn.png){width='100%'}
+
+![](../docs/figures/venn_diagrams/F6_byGrass_venn.png){width='49%'}
+
+![](../docs/figures/venn_diagrams/F7_byGrass_venn.png){width='49%'}
+
+![](../docs/figures/venn_diagrams/F8_byGrass_venn.png){width='49%'}
+
+![](../docs/figures/venn_diagrams/F9_byGrass_venn.png){width='49%'}
+
+![](../docs/figures/venn_diagrams/F10_byGrass_venn.png){width='100%'}
+
+
+# Fungal vs. bacterial dissimilarity {.tabset}
+
+## Scatterplots of fungal vs. bacterial dissimilarities
+
+
+
+
+
+
+
+```
+## `geom_smooth()` using formula = 'y ~ x'
+```
+
+![](/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2_files/figure-html/scatterplot-BF-Fun-sor-clus2-sor-1.png)<!-- -->
+
+## Source or sink (F1 - fungal only)
+
+n/a
+
+## fungal cluster dissimilarity as predictor of bacterial dissimilarity
+
+“When two fungal clusters are different (e.g., F1–F2 vs F1–F7), do their bacterial dissimilarities also differ?”
+
+
+```
+## 
+## Call:
+## lm(formula = Bac_beta_sor ~ Fun_beta_sor, data = combined_df)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.245771 -0.060146 -0.004457  0.055977  0.252640 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  0.619647   0.002007  308.79   <2e-16 ***
+## Fun_beta_sor 0.069552   0.002395   29.04   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.08466 on 53474 degrees of freedom
+## Multiple R-squared:  0.01552,	Adjusted R-squared:  0.0155 
+## F-statistic: 843.1 on 1 and 53474 DF,  p-value: < 2.2e-16
+```
+
+```
+## 
+## Call:
+## lm(formula = Bac_beta_sor ~ Fun_beta_sor * Group, data = combined_df)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.29352 -0.04508 -0.00756  0.03817  0.32947 
+## 
+## Coefficients:
+##                           Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)               0.503200   0.005549   90.68   <2e-16 ***
+## Fun_beta_sor              0.407096   0.010765   37.82   <2e-16 ***
+## Groupnon-F1              -0.467833   0.006736  -69.45   <2e-16 ***
+## Fun_beta_sor:Groupnon-F1  0.313670   0.011599   27.04   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.06756 on 53472 degrees of freedom
+## Multiple R-squared:  0.3731,	Adjusted R-squared:  0.3731 
+## F-statistic: 1.061e+04 on 3 and 53472 DF,  p-value: < 2.2e-16
+```
+
+```
+## 
+## Call:
+## lm(formula = Bac_beta_sor ~ Fun_beta_sor * Group + Site_pair, 
+##     data = combined_df)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.25528 -0.04312 -0.00677  0.03672  0.26981 
+## 
+## Coefficients:
+##                           Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)               0.592134   0.005539 106.894  < 2e-16 ***
+## Fun_beta_sor              0.262001   0.010636  24.632  < 2e-16 ***
+## Groupnon-F1              -0.554084   0.007145 -77.546  < 2e-16 ***
+## Site_pairBLM             -0.172541   0.005747 -30.022  < 2e-16 ***
+## Site_pairBNP             -0.026819   0.006242  -4.297 1.74e-05 ***
+## Site_pairCAD             -0.045868   0.002486 -18.453  < 2e-16 ***
+## Site_pairCNF             -0.097893   0.006700 -14.610  < 2e-16 ***
+## Site_pairCPR             -0.011932   0.008683  -1.374  0.16941    
+## Site_pairDMT             -0.021697   0.003560  -6.095 1.10e-09 ***
+## Site_pairFCP             -0.037027   0.003450 -10.731  < 2e-16 ***
+## Site_pairFMT             -0.017886   0.006246  -2.864  0.00419 ** 
+## Site_pairGMT             -0.174356   0.011834 -14.733  < 2e-16 ***
+## Site_pairGNF              0.010076   0.013966   0.721  0.47061    
+## Site_pairHAR             -0.022500   0.002571  -8.751  < 2e-16 ***
+## Site_pairHPG             -0.175921   0.010525 -16.715  < 2e-16 ***
+## Site_pairKAE              0.110669   0.002973  37.219  < 2e-16 ***
+## Site_pairKNZ             -0.041752   0.002366 -17.644  < 2e-16 ***
+## Site_pairLAR              0.043931   0.003597  12.212  < 2e-16 ***
+## Site_pairLBJ             -0.117382   0.003402 -34.503  < 2e-16 ***
+## Site_pairNWP             -0.186805   0.011301 -16.529  < 2e-16 ***
+## Site_pairONF             -0.181560   0.006128 -29.628  < 2e-16 ***
+## Site_pairRNF             -0.244916   0.028506  -8.592  < 2e-16 ***
+## Site_pairSEV             -0.023567   0.009535  -2.472  0.01345 *  
+## Site_pairSFA              0.119287   0.009651  12.359  < 2e-16 ***
+## Site_pairUHC             -0.142299   0.007321 -19.438  < 2e-16 ***
+## Fun_beta_sor:Groupnon-F1  0.456595   0.011766  38.806  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.06369 on 53450 degrees of freedom
+## Multiple R-squared:  0.443,	Adjusted R-squared:  0.4428 
+## F-statistic:  1701 on 25 and 53450 DF,  p-value: < 2.2e-16
+```
+
+
+We’ve just shown:
+
+Fungal β<sub>sor</sub> predicts bacterial β<sub>sor</sub> (weakly in F1, strongly in non-F1)
+
+But if F1 is compositionally homogeneous (as we know it is) and species-rich, then:
+
+Its β<sub>sor</sub> is low
+
+But we don’t yet know: Is that due to low turnover (β<sub>sim</sub>) or high nestedness (β<sub>sne</sub>)?
+
+And more importantly:
+
+Does fungal turnover (β<sub>sim</sub>) drive bacterial dissimilarity — more than nestedness does?
+
+Better question to test: Is fungal turnover (β<sub>sim</sub>) more predictive of bacterial β-diversity than fungal nestedness (β<sub>sne</sub>)?
+
+
+
+
+
+
+
+
+1. Fungal turnover in F1 is decoupled from bacterial community structure
+
+The fungi that vary in F1 aren’t influencing bacterial composition
+
+Or: bacteria are structured by other factors in these samples (e.g. environment, host, site)
+
+2. Fungal variation in F1 may be functionally irrelevant to bacteria
+
+Even if turnover occurs, it could be:
+
+Among redundant taxa
+
+Within functionally equivalent guilds
+
+Not enough to change niches, resources, or microenvironments for bacteria
+
+3. Fungal influence on bacterial structure may require broader compositional shifts
+
+Like those in non-F1, where fungal turnover is higher and more ecologically distinct
+
+Suggesting threshold-like or nonlinear effects — below a certain fungal shift, bacteria don’t respond
+
+...
+There is a decoupling threshold: below a certain level of fungal community differentiation — even if it’s real turnover — bacterial communities do not track those changes.?
+
+How much of bacterial compositional turnover is explained by:
+
+Site (regional species pool)?
+
+Fungal assemblage identity (local community state)?
+
+Which is a stronger predictor?
+
+Can fungal identity predict bacterial community structure beyond regional context?
+
+--
+
+2. Account for the pool explicitly using γ-diversity or incidence matrices
+
+Use site-level γ-diversity (total taxa observed) as a covariate
+
+Or subtract site-level effects by modeling residuals of bacterial composition from a null model (e.g. Raup–Crick, C-score deviations)
+
+--
+
+## Regression using residuals
+
+If fungal cluster identity explains bacterial dissimilarity even after accounting for pool similarity, it strongly supports the idea that fungal communities locally structure bacterial assembly beyond what's available regionally.
+    - By controlling for both the regional bacterial pool (site-level shared species) and fungal dissimilarity (i.e., how different the fungal communities are) — and test whether fungal subassemblage identity still explains bacterial dissimilarity.
+    
+    - Do fungal subassemblage assignments explain bacterial β-diversity above and beyond what’s expected from fungal compositional distance and shared regional pool?\
+\
+
+Modeling bacterial dissimilarity as a function of:
+Fun_beta_sim (fungal turnover)
+Pool_dist (bacterial regional pool difference between sites)\
+\
+
+bacterial turnover ~ fungal + regional pool + cluster identity:
+
+
+```
+## 
+## Call:
+## lm(formula = Bac_beta_sim ~ Fun_beta_sim + Bac_pool_sim + Fungal_cluster_pair, 
+##     data = df_beta_wpool)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.291024 -0.042695  0.000379  0.042842  0.220247 
+## 
+## Coefficients:
+##                            Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)                0.285516   0.002694 105.971   <2e-16 ***
+## Fun_beta_sim               0.361806   0.005079  71.231   <2e-16 ***
+## Bac_pool_sim               0.480801   0.003611 133.144   <2e-16 ***
+## Fungal_cluster_pairF1_F10 -0.118824   0.002295 -51.766   <2e-16 ***
+## Fungal_cluster_pairF1_F2  -0.180073   0.002766 -65.096   <2e-16 ***
+## Fungal_cluster_pairF1_F3  -0.119882   0.002764 -43.367   <2e-16 ***
+## Fungal_cluster_pairF1_F4  -0.144103   0.002269 -63.519   <2e-16 ***
+## Fungal_cluster_pairF1_F5  -0.120914   0.002534 -47.718   <2e-16 ***
+## Fungal_cluster_pairF1_F6  -0.128753   0.002231 -57.704   <2e-16 ***
+## Fungal_cluster_pairF1_F7  -0.150491   0.002340 -64.300   <2e-16 ***
+## Fungal_cluster_pairF1_F8  -0.140445   0.002175 -64.577   <2e-16 ***
+## Fungal_cluster_pairF1_F9  -0.131187   0.002218 -59.140   <2e-16 ***
+## Fungal_cluster_pairF10    -0.159528   0.004528 -35.235   <2e-16 ***
+## Fungal_cluster_pairF10_F2 -0.179072   0.010302 -17.382   <2e-16 ***
+## Fungal_cluster_pairF10_F3 -0.107011   0.003434 -31.163   <2e-16 ***
+## Fungal_cluster_pairF10_F4 -0.159303   0.003157 -50.465   <2e-16 ***
+## Fungal_cluster_pairF10_F5 -0.126182   0.003962 -31.852   <2e-16 ***
+## Fungal_cluster_pairF10_F6 -0.129113   0.003840 -33.622   <2e-16 ***
+## Fungal_cluster_pairF10_F7 -0.168502   0.003233 -52.120   <2e-16 ***
+## Fungal_cluster_pairF10_F8 -0.134105   0.003121 -42.971   <2e-16 ***
+## Fungal_cluster_pairF10_F9 -0.159780   0.003007 -53.141   <2e-16 ***
+## Fungal_cluster_pairF2_F3  -0.122286   0.014412  -8.485   <2e-16 ***
+## Fungal_cluster_pairF2_F4  -0.244910   0.009239 -26.508   <2e-16 ***
+## Fungal_cluster_pairF2_F5  -0.208506   0.009285 -22.457   <2e-16 ***
+## Fungal_cluster_pairF2_F6  -0.140555   0.005227 -26.890   <2e-16 ***
+## Fungal_cluster_pairF2_F7  -0.174405   0.006034 -28.903   <2e-16 ***
+## Fungal_cluster_pairF2_F8  -0.180920   0.007067 -25.601   <2e-16 ***
+## Fungal_cluster_pairF2_F9  -0.169815   0.004789 -35.460   <2e-16 ***
+## Fungal_cluster_pairF3_F4  -0.105371   0.003183 -33.106   <2e-16 ***
+## Fungal_cluster_pairF3_F5  -0.163868   0.008648 -18.948   <2e-16 ***
+## Fungal_cluster_pairF3_F6  -0.205383   0.003346 -61.373   <2e-16 ***
+## Fungal_cluster_pairF3_F7  -0.184386   0.003337 -55.251   <2e-16 ***
+## Fungal_cluster_pairF3_F8  -0.157711   0.003050 -51.715   <2e-16 ***
+## Fungal_cluster_pairF3_F9  -0.120684   0.003303 -36.533   <2e-16 ***
+## Fungal_cluster_pairF4     -0.220994   0.009262 -23.861   <2e-16 ***
+## Fungal_cluster_pairF4_F5  -0.164680   0.005846 -28.168   <2e-16 ***
+## Fungal_cluster_pairF4_F6  -0.163796   0.003532 -46.372   <2e-16 ***
+## Fungal_cluster_pairF4_F7  -0.178788   0.003301 -54.154   <2e-16 ***
+## Fungal_cluster_pairF4_F8  -0.197457   0.002980 -66.250   <2e-16 ***
+## Fungal_cluster_pairF4_F9  -0.191056   0.003115 -61.341   <2e-16 ***
+## Fungal_cluster_pairF5     -0.153357   0.008889 -17.252   <2e-16 ***
+## Fungal_cluster_pairF5_F6  -0.131754   0.004188 -31.456   <2e-16 ***
+## Fungal_cluster_pairF5_F7  -0.150454   0.003861 -38.963   <2e-16 ***
+## Fungal_cluster_pairF5_F8  -0.122235   0.003772 -32.408   <2e-16 ***
+## Fungal_cluster_pairF5_F9  -0.101171   0.003554 -28.467   <2e-16 ***
+## Fungal_cluster_pairF6     -0.224283   0.007391 -30.345   <2e-16 ***
+## Fungal_cluster_pairF6_F7  -0.188404   0.004190 -44.969   <2e-16 ***
+## Fungal_cluster_pairF6_F8  -0.146629   0.003428 -42.769   <2e-16 ***
+## Fungal_cluster_pairF6_F9  -0.127590   0.003385 -37.694   <2e-16 ***
+## Fungal_cluster_pairF7     -0.206979   0.004858 -42.602   <2e-16 ***
+## Fungal_cluster_pairF7_F8  -0.159840   0.003242 -49.298   <2e-16 ***
+## Fungal_cluster_pairF7_F9  -0.161023   0.003053 -52.743   <2e-16 ***
+## Fungal_cluster_pairF8     -0.160218   0.003636 -44.065   <2e-16 ***
+## Fungal_cluster_pairF8_F9  -0.165677   0.002936 -56.435   <2e-16 ***
+## Fungal_cluster_pairF9     -0.167507   0.003428 -48.868   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.06383 on 54416 degrees of freedom
+##   (2702 observations deleted due to missingness)
+## Multiple R-squared:  0.478,	Adjusted R-squared:  0.4775 
+## F-statistic: 922.9 on 54 and 54416 DF,  p-value: < 2.2e-16
+```
+
+\
+isolate the residuals and test the contribution of fungal subassemblages after controlling for pool + turnover:
+
+
+```
+## 
+## Call:
+## lm(formula = Bac_beta_sim_resid ~ Fungal_cluster_pair, data = df_resid)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.299476 -0.043887  0.001015  0.044787  0.235119 
+## 
+## Coefficients:
+##                             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)                0.0243291  0.0007631  31.881  < 2e-16 ***
+## Fungal_cluster_pairF1_F10 -0.0121126  0.0014084  -8.600  < 2e-16 ***
+## Fungal_cluster_pairF1_F2  -0.0896073  0.0023244 -38.550  < 2e-16 ***
+## Fungal_cluster_pairF1_F3  -0.0293151  0.0023734 -12.351  < 2e-16 ***
+## Fungal_cluster_pairF1_F4  -0.0536594  0.0017000 -31.564  < 2e-16 ***
+## Fungal_cluster_pairF1_F5  -0.0161719  0.0018394  -8.792  < 2e-16 ***
+## Fungal_cluster_pairF1_F6  -0.0220391  0.0013542 -16.275  < 2e-16 ***
+## Fungal_cluster_pairF1_F7  -0.0363736  0.0013530 -26.884  < 2e-16 ***
+## Fungal_cluster_pairF1_F8  -0.0333497  0.0012423 -26.845  < 2e-16 ***
+## Fungal_cluster_pairF1_F9  -0.0189083  0.0011687 -16.179  < 2e-16 ***
+## Fungal_cluster_pairF10    -0.0424626  0.0041948 -10.123  < 2e-16 ***
+## Fungal_cluster_pairF10_F2 -0.0701455  0.0104425  -6.717 1.87e-11 ***
+## Fungal_cluster_pairF10_F3  0.0355832  0.0025022  14.221  < 2e-16 ***
+## Fungal_cluster_pairF10_F4 -0.0315742  0.0023302 -13.550  < 2e-16 ***
+## Fungal_cluster_pairF10_F5  0.0096460  0.0033108   2.913 0.003576 ** 
+## Fungal_cluster_pairF10_F6  0.0214404  0.0029637   7.234 4.74e-13 ***
+## Fungal_cluster_pairF10_F7 -0.0299046  0.0023018 -12.992  < 2e-16 ***
+## Fungal_cluster_pairF10_F8  0.0046295  0.0021335   2.170 0.030016 *  
+## Fungal_cluster_pairF10_F9 -0.0394547  0.0022918 -17.215  < 2e-16 ***
+## Fungal_cluster_pairF2_F3  -0.0136984  0.0147482  -0.929 0.352987    
+## Fungal_cluster_pairF2_F4  -0.1391947  0.0093463 -14.893  < 2e-16 ***
+## Fungal_cluster_pairF2_F5  -0.0928017  0.0093463  -9.929  < 2e-16 ***
+## Fungal_cluster_pairF2_F6  -0.0204185  0.0049684  -4.110 3.97e-05 ***
+## Fungal_cluster_pairF2_F7  -0.0506213  0.0058272  -8.687  < 2e-16 ***
+## Fungal_cluster_pairF2_F8  -0.0604400  0.0069849  -8.653  < 2e-16 ***
+## Fungal_cluster_pairF2_F9  -0.0464437  0.0044474 -10.443  < 2e-16 ***
+## Fungal_cluster_pairF3_F4   0.0036740  0.0026825   1.370 0.170812    
+## Fungal_cluster_pairF3_F5  -0.0290293  0.0086091  -3.372 0.000747 ***
+## Fungal_cluster_pairF3_F6  -0.0802716  0.0026807 -29.945  < 2e-16 ***
+## Fungal_cluster_pairF3_F7  -0.0523496  0.0025577 -20.467  < 2e-16 ***
+## Fungal_cluster_pairF3_F8  -0.0351368  0.0023040 -15.250  < 2e-16 ***
+## Fungal_cluster_pairF3_F9   0.0157531  0.0024288   6.486 8.90e-11 ***
+## Fungal_cluster_pairF4     -0.1061536  0.0093463 -11.358  < 2e-16 ***
+## Fungal_cluster_pairF4_F5  -0.0357811  0.0055799  -6.412 1.44e-10 ***
+## Fungal_cluster_pairF4_F6  -0.0296180  0.0028017 -10.571  < 2e-16 ***
+## Fungal_cluster_pairF4_F7  -0.0428221  0.0024548 -17.444  < 2e-16 ***
+## Fungal_cluster_pairF4_F8  -0.0756625  0.0022322 -33.897  < 2e-16 ***
+## Fungal_cluster_pairF4_F9  -0.0650734  0.0023527 -27.659  < 2e-16 ***
+## Fungal_cluster_pairF5     -0.0518707  0.0089959  -5.766 8.16e-09 ***
+## Fungal_cluster_pairF5_F6  -0.0081938  0.0037491  -2.186 0.028856 *  
+## Fungal_cluster_pairF5_F7  -0.0368670  0.0034597 -10.656  < 2e-16 ***
+## Fungal_cluster_pairF5_F8   0.0080608  0.0031613   2.550 0.010779 *  
+## Fungal_cluster_pairF5_F9   0.0368798  0.0027677  13.325  < 2e-16 ***
+## Fungal_cluster_pairF6     -0.1309574  0.0074499 -17.578  < 2e-16 ***
+## Fungal_cluster_pairF6_F7  -0.0686673  0.0037889 -18.123  < 2e-16 ***
+## Fungal_cluster_pairF6_F8  -0.0246008  0.0028282  -8.698  < 2e-16 ***
+## Fungal_cluster_pairF6_F9   0.0163727  0.0024222   6.760 1.40e-11 ***
+## Fungal_cluster_pairF7     -0.1096525  0.0047197 -23.233  < 2e-16 ***
+## Fungal_cluster_pairF7_F8  -0.0317269  0.0024978 -12.702  < 2e-16 ***
+## Fungal_cluster_pairF7_F9  -0.0292020  0.0021605 -13.517  < 2e-16 ***
+## Fungal_cluster_pairF8     -0.0402264  0.0031140 -12.918  < 2e-16 ***
+## Fungal_cluster_pairF8_F9  -0.0365432  0.0020351 -17.957  < 2e-16 ***
+## Fungal_cluster_pairF9     -0.0599562  0.0029984 -19.996  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.06587 on 54418 degrees of freedom
+## Multiple R-squared:  0.1323,	Adjusted R-squared:  0.1315 
+## F-statistic: 159.6 on 52 and 54418 DF,  p-value: < 2.2e-16
+```
+
+- We modeled bacterial turnover (β<sub>sim</sub>) residuals, controlling for: 1) fungal turnover (β<sub>sim</sub>) and 2) regional bacterial species pool similarity, then we tested whether fungal cluster pair identity (i.e. transitions between fungal community states) still explains residual variation in bacterial turnover.
+
+- We calculated R² = 13.2% of the residual variation is still explained by fungal cluster pairing (p < 2e-16, highly significant overall). We also found many specific cluster pair coefficients are strongly negative and highly significant.
+
+- Discussion points: 
+These coefficients are the expected change in bacterial turnover (after controlling for fungal β<sub>sim</sub> and regional pool similarity) for each fungal subassemblages pair, compared to the reference level (the intercept), i.e., they quantify the additional, identity-specific effect of transitioning between fungal subassemblages.
+
+Fungal cluster identity still predicts bacterial turnover, even when:
+- Fungal compositional turnover is already accounted for
+- Regional species pool differences are already accounted for 
+
+This implies that:
+Not all fungal turnover is equivalent in its effects on bacterial structure
+
+What fungal state the bacterial community in (e.g., F1 vs F3 vs F7) matters beyond how different the fungal communities are compositionally
+
+There's something about the identity of the fungal clusters/emergent properties of their constituent communities — beyond just their dissimilarity — that influences how bacteria assemble.\
+\
+
+
+Now comparing those results those when controlling for fungal total dissimilarity ( as opposed to turnover) and bacterial regional pool total dissimilarity:
+
+
+```
+## 
+## Call:
+## lm(formula = Bac_beta_sim_resid ~ Fungal_cluster_pair, data = df_resid2)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.26909 -0.04567 -0.00037  0.04650  0.23263 
+## 
+## Coefficients:
+##                             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)                0.0204359  0.0007955  25.690  < 2e-16 ***
+## Fungal_cluster_pairF1_F10  0.0066615  0.0014681   4.537 5.71e-06 ***
+## Fungal_cluster_pairF1_F2  -0.0511291  0.0024230 -21.102  < 2e-16 ***
+## Fungal_cluster_pairF1_F3  -0.0156867  0.0024740  -6.341 2.31e-10 ***
+## Fungal_cluster_pairF1_F4  -0.0370087  0.0017721 -20.884  < 2e-16 ***
+## Fungal_cluster_pairF1_F5  -0.0304235  0.0019173 -15.868  < 2e-16 ***
+## Fungal_cluster_pairF1_F6  -0.0173919  0.0014116 -12.321  < 2e-16 ***
+## Fungal_cluster_pairF1_F7  -0.0195874  0.0014103 -13.889  < 2e-16 ***
+## Fungal_cluster_pairF1_F8  -0.0279759  0.0012949 -21.604  < 2e-16 ***
+## Fungal_cluster_pairF1_F9  -0.0055797  0.0012183  -4.580 4.66e-06 ***
+## Fungal_cluster_pairF10    -0.0901808  0.0043726 -20.624  < 2e-16 ***
+## Fungal_cluster_pairF10_F2 -0.0436520  0.0108851  -4.010 6.07e-05 ***
+## Fungal_cluster_pairF10_F3  0.0444445  0.0026083  17.040  < 2e-16 ***
+## Fungal_cluster_pairF10_F4 -0.0009960  0.0024290  -0.410 0.681786    
+## Fungal_cluster_pairF10_F5  0.0041735  0.0034512   1.209 0.226553    
+## Fungal_cluster_pairF10_F6 -0.0317761  0.0030894 -10.286  < 2e-16 ***
+## Fungal_cluster_pairF10_F7 -0.0561588  0.0023993 -23.406  < 2e-16 ***
+## Fungal_cluster_pairF10_F8 -0.0256100  0.0022239 -11.516  < 2e-16 ***
+## Fungal_cluster_pairF10_F9 -0.0561617  0.0023890 -23.509  < 2e-16 ***
+## Fungal_cluster_pairF2_F3   0.0152238  0.0153733   0.990 0.322046    
+## Fungal_cluster_pairF2_F4  -0.1016061  0.0097425 -10.429  < 2e-16 ***
+## Fungal_cluster_pairF2_F5  -0.0543610  0.0097425  -5.580 2.42e-08 ***
+## Fungal_cluster_pairF2_F6  -0.0205953  0.0051790  -3.977 7.00e-05 ***
+## Fungal_cluster_pairF2_F7  -0.0226512  0.0060742  -3.729 0.000192 ***
+## Fungal_cluster_pairF2_F8  -0.0686934  0.0072809  -9.435  < 2e-16 ***
+## Fungal_cluster_pairF2_F9  -0.0420814  0.0046359  -9.077  < 2e-16 ***
+## Fungal_cluster_pairF3_F4  -0.0079425  0.0027962  -2.840 0.004507 ** 
+## Fungal_cluster_pairF3_F5  -0.0479590  0.0089740  -5.344 9.12e-08 ***
+## Fungal_cluster_pairF3_F6  -0.0359411  0.0027943 -12.862  < 2e-16 ***
+## Fungal_cluster_pairF3_F7   0.0016466  0.0026661   0.618 0.536830    
+## Fungal_cluster_pairF3_F8   0.0058904  0.0024017   2.453 0.014185 *  
+## Fungal_cluster_pairF3_F9   0.0557289  0.0025318  22.012  < 2e-16 ***
+## Fungal_cluster_pairF4     -0.1109378  0.0097425 -11.387  < 2e-16 ***
+## Fungal_cluster_pairF4_F5  -0.0182134  0.0058164  -3.131 0.001741 ** 
+## Fungal_cluster_pairF4_F6  -0.0599118  0.0029205 -20.514  < 2e-16 ***
+## Fungal_cluster_pairF4_F7  -0.0574511  0.0025588 -22.452  < 2e-16 ***
+## Fungal_cluster_pairF4_F8  -0.0838230  0.0023268 -36.026  < 2e-16 ***
+## Fungal_cluster_pairF4_F9  -0.0674211  0.0024524 -27.492  < 2e-16 ***
+## Fungal_cluster_pairF5     -0.0586659  0.0093772  -6.256 3.97e-10 ***
+## Fungal_cluster_pairF5_F6  -0.0998120  0.0039081 -25.540  < 2e-16 ***
+## Fungal_cluster_pairF5_F7  -0.1150153  0.0036064 -31.892  < 2e-16 ***
+## Fungal_cluster_pairF5_F8  -0.0394160  0.0032952 -11.961  < 2e-16 ***
+## Fungal_cluster_pairF5_F9  -0.0189585  0.0028850  -6.571 5.03e-11 ***
+## Fungal_cluster_pairF6     -0.0826247  0.0077656 -10.640  < 2e-16 ***
+## Fungal_cluster_pairF6_F7  -0.0341321  0.0039495  -8.642  < 2e-16 ***
+## Fungal_cluster_pairF6_F8  -0.0256946  0.0029481  -8.716  < 2e-16 ***
+## Fungal_cluster_pairF6_F9   0.0253929  0.0025248  10.057  < 2e-16 ***
+## Fungal_cluster_pairF7     -0.0685378  0.0049197 -13.931  < 2e-16 ***
+## Fungal_cluster_pairF7_F8  -0.0287286  0.0026036 -11.034  < 2e-16 ***
+## Fungal_cluster_pairF7_F9  -0.0124825  0.0022520  -5.543 2.99e-08 ***
+## Fungal_cluster_pairF8     -0.0750490  0.0032460 -23.121  < 2e-16 ***
+## Fungal_cluster_pairF8_F9  -0.0389564  0.0021213 -18.364  < 2e-16 ***
+## Fungal_cluster_pairF9     -0.0775758  0.0031255 -24.820  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.06866 on 54418 degrees of freedom
+## Multiple R-squared:  0.1434,	Adjusted R-squared:  0.1426 
+## F-statistic: 175.2 on 52 and 54418 DF,  p-value: < 2.2e-16
+```
+
+Total fungal dissimilarity is slightly more influential over bacterial turnover than fungal turnover. Still, not all fungal compositional dissimilarity is equal.
+The identity of the fungal community state (i.e., subassemblage membership) has predictive power over bacterial turnover beyond what is explained by simple differences in fungal composition or site-level species availability. Said differently: Transitions between specific fungal states leave distinct bacterial signatures, even if the fungal communities are equally dissimilar in total composition or shared taxa. Example: F1_F2 vs F1_F5
+Both may have similar β<sub>sor</sub>, but the transition F1 → F2 has a much stronger effect on bacterial turnover than F1 → F5. But this might be where we are seeing a host effect - F2 is only SCSC and F5 has SCSC, BOER, and BOGR. 
+
+
+
+
+
+What about bacterial total dissimilarity?
+
+
+```
+## 
+## Call:
+## lm(formula = Bac_beta_sor_resid ~ Fungal_cluster_pair, data = df_resid3)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.257806 -0.036063 -0.000083  0.037135  0.209522 
+## 
+## Coefficients:
+##                             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)                0.0155412  0.0006483  23.972  < 2e-16 ***
+## Fungal_cluster_pairF1_F10 -0.0057449  0.0011965  -4.801 1.58e-06 ***
+## Fungal_cluster_pairF1_F2  -0.0374382  0.0019747 -18.959  < 2e-16 ***
+## Fungal_cluster_pairF1_F3   0.0812394  0.0020163  40.292  < 2e-16 ***
+## Fungal_cluster_pairF1_F4  -0.0148177  0.0014442 -10.260  < 2e-16 ***
+## Fungal_cluster_pairF1_F5  -0.0358378  0.0015626 -22.935  < 2e-16 ***
+## Fungal_cluster_pairF1_F6  -0.0208762  0.0011504 -18.147  < 2e-16 ***
+## Fungal_cluster_pairF1_F7  -0.0245058  0.0011494 -21.321  < 2e-16 ***
+## Fungal_cluster_pairF1_F8  -0.0249636  0.0010554 -23.654  < 2e-16 ***
+## Fungal_cluster_pairF1_F9  -0.0163813  0.0009929 -16.499  < 2e-16 ***
+## Fungal_cluster_pairF10    -0.0920758  0.0035636 -25.838  < 2e-16 ***
+## Fungal_cluster_pairF10_F2 -0.0098479  0.0088712  -1.110    0.267    
+## Fungal_cluster_pairF10_F3  0.0505642  0.0021257  23.787  < 2e-16 ***
+## Fungal_cluster_pairF10_F4 -0.0190560  0.0019796  -9.626  < 2e-16 ***
+## Fungal_cluster_pairF10_F5 -0.0235042  0.0028127  -8.357  < 2e-16 ***
+## Fungal_cluster_pairF10_F6 -0.0101822  0.0025178  -4.044 5.26e-05 ***
+## Fungal_cluster_pairF10_F7 -0.0517210  0.0019554 -26.450  < 2e-16 ***
+## Fungal_cluster_pairF10_F8 -0.0232045  0.0018125 -12.803  < 2e-16 ***
+## Fungal_cluster_pairF10_F9 -0.0570092  0.0019470 -29.281  < 2e-16 ***
+## Fungal_cluster_pairF2_F3   0.1231597  0.0125291   9.830  < 2e-16 ***
+## Fungal_cluster_pairF2_F4  -0.0347378  0.0079400  -4.375 1.22e-05 ***
+## Fungal_cluster_pairF2_F5  -0.0406306  0.0079400  -5.117 3.11e-07 ***
+## Fungal_cluster_pairF2_F6  -0.0563484  0.0042208 -13.350  < 2e-16 ***
+## Fungal_cluster_pairF2_F7  -0.0328150  0.0049503  -6.629 3.42e-11 ***
+## Fungal_cluster_pairF2_F8  -0.0972497  0.0059339 -16.389  < 2e-16 ***
+## Fungal_cluster_pairF2_F9  -0.0394175  0.0037782 -10.433  < 2e-16 ***
+## Fungal_cluster_pairF3_F4   0.0204802  0.0022789   8.987  < 2e-16 ***
+## Fungal_cluster_pairF3_F5  -0.0077461  0.0073137  -1.059    0.290    
+## Fungal_cluster_pairF3_F6   0.0389200  0.0022773  17.090  < 2e-16 ***
+## Fungal_cluster_pairF3_F7   0.0518838  0.0021729  23.878  < 2e-16 ***
+## Fungal_cluster_pairF3_F8   0.0439946  0.0019573  22.477  < 2e-16 ***
+## Fungal_cluster_pairF3_F9   0.0754474  0.0020634  36.565  < 2e-16 ***
+## Fungal_cluster_pairF4     -0.0418579  0.0079400  -5.272 1.36e-07 ***
+## Fungal_cluster_pairF4_F5  -0.0325138  0.0047403  -6.859 7.01e-12 ***
+## Fungal_cluster_pairF4_F6  -0.0155051  0.0023801  -6.514 7.36e-11 ***
+## Fungal_cluster_pairF4_F7  -0.0225397  0.0020854 -10.808  < 2e-16 ***
+## Fungal_cluster_pairF4_F8  -0.0517862  0.0018963 -27.309  < 2e-16 ***
+## Fungal_cluster_pairF4_F9  -0.0461854  0.0019987 -23.108  < 2e-16 ***
+## Fungal_cluster_pairF5     -0.0720443  0.0076423  -9.427  < 2e-16 ***
+## Fungal_cluster_pairF5_F6  -0.0743485  0.0031850 -23.343  < 2e-16 ***
+## Fungal_cluster_pairF5_F7  -0.0897576  0.0029391 -30.539  < 2e-16 ***
+## Fungal_cluster_pairF5_F8  -0.0378527  0.0026856 -14.095  < 2e-16 ***
+## Fungal_cluster_pairF5_F9  -0.0288196  0.0023512 -12.257  < 2e-16 ***
+## Fungal_cluster_pairF6     -0.0859069  0.0063289 -13.574  < 2e-16 ***
+## Fungal_cluster_pairF6_F7  -0.0327010  0.0032188 -10.160  < 2e-16 ***
+## Fungal_cluster_pairF6_F8  -0.0304913  0.0024026 -12.691  < 2e-16 ***
+## Fungal_cluster_pairF6_F9   0.0161886  0.0020577   7.867 3.69e-15 ***
+## Fungal_cluster_pairF7     -0.0636573  0.0040095 -15.877  < 2e-16 ***
+## Fungal_cluster_pairF7_F8  -0.0345887  0.0021219 -16.301  < 2e-16 ***
+## Fungal_cluster_pairF7_F9  -0.0204164  0.0018354 -11.124  < 2e-16 ***
+## Fungal_cluster_pairF8     -0.0633510  0.0026454 -23.947  < 2e-16 ***
+## Fungal_cluster_pairF8_F9  -0.0410799  0.0017288 -23.762  < 2e-16 ***
+## Fungal_cluster_pairF9     -0.0709016  0.0025472 -27.835  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.05596 on 54418 degrees of freedom
+## Multiple R-squared:  0.2233,	Adjusted R-squared:  0.2226 
+## F-statistic: 300.9 on 52 and 54418 DF,  p-value: < 2.2e-16
+```
+
+higher, cool. Controlling for host-effect now:
+
+
+```
+## 
+## Call:
+## lm(formula = Bac_sor_resid_grass ~ Fungal_cluster_pair, data = df_resid_grass_sor)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.244679 -0.034205 -0.001061  0.033724  0.198605 
+## 
+## Coefficients:
+##                             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)                0.0145362  0.0005980  24.306  < 2e-16 ***
+## Fungal_cluster_pairF1_F10 -0.0002785  0.0011038  -0.252 0.800768    
+## Fungal_cluster_pairF1_F2  -0.0407429  0.0018216 -22.366  < 2e-16 ***
+## Fungal_cluster_pairF1_F3   0.0693351  0.0018600  37.277  < 2e-16 ***
+## Fungal_cluster_pairF1_F4  -0.0152797  0.0013323 -11.469  < 2e-16 ***
+## Fungal_cluster_pairF1_F5  -0.0252124  0.0014415 -17.491  < 2e-16 ***
+## Fungal_cluster_pairF1_F6  -0.0316143  0.0010612 -29.790  < 2e-16 ***
+## Fungal_cluster_pairF1_F7  -0.0149902  0.0010603 -14.138  < 2e-16 ***
+## Fungal_cluster_pairF1_F8  -0.0335921  0.0009736 -34.505  < 2e-16 ***
+## Fungal_cluster_pairF1_F9  -0.0086659  0.0009159  -9.462  < 2e-16 ***
+## Fungal_cluster_pairF10    -0.0469039  0.0032874 -14.268  < 2e-16 ***
+## Fungal_cluster_pairF10_F2 -0.0142807  0.0081836  -1.745 0.080983 .  
+## Fungal_cluster_pairF10_F3  0.0463410  0.0019609  23.632  < 2e-16 ***
+## Fungal_cluster_pairF10_F4 -0.0285556  0.0018261 -15.637  < 2e-16 ***
+## Fungal_cluster_pairF10_F5  0.0233749  0.0025946   9.009  < 2e-16 ***
+## Fungal_cluster_pairF10_F6 -0.0190414  0.0023226  -8.198 2.49e-16 ***
+## Fungal_cluster_pairF10_F7 -0.0224133  0.0018039 -12.425  < 2e-16 ***
+## Fungal_cluster_pairF10_F8 -0.0385337  0.0016720 -23.047  < 2e-16 ***
+## Fungal_cluster_pairF10_F9 -0.0308032  0.0017961 -17.150  < 2e-16 ***
+## Fungal_cluster_pairF2_F3   0.1248669  0.0115579  10.804  < 2e-16 ***
+## Fungal_cluster_pairF2_F4  -0.0322347  0.0073245  -4.401 1.08e-05 ***
+## Fungal_cluster_pairF2_F5  -0.0362838  0.0073245  -4.954 7.30e-07 ***
+## Fungal_cluster_pairF2_F6  -0.0643813  0.0038937 -16.535  < 2e-16 ***
+## Fungal_cluster_pairF2_F7  -0.0310564  0.0045666  -6.801 1.05e-11 ***
+## Fungal_cluster_pairF2_F8  -0.0972474  0.0054739 -17.766  < 2e-16 ***
+## Fungal_cluster_pairF2_F9  -0.0395984  0.0034853 -11.361  < 2e-16 ***
+## Fungal_cluster_pairF3_F4   0.0073773  0.0021022   3.509 0.000450 ***
+## Fungal_cluster_pairF3_F5  -0.0148278  0.0067468  -2.198 0.027971 *  
+## Fungal_cluster_pairF3_F6   0.0239312  0.0021008  11.392  < 2e-16 ***
+## Fungal_cluster_pairF3_F7   0.0520707  0.0020044  25.978  < 2e-16 ***
+## Fungal_cluster_pairF3_F8   0.0322785  0.0018056  17.877  < 2e-16 ***
+## Fungal_cluster_pairF3_F9   0.0736665  0.0019034  38.702  < 2e-16 ***
+## Fungal_cluster_pairF4     -0.0518947  0.0073245  -7.085 1.41e-12 ***
+## Fungal_cluster_pairF4_F5  -0.0198160  0.0043729  -4.532 5.87e-06 ***
+## Fungal_cluster_pairF4_F6  -0.0236030  0.0021956 -10.750  < 2e-16 ***
+## Fungal_cluster_pairF4_F7  -0.0235911  0.0019238 -12.263  < 2e-16 ***
+## Fungal_cluster_pairF4_F8  -0.0611967  0.0017493 -34.984  < 2e-16 ***
+## Fungal_cluster_pairF4_F9  -0.0469254  0.0018437 -25.451  < 2e-16 ***
+## Fungal_cluster_pairF5     -0.0444327  0.0070499  -6.303 2.95e-10 ***
+## Fungal_cluster_pairF5_F6  -0.0836759  0.0029381 -28.479  < 2e-16 ***
+## Fungal_cluster_pairF5_F7  -0.0608788  0.0027113 -22.454  < 2e-16 ***
+## Fungal_cluster_pairF5_F8  -0.0481399  0.0024774 -19.432  < 2e-16 ***
+## Fungal_cluster_pairF5_F9  -0.0010221  0.0021690  -0.471 0.637461    
+## Fungal_cluster_pairF6     -0.1020882  0.0058383 -17.486  < 2e-16 ***
+## Fungal_cluster_pairF6_F7  -0.0402868  0.0029693 -13.568  < 2e-16 ***
+## Fungal_cluster_pairF6_F8  -0.0396996  0.0022164 -17.912  < 2e-16 ***
+## Fungal_cluster_pairF6_F9   0.0072492  0.0018982   3.819 0.000134 ***
+## Fungal_cluster_pairF7     -0.0356544  0.0036987  -9.640  < 2e-16 ***
+## Fungal_cluster_pairF7_F8  -0.0389303  0.0019575 -19.888  < 2e-16 ***
+## Fungal_cluster_pairF7_F9   0.0056223  0.0016931   3.321 0.000899 ***
+## Fungal_cluster_pairF8     -0.0723700  0.0024404 -29.655  < 2e-16 ***
+## Fungal_cluster_pairF8_F9  -0.0491562  0.0015948 -30.822  < 2e-16 ***
+## Fungal_cluster_pairF9     -0.0482688  0.0023498 -20.542  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.05162 on 54418 degrees of freedom
+## Multiple R-squared:  0.2317,	Adjusted R-squared:  0.231 
+## F-statistic: 315.6 on 52 and 54418 DF,  p-value: < 2.2e-16
+```
+
+After controlling for:
+    - Fungal compositional dissimilarity (β<sub>sor</sub>)
+    - Regional bacterial species pool similarity (pool β<sub>sor</sub>)
+    - Plant host identity (Grass_pair)
+
+We modeled the residual bacterial dissimilarity (β<sub>sor</sub>) and asked:
+
+Does fungal subassemblage identity (cluster pairing) still explain variation?
+- A: yes! 23.1%!\
+
+Emergent properties of fungal subassemblages reveal how fungal communities serve as the architects of bacterial community structure, even after controlling for fungal compositional dissimilarity, the regional species of bacteria, and the plant host identity. 
+
+This means:
+- The identity of the fungal community state, not just its composition or distance, matters for bacterial assembly
+- Some transitions between fungal clusters lead to consistently greater bacterial restructuring, others to less
+- This is not explained by host plant or species pool availability
+
+What remains is fungal subassemblage-specific filtering of bacterial turnover
+
+This is our BFI angle... a cross-site, compositional and identity-level signal in bacterial community outcomes.
+What do we mean by an "identity-level signal"?
+In this context, we’re distinguishing between:
+
+1. Compositional dissimilarity (β<sub>sor</sub>)
+How different are two fungal communities based on species presence/absence?
+
+This tells us how much communities differ, but not who they are.
+
+2. Subassemblage identity (e.g., F1, F2, F3...)
+What discrete community state (cluster) is a sample in?
+
+This is a qualitative label that groups communities with similar structure and presumed function or assembly history.
+
+-> Does the identity of the fungal cluster pair (e.g., F1 vs F3) explain bacterial turnover after controlling for how different those communities are compositionally?
+
+And the answer is yes — substantially so.
+This is not just a beta-diversity correlation. This is a much stronger ecological statement:
+
+🔹 Two fungal sample pairs with the same β<sub>sor</sub> can have:
+Very different fungal cluster pairings (e.g., F1 vs F2 vs F3 vs F7)
+
+Very different impacts on bacterial turnover
+
+→ That means the community state itself matters, not just the dissimilarity.
+
+Why fungal identity might matter beyond composition:
+1. Functional differences among clusters
+F1 and F3 may have distinct dominant guilds (e.g., symbionts, decomposers, pathogens)
+
+→ Even if two clusters are equally dissimilar, transitions involving functionally distinct states will have different effects on bacteria.
+
+2. Differences in ecological assembly rules
+One cluster might be dispersal-limited, another environmentally filtered
+
+Or one is a stable attractor state, the other a transient stage
+
+These properties can influence how predictable and structured the associated bacterial community is.
+
+3. Fungal clusters as habitat templates
+Fungal communities aren’t just biomass — they structure the rhizosphere
+
+They influence carbon flow, exudates, hyphal networks, redox microenvironments
+
+Different fungal states = different bacterial niches, even if compositionally similar
+
+Implications: 
+Bacterial community assembly is sensitive to the identity of the fungal biotic environment, not just to compositional gradients or environmental/host context.
+
+This supports the idea that fungal clusters act as filtering regimes — discrete, recognizable, and functionally important community states that structure bacterial turnover.
+
+This identity-level structuring effect is:
+    - Cross-site
+    - Host-independent (controlled for Grass)
+    - Not a compositional artifact (controlled for β<sub>sor</sub>)
+    - Not a biogeographic artifact (controlled for species pool)
+\
+\
+
 
 
 # Distance–Decay Plots
