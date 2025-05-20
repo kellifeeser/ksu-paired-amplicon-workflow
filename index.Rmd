@@ -75,6 +75,9 @@ rmarkdown::render("code/nestedness_sites_clusters.Rmd", output_file="/Users/L347
 #render nestedness_sites_clusters - doesnt work from here, needs new session
 rmarkdown::render("code/nestedness_clusters_v2.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_nestedness_clusters_v2")
 
+#render nestedness_looped_params.Rmd
+rmarkdown::render("code/nestedness_looped_params.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_nestedness_looped_params_bacteria")
+
 
 
 #render PAM_Clusters
@@ -84,6 +87,8 @@ rmarkdown::render("code/PAM_Clusters.Rmd", output_file="/Users/L347123/Desktop/k
 #render F1_vs_nonF1_v2
 rmarkdown::render("code/F1_vs_nonF1_v2.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_F1_vs_nonF1_v2")
 
+#render MRM_SEM_Landspace_Bacteria
+rmarkdown::render("code/MRM_SEM_Landspace_Bacteria.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_MRM_SEM_Landspace_Bacteria")
 ```
 
 On this GitHub Pages site, you can find:
@@ -165,6 +170,10 @@ links:
 -   Spatial Origins and Cross-Kingdom Congruence in Bacterial and Fungal Communities
 
     -   <a href="github_F1_vs_nonF1.html" target="_blank">Contrasting fungal F1 subassemblage vs. non-F1 subassemblages and associated bacterial communities</a> (last updated 23 April 2025 - see <a href="github_F1_vs_nonF1_v2.html" target="_blank">version 2</a>)
+
+-   MRM Results
+
+    -   <a href="github_MRM_SEM_Landspace_Bacteria.html" target="_blank">Bacteria - Landscape-scale</a> (last updated 20 May 2025)
 
 \
 \
