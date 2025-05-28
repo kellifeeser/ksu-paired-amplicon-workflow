@@ -1,0 +1,1655 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Latitudinal Bin
+Longitudinal Gradient
+
+colorBin
+colorGradient
+
+bin_cols_n5
+grad_cols_n3
+
+color = "Bin"
+color = "Gradient"
+
+Bin_whole word
+Grad_whole word
+
+colGrad
+colGrad
+
+# ordinations
+
+```{r plot nmds AllG col Grad, include=F, eval=F}
+
+nmds.Bac.AllG.colGrad_wleg<-plot_ordination(Bac.AllG, Bac.AllG.k5.ord, color = "Gradient") +
+  scale_color_manual(values = bac_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Longitudinal Gradient (90% confidence level for multivariate t-distribution)", subtitle = "16S: All Grass Hosts") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colGrad<-get_legend(nmds.Bac.AllG.colGrad_wleg)
+nmds.Bac.AllG.colGrad<-nmds.Bac.AllG.colGrad_wleg+theme(legend.position="none")
+
+nmds.Fun.AllG.colGrad<-plot_ordination(Fun.AllG, Fun.AllG.k5.ord, color = "Gradient") +
+  scale_color_manual(values = fun_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: All Grass Hosts") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.AllG.colGrad_upper<-plot_grid(nmds.Bac.AllG.colGrad,nmds.Fun.AllG.colGrad, ncol=2)
+plot_grid(nmds.AllG.colGrad_upper,leg_nmds.colGrad, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_AllG_colorGradient.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds ANGE col Grad, include=F, eval=F}
+
+  Bac.ANGE.k4.ord
+  Fun.ANGE.k5.ord # 4-7
+
+nmds.Bac.ANGE.colGrad_wleg<-plot_ordination(Bac.ANGE, Bac.ANGE.k5.ord, color = "Gradient") +
+  scale_color_manual(values = bac_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Longitudinal Gradient (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = ANGE") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colGrad<-get_legend(nmds.Bac.ANGE.colGrad_wleg)
+nmds.Bac.ANGE.colGrad<-nmds.Bac.ANGE.colGrad_wleg+theme(legend.position="none")
+
+nmds.Fun.ANGE.colGrad<-plot_ordination(Fun.ANGE, Fun.ANGE.k5.ord, color = "Gradient") +
+  scale_color_manual(values = fun_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = ANGE") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.ANGE.colGrad_upper<-plot_grid(nmds.Bac.ANGE.colGrad,nmds.Fun.ANGE.colGrad, ncol=2)
+plot_grid(nmds.ANGE.colGrad_upper,leg_nmds.colGrad, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_ANGE_colorGradient.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds BOER col Grad, include=F, eval=F}
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[5])
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[6])
+
+nmds.Bac.BOER.colGrad_wleg<-plot_ordination(Bac.BOER, Bac.BOER.k5.ord, color = "Gradient") +
+  scale_color_manual(values = bac_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Longitudinal Gradient (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = BOER") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colGrad<-get_legend(nmds.Bac.BOER.colGrad_wleg)
+nmds.Bac.BOER.colGrad<-nmds.Bac.BOER.colGrad_wleg+theme(legend.position="none")
+
+nmds.Fun.BOER.colGrad<-plot_ordination(Fun.BOER, Fun.BOER.k5.ord, color = "Gradient") +
+  scale_color_manual(values = fun_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = BOER") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.BOER.colGrad_upper<-plot_grid(nmds.Bac.BOER.colGrad,nmds.Fun.BOER.colGrad, ncol=2)
+plot_grid(nmds.BOER.colGrad_upper,leg_nmds.colGrad, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_BOER_colorGradient.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds BOGR col Grad, include=F, eval=F}
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[7])
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[8])
+
+nmds.Bac.BOGR.colGrad_wleg<-plot_ordination(Bac.BOGR, Bac.BOGR.k5.ord, color = "Gradient") +
+  scale_color_manual(values = bac_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Longitudinal Gradient (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = BOGR") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colGrad<-get_legend(nmds.Bac.BOGR.colGrad_wleg)
+nmds.Bac.BOGR.colGrad<-nmds.Bac.BOGR.colGrad_wleg+theme(legend.position="none")
+
+nmds.Fun.BOGR.colGrad<-plot_ordination(Fun.BOGR, Fun.BOGR.k5.ord, color = "Gradient") +
+  scale_color_manual(values = fun_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = BOGR") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.BOGR.colGrad_upper<-plot_grid(nmds.Bac.BOGR.colGrad,nmds.Fun.BOGR.colGrad, ncol=2)
+plot_grid(nmds.BOGR.colGrad_upper,leg_nmds.colGrad, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_BOGR_colorGradient.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds BUDA col Grad, include=F, eval=F}
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[9])
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[10])
+
+#flip y coord of ITS Fun.BUDA.k6.ord
+
+nmds.Bac.BUDA.colGrad_wleg<-plot_ordination(Bac.BUDA, Bac.BUDA.k6.ord, color = "Gradient") +
+  scale_color_manual(values = bac_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Longitudinal Gradient (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = BUDA") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colGrad<-get_legend(nmds.Bac.BUDA.colGrad_wleg)
+nmds.Bac.BUDA.colGrad<-nmds.Bac.BUDA.colGrad_wleg+theme(legend.position="none")
+
+nmds.Fun.BUDA.colGrad<-plot_ordination(Fun.BUDA, Fun.BUDA.k6.ord, color = "Gradient") +
+  scale_color_manual(values = fun_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = BUDA") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.BUDA.colGrad_upper<-plot_grid(nmds.Bac.BUDA.colGrad,nmds.Fun.BUDA.colGrad, ncol=2)
+plot_grid(nmds.BUDA.colGrad_upper,leg_nmds.colGrad, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_BUDA_colorGradient.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds SCSC col Grad, include=F, eval=F}
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[11])
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[12])
+
+nmds.Bac.SCSC.colGrad_wleg<-plot_ordination(Bac.SCSC, Bac.SCSC.k5.ord, color = "Gradient") +
+  scale_color_manual(values = bac_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Longitudinal Gradient (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = SCSC") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colGrad<-get_legend(nmds.Bac.SCSC.colGrad_wleg)
+nmds.Bac.SCSC.colGrad<-nmds.Bac.SCSC.colGrad_wleg+theme(legend.position="none")
+
+nmds.Fun.SCSC.colGrad<-plot_ordination(Fun.SCSC, Fun.SCSC.k5.ord, color = "Gradient") +
+  scale_color_manual(values = fun_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = SCSC") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.SCSC.colGrad_upper<-plot_grid(nmds.Bac.SCSC.colGrad,nmds.Fun.SCSC.colGrad, ncol=2)
+plot_grid(nmds.SCSC.colGrad_upper,leg_nmds.colGrad, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_SCSC_colorGradient.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+############################################################################
+
+
+############################################################################
+# taxonomy
+
+## full dataset: grouped by Cluster
+
+### Fun 
+
+```{r Fun-Phylum-Cluster, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Fun.Phylum.r, aes(x = sample_name, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Phylum)) + 
+
+  facet_wrap("Fun_sor_clusters", nrow=2, ncol=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nsample name', y="Relative Abundance", fill="Phylum")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = c("≤ 0.0002% relative abundance" = '#28A48D', 
+            "Ascomycota"="#8569D5",
+           "Basidiomycota"="#D1A33D",
+           "Mucoromycota"="#5E738F")) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Phylum_Full_sample_cluster.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+```{r}
+ggplot(dat_Fun.Phylum.r, aes(x = sample_name, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Phylum)) + 
+
+  facet_wrap("Fun_sor_clusters", nrow=2, ncol=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nsample name', y="Relative Abundance", fill="Phylum")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = c("≤ 0.0002% relative abundance" = '#28A48D', 
+            "Ascomycota"="#8569D5",
+           "Basidiomycota"="#D1A33D",
+           "Mucoromycota"="#5E738F")) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Phylum_Full_sample_cluster.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+
+
+ggplot(dat_Fun.Class.r, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Class)) + 
+  facet_wrap("Fun_sor_clusters", nrow=2, ncol=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nsample_name', y="Relative Abundance", fill="Class")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Class_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Class_Full_sample_cluster.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+
+ggplot(dat_Fun.Order.r, aes(x = sample_name,y = as.numeric(Abundance*100),fill = Order)) + 
+  facet_wrap("Fun_sor_clusters", nrow=2, ncol=5, scales = "free_x")+
+  labs(x= '\nsample_name', y="Relative Abundance", fill="Order")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Order_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Order_Full_sample_cluster.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+
+
+ggplot(dat_Fun.Family.r, aes(x = sample_name, y = as.numeric(Abundance*100),  fill = Family)) + 
+  facet_wrap("Fun_sor_clusters", nrow=2, ncol=5, scales = "free_x")+
+  labs(x= '\nsample_name', y="Relative Abundance", fill="Family")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Family_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Family_Full_sample_cluster.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+
+
+ggplot(dat_Fun.Genus.r, aes(x = sample_name, y = as.numeric(Abundance),  fill = Genus)) + 
+  facet_wrap("Fun_sor_clusters", nrow=2, ncol=5, scales = "free_x")+
+  scale_y_continuous(labels = scales::percent)+
+  labs(x= '\nsample_name', y="Relative Abundance", fill="Genus")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Genus_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Genus_Full_sample_cluster.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+
+GvS_cols<-c("#d01c8b","#4dac26","grey")
+
+ggplot(dat_Fun.Sign.r, aes(x = sample_name, y = as.numeric(Abundance*100),fill = Sign)) + 
+  facet_wrap("Fun_sor_clusters", nrow=2, ncol=5, scales = "free_x")+
+  labs(x= '\nsample_name', y="Relative Abundance", fill="Sign")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(
+    values = c(
+      "Generalists" = "#4dac26",
+      "Specialists" = "#d01c8b",
+      "NS" = "grey40",
+      "Singleton" = "grey"),
+    guide = "legend"
+  ) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Sign_Full_sample_cluster.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+### Bac
+
+```{r}
+ggplot(dat_Bac.Phylum.r, aes(x = sample_name,y = as.numeric(Abundance),fill = Phylum)) + 
+  facet_wrap("Bac_sor_clusters", nrow=3, ncol=5, scales = "free_x")+
+  scale_y_continuous(labels = scales::percent)+
+  labs(x= '\nsample name', y="Relative Abundance", fill="Phylum")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Bac_Phylum_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Bac_Phylum_Full_sample_cluster.png", plot = last_plot(), width=9, height=7, units = "in", device="png")
+
+
+ggplot(dat_Bac.Class.r, aes(x = sample_name,y = as.numeric(Abundance), fill = Class)) + 
+  facet_wrap("Bac_sor_clusters", nrow=3, ncol=5, scales = "free_x")+
+  scale_y_continuous(labels = scales::percent)+
+  labs(x= '\nsample_name', y="Relative Abundance", fill="Class")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Bac_Class_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Bac_Class_Full_sample_cluster.png", plot = last_plot(), width=9, height=7, units = "in", device="png")
+
+ggplot(dat_Bac.Order.r, aes(x = sample_name,y = as.numeric(Abundance),fill = Order)) + 
+  facet_wrap("Bac_sor_clusters", nrow=3, ncol=5, scales = "free_x")+
+  scale_y_continuous(labels = scales::percent)+
+  labs(x= '\nsample_name', y="Relative Abundance", fill="Order")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Bac_Order_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Bac_Order_Full_sample_cluster.png", plot = last_plot(), width=9, height=7, units = "in", device="png")
+
+
+ggplot(dat_Bac.Family.r, aes(x = sample_name, y = as.numeric(Abundance),  fill = Family)) + 
+  facet_wrap("Bac_sor_clusters", nrow=3, ncol=5, scales = "free_x")+
+  scale_y_continuous(labels = scales::percent)+
+  labs(x= '\nsample_name', y="Relative Abundance", fill="Family")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Bac_Family_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Bac_Family_Full_sample_cluster.png", plot = last_plot(), width=9, height=7, units = "in", device="png")
+
+
+ggplot(dat_Bac.Genus.r, aes(x = sample_name, y = as.numeric(Abundance),  fill = Genus)) + 
+  facet_wrap("Bac_sor_clusters", nrow=3, ncol=5, scales = "free_x")+
+  scale_y_continuous(labels = scales::percent)+
+  labs(x= '\nsample_name', y="Relative Abundance", fill="Genus")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Bac_Genus_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Bac_Genus_Full_sample_cluster.png", plot = last_plot(), width=9, height=7, units = "in", device="png")
+```
+
+## full dataset: grouped by Cluster2 (f1 vs non-f1)
+
+### Fun 
+
+```{r}
+ggplot(dat_Fun.Phylum.r, aes(x = Site_Grass, y = as.numeric(Abundance),
+                             fill = Phylum)) + 
+  # facet_wrap("Fun_sor_clus2", ncol=2, scales = "free_x")+
+  facet_grid(.~ Fun_sor_clus2, scales = "free_x", space= "free_x")+
+  scale_y_continuous(labels = scales::percent)+
+  labs(x= '\nSite_Grass', y="Relative Abundance", fill="Phylum")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = c("≤ 0.0002% relative abundance" = '#28A48D', 
+            "Ascomycota"="#8569D5",
+           "Basidiomycota"="#D1A33D",
+           "Mucoromycota"="#5E738F")) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Phylum_Full_sitegrass_cluster2.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+
+
+ggplot(dat_Fun.Class.r, aes(x = Site_Grass,y = as.numeric(Abundance), fill = Class)) + 
+  facet_grid(.~ Fun_sor_clus2, scales = "free_x", space= "free_x")+
+  scale_y_continuous(labels = scales::percent)+
+  labs(x= '\nSite_Grass', y="Relative Abundance", fill="Class")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Class_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Class_Full_sitegrass_cluster2.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+
+#### Order #### 
+ggplot(dat_Fun.Order.r, aes(x = Site_Grass, y = as.numeric(Abundance*100), 
+                                                    fill = Order)) + 
+  facet_grid(.~ Fun_sor_clus2, scales = "free_x", space= "free_x")+
+  scale_y_continuous(labels = scales::percent)+
+  labs(x= '\nSite_Grass', y="Relative Abundance", fill="Order")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Order_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Order_Full_sitegrass_cluster2.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+#### Order #### 
+
+
+#### Family #### 
+ggplot(dat_Fun.Family.r, aes(x = Site_Grass,y = as.numeric(Abundance*100), 
+                                                    fill = Family)) + 
+  facet_grid(.~ Fun_sor_clus2, scales = "free_x", space= "free_x")+
+  scale_y_continuous(labels = scales::percent)+
+  labs(x= '\nSite_Grass', y="Relative Abundance", fill="Family")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Family_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Family_Full_sitegrass_cluster2.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+#### Family #### 
+
+
+#### Genus #### 
+ggplot(dat_Fun.Genus.r, aes(x = Site_Grass,y = as.numeric(Abundance*100), 
+                                                    fill = Genus)) + 
+  facet_grid(.~ Fun_sor_clus2, scales = "free_x", space= "free_x")+
+  scale_y_continuous(labels = scales::percent)+
+  labs(x= '\nSite_Grass', y="Relative Abundance", fill="Genus")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Genus_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Genus_Full_sitegrass_cluster2.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+#### Genus #### 
+
+#### GvS #### 
+GvS_cols<-c("#d01c8b","#4dac26","grey")
+
+ggplot(dat_Fun.Sign.r, aes(x = Site_Grass, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Sign)) + 
+
+  facet_wrap("Fun_sor_clus2", nrow=2, ncol=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite_Grass', y="Relative Abundance", fill="Sign")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(
+    values = c(
+      "Generalists" = "#4dac26",
+      "Specialists" = "#d01c8b",
+      "NS" = "grey40",
+      "Singleton" = "grey"),
+    guide = "legend"
+  ) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Sign_Full_sitegrass_cluster2.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+#### GvS #### 
+
+```
+
+##### 
+
+
+
+## full dataset: Grass replicates, grouped by Site
+
+### Bac - Phylum
+
+```{r Bac-Phylum-Full-GrassRep-Site, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Bac.Phylum.r, aes(x = Grass_Rep, 
+                             y = as.numeric(Abundance*100), 
+                             fill = Phylum)) + 
+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Phylum")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = Bac_Phylum_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Phylum_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+### Fun - Phylum
+
+```{r Fun-Phylum-Full-GrassRep-Site, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Fun.Phylum.r, aes(x = Grass_Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Phylum)) + 
+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Phylum")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = c("≤ 0.0002% relative abundance" = '#28A48D', 
+            "Ascomycota"="#8569D5",
+           "Basidiomycota"="#D1A33D",
+           "Mucoromycota"="#5E738F")) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Phylum_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+##### 
+
+### Bac - Class
+
+```{r Bac-Class-Full-GrassRep-Site, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Bac.Class.r, aes(x = Grass_Rep, 
+                             y = as.numeric(Abundance*100), 
+                             fill = Class)) + 
+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Class")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = Bac_Class_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Class_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+### Fun - Class
+
+```{r Fun-Class-Full-GrassRep-Site, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Fun.Class.r, aes(x = Grass_Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Class)) + 
+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Class")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Class_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Class_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+##### 
+
+### Bac - Order
+
+```{r Bac-Order-Full-GrassRep-Site, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Bac.Order.r, aes(x = Grass_Rep, 
+                             y = as.numeric(Abundance*100), 
+                             fill = Order)) + 
+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Order")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = Bac_Order_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Order_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+### Fun - Order
+
+```{r Fun-Order-Full-GrassRep-Site, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Fun.Order.r, aes(x = Grass_Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Order)) + 
+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Order")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Order_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Order_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+##### 
+
+### Bac - Family
+
+```{r Bac-Family-Full-GrassRep-Site, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Bac.Family.r, aes(x = Grass_Rep, 
+                             y = as.numeric(Abundance*100), 
+                             fill = Family)) + 
+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Family")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = Bac_Family_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Family_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+### Fun - Family
+
+```{r Fun-Family-Full-GrassRep-Site, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Fun.Family.r, aes(x = Grass_Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Family)) + 
+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Family")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Family_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Family_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+
+
+##### 
+
+
+
+
+
+
+####################################################
+####################################################
+## full dataset: Site replicates, grouped by Grass
+
+### Bac - Phylum
+
+```{r Bac-Phylum-Full-SiteRep-Grass, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Bac.Phylum.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Phylum)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Phylum")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = Bac_Phylum_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Phylum_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+### Fun - Phylum
+
+```{r Fun-Phylum-Full-SiteRep-Grass, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Fun.Phylum.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Phylum)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Phylum")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = c("≤ 0.0002% relative abundance" = '#28A48D', 
+            "Ascomycota"="#8569D5",
+           "Basidiomycota"="#D1A33D",
+           "Mucoromycota"="#5E738F")) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Phylum_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+
+##### 
+
+### Bac - Class
+
+```{r Bac-Class-Full-SiteRep-Grass, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Bac.Class.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Class)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Class")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = Bac_Class_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Class_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+### Fun - Class
+
+```{r Fun-Class-Full-SiteRep-Grass, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Fun.Class.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Class)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Class")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Class_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Class_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+
+##### 
+
+### Bac - Order
+
+```{r Bac-Order-Full-SiteRep-Grass, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Bac.Order.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Order)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Order")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = Bac_Order_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Order_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+### Fun - Order
+
+```{r Fun-Order-Full-SiteRep-Grass, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Fun.Order.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Order)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Order")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Order_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Order_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+
+
+
+##### 
+
+### Bac - Family
+
+```{r Bac-Family-Full-SiteRep-Grass, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Bac.Family.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Family)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Family")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = Bac_Family_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Family_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+### Fun - Family
+
+```{r Fun-Family-Full-SiteRep-Grass, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Fun.Family.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Family)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Family")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Family_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Family_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+
+
+
+##### 
+
+
+
+
+####################################################
+####################################################
+## Across Different Sites by Grass Hosts
+
+### Bac - Phylum
+
+autogen code:
+
+```{r autogen-SitebyGrass-Bac-Phylum, echo=F, results='asis'}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Phylum
+#price=Abundance
+#col=fill
+
+BA_tabs <- sort(unique(dat_Bac.Phylum.r2$Site))
+
+
+
+for(tab in BA_tabs) {
+
+  cat('\n')
+
+  cat('### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Bac.Phylum.r2 %>% filter(Site == tab)
+
+  subtabs <- sort(unique(sub_values$Grass))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('#### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    plot_values <- sub_values %>% filter(Grass == subtab)
+
+
+    print(ggplot(plot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Phylum)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = c( "≤ 0.4% relative abundance" = '#CBD588', 
+                     "Acidobacteria" = '#5F7FC7', 
+                     "Actinobacteria" = '#FFA401', 
+                     "Armatimonadetes" = '#DA5724',
+                     "Bacteroidetes" = '#508578',
+                     "Candidatus_Saccharibacteria" = '#CD9BCD',
+                     "Firmicutes" = '#673770', 
+                     "Planctomycetes" = '#D14285',
+                     "Proteobacteria" = '#652926', 
+                     "Verrucomicrobia" = '#C84248')) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Phylum') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```

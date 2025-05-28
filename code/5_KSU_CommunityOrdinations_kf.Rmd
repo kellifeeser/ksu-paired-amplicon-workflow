@@ -1,0 +1,1677 @@
+---
+title: "**KSU paired amplicon community ordinations**"
+subtitle: "Comparative NMDS plots of 16S and ITS data (EDGE samples excluded), updated to include adonis2 analyses (permANOVA by metadata)"
+author: "Kelli Feeser"
+date: '2023-10-02'
+output:
+  html_notebook:
+    code_folding: hide
+    df_print: paged
+    number_sections: yes
+    css: styles.css
+    toc: yes
+    toc_depth: 2
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+    fig.caption: yes
+    keep_md: yes
+  html_document: 
+    code_folding: hide
+    css: test.css
+    fig_height: 4
+    fig_width: 5.5
+    number_sections: yes
+    theme: cosmo
+    toc: yes
+    toc_depth: 2
+editor_options:
+  chunk_output_type: inline
+---
+
+\
+<div class="homelink">
+<a href="https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html" target="_blank" style="text-align:right">Back to Home</a>
+</div>
+
+
+```{r}
+opts <- options(knitr.kable.NA = "")
+```
+
+```{r LANL proxies, eval=T, include=FALSE}
+# LANL proxies
+Sys.setenv('HTTP_PROXY'='http://proxyout.lanl.gov:8080')
+Sys.setenv('HTTPS_PROXY'='http://proxyout.lanl.gov:8080')
+```
+
+```{r load packages, eval=T, include=F,results='hide', error=F}
+library("ggplot2"); packageVersion("ggplot2") #‘3.4.4’
+library("vegan"); packageVersion("vegan") # # ‘2.6.4’
+library("phyloseq"); packageVersion("phyloseq") #‘1.44.0’
+library("scales"); packageVersion("scales") #‘1.2.1’
+library("swatches"); packageVersion("swatches") #‘0.5.0’
+library("ggsci"); packageVersion("ggsci") #‘3.0.0’
+library("ggpubr"); packageVersion("ggpubr") #‘0.6.0’
+library("viridis"); packageVersion("viridis") #‘0.6.4’
+library("RColorBrewer"); packageVersion("RColorBrewer") #‘1.1.3’
+library("cowplot"); packageVersion("cowplot") #‘1.1.1’
+library("dplyr"); packageVersion("dplyr") #‘1.1.3’
+library("knitr"); packageVersion("knitr") #‘1.44’
+
+  # library(BiocManager)
+  # BiocManager::install("microbiome")
+
+library("microbiome"); packageVersion("microbiome") #‘1.22.0’
+
+source("ksu_colors.R")
+```
+
+# Set-up {.hidden .unlisted .unnumbered}
+
+## Import clean OTU tables {.unlisted}
+
+```{r readin clean rds AllG, echo=F, eval=T}
+Bac<-readRDS(file = "../processed_data/clean_rds_saves/BacArch_min2_rare9048_v1.rds")
+  # otu_table()   OTU Table:         [ 23156 taxa and 533 samples ]
+  # sample_data() Sample Data:       [ 533 samples by 39 sample variables ]
+Fun<-readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_v2.rds")
+  # otu_table()   OTU Table:         [ 6749 taxa and 509 samples ]
+  # sample_data() Sample Data:       [ 509 samples by 39 sample variables ]
+
+Bac.AllG<-Bac
+Fun.AllG<-Fun
+```
+
+```{r readin clean rds subsettedG, include=F, eval=T, cache=TRUE}
+Bac.ANGE<-readRDS(file = "../processed_data/clean_rds_saves/BacArch_min2_rare9048_noEDGE_ANGE_v1.rds")
+Fun.ANGE<-readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_noEDGE_ANGE_v1.rds")
+
+Bac.BOER<-readRDS(file = "../processed_data/clean_rds_saves/BacArch_min2_rare9048_noEDGE_BOER_v1.rds")
+Fun.BOER<-readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_noEDGE_BOER_v1.rds")
+
+Bac.BOGR<-readRDS(file = "../processed_data/clean_rds_saves/BacArch_min2_rare9048_noEDGE_BOGR_v1.rds")
+Fun.BOGR<-readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_noEDGE_BOGR_v1.rds")
+
+Bac.BUDA<-readRDS(file = "../processed_data/clean_rds_saves/BacArch_min2_rare9048_noEDGE_BUDA_v1.rds")
+Fun.BUDA<-readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_noEDGE_BUDA_v1.rds")
+
+Bac.SCSC<-readRDS(file = "../processed_data/clean_rds_saves/BacArch_min2_rare9048_noEDGE_SCSC_v1.rds")
+Fun.SCSC<-readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_noEDGE_SCSC_v1.rds")
+```
+
+```{r make name list of comms, include=FALSE, eval=TRUE}
+comm.names.by.grass <- c("Bac.AllG","Fun.AllG",
+                         "Bac.ANGE", "Fun.ANGE",
+                         "Bac.BOER","Fun.BOER",
+                         "Bac.BOGR","Fun.BOGR",
+                         "Bac.BUDA","Fun.BUDA",
+                         "Bac.SCSC","Fun.SCSC")
+```
+
+\
+
+## Ordinate all grasses and by-host (trying k 1-7) {.unlisted}
+
+```{r AllG ord, eval=F, include=F}
+Bac.AllG.k1.ord = ordinate(Bac, "NMDS", "bray", k=1, maxit=500)
+Bac.AllG.k2.ord = ordinate(Bac, "NMDS", "bray", k=2, maxit=500)
+Bac.AllG.k3.ord = ordinate(Bac, "NMDS", "bray", k=3, maxit=500)
+Bac.AllG.k4.ord = ordinate(Bac, "NMDS", "bray", k=4, maxit=500)
+Bac.AllG.k5.ord = ordinate(Bac, "NMDS", "bray", k=5, maxit=500)
+Bac.AllG.k6.ord = ordinate(Bac, "NMDS", "bray", k=6, maxit=500)
+Bac.AllG.k7.ord = ordinate(Bac, "NMDS", "bray", k=7, maxit=500)
+
+Fun.AllG.k1.ord = ordinate(Fun, "NMDS", "bray", k=1, maxit=500)
+Fun.AllG.k2.ord = ordinate(Fun, "NMDS", "bray", k=2, maxit=500)
+Fun.AllG.k3.ord = ordinate(Fun, "NMDS", "bray", k=3, maxit=500)
+Fun.AllG.k4.ord = ordinate(Fun, "NMDS", "bray", k=4, maxit=500)
+Fun.AllG.k5.ord = ordinate(Fun, "NMDS", "bray", k=5, maxit=500)
+Fun.AllG.k6.ord = ordinate(Fun, "NMDS", "bray", k=6, maxit=500)
+Fun.AllG.k7.ord = ordinate(Fun, "NMDS", "bray", k=7, maxit=500)
+```
+
+```{r ANGE ord, eval=F, include=F}
+Bac.ANGE.k1.ord = ordinate(Bac.ANGE, "NMDS", "bray", k=1, maxit=500)
+Bac.ANGE.k2.ord = ordinate(Bac.ANGE, "NMDS", "bray", k=2, maxit=500)
+Bac.ANGE.k3.ord = ordinate(Bac.ANGE, "NMDS", "bray", k=3, maxit=500)
+Bac.ANGE.k4.ord = ordinate(Bac.ANGE, "NMDS", "bray", k=4, maxit=500)
+Bac.ANGE.k5.ord = ordinate(Bac.ANGE, "NMDS", "bray", k=5, maxit=500)
+Bac.ANGE.k6.ord = ordinate(Bac.ANGE, "NMDS", "bray", k=6, maxit=500)
+Bac.ANGE.k7.ord = ordinate(Bac.ANGE, "NMDS", "bray", k=7, maxit=500)
+
+Fun.ANGE.k1.ord = ordinate(Fun.ANGE, "NMDS", "bray", k=1, maxit=500)
+Fun.ANGE.k2.ord = ordinate(Fun.ANGE, "NMDS", "bray", k=2, maxit=500)
+Fun.ANGE.k3.ord = ordinate(Fun.ANGE, "NMDS", "bray", k=3, maxit=500)
+Fun.ANGE.k4.ord = ordinate(Fun.ANGE, "NMDS", "bray", k=4, maxit=500)
+Fun.ANGE.k5.ord = ordinate(Fun.ANGE, "NMDS", "bray", k=5, maxit=500)
+Fun.ANGE.k6.ord = ordinate(Fun.ANGE, "NMDS", "bray", k=6, maxit=500)
+Fun.ANGE.k7.ord = ordinate(Fun.ANGE, "NMDS", "bray", k=7, maxit=500)
+```
+
+```{r BOER ord, eval=F, include=F}
+Bac.BOER.k1.ord = ordinate(Bac.BOER, "NMDS", "bray", k=1, maxit=500)
+Bac.BOER.k2.ord = ordinate(Bac.BOER, "NMDS", "bray", k=2, maxit=500)
+Bac.BOER.k3.ord = ordinate(Bac.BOER, "NMDS", "bray", k=3, maxit=500)
+Bac.BOER.k4.ord = ordinate(Bac.BOER, "NMDS", "bray", k=4, maxit=500)
+Bac.BOER.k5.ord = ordinate(Bac.BOER, "NMDS", "bray", k=5, maxit=500)
+Bac.BOER.k6.ord = ordinate(Bac.BOER, "NMDS", "bray", k=6, maxit=500)
+Bac.BOER.k7.ord = ordinate(Bac.BOER, "NMDS", "bray", k=7, maxit=500)
+
+Fun.BOER.k1.ord = ordinate(Fun.BOER, "NMDS", "bray", k=1, maxit=500)
+Fun.BOER.k2.ord = ordinate(Fun.BOER, "NMDS", "bray", k=2, maxit=500)
+Fun.BOER.k3.ord = ordinate(Fun.BOER, "NMDS", "bray", k=3, maxit=500)
+Fun.BOER.k4.ord = ordinate(Fun.BOER, "NMDS", "bray", k=4, maxit=500)
+Fun.BOER.k5.ord = ordinate(Fun.BOER, "NMDS", "bray", k=5, maxit=500)
+Fun.BOER.k6.ord = ordinate(Fun.BOER, "NMDS", "bray", k=6, maxit=500)
+Fun.BOER.k7.ord = ordinate(Fun.BOER, "NMDS", "bray", k=7, maxit=500)
+```
+
+```{r BOGR ord, eval=F, include=F}
+Bac.BOGR.k1.ord = ordinate(Bac.BOGR, "NMDS", "bray", k=1, maxit=500)
+Bac.BOGR.k2.ord = ordinate(Bac.BOGR, "NMDS", "bray", k=2, maxit=500)
+Bac.BOGR.k3.ord = ordinate(Bac.BOGR, "NMDS", "bray", k=3, maxit=500)
+Bac.BOGR.k4.ord = ordinate(Bac.BOGR, "NMDS", "bray", k=4, maxit=500)
+Bac.BOGR.k5.ord = ordinate(Bac.BOGR, "NMDS", "bray", k=5, maxit=500)
+Bac.BOGR.k6.ord = ordinate(Bac.BOGR, "NMDS", "bray", k=6, maxit=500)
+Bac.BOGR.k7.ord = ordinate(Bac.BOGR, "NMDS", "bray", k=7, maxit=500)
+
+Fun.BOGR.k1.ord = ordinate(Fun.BOGR, "NMDS", "bray", k=1, maxit=500)
+Fun.BOGR.k2.ord = ordinate(Fun.BOGR, "NMDS", "bray", k=2, maxit=500)
+Fun.BOGR.k3.ord = ordinate(Fun.BOGR, "NMDS", "bray", k=3, maxit=500)
+Fun.BOGR.k4.ord = ordinate(Fun.BOGR, "NMDS", "bray", k=4, maxit=500)
+Fun.BOGR.k5.ord = ordinate(Fun.BOGR, "NMDS", "bray", k=5, maxit=500)
+Fun.BOGR.k6.ord = ordinate(Fun.BOGR, "NMDS", "bray", k=6, maxit=500)
+Fun.BOGR.k7.ord = ordinate(Fun.BOGR, "NMDS", "bray", k=7, maxit=500)
+```
+
+```{r BUDA ord, eval=F, include=F}
+Bac.BUDA.k1.ord = ordinate(Bac.BUDA, "NMDS", "bray", k=1, maxit=500)
+Bac.BUDA.k2.ord = ordinate(Bac.BUDA, "NMDS", "bray", k=2, maxit=500)
+Bac.BUDA.k3.ord = ordinate(Bac.BUDA, "NMDS", "bray", k=3, maxit=500)
+Bac.BUDA.k4.ord = ordinate(Bac.BUDA, "NMDS", "bray", k=4, maxit=500)
+Bac.BUDA.k5.ord = ordinate(Bac.BUDA, "NMDS", "bray", k=5, maxit=500)
+Bac.BUDA.k6.ord = ordinate(Bac.BUDA, "NMDS", "bray", k=6, maxit=500)
+Bac.BUDA.k7.ord = ordinate(Bac.BUDA, "NMDS", "bray", k=7, maxit=500)
+
+Fun.BUDA.k1.ord = ordinate(Fun.BUDA, "NMDS", "bray", k=1, maxit=500)
+Fun.BUDA.k2.ord = ordinate(Fun.BUDA, "NMDS", "bray", k=2, maxit=500)
+Fun.BUDA.k3.ord = ordinate(Fun.BUDA, "NMDS", "bray", k=3, maxit=500)
+Fun.BUDA.k4.ord = ordinate(Fun.BUDA, "NMDS", "bray", k=4, maxit=500)
+Fun.BUDA.k5.ord = ordinate(Fun.BUDA, "NMDS", "bray", k=5, maxit=500)
+Fun.BUDA.k6.ord = ordinate(Fun.BUDA, "NMDS", "bray", k=6, maxit=500)
+Fun.BUDA.k7.ord = ordinate(Fun.BUDA, "NMDS", "bray", k=7, maxit=500)
+```
+
+```{r SCSC ord, eval=F, include=F}
+Bac.SCSC.k1.ord = ordinate(Bac.SCSC, "NMDS", "bray", k=1, maxit=500)
+Bac.SCSC.k2.ord = ordinate(Bac.SCSC, "NMDS", "bray", k=2, maxit=500)
+Bac.SCSC.k3.ord = ordinate(Bac.SCSC, "NMDS", "bray", k=3, maxit=500)
+Bac.SCSC.k4.ord = ordinate(Bac.SCSC, "NMDS", "bray", k=4, maxit=500)
+Bac.SCSC.k5.ord = ordinate(Bac.SCSC, "NMDS", "bray", k=5, maxit=500)
+Bac.SCSC.k6.ord = ordinate(Bac.SCSC, "NMDS", "bray", k=6, maxit=500)
+Bac.SCSC.k7.ord = ordinate(Bac.SCSC, "NMDS", "bray", k=7, maxit=500)
+
+Fun.SCSC.k1.ord = ordinate(Fun.SCSC, "NMDS", "bray", k=1, maxit=500)
+Fun.SCSC.k2.ord = ordinate(Fun.SCSC, "NMDS", "bray", k=2, maxit=500)
+Fun.SCSC.k3.ord = ordinate(Fun.SCSC, "NMDS", "bray", k=3, maxit=500)
+Fun.SCSC.k4.ord = ordinate(Fun.SCSC, "NMDS", "bray", k=4, maxit=500)
+Fun.SCSC.k5.ord = ordinate(Fun.SCSC, "NMDS", "bray", k=5, maxit=500)
+Fun.SCSC.k6.ord = ordinate(Fun.SCSC, "NMDS", "bray", k=6, maxit=500)
+Fun.SCSC.k7.ord = ordinate(Fun.SCSC, "NMDS", "bray", k=7, maxit=500)
+```
+
+```{r make name list of comm ords, eval=TRUE, include=FALSE}
+# comm.ord.names.by.grass <- c("Bac.AllG.k1.ord", "Bac.AllG.k2.ord")
+
+comm.ord.names.by.grass <- c("Bac.AllG.k1.ord", "Bac.AllG.k2.ord", "Bac.AllG.k3.ord", "Bac.AllG.k4.ord", "Bac.AllG.k5.ord", "Bac.AllG.k6.ord", "Bac.AllG.k7.ord", "Bac.ANGE.k1.ord", "Bac.ANGE.k2.ord", "Bac.ANGE.k3.ord", "Bac.ANGE.k4.ord", "Bac.ANGE.k5.ord", "Bac.ANGE.k6.ord", "Bac.ANGE.k7.ord", "Bac.BOER.k1.ord", "Bac.BOER.k2.ord", "Bac.BOER.k3.ord", "Bac.BOER.k4.ord", "Bac.BOER.k5.ord", "Bac.BOER.k6.ord", "Bac.BOER.k7.ord", "Bac.BOGR.k1.ord", "Bac.BOGR.k2.ord", "Bac.BOGR.k3.ord", "Bac.BOGR.k4.ord", "Bac.BOGR.k5.ord", "Bac.BOGR.k6.ord", "Bac.BOGR.k7.ord", "Bac.BUDA.k1.ord", "Bac.BUDA.k2.ord", "Bac.BUDA.k3.ord", "Bac.BUDA.k4.ord", "Bac.BUDA.k5.ord", "Bac.BUDA.k6.ord", "Bac.BUDA.k7.ord", "Bac.SCSC.k1.ord", "Bac.SCSC.k2.ord", "Bac.SCSC.k3.ord", "Bac.SCSC.k4.ord", "Bac.SCSC.k5.ord", "Bac.SCSC.k6.ord", "Bac.SCSC.k7.ord", "Fun.AllG.k1.ord", "Fun.AllG.k2.ord", "Fun.AllG.k3.ord", "Fun.AllG.k4.ord", "Fun.AllG.k5.ord", "Fun.AllG.k6.ord", "Fun.AllG.k7.ord", "Fun.ANGE.k1.ord", "Fun.ANGE.k2.ord", "Fun.ANGE.k3.ord", "Fun.ANGE.k4.ord", "Fun.ANGE.k5.ord", "Fun.ANGE.k6.ord", "Fun.ANGE.k7.ord", "Fun.BOER.k1.ord", "Fun.BOER.k2.ord", "Fun.BOER.k3.ord", "Fun.BOER.k4.ord", "Fun.BOER.k5.ord", "Fun.BOER.k6.ord", "Fun.BOER.k7.ord", "Fun.BOGR.k1.ord", "Fun.BOGR.k2.ord", "Fun.BOGR.k3.ord", "Fun.BOGR.k4.ord", "Fun.BOGR.k5.ord", "Fun.BOGR.k6.ord", "Fun.BOGR.k7.ord", "Fun.BUDA.k1.ord", "Fun.BUDA.k2.ord", "Fun.BUDA.k3.ord", "Fun.BUDA.k4.ord", "Fun.BUDA.k5.ord", "Fun.BUDA.k6.ord", "Fun.BUDA.k7.ord", "Fun.SCSC.k1.ord", "Fun.SCSC.k2.ord", "Fun.SCSC.k3.ord", "Fun.SCSC.k4.ord", "Fun.SCSC.k5.ord", "Fun.SCSC.k6.ord", "Fun.SCSC.k7.ord")
+```
+
+\
+
+## QC, stress check and validation of ordinations {.unlisted}
+
+```{r extract.nmds.checkfit-function, include=F}
+extract.nmds.checkfit <- function(ord.object, ...) {
+  
+  checkfit_vals <- nmds.checkfit(ord.object)
+  
+  input.name.tooooo.long <- print(as.character(name)) 
+  input.name.shorter <- sapply(strsplit(input.name.tooooo.long, ".k"), "[", 1) 
+  
+  out.df <- data.frame(name_of_row = paste0("k_", ord.object$ndim),
+                       k_values = ord.object$ndim,
+                       input_data = input.name.shorter,
+                       stress = checkfit_vals$stress,
+                       nonmetric.fit.r2 = checkfit_vals$nonmetric.fit.r2,
+                       linear.fit.r2 = checkfit_vals$linear.fit.r2)
+  
+  class(out.df) <- "nmsd.gof"
+  
+  out.df
+}
+```
+
+```{r make checkfit df, cache=TRUE, message=FALSE, eval=F}
+ord_checkfit_df = data.frame()
+
+for (name in comm.ord.names.by.grass) {
+  
+  output = extract.nmds.checkfit(get(name))
+
+  ord_checkfit_df = rbind(ord_checkfit_df, output)
+
+}
+
+```
+
+```{r choose k vals, eval=F}
+# Ideal stress value is < 0.05 (but k > 5 makes interpretation difficult)
+    # Higher than 0.2 is poor (risks for false interpretation).
+    # 0.1 - 0.2 is fair (some distances can be misleading for interpretation).
+    # 0.05 - 0.1 is good (can be confident in inferences from plot).
+    # Less than 0.05 is excellent (this can be rare).
+
+
+ord_checkfit_df$stress<-round(ord_checkfit_df$stress,3)
+ord_checkfit_df$nonmetric.fit.r2<-round(ord_checkfit_df$nonmetric.fit.r2,3)
+ord_checkfit_df$linear.fit.r2<-round(ord_checkfit_df$linear.fit.r2,3)
+
+
+# Final choices on k values
+
+## AllG
+  subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[1])
+  subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[2])
+  
+  # flipping x axis coords for ease of interpretation
+    # Fun.AllG.k5.ord$points[,1]<-Fun.AllG.k5.ord$points[,1]*-1 # already done
+  
+  saveRDS(Bac.AllG.k5.ord, file="../processed_data/clean_rds_saves/Bac.AllG.k5.ord.rds")
+  saveRDS(Fun.AllG.k5.ord, file="../processed_data/clean_rds_saves/Fun.AllG.k5.ord.rds")
+
+## ANGE
+  subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[3])
+  subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[4])
+  
+  #flip x coord of ITS Fun.ANGE.k5.ord
+     # Fun.ANGE.k5.ord$points[,1]<-Fun.ANGE.k5.ord$points[,1]*-1 # already done
+  
+  saveRDS(Bac.ANGE.k5.ord, file="../processed_data/clean_rds_saves/Bac.ANGE.k5.ord.rds")
+  saveRDS(Fun.ANGE.k5.ord, file="../processed_data/clean_rds_saves/Fun.ANGE.k5.ord.rds")
+
+## BOER
+  saveRDS(Bac.BOER.k5.ord, file="../processed_data/clean_rds_saves/Bac.BOER.k5.ord.rds")
+  saveRDS(Fun.BOER.k5.ord, file="../processed_data/clean_rds_saves/Fun.BOER.k5.ord.rds")
+
+## BOGR
+  subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[7])
+  subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[8])
+  
+  saveRDS(Bac.BOGR.k5.ord, file="../processed_data/clean_rds_saves/Bac.BOGR.k5.ord.rds")
+  saveRDS(Fun.BOGR.k5.ord, file="../processed_data/clean_rds_saves/Fun.BOGR.k5.ord.rds")
+
+## BUDA
+  subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[9])
+  subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[10])
+  
+  # flipping y axis coords for ease of interpretation
+    # Fun.BUDA.k6.ord$points[,2]<-Fun.BUDA.k6.ord$points[,2]*-1 # already done
+  
+  saveRDS(Bac.BUDA.k6.ord, file="../processed_data/clean_rds_saves/Bac.BUDA.k6.ord.rds")
+  saveRDS(Fun.BUDA.k6.ord, file="../processed_data/clean_rds_saves/Fun.BUDA.k6.ord.rds")
+
+## SCSC
+  subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[11])
+  subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[12])
+  
+  saveRDS(Bac.SCSC.k5.ord, file="../processed_data/clean_rds_saves/Bac.SCSC.k5.ord.rds")
+  saveRDS(Fun.SCSC.k5.ord, file="../processed_data/clean_rds_saves/Fun.SCSC.k5.ord.rds")
+
+```
+
+```{r restore ord objects, eval=T, include=F, cache=TRUE}
+Bac.AllG.k5.ord <- readRDS(file="../processed_data/clean_rds_saves/Bac.AllG.k5.ord.rds")
+Fun.AllG.k5.ord <- readRDS(file="../processed_data/clean_rds_saves/Fun.AllG.k5.ord.rds")
+
+Bac.ANGE.k5.ord <- readRDS(file="../processed_data/clean_rds_saves/Bac.ANGE.k5.ord.rds")
+Fun.ANGE.k5.ord <- readRDS(file="../processed_data/clean_rds_saves/Fun.ANGE.k5.ord.rds")
+
+Bac.BOER.k5.ord <- readRDS(file="../processed_data/clean_rds_saves/Bac.BOER.k5.ord.rds")
+Fun.BOER.k5.ord <- readRDS(file="../processed_data/clean_rds_saves/Fun.BOER.k5.ord.rds")
+
+Bac.BOGR.k5.ord <- readRDS(file="../processed_data/clean_rds_saves/Bac.BOGR.k5.ord.rds")
+Fun.BOGR.k5.ord <- readRDS(file="../processed_data/clean_rds_saves/Fun.BOGR.k5.ord.rds")
+
+Bac.BUDA.k6.ord <- readRDS(file="../processed_data/clean_rds_saves/Bac.BUDA.k6.ord.rds")
+Fun.BUDA.k6.ord <- readRDS(file="../processed_data/clean_rds_saves/Fun.BUDA.k6.ord.rds")
+
+Bac.SCSC.k5.ord <- readRDS(file="../processed_data/clean_rds_saves/Bac.SCSC.k5.ord.rds")
+Fun.SCSC.k5.ord <- readRDS(file="../processed_data/clean_rds_saves/Fun.SCSC.k5.ord.rds")
+```
+
+```{r, include=F}
+list.ordobject.names <- c("Bac.AllG.k5.ord","Fun.AllG.k5.ord",
+                          "Bac.ANGE.k5.ord","Fun.ANGE.k5.ord",
+                          "Bac.BOER.k5.ord","Fun.BOER.k5.ord",
+                          "Bac.BOGR.k5.ord","Fun.BOGR.k5.ord",
+                          "Bac.BUDA.k6.ord","Fun.BUDA.k6.ord",
+                          "Bac.SCSC.k5.ord","Fun.SCSC.k5.ord")
+```
+
+\
+
+## Set-up metadata {.unlisted}
+
+Available metadata:
+
+```{r, echo=F, eval=T}
+sd_Bac<-as.data.frame(sample_data(Bac))
+colnames(sd_Bac)
+```
+
+\
+
+## adonis2 tables {.unlisted .unnumbered .hidden}
+
+### by grass {.unlisted .unnumbered .hidden}
+
+```{r, eval=F, include=F}
+# create container array (dim = c(nrow, ncol, n_df))
+adonis.out_predGrass.list = vector("list", length = length(comm.names.by.grass[1:2]))
+
+for (comm in comm.names.by.grass[1:2]) {
+  adonis.temp_predGrass <- adonis2(phyloseq::distance(get(comm), method="bray") ~ Grass, 
+          data = (as(sample_data(get(comm)), "data.frame")))
+  
+  adonis.temp_predGrass$comm <- comm 
+  
+  adonis.out_predGrass.list[[comm]] <- (as.data.frame(adonis.temp_predGrass))
+
+  }
+
+adonis.out.array_predGrass = do.call(rbind, adonis.out_predGrass.list)
+```
+
+\
+
+### by Bin {.unlisted .unnumbered .hidden}
+
+```{r, eval=F, include=F}
+# create container array (dim = c(nrow, ncol, n_df))
+adonis.out_predBin.list = vector("list", length = length(comm.names.by.grass))
+
+for (comm in comm.names.by.grass) {
+  adonis.temp_predBin <- adonis2(phyloseq::distance(get(comm), method="bray") ~ Bin, 
+          data = (as(sample_data(get(comm)), "data.frame")))
+  
+  adonis.temp_predBin$comm <- comm 
+  
+  adonis.out_predBin.list[[comm]] <- (as.data.frame(adonis.temp_predBin))
+
+  }
+
+adonis.out.array_predBin = do.call(rbind, adonis.out_predBin.list)
+```
+
+### by Gradient {.unlisted .unnumbered .hidden}
+
+```{r, eval=F, include=F}
+# create container array (dim = c(nrow, ncol, n_df))
+adonis.out_predGradient.list = vector("list", length = length(comm.names.by.grass))
+
+# excluding BOER bc it only occurs in West
+
+for (comm in comm.names.by.grass[c(1:4,7:12)]) {
+  adonis.temp_predGradient <- adonis2(phyloseq::distance(get(comm), method="bray") ~ Gradient, 
+          data = (as(sample_data(get(comm)), "data.frame")))
+  
+  adonis.temp_predGradient$comm <- comm 
+  
+  adonis.out_predGradient.list[[comm]] <- (as.data.frame(adonis.temp_predGradient))
+
+  }
+
+adonis.out.array_predGradient = do.call(rbind, adonis.out_predGradient.list)
+```
+
+\
+
+### save adonis2 outputs {.unlisted .unnumbered}
+
+```{r, eval=F, include=F}
+saveRDS(adonis.out.array_predGrass, file = '../processed_data/adonis2/adonis.out.array_predGrass.rds')
+saveRDS(adonis.out.array_predBin, file = '../processed_data/adonis2/adonis.out.array_predBin.rds')
+saveRDS(adonis.out.array_predGradient, file = '../processed_data/adonis2/adonis.out.array_predGradient.rds')
+```
+
+```{r, include=F, eval=TRUE}
+adonis.out.array_predGrass<-readRDS(file = '../processed_data/adonis2/adonis.out.array_predGrass.rds')
+adonis.out.array_predBin<-readRDS(file = '../processed_data/adonis2/adonis.out.array_predBin.rds')
+adonis.out.array_predGradient<-readRDS(file = '../processed_data/adonis2/adonis.out.array_predGradient.rds')
+```
+
+## Generate plots for later viewing {.unlisted .unnumbered .hidden}
+
+### color by grass {.unlisted .unnumbered}
+
+```{r plot nmds AllG col Grass, include=F, eval=F}
+nmds.Bac.AllG.colGrass_wleg<-plot_ordination(Bac.AllG, Bac.AllG.k5.ord, color = "Grass") +
+  scale_color_manual(values = bac_grass_cols,
+                     name="Grass Host") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Grass Host (90% confidence level for multivariate t-distribution)", subtitle = "16S") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colGrass<-get_legend(nmds.Bac.AllG.colGrass_wleg)
+nmds.Bac.AllG.colGrass<-nmds.Bac.AllG.colGrass_wleg+theme(legend.position="none")
+
+nmds.Fun.AllG.colGrass<-plot_ordination(Fun.AllG, Fun.AllG.k5.ord, color = "Grass") +
+  scale_color_manual(values = fun_grass_cols,
+                     name="Grass Host") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.AllG.colGrass_upper<-plot_grid(nmds.Bac.AllG.colGrass,nmds.Fun.AllG.colGrass, ncol=2)
+plot_grid(nmds.AllG.colGrass_upper,leg_nmds.colGrass, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_AllG_colorGrass.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+### color by bin {.unlisted .unnumbered}
+
+```{r plot nmds AllG col bin, include=F, eval=F}
+
+nmds.Bac.AllG.colBin_wleg<-plot_ordination(Bac.AllG, Bac.AllG.k5.ord, color = "Bin") +
+  scale_color_manual(values = bac_bin_cols_n5,
+                     name="Latitudinal Bin") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Latitudinal Bin (90% confidence level for multivariate t-distribution)", subtitle = "16S: All Grass Hosts") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colBin<-get_legend(nmds.Bac.AllG.colBin_wleg)
+nmds.Bac.AllG.colBin<-nmds.Bac.AllG.colBin_wleg+theme(legend.position="none")
+
+nmds.Fun.AllG.colBin<-plot_ordination(Fun.AllG, Fun.AllG.k5.ord, color = "Bin") +
+  scale_color_manual(values = fun_bin_cols_n5,
+                     name="Latitudinal Bin") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: All Grass Hosts") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.AllG.colBin_upper<-plot_grid(nmds.Bac.AllG.colBin,nmds.Fun.AllG.colBin, ncol=2)
+plot_grid(nmds.AllG.colBin_upper,leg_nmds.colBin, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_AllG_colorBin.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds ANGE col bin, include=F, eval=F}
+
+  Bac.ANGE.k4.ord
+  Fun.ANGE.k5.ord # 4-7
+
+nmds.Bac.ANGE.colBin_wleg<-plot_ordination(Bac.ANGE, Bac.ANGE.k5.ord, color = "Bin") +
+  scale_color_manual(values = bac_bin_cols_n5,
+                     name="Latitudinal Bin") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Latitudinal Bin (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = ANGE") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colBin<-get_legend(nmds.Bac.ANGE.colBin_wleg)
+nmds.Bac.ANGE.colBin<-nmds.Bac.ANGE.colBin_wleg+theme(legend.position="none")
+
+nmds.Fun.ANGE.colBin<-plot_ordination(Fun.ANGE, Fun.ANGE.k5.ord, color = "Bin") +
+  scale_color_manual(values = fun_bin_cols_n5,
+                     name="Latitudinal Bin") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = ANGE") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.ANGE.colBin_upper<-plot_grid(nmds.Bac.ANGE.colBin,nmds.Fun.ANGE.colBin, ncol=2)
+plot_grid(nmds.ANGE.colBin_upper,leg_nmds.colBin, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_ANGE_colorBin.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds BOER col bin, include=F, eval=F}
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[5])
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[6])
+
+nmds.Bac.BOER.colBin_wleg<-plot_ordination(Bac.BOER, Bac.BOER.k5.ord, color = "Bin") +
+  scale_color_manual(values = bac_bin_cols_n5,
+                     name="Latitudinal Bin") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Latitudinal Bin (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = BOER") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colBin<-get_legend(nmds.Bac.BOER.colBin_wleg)
+nmds.Bac.BOER.colBin<-nmds.Bac.BOER.colBin_wleg+theme(legend.position="none")
+
+nmds.Fun.BOER.colBin<-plot_ordination(Fun.BOER, Fun.BOER.k5.ord, color = "Bin") +
+  scale_color_manual(values = fun_bin_cols_n5,
+                     name="Latitudinal Bin") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = BOER") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.BOER.colBin_upper<-plot_grid(nmds.Bac.BOER.colBin,nmds.Fun.BOER.colBin, ncol=2)
+plot_grid(nmds.BOER.colBin_upper,leg_nmds.colBin, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_BOER_colorBin.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds BOGR col bin, include=F, eval=F}
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[7])
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[8])
+
+nmds.Bac.BOGR.colBin_wleg<-plot_ordination(Bac.BOGR, Bac.BOGR.k5.ord, color = "Bin") +
+  scale_color_manual(values = bac_bin_cols_n5,
+                     name="Latitudinal Bin") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Latitudinal Bin (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = BOGR") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colBin<-get_legend(nmds.Bac.BOGR.colBin_wleg)
+nmds.Bac.BOGR.colBin<-nmds.Bac.BOGR.colBin_wleg+theme(legend.position="none")
+
+nmds.Fun.BOGR.colBin<-plot_ordination(Fun.BOGR, Fun.BOGR.k5.ord, color = "Bin") +
+  scale_color_manual(values = fun_bin_cols_n5,
+                     name="Latitudinal Bin") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = BOGR") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.BOGR.colBin_upper<-plot_grid(nmds.Bac.BOGR.colBin,nmds.Fun.BOGR.colBin, ncol=2)
+plot_grid(nmds.BOGR.colBin_upper,leg_nmds.colBin, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_BOGR_colorBin.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds BUDA col bin, include=F, eval=F}
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[9])
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[10])
+
+#flip y coord of ITS Fun.BUDA.k6.ord
+
+nmds.Bac.BUDA.colBin_wleg<-plot_ordination(Bac.BUDA, Bac.BUDA.k6.ord, color = "Bin") +
+  scale_color_manual(values = bac_bin_cols_n5,
+                     name="Latitudinal Bin") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Latitudinal Bin (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = BUDA") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colBin<-get_legend(nmds.Bac.BUDA.colBin_wleg)
+nmds.Bac.BUDA.colBin<-nmds.Bac.BUDA.colBin_wleg+theme(legend.position="none")
+
+nmds.Fun.BUDA.colBin<-plot_ordination(Fun.BUDA, Fun.BUDA.k6.ord, color = "Bin") +
+  scale_color_manual(values = fun_bin_cols_n5,
+                     name="Latitudinal Bin") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = BUDA") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.BUDA.colBin_upper<-plot_grid(nmds.Bac.BUDA.colBin,nmds.Fun.BUDA.colBin, ncol=2)
+plot_grid(nmds.BUDA.colBin_upper,leg_nmds.colBin, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_BUDA_colorBin.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds SCSC col bin, include=F, eval=F}
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[11])
+subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[12])
+
+nmds.Bac.SCSC.colBin_wleg<-plot_ordination(Bac.SCSC, Bac.SCSC.k5.ord, color = "Bin") +
+  scale_color_manual(values = bac_bin_cols_n5,
+                     name="Latitudinal Bin") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Latitudinal Bin (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = SCSC") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colBin<-get_legend(nmds.Bac.SCSC.colBin_wleg)
+nmds.Bac.SCSC.colBin<-nmds.Bac.SCSC.colBin_wleg+theme(legend.position="none")
+
+nmds.Fun.SCSC.colBin<-plot_ordination(Fun.SCSC, Fun.SCSC.k5.ord, color = "Bin") +
+  scale_color_manual(values = fun_bin_cols_n5,
+                     name="Latitudinal Bin") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = SCSC") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.SCSC.colBin_upper<-plot_grid(nmds.Bac.SCSC.colBin,nmds.Fun.SCSC.colBin, ncol=2)
+plot_grid(nmds.SCSC.colBin_upper,leg_nmds.colBin, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_SCSC_colorBin.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+### color by gradient {.unlisted .unnumbered}
+
+```{r plot nmds AllG col Grad, include=F, eval=F}
+
+nmds.Bac.AllG.colGrad_wleg<-plot_ordination(Bac.AllG, Bac.AllG.k5.ord, color = "Gradient") +
+  scale_color_manual(values = bac_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Longitudinal Gradient (90% confidence level for multivariate t-distribution)", subtitle = "16S: All Grass Hosts") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colGrad<-get_legend(nmds.Bac.AllG.colGrad_wleg)
+nmds.Bac.AllG.colGrad<-nmds.Bac.AllG.colGrad_wleg+theme(legend.position="none")
+
+nmds.Fun.AllG.colGrad<-plot_ordination(Fun.AllG, Fun.AllG.k5.ord, color = "Gradient") +
+  scale_color_manual(values = fun_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: All Grass Hosts") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank(), panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(), panel.background = element_blank(),
+    axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14), axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.AllG.colGrad_upper<-plot_grid(nmds.Bac.AllG.colGrad,nmds.Fun.AllG.colGrad, ncol=2)
+plot_grid(nmds.AllG.colGrad_upper,leg_nmds.colGrad, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_AllG_colorGradient.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds ANGE col Grad, include=F, eval=F}
+nmds.Bac.ANGE.colGrad_wleg<-plot_ordination(Bac.ANGE, Bac.ANGE.k5.ord, color = "Gradient") +
+  scale_color_manual(values = bac_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Longitudinal Gradient (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = ANGE") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colGrad<-get_legend(nmds.Bac.ANGE.colGrad_wleg)
+nmds.Bac.ANGE.colGrad<-nmds.Bac.ANGE.colGrad_wleg+theme(legend.position="none")
+
+nmds.Fun.ANGE.colGrad<-plot_ordination(Fun.ANGE, Fun.ANGE.k5.ord, color = "Gradient") +
+  scale_color_manual(values = fun_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = ANGE") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.ANGE.colGrad_upper<-plot_grid(nmds.Bac.ANGE.colGrad,nmds.Fun.ANGE.colGrad, ncol=2)
+plot_grid(nmds.ANGE.colGrad_upper,leg_nmds.colGrad, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_ANGE_colorGradient.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds BOER col Grad, include=F, eval=F}
+# subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[5])
+# subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[6])
+
+nmds.Bac.BOER.colGrad_wleg<-plot_ordination(Bac.BOER, Bac.BOER.k5.ord, color = "Gradient") +
+  scale_color_manual(values = bac_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Longitudinal Gradient (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = BOER") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colGrad<-get_legend(nmds.Bac.BOER.colGrad_wleg)
+nmds.Bac.BOER.colGrad<-nmds.Bac.BOER.colGrad_wleg+theme(legend.position="none")
+
+nmds.Fun.BOER.colGrad<-plot_ordination(Fun.BOER, Fun.BOER.k5.ord, color = "Gradient") +
+  scale_color_manual(values = fun_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = BOER") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.BOER.colGrad_upper<-plot_grid(nmds.Bac.BOER.colGrad,nmds.Fun.BOER.colGrad, ncol=2)
+plot_grid(nmds.BOER.colGrad_upper,leg_nmds.colGrad, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_BOER_colorGradient.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds BOGR col Grad, include=F, eval=F}
+# subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[7])
+# subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[8])
+
+nmds.Bac.BOGR.colGrad_wleg<-plot_ordination(Bac.BOGR, Bac.BOGR.k5.ord, color = "Gradient") +
+  scale_color_manual(values = bac_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Longitudinal Gradient (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = BOGR") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colGrad<-get_legend(nmds.Bac.BOGR.colGrad_wleg)
+nmds.Bac.BOGR.colGrad<-nmds.Bac.BOGR.colGrad_wleg+theme(legend.position="none")
+
+nmds.Fun.BOGR.colGrad<-plot_ordination(Fun.BOGR, Fun.BOGR.k5.ord, color = "Gradient") +
+  scale_color_manual(values = fun_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = BOGR") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.BOGR.colGrad_upper<-plot_grid(nmds.Bac.BOGR.colGrad,nmds.Fun.BOGR.colGrad, ncol=2)
+plot_grid(nmds.BOGR.colGrad_upper,leg_nmds.colGrad, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_BOGR_colorGradient.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds BUDA col Grad, include=F, eval=F}
+# subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[9])
+# subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[10])
+
+#flip y coord of ITS Fun.BUDA.k6.ord
+
+nmds.Bac.BUDA.colGrad_wleg<-plot_ordination(Bac.BUDA, Bac.BUDA.k6.ord, color = "Gradient") +
+  scale_color_manual(values = bac_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Longitudinal Gradient (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = BUDA") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colGrad<-get_legend(nmds.Bac.BUDA.colGrad_wleg)
+nmds.Bac.BUDA.colGrad<-nmds.Bac.BUDA.colGrad_wleg+theme(legend.position="none")
+
+nmds.Fun.BUDA.colGrad<-plot_ordination(Fun.BUDA, Fun.BUDA.k6.ord, color = "Gradient") +
+  scale_color_manual(values = fun_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = BUDA") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.BUDA.colGrad_upper<-plot_grid(nmds.Bac.BUDA.colGrad,nmds.Fun.BUDA.colGrad, ncol=2)
+plot_grid(nmds.BUDA.colGrad_upper,leg_nmds.colGrad, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_BUDA_colorGradient.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+```{r plot nmds SCSC col Grad, include=F, eval=F}
+# subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[11])
+# subset(ord_checkfit_df,ord_checkfit_df$input_data==comm.names.by.grass[12])
+
+nmds.Bac.SCSC.colGrad_wleg<-plot_ordination(Bac.SCSC, Bac.SCSC.k5.ord, color = "Gradient") +
+  scale_color_manual(values = bac_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9)+
+  stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Longitudinal Gradient (90% confidence level for multivariate t-distribution)", subtitle = "16S: Grass Host = SCSC") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colGrad<-get_legend(nmds.Bac.SCSC.colGrad_wleg)
+nmds.Bac.SCSC.colGrad<-nmds.Bac.SCSC.colGrad_wleg+theme(legend.position="none")
+
+nmds.Fun.SCSC.colGrad<-plot_ordination(Fun.SCSC, Fun.SCSC.k5.ord, color = "Gradient") +
+  scale_color_manual(values = fun_grad_cols_n3,
+                     name="Longitudinal Gradient") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS: Grass Host = SCSC") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.SCSC.colGrad_upper<-plot_grid(nmds.Bac.SCSC.colGrad,nmds.Fun.SCSC.colGrad, ncol=2)
+plot_grid(nmds.SCSC.colGrad_upper,leg_nmds.colGrad, nrow=2, rel_heights = c(0.85,0.15))
+
+ggsave(filename = "../analyses/ordinations/NMDS_SCSC_colorGradient.png", plot = last_plot(), 
+       device = "png", height = 4, width = 7, units = "in")
+```
+
+# Data overview {.tabset .tabset-pills}
+
+All EDGE samples excluded\
+OTU tables rarefied (16S: 9,048 & ITS: 10,116 seqs/sample)\
+'Taxa' are OTUs\
+
+## AllG (All Grasses) {.unnumbered}
+
+**Bacterial & Archaeal Dataset:**
+
+```{r}
+Bac.AllG
+```
+
+\
+
+**Fungal Dataset:**
+
+```{r}
+Fun.AllG
+```
+
+\
+
+## ANGE (*Andropogon gerardii* / Big bluestem) {.unnumbered}
+
+**Bacterial & Archaeal Dataset:**
+
+```{r}
+Bac.ANGE
+```
+
+\
+
+**Fungal Dataset:**
+
+```{r}
+Fun.ANGE
+```
+
+\
+
+## BOER (*B. eriopoda* / Black grama) {.unnumbered}
+
+**Bacterial & Archaeal Dataset:**
+
+```{r}
+Bac.BOER
+```
+
+\
+
+**Fungal Dataset:**
+
+```{r}
+Fun.BOER
+```
+
+\
+
+## BOGR (*B. gracilis* / Blue grama) {.unnumbered}
+
+**Bacterial & Archaeal Dataset:**
+
+```{r}
+Bac.BOGR
+```
+
+\
+
+**Fungal Dataset:**
+
+```{r}
+Fun.BOGR
+```
+
+\
+
+## BUDA (*Bouteloua dactyloides* / Buffalograss) {.unnumbered}
+
+**Bacterial & Archaeal Dataset:**
+
+```{r}
+Bac.BUDA
+```
+
+\
+
+**Fungal Dataset:**
+
+```{r}
+Fun.BUDA
+```
+
+\
+
+## SCSC (*Schizachyrium scoparium* / Little bluestem) {.unnumbered}
+
+**Bacterial & Archaeal Dataset:**
+
+```{r}
+Bac.SCSC
+```
+
+\
+
+**Fungal Dataset:**
+
+```{r}
+Fun.SCSC
+```
+
+\
+
+# NMDS By Grass Host
+
+\
+- ANGE (*Andropogon gerardii* / Big bluestem)\
+- SCSC (*Schizachyrium scoparium* / Little bluestem)\
+- BOER (*B. eriopoda* / Black grama)\
+- BOGR (*B. gracilis* / Blue grama)\
+- BUDA (*Bouteloua dactyloides* / Buffalograss)\
+\
+
+![NMDS plots of all samples, colored by grass host](../analyses/ordinations/NMDS_AllG_colorGrass.png){out.width="400px"}
+
+```{r, cache=T}
+knitr::kable((as.data.frame(subset(adonis.out.array_predGrass, 
+                    comm==comm.names.by.grass[1])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+knitr::kable((as.data.frame(subset(adonis.out.array_predGrass, 
+                    comm==comm.names.by.grass[2])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+```
+
+# Subset by Grass Host
+
+## Influence of discrete latitudinal bins {.tabset .tabset-pills}
+
+### AllG (All Grasses) {.unnumbered}
+
+![NMDS plots of all samples, colored by latitudinal bin](../analyses/ordinations/NMDS_AllG_colorBin.png){out.width="400px"}
+
+```{r, cache=T}
+knitr::kable((as.data.frame(subset(adonis.out.array_predBin, 
+                    comm==comm.names.by.grass[1])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+knitr::kable((as.data.frame(subset(adonis.out.array_predBin, 
+                    comm==comm.names.by.grass[2])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+```
+
+### ANGE (*Andropogon gerardii* / Big bluestem) {.unnumbered}
+
+![NMDS plots of ANGE host-associated samples, colored by latitudinal bin](../analyses/ordinations/NMDS_ANGE_colorBin.png){out.height="50%"}
+
+```{r, cache=T, eval=T}
+knitr::kable((as.data.frame(subset(adonis.out.array_predBin, 
+                    comm==comm.names.by.grass[3])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+knitr::kable((as.data.frame(subset(adonis.out.array_predBin, 
+                    comm==comm.names.by.grass[4])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+```
+
+### BOER (*B. eriopoda* / Black grama) {.unnumbered}
+
+![NMDS plots of BOER host-associated samples, colored by latitudinal bin](../analyses/ordinations/NMDS_BOER_colorBin.png){out.width="400px"}
+
+```{r, cache=T}
+knitr::kable((as.data.frame(subset(adonis.out.array_predBin, 
+                    comm==comm.names.by.grass[5])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+knitr::kable((as.data.frame(subset(adonis.out.array_predBin, 
+                    comm==comm.names.by.grass[6])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+```
+
+### BOGR (*B. gracilis* / Blue grama) {.unnumbered}
+
+![NMDS plots of BOGR host-associated samples, colored by latitudinal bin](../analyses/ordinations/NMDS_BOGR_colorBin.png){out.width="400px"}
+
+```{r, cache=T}
+knitr::kable((as.data.frame(subset(adonis.out.array_predBin, 
+                    comm==comm.names.by.grass[7])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+knitr::kable((as.data.frame(subset(adonis.out.array_predBin, 
+                    comm==comm.names.by.grass[8])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+```
+
+### BUDA (*Bouteloua dactyloides* / Buffalograss) {.unnumbered}
+
+![NMDS plots of BUDA host-associated samples, colored by latitudinal bin](../analyses/ordinations/NMDS_BUDA_colorBin.png){out.width="400px"}
+
+```{r, cache=T}
+knitr::kable((as.data.frame(subset(adonis.out.array_predBin, 
+                    comm==comm.names.by.grass[9])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+knitr::kable((as.data.frame(subset(adonis.out.array_predBin, 
+                    comm==comm.names.by.grass[10])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+```
+
+### SCSC (*Schizachyrium scoparium* / Little bluestem) {.unnumbered}
+
+![NMDS plots of SCSC host-associated samples, colored by latitudinal bin](../analyses/ordinations/NMDS_SCSC_colorBin.png){out.width="400px"}
+
+```{r, cache=T}
+knitr::kable((as.data.frame(subset(adonis.out.array_predBin, 
+                    comm==comm.names.by.grass[11])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+knitr::kable((as.data.frame(subset(adonis.out.array_predBin, 
+                    comm==comm.names.by.grass[12])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+```
+
+\
+
+## Influence of discrete longitudinal gradients {.tabset .tabset-pills}
+
+### AllG (All Grasses) {.unnumbered}
+
+![NMDS plots of all samples, colored by longitudinal gradient](../analyses/ordinations/NMDS_AllG_colorGradient.png){out.width="600px"}
+
+```{r, cache=T}
+knitr::kable((as.data.frame(subset(adonis.out.array_predGradient, 
+                    comm==comm.names.by.grass[1])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+knitr::kable((as.data.frame(subset(adonis.out.array_predGradient, 
+                    comm==comm.names.by.grass[2])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+```
+
+### ANGE (*Andropogon gerardii* / Big bluestem) {.unnumbered}
+
+![NMDS plots of ANGE host-associated samples, colored by longitudinal gradient](../analyses/ordinations/NMDS_ANGE_colorGradient.png){out.width="600px"}
+
+```{r, cache=T}
+knitr::kable((as.data.frame(subset(adonis.out.array_predGradient, 
+                    comm==comm.names.by.grass[3])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+knitr::kable((as.data.frame(subset(adonis.out.array_predGradient, 
+                    comm==comm.names.by.grass[4])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+```
+
+### BOER (*B. eriopoda* / Black grama) {.unnumbered}
+
+![NMDS plots of BOER host-associated samples, colored by longitudinal gradient](../analyses/ordinations/NMDS_BOER_colorGradient.png){out.width="600px"}\
+\
+\
+\
+\
+\
+\
+
+<p class="text-center" style="background-color: aliceblue">**[NA on stats here - only 1 factor level]**</p>
+
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+
+```{r, cache=T}
+# knitr::kable((as.data.frame(subset(adonis.out.array_predGradient, 
+#                     comm==comm.names.by.grass[5])))[,1:5], "simple", 
+#              digits =c (0,1,3,2,3), 
+#              align = 'c')
+
+# knitr::kable((as.data.frame(subset(adonis.out.array_predGradient, 
+#                     comm==comm.names.by.grass[6])))[,1:5], "simple", 
+#              digits =c (0,1,3,2,3), 
+#              align = 'c')
+```
+
+### BOGR (*B. gracilis* / Blue grama) {.unnumbered}
+
+![NMDS plots of BOGR host-associated samples, colored by longitudinal gradient](../analyses/ordinations/NMDS_BOGR_colorGradient.png){out.width="600px"}
+
+```{r, cache=T}
+knitr::kable((as.data.frame(subset(adonis.out.array_predGradient, 
+                    comm==comm.names.by.grass[7])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+knitr::kable((as.data.frame(subset(adonis.out.array_predGradient, 
+                    comm==comm.names.by.grass[8])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+```
+
+### BUDA (*Bouteloua dactyloides* / Buffalograss) {.unnumbered}
+
+![NMDS plots of BUDA host-associated samples, colored by longitudinal gradient](../analyses/ordinations/NMDS_BUDA_colorGradient.png){out.width="600px"}
+
+```{r, cache=T}
+knitr::kable((as.data.frame(subset(adonis.out.array_predGradient, 
+                    comm==comm.names.by.grass[9])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+knitr::kable((as.data.frame(subset(adonis.out.array_predGradient, 
+                    comm==comm.names.by.grass[10])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+```
+
+### SCSC (*Schizachyrium scoparium* / Little bluestem) {.unnumbered}
+
+![NMDS plots of SCSC host-associated samples, colored by longitudinal gradient](../analyses/ordinations/NMDS_SCSC_colorGradient.png){out.width="600px"}
+
+```{r, cache=T}
+knitr::kable((as.data.frame(subset(adonis.out.array_predGradient, 
+                    comm==comm.names.by.grass[11])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+knitr::kable((as.data.frame(subset(adonis.out.array_predGradient, 
+                    comm==comm.names.by.grass[12])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+```
+
+\
+
+
+# Map
+
+```{r}
+# installed YARN in bash
+# % curl -o- -L https://yarnpkg.com/install.sh | bash
+# > We've added the following to your /Users/L347123/.zshrc
+# > If this isn't the profile of your current shell then please add the following to your correct profile:
+
+# export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+
+# > Successfully installed Yarn 1.22.19! Please open another terminal where the `yarn` command will now be available.
+
+# # install dependencies
+# yarn
+# 
+# # compile
+# yarn build
+# 
+# # watch
+# yarn watch
+Sys.setenv('http_proxy'='http://proxyout.lanl.gov:8080')
+Sys.setenv('HTTP_PROXY'='http://proxyout.lanl.gov:8080')
+Sys.setenv('HTTPS_PROXY'='http://proxyout.lanl.gov:8080')
+
+
+
+if (!require('devtools')) install.packages('devtools')
+devtools::install_github('rstudio/leaflet')
+library(leaflet)
+
+# create df with only 1 rep/unique entry from each site
+sd_Fun_m.std <- sample_data(Fun_m.std)
+unique_sites <- unique(sd_Fun_m.std$Site)
+first_entries <- sapply(unique_sites, function(site) which(sd_Fun_m.std$Site == site)[1])
+Fun_meta_for_map <- sd_Fun_m.std[first_entries, ]
+
+# Extract GPS coordinates and other metadata from sample data
+# coords <- sample_data(Fun_m.std)[, c("Latitude", "Longitude", "Site", "Other_Metadata")]
+coords <- sd_Fun_m.std
+  
+# Define colors based on other metadata (change this according to your metadata)
+colors <- colorFactor(palette = c("#6BE9FF","#6ABEF9","#FFFA6C","#FFC25B"), domain = coords$Bin)
+fun_bin_cols_n5<-c("North" = "#6BE9FF",
+                    "North Central" = "#6ABEF9",
+                    "South Central" = "#FFFA6C",
+                    "South" = "#FFC25B")
+
+# Create a leaflet map
+m <- leaflet() %>%
+  addTiles() %>%  # Add a tile layer
+  setView(lng = mean(coords$Longitude), lat = mean(coords$Latitude), zoom = 10)  # Set initial view based on the mean coordinates
+
+# Add markers for each site
+for (i in unique(coords$Site)) {
+  site_coords <- coords[coords$Site == i, c("Latitude", "Longitude")]
+  site_metadata <- coords[coords$Site == i, "Bin"]
+  
+  m <- addCircleMarkers(
+    map = m,
+    lng = site_coords$Longitude,
+    lat = site_coords$Latitude,
+    color = ~colors(site_metadata),  # Color markers based on other metadata
+    popup = i  # Popup label for each marker
+  )
+}
+
+# Print the map
+m
+pal <- colorFactor(c("navy", "red"), domain = c("ship", "pirate"))
+
+
+colors_bin <- colorFactor(palette = c("#6BE9FF","#6ABEF9","#FFC25B","#FFFA6C"), domain = c("North", "North Central", "South", "South Central"))
+leaflet(data = Fun_meta_for_map) %>% addTiles() %>% setView(-106.25329	, 37.62755, zoom = 5) %>% 
+  addCircleMarkers(lng = ~Longitude, lat = ~Latitude, popup = ~as.character(Site),color = ~colors_bin(Bin),fillOpacity = 0.9,radius = 15)
+```
+
+
+
+
+\
+
+
+# Visual assessment of drivers of fungal diversity
+
+## TBD {.tabset .tabset-pills}
+
+```{r}
+plot_ordination(Fun.AllG, Fun.AllG.k5.ord, color = "Site", label = "sample_name") +
+  # scale_color_manual(values = fun_grass_cols,
+  #                    name="Grass Host") +
+  geom_point(size = 3, alpha = 0.9) +
+  stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="right",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+```
+
+
+### TBD {.unnumbered}

@@ -1,0 +1,1412 @@
+---
+title: "MRM Results"
+author: "Kelli Feeser"
+date: "`r Sys.Date()`"
+output:
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 5
+    toc_float: true
+    fig.caption: yes
+    keep_md: yes
+  html_document:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+  html_notebook:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+---
+
+\
+
+# Set-up {.unlisted .unnumbered .hidden}
+
+```{r global-options, include=FALSE,eval=T}
+library(knitr)
+
+FIG_PATH="../docs/github_MRM_SEM_figures/"
+CACHE_PATH="../docs/github_MRM_SEM_cache/"
+
+## ~~create directories~~ ##
+###########################################
+dir.create(FIG_PATH, showWarnings = T,recursive=T)
+dir.create(CACHE_PATH, showWarnings = T,recursive=T)
+###########################################
+
+knitr::opts_chunk$set(fig.path=FIG_PATH,
+                      cache.path = CACHE_PATH)
+opts_knit$set(eval.after = "fig.cap")
+knitr::opts_chunk$set(fig.pos = '!h')
+options(knitr.kable.NA = '')
+```
+
+## load packages
+
+```{r load-packages, eval=T, include=F}
+library("vegan"); packageVersion("vegan") # ‘2.6.4’
+library("phyloseq"); packageVersion("phyloseq") # ‘1.41.1’
+library("betapart"); packageVersion("betapart") # ‘1.6’
+library("ecodist"); packageVersion("ecodist") # ‘2.0.9’
+library("measurements"); packageVersion("measurements") # ‘1.5.1’
+library("geosphere"); packageVersion("geosphere") # ‘1.5.18’
+  # The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,
+  # which was just loaded, were retired in October 2023.
+  # Please refer to R-spatial evolution reports for details, especially
+  # https://r-spatial.org/r/2023/05/15/evolution4.html.
+  # It may be desirable to make the sf package available;
+  # package maintainers should consider adding sf to Suggests:.
+library("gdata"); packageVersion("gdata") # ‘2.19.0’
+# library("spam"); packageVersion("spam") # ‘2.9.1’
+library("ggplot2"); packageVersion("ggplot2") # ‘3.4.4’
+library("ggpubr"); packageVersion("ggpubr") # ‘0.6.0’
+library("cowplot"); packageVersion("cowplot") # ‘1.1.1’
+library("geodist"); packageVersion("geodist") # ‘0.0.8’
+library(kableExtra)
+# detach("package:spam", unload = TRUE)
+source("RAM_bulk_harvester.R")
+```
+
+## load cache & rds
+
+```{r load-cache, include=FALSE, eval=T}
+# OBJECT <- if (file.exists('OBJECT.rds')) {
+#   readRDS('OBJECT.rds')
+# } else {
+#   "The value of `OBJECT` is not available yet"
+# }
+
+env_dist_matrices <- readRDS(file = "../processed_data/clean_rds_saves/env_dist_matrices_MRM.rds")
+betapart_results <- readRDS(file = "../processed_data/clean_rds_saves/betapart_results.rds")
+
+
+# knitr::load_cache('CHUNK-NAME', 'OBJECT')
+# knitr::load_cache('calc-DD-BF-all')
+```
+
+### Edaphic/environmental variables: generate distance matrices
+
+### list of env var
+
+```{r var-list, echo=T,eval=TRUE,cache=F}
+vard_sample <- c("Site","Grass","Site_Grass","Grassland","Latitude","Longitude","Elevation_m")
+
+vard_intpred <- c("Site","Grass","Site_Grass",
+                  "Bac_sor_clusters","Fun_sor_clusters",
+                  "nsamples_per_Site",
+                  "nsamples_perBac_sor_clusters","nsamples_perFun_sor_clusters",
+                  "ngrass_persite","ngrass_perBac_sor_clusters","ngrass_perFun_sor_clusters",
+                  "nsamples_at_site_within_Fun_sor_clus2","ngrasses_at_site_within_Fun_sor_clus2",
+                  "Bac_gamma_Site","Fun_gamma_Site",
+                  "Bac_Observed","Fun_Observed",
+                  "Bac_Chao1","Fun_Chao1",
+                  "Bac_InvSimpson","Fun_InvSimpson",
+                  "Bac_Shannon","Fun_Shannon")
+
+vard_climate <- c("GDD3yr_m.std","ppt3yr_m.std")
+
+vard_edaphic <- c("soil_water_content_m.std","pH_m.std","phos_m.std","ammonium_m.std","SOM_m.std")
+
+vard_plant <- c("avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std")
+
+vard_all <- c("Site","Grass","Site_Grass","Grassland","Latitude","Longitude","Elevation_m",
+              "GDD3yr_m.std","ppt3yr_m.std",
+              "soil_water_content_m.std","pH_m.std","phos_m.std","ammonium_m.std","SOM_m.std",
+              "avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std",
+              "Bac_sor_clusters","Fun_sor_clusters",
+              "nsamples_per_Site",
+              "nsamples_perBac_sor_clusters","nsamples_perFun_sor_clusters",
+              "ngrass_persite","ngrass_perBac_sor_clusters","ngrass_perFun_sor_clusters",
+              "nsamples_at_site_within_Fun_sor_clus2","ngrasses_at_site_within_Fun_sor_clus2",
+                  "Bac_gamma_Site","Fun_gamma_Site",
+                  "Bac_Observed","Fun_Observed",
+                  "Bac_Chao1","Fun_Chao1",
+                  "Bac_InvSimpson","Fun_InvSimpson",
+                  "Bac_Shannon","Fun_Shannon")
+
+vard_all_numeric <- c("Latitude","Longitude","Elevation_m",
+              "GDD3yr_m.std","ppt3yr_m.std",
+              "soil_water_content_m.std","pH_m.std","phos_m.std","ammonium_m.std","SOM_m.std",
+              "avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std",
+              "nsamples_per_Site",
+              "nsamples_perBac_sor_clusters","nsamples_perFun_sor_clusters",
+              "ngrass_persite","ngrass_perBac_sor_clusters","ngrass_perFun_sor_clusters",
+              "nsamples_at_site_within_Fun_sor_clus2","ngrasses_at_site_within_Fun_sor_clus2",
+                  "Bac_gamma_Site","Fun_gamma_Site",
+                  "Bac_Observed","Fun_Observed",
+                  "Bac_Chao1","Fun_Chao1",
+                  "Bac_InvSimpson","Fun_InvSimpson",
+                  "Bac_Shannon","Fun_Shannon")
+
+vard_all_numeric_env <- c("GDD3yr_m.std","ppt3yr_m.std","soil_water_content_m.std","pH_m.std","phos_m.std","ammonium_m.std","SOM_m.std","avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std",
+                          "nsamples_per_Site",
+              "nsamples_perBac_sor_clusters","nsamples_perFun_sor_clusters",
+              "ngrass_persite","ngrass_perBac_sor_clusters","ngrass_perFun_sor_clusters",
+              "nsamples_at_site_within_Fun_sor_clus2","ngrasses_at_site_within_Fun_sor_clus2",
+                  "Bac_gamma_Site","Fun_gamma_Site",
+                  "Bac_Observed","Fun_Observed",
+                  "Bac_Chao1","Fun_Chao1",
+                  "Bac_InvSimpson","Fun_InvSimpson",
+                  "Bac_Shannon","Fun_Shannon")
+
+vard_all_numeric_intpred <- c("nsamples_per_Site",
+                              "nsamples_perBac_sor_clusters","nsamples_perFun_sor_clusters",
+              "ngrass_persite","ngrass_perBac_sor_clusters","ngrass_perFun_sor_clusters",
+              "nsamples_at_site_within_Fun_sor_clus2","ngrasses_at_site_within_Fun_sor_clus2",
+                  "Bac_gamma_Site","Fun_gamma_Site",
+                  "Bac_Observed","Fun_Observed",
+                  "Bac_Chao1","Fun_Chao1",
+                  "Bac_InvSimpson","Fun_InvSimpson",
+                  "Bac_Shannon","Fun_Shannon")
+vard_all_numeric_env_intpred <-union(vard_all_numeric_env,vard_all_numeric_intpred)
+
+vard_all_numeric_env_intpred_NOTSTD <- c("Latitude","Longitude","Elevation_m",
+              "GDD3yr","ppt3yr",
+              "soil_water_content","pH","phos","ammonium","SOM",
+              "avg_SRL","avg_SLA","herbivory_perc",
+                  "Bac_gamma_Site","Fun_gamma_Site",
+                  "Bac_Observed","Fun_Observed",
+                  "Bac_Chao1","Fun_Chao1",
+                  "Bac_InvSimpson","Fun_InvSimpson",
+                  "Bac_Shannon","Fun_Shannon",
+              "nsamples_per_Site",
+              "nsamples_perBac_sor_clusters","nsamples_perFun_sor_clusters",
+              "ngrass_persite","ngrass_perBac_sor_clusters","ngrass_perFun_sor_clusters",
+              "nsamples_at_site_within_Fun_sor_clus2","ngrasses_at_site_within_Fun_sor_clus2")
+```
+
+#### generate distance matrices of env var and Lat/long distance matrix calc
+
+```{r env-var-dist-calc, echo=T,eval=F, cache=F}
+var_Fun_sor_clus2 <- levels(sd$Fun_sor_clus2)
+var_Fun_sor_clusters <- levels(sd$Fun_sor_clusters)
+var_Bac_sor_clusters <- levels(sd$Bac_sor_clusters)
+var_Site <- levels(sd$Site)
+var_Grass <- levels(sd$Grass)
+
+# Create an empty list to store the distance matrices
+env_dist_matrices <- list("all"=list(),"allNSTD"=list(),"Site"=list(),"Grass"=list(),"Bac_sor_clusters"=list(),
+                          "Fun_sor_clusters"=list(),"Fun_sor_clus2"=list())
+
+  
+# all
+for (var in vard_all_numeric_env_intpred) {
+  # Calculate geodistance matrices 
+  Bac_all.geo<-as(subset(sd, select = c(Longitude,Latitude)), "data.frame")
+  Bac_all.geodist_mat <- as.dist(geodist(Bac_all.geo, measure = 'geodesic' )/1000) #converting it to km
+  
+  Fun_all.geo<-as(subset(sd, select = c(Longitude,Latitude)), "data.frame")
+  Fun_all.geodist_mat <- as.dist(geodist(Fun_all.geo, measure = 'geodesic' )/1000) #converting it to km
+  
+  # Store the geodist matrices in the list using variable name as key
+  env_dist_matrices$all[["geodist_Bac"]] <- Bac_all.geodist_mat
+  env_dist_matrices$all[["geodist_Fun"]] <- Fun_all.geodist_mat
+
+  # Subset the data for the current variable
+  Bac_subset <- subset(as.data.frame(sample_data(Bac_wholecommunity)), select = var)
+  Fun_subset <- subset(as.data.frame(sample_data(Fun_wholecommunity)), select = var)
+  
+  # Calculate distance matrices and store them in the list
+  Bac_dist_matrix <- dist(Bac_subset, method = "euclidean", diag = TRUE, upper = FALSE)
+  Fun_dist_matrix <- dist(Fun_subset, method = "euclidean", diag = TRUE, upper = FALSE)
+  
+  # Store the matrices in the list using variable name as key
+  env_dist_matrices$all[[paste0(var,"_Bac")]] <- Bac_dist_matrix
+  env_dist_matrices$all[[paste0(var,"_Fun")]] <- Fun_dist_matrix
+
+}
+
+# allNSTD NOT STANDARDIZED
+for (var in vard_all_numeric_env_intpred_NOTSTD) {
+  # Calculate geodistance matrices 
+  Bac_all.geo<-as(subset(sd, select = c(Longitude,Latitude)), "data.frame")
+  Bac_all.geodist_mat <- as.dist(geodist(Bac_all.geo, measure = 'geodesic' )/1000) #converting it to km
+  
+  Fun_all.geo<-as(subset(sd, select = c(Longitude,Latitude)), "data.frame")
+  Fun_all.geodist_mat <- as.dist(geodist(Fun_all.geo, measure = 'geodesic' )/1000) #converting it to km
+  
+  # Store the geodist matrices in the list using variable name as key
+  env_dist_matrices$allNSTD[["geodist_Bac"]] <- Bac_all.geodist_mat
+  env_dist_matrices$allNSTD[["geodist_Fun"]] <- Fun_all.geodist_mat
+
+  # Subset the data for the current variable
+  Bac_subset <- subset(as.data.frame(sample_data(Bac_wholecommunity)), select = var)
+  Fun_subset <- subset(as.data.frame(sample_data(Fun_wholecommunity)), select = var)
+  
+  # Calculate distance matrices and store them in the list
+  Bac_dist_matrix <- dist(Bac_subset, method = "euclidean", diag = TRUE, upper = FALSE)
+  Fun_dist_matrix <- dist(Fun_subset, method = "euclidean", diag = TRUE, upper = FALSE)
+  
+  # Store the matrices in the list using variable name as key
+  env_dist_matrices$allNSTD[[paste0(var,"_Bac")]] <- Bac_dist_matrix
+  env_dist_matrices$allNSTD[[paste0(var,"_Fun")]] <- Fun_dist_matrix
+
+}
+
+
+# var_Site
+for (var in var_Site) {
+  # Subset the data for the current variable
+  sd_subset <- subset(sd, Site == var)
+  
+  subset.geo<-as(subset(sd_subset, select = c(Longitude,Latitude)), "data.frame")
+  subset.geodist_mat <- as.dist(geodist(subset.geo, measure = 'geodesic' )/1000) #convert to km
+
+  # Store the matrices in the list using variable name as key
+  env_dist_matrices$Site[[paste0(var,"_geodist")]] <- subset.geodist_mat
+  
+  for (var2 in vard_all_numeric_env_intpred) {
+    sd_subsubset <- subset(sd_subset, select = var2)
+  
+    # Calculate distance matrices and store them in the list
+    subset_dist_matrix <- dist(sd_subsubset, method = "euclidean", diag = T, upper = F)
+  
+    # Store the matrices in the list using variable name as key
+    env_dist_matrices$Site[[paste0(var,"_",var2)]] <- subset_dist_matrix
+  }
+}
+
+# var_Grass
+for (var in var_Grass) {
+  # Subset the data for the current variable
+  sd_subset <- subset(sd, Grass == var)
+  
+  subset.geo<-as(subset(sd_subset, select = c(Longitude,Latitude)), "data.frame")
+  subset.geodist_mat <- as.dist(geodist(subset.geo, measure = 'geodesic' )/1000) #convert to km
+
+  # Store the matrices in the list using variable name as key
+  env_dist_matrices$Grass[[paste0(var,"_geodist")]] <- subset.geodist_mat
+  
+  for (var2 in vard_all_numeric_env_intpred) {
+    sd_subsubset <- subset(sd_subset, select = var2)
+  
+    # Calculate distance matrices and store them in the list
+    subset_dist_matrix <- dist(sd_subsubset, method = "euclidean", diag = T, upper = F)
+  
+    # Store the matrices in the list using variable name as key
+    env_dist_matrices$Grass[[paste0(var,"_",var2)]] <- subset_dist_matrix
+  }
+}
+
+# var_Bac_sor_clusters
+for (var in var_Bac_sor_clusters) {
+  # Subset the data for the current variable
+  sd_subset <- subset(sd, Bac_sor_clusters == var)
+  
+  subset.geo<-as(subset(sd_subset, select = c(Longitude,Latitude)), "data.frame")
+  subset.geodist_mat <- as.dist(geodist(subset.geo, measure = 'geodesic' )/1000) #convert to km
+
+  # Store the matrices in the list using variable name as key
+  env_dist_matrices$Bac_sor_clusters[[paste0(var,"_geodist")]] <- subset.geodist_mat
+  
+  for (var2 in vard_all_numeric_env_intpred) {
+    sd_subsubset <- subset(sd_subset, select = var2)
+  
+    # Calculate distance matrices and store them in the list
+    subset_dist_matrix <- dist(sd_subsubset, method = "euclidean", diag = T, upper = F)
+  
+    # Store the matrices in the list using variable name as key
+    env_dist_matrices$Bac_sor_clusters[[paste0(var,"_",var2)]] <- subset_dist_matrix
+  }
+}
+
+# var_Fun_sor_clusters
+for (var in var_Fun_sor_clusters) {
+  # Subset the data for the current variable
+  sd_subset <- subset(sd, Fun_sor_clusters == var)
+  
+  subset.geo<-as(subset(sd_subset, select = c(Longitude,Latitude)), "data.frame")
+  subset.geodist_mat <- as.dist(geodist(subset.geo, measure = 'geodesic' )/1000) #convert to km
+
+  # Store the matrices in the list using variable name as key
+  env_dist_matrices$Fun_sor_clusters[[paste0(var,"_geodist")]] <- subset.geodist_mat
+  
+  for (var2 in vard_all_numeric_env_intpred) {
+    sd_subsubset <- subset(sd_subset, select = var2)
+  
+    # Calculate distance matrices and store them in the list
+    subset_dist_matrix <- dist(sd_subsubset, method = "euclidean", diag = T, upper = F)
+  
+    # Store the matrices in the list using variable name as key
+    env_dist_matrices$Fun_sor_clusters[[paste0(var,"_",var2)]] <- subset_dist_matrix
+  }
+}
+
+# var_Fun_sor_clus2
+for (var in var_Fun_sor_clus2) {
+  # Subset the data for the current variable
+  sd_subset <- subset(sd, Fun_sor_clus2 == var)
+  
+  subset.geo<-as(subset(sd_subset, select = c(Longitude,Latitude)), "data.frame")
+  subset.geodist_mat <- as.dist(geodist(subset.geo, measure = 'geodesic' )/1000) #convert to km
+
+  # Store the matrices in the list using variable name as key
+  env_dist_matrices$Fun_sor_clus2[[paste0(var,"_geodist")]] <- subset.geodist_mat
+  
+  for (var2 in vard_all_numeric_env_intpred) {
+    sd_subsubset <- subset(sd_subset, select = var2)
+  
+    # Calculate distance matrices and store them in the list
+    subset_dist_matrix <- dist(sd_subsubset, method = "euclidean", diag = T, upper = F)
+  
+    # Store the matrices in the list using variable name as key
+    env_dist_matrices$Fun_sor_clus2[[paste0(var,"_",var2)]] <- subset_dist_matrix
+  }
+}
+
+# var_Grass
+
+
+# saveRDS(env_dist_matrices, file = "../processed_data/clean_rds_saves/env_dist_matrices_MRM.rds")
+
+saveRDS(env_dist_matrices, file = "../docs/processed_data/clean_rds_saves/env_dist_matrices_MRM.rds")
+```
+
+```{r include=FALSE,eval=FALSE}
+> str(env_dist_matrices, l=2)
+List of 5
+ $ all             :List of 38
+  ..$ geodist_Bac                     : 'dist' num [1:116886] 0 0 0 0 0 0 0 0 0 0 ...
+  .. ..- attr(*, "Size")= int 484
+  .. ..- attr(*, "call")= language as.dist.default(m = geodist(Bac_all.geo, measure = "geodesic")/1000)
+  .. ..- attr(*, "Diag")= logi FALSE
+  .. ..- attr(*, "Upper")= logi FALSE
+  ..$ geodist_Fun                     : 'dist' num [1:116886] 0 0 0 0 0 0 0 0 0 0 ...
+  .. ..- attr(*, "Size")= int 484
+  .. ..- attr(*, "call")= language as.dist.default(m = geodist(Fun_all.geo, measure = "geodesic")/1000)
+  .. ..- attr(*, "Diag")= logi FALSE
+  .. ..- attr(*, "Upper")= logi FALSE
+  .. [list output truncated]
+ $ Site            :List of 418
+  ..$ BLM_geodist                     : 'dist' num [1:253] 0 0 0 0 0 0 0 0 0 0 ...
+  .. ..- attr(*, "Size")= int 23
+  .. ..- attr(*, "call")= language as.dist.default(m = geodist(subset.geo, measure = "geodesic")/1000)
+  .. ..- attr(*, "Diag")= logi FALSE
+  .. ..- attr(*, "Upper")= logi FALSE
+  ..$ BLM_GDD3yr_m.std                : 'dist' num [1:253] 0 0 0 0 0 0 0 0 0 0 ...
+  .. ..- attr(*, "Size")= int 23
+  .. ..- attr(*, "Labels")= chr [1:23] "SRR13801399" "SRR13801186" "SRR13801171" "SRR13801400" ...
+  .. ..- attr(*, "Diag")= logi TRUE
+  .. ..- attr(*, "Upper")= logi FALSE
+  .. ..- attr(*, "method")= chr "euclidean"
+  .. ..- attr(*, "call")= language dist(x = sd_subsubset, method = "euclidean", diag = T, upper = F)
+  # .. [list output truncated]
+  # [list output truncated]
+```
+
+
+\
+\
+
+## load functions
+
+```{r print-clean-MRM-res-table-function, include=FALSE, eval=TRUE}
+# mrm_result <- MRM.all_Fun.linear.sor_Var_All
+
+print_clean_MRM_table <- function(mrm_result, caption) {
+  # Get coefficient names and values
+  coefs <- mrm_result$coef[, 1]
+  pvals_raw <- mrm_result$coef[, 2]
+  terms <- ifelse(
+    names(coefs) == "Int",
+    "Intercept",
+    gsub(
+      '^env_dist_matrices\\[\\["all"\\]\\]\\[\\["|_m\\.std_(Bac|Fun)\\"]\\]|_(Bac|Fun)\\"]\\]|\\"]$',
+      "",
+      names(coefs)
+    )
+  )
+  mrm_df <- data.frame(cbind(terms,"coefs"=as.numeric(coefs), "pvals_raw"=as.numeric(pvals_raw)), stringsAsFactors = F)
+  mrm_df <- data.frame(terms,"coef"=as.numeric(coefs), "p-value"=as.numeric(pvals_raw), stringsAsFactors = F)
+  mrm_df_sorted <- mrm_df[order(abs(mrm_df$coef), decreasing = TRUE),]
+
+  
+  mrm_df_sorted$coef <- round(mrm_df_sorted$coef,4)
+  h1 <- paste0("Model Rsquared = ", round(mrm_result$r.squared[1],4), " (p-value = ",round(mrm_result$r.squared[2],4),")")
+  h2 <- paste0("Model F.test = ", round(mrm_result$F.test[1],2)," (F.p-value = ",round(mrm_result$F.test[2],4),")")
+
+  
+  kbl(mrm_df_sorted, row.names = F, align = c('l','c','c'),
+      caption = caption) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive", full_width = F, position = "left")) %>%
+  column_spec(2, color = "white",
+              background = spec_color(mrm_df_sorted$coef[1:length(mrm_df_sorted$coef)], end = 0.7)) %>%
+  add_header_above(c(setNames(3,h2)),align = "l", italic = T) %>%
+  add_header_above(c(setNames(3,h1)),align = "l", italic = T) 
+  
+
+}
+
+# print_clean_MRM_table(MRM.all_Fun.linear.sor_Var_All)
+```
+
+
+```{r extract_env_dist_pred_names-function, include=FALSE, eval=TRUE}
+extract_env_dist_pred_names <- function(mrm_result) {
+  raw_names <- rownames(mrm_result[[1]])[-1]  # drop intercept
+  # Filter only env_dist_matrices[["all"]] entries
+  env_preds <- grep('^env_dist_matrices\\[\\["all"\\]\\]\\[\\[', raw_names, value = TRUE)
+  # Clean up names: remove prefix and suffix
+  cleaned_names <- gsub('^env_dist_matrices\\[\\["all"\\]\\]\\[\\["|_m\\.std_(Bac|Fun)\\"]\\]|_(Bac|Fun)\\"]\\]|\\"]$', "", env_preds)
+  paste(cleaned_names, collapse = ", ")
+}
+
+# Example usage:
+cat(extract_env_dist_pred_names(MRM.all_Bac.linear.sor_Var_All))
+
+extract_sorted_env_dist_pred_names <- function(mrm_result) {
+  # Get coefficient names and values
+  coefs <- mrm_result$coef[, 1]
+  sorted_names <- names(sort(abs(coefs), decreasing = TRUE))
+  
+  # Clean names: special case for intercept
+  cleaned_names <- ifelse(
+    sorted_names == "Int",
+    "Intercept",
+    gsub(
+      '^env_dist_matrices\\[\\["all"\\]\\]\\[\\["|_m\\.std_(Bac|Fun)\\"]\\]|_(Bac|Fun)\\"]\\]|\\"]$',
+      "",
+      sorted_names
+    )
+  )
+  
+  # Return as single comma-separated string
+  paste(cleaned_names, collapse = ", ")
+}
+
+# Example usage:
+cat(extract_sorted_env_dist_pred_names(MRM.all_Bac.linear.sor_Var_All))
+
+
+# extract_sorted_env_dist_pred_names_filtered by pval
+extract_sorted_env_dist_pred_names_filtered <- function(mrm_result, pval_threshold = 0.05) {
+  # Extract p-values and coefficients
+  pvals <- mrm_result[[1]][, 2]
+  coefs <- mrm_result$coef[, 1]
+  
+  # Always include intercept
+  keep_terms <- names(pvals[pvals <= pval_threshold])
+  if (!"Int" %in% keep_terms) {
+    keep_terms <- c("Int", keep_terms)
+  }
+  
+  # Subset coefficients to those with significant p-values
+  coefs_filtered <- coefs[keep_terms]
+  
+  # Sort by absolute value
+  sorted_names <- names(sort(abs(coefs_filtered), decreasing = TRUE))
+  
+  # Clean names
+  cleaned_names <- ifelse(
+    sorted_names == "Int",
+    "Intercept",
+    gsub(
+      '^env_dist_matrices\\[\\["all"\\]\\]\\[\\["|_m\\.std_(Bac|Fun)\\"]\\]|_(Bac|Fun)\\"]\\]|\\"]$',
+      "",
+      sorted_names
+    )
+  )
+  
+  # Return as a comma-separated string
+  paste(cleaned_names, collapse = ", ")
+}
+
+# Example usage:
+# cat(extract_sorted_env_dist_pred_names_filtered(MRM.all_Bac.linear.sor_Var_All))               # uses default 0.05
+# cat(extract_sorted_env_dist_pred_names_filtered(MRM.all_Bac.linear.sor_Var_All, 0.01))         # stricter filter
+
+
+# extract_nonsignif_env_dist_pred_names
+extract_nonsignif_env_dist_pred_names <- function(mrm_result, alpha = 0.05) {
+  # Extract p-values and exclude intercept
+  pvals <- mrm_result[[1]][, 2]
+  # pvals <- pvals[names(pvals) != "Int"]
+  
+  # Filter for non-significant predictors
+  nonsig <- pvals[pvals > alpha]
+  
+  # Clean names
+  cleaned_names <- gsub(
+    '^env_dist_matrices\\[\\["all"\\]\\]\\[\\["|_m\\.std_(Bac|Fun)\\"]\\]|_(Bac|Fun)\\"]\\]|\\"]$',
+    "",
+    names(nonsig)
+  )
+  
+  # Return as comma-separated string
+  paste(cleaned_names, collapse = ", ")
+}
+
+# Example usage:
+cat(extract_nonsignif_env_dist_pred_names(MRM.all_Bac.linear.sor_Var_All))
+```
+
+
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+\
+\
+
+# Results
+
+## Results - Fungi
+
+\
+
+### Landscape-scale: All samples (agnostic to site) {.tabset}
+
+#### Pure spatial effects (S)
+
+Distance-decay relationships between geographic distance (in km) between communities and i) total community pairwise dissimilarity (β~sor~), ii) spatial turnover-resultant dissimilarity (β~sim~), and iii) nestedness-resultant dissimilarity (β~sne~) using 1,000 permutations. Differences between bacterial and fungal model parameters were assessed via block-site bootstrap whether the parameters of both models are equal (n = 1,000 bootstrap resamples). Both tests were conducted independently, one for the equality of the first parameters of both models, another for the equality of the second parameters (slopes) of both models.
+
+```{r plot.decay.pretty-function, include=FALSE,eval=TRUE}
+plot.decay.pretty = function (x, xlim = c(0, max(x$data.x)), ylim = c(0, 1), add = FALSE, 
+  remove.dots = FALSE, col = "black", pch = 1, lty = 1, lwd = 5, las=1,
+  # xaxp = c(0,max(x$data.x),4), 
+  yaxp = c(0,1,5),col.line = "black", ylab,xlab,
+  cex = 1, ...) 
+{
+  if (!inherits(x, "decay")) {
+    stop("The input is not a distance-decay model fitted with decay.model().", 
+      call. = TRUE)
+  }
+  data <- data.frame(as.vector(x$data.x), as.vector(x$data.y))
+  if (!remove.dots) {
+    pch = pch
+  }
+  else {
+    pch = ""
+  }
+  if (!add) {
+    plot(x$data.x, x$data.y, xlim = xlim, ylim = ylim, xlab = xlab, 
+      ylab = ylab, col = col, pch = pch, cex = cex, 
+      ...)
+  }
+  if (add) {
+    points(x$data.x, x$data.y, xlim = xlim, ylim = ylim, 
+      xlab = xlab, ylab = ylab, col = col, pch = pch, 
+      cex = cex, ...)
+  }
+  switch(x$y.type, similarities = {
+    lines(fitted(x$model)[order(x$data.x)] ~ sort(x$data.x), 
+      col = col.line, lty = lty, lwd = lwd, ...)
+  }, dissimilarities = {
+    lines(1 - fitted(x$model)[order(x$data.x)] ~ sort(x$data.x), 
+      col = col.line, lty = lty, lwd = lwd, ...)
+  })
+}
+
+```
+
+```{r calc-DD-BF-all-MRM-sor, include=FALSE,cache=T, eval=TRUE}
+# (MRM(betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~ env_dist_matrices[["all"]][["geodist_Bac"]],nperm=1000))
+#$r.squared R2 0.1529891     pval 0.0010000
+
+# vard_all_numeric_env_intpred
+#  [1] "GDD3yr_m.std"                 "ppt3yr_m.std"                 "soil_water_content_m.std"     "pH_m.std"                    
+#  [5] "phos_m.std"                   "ammonium_m.std"               "SOM_m.std"                    "avg_SRL_m.std"               
+#  [9] "avg_SLA_m.std"                "herbivory_perc_m.std"         "nsamples_per_Site"            "nsamples_perBac_sor_clusters"
+# [13] "nsamples_perFun_sor_clusters" "ngrass_persite"               "ngrass_perBac_sor_clusters"   "ngrass_perFun_sor_clusters"  
+# [17] "Bac_gamma_Site"               "Fun_gamma_Site"      
+
+# Spatial ----
+MRM.all_Fun.linear.sor_Spatial<-MRM(betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+      env_dist_matrices[["all"]][["geodist_Fun"]],
+    method = "linear", nperm = 1000)
+# endSpatial ----
+
+# Environmental:Climate ----
+MRM.all_Fun.linear.sor_E_Climate<-MRM(betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+     env_dist_matrices[["all"]][["GDD3yr_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["ppt3yr_m.std_Fun"]],
+    method = "linear", nperm = 1000)
+# endEnvironmental:Climate ----
+
+
+# Environmental:Edaphic ----
+MRM.all_Fun.linear.sor_E_Edaphic<-MRM(betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+      env_dist_matrices[["all"]][["soil_water_content_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["pH_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["phos_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["ammonium_m.std_Fun"]],
+    method = "linear", nperm = 1000)
+
+# endEnvironmental:Edaphic ----
+
+
+# Environmental:Plant ----
+MRM.all_Fun.linear.sor_E_Plant <- MRM(betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+      env_dist_matrices[["all"]][["avg_SRL_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["avg_SLA_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["herbivory_perc_m.std_Fun"]],
+    method = "linear", nperm = 1000)
+# MRM.all_Fun.linear.sor_E_Plant
+# endEnvironmental:Plant ----
+
+
+# Environmental:All ----
+MRM.all_Fun.linear.sor_E_All<-MRM(betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+     env_dist_matrices[["all"]][["GDD3yr_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["ppt3yr_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["soil_water_content_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["pH_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["phos_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["ammonium_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["avg_SRL_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["avg_SLA_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["herbivory_perc_m.std_Fun"]],
+    method = "linear", nperm = 1000)
+# endEnvironmental:All ----
+
+
+# Mixed (E*S):All ----
+MRM.all_Fun.linear.sor_ES_All <- MRM(betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+     env_dist_matrices[["all"]][["geodist_Fun"]] +
+      env_dist_matrices[["all"]][["GDD3yr_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["ppt3yr_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["soil_water_content_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["pH_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["phos_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["ammonium_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["avg_SRL_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["avg_SLA_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["herbivory_perc_m.std_Fun"]],
+    method = "linear", nperm = 1000)
+# endMixed (E*S):All ----
+
+# Var:Intpred ----
+MRM.all_Fun.linear.sor_Var_Intpred <- MRM(betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+      env_dist_matrices[["all"]][["nsamples_per_Site_Fun"]] + 
+      env_dist_matrices[["all"]][["nsamples_perBac_sor_clusters_Fun"]] + 
+      env_dist_matrices[["all"]][["nsamples_perFun_sor_clusters_Fun"]] + 
+      env_dist_matrices[["all"]][["ngrass_persite_Fun"]] + 
+      env_dist_matrices[["all"]][["ngrass_perBac_sor_clusters_Fun"]] + 
+      env_dist_matrices[["all"]][["ngrass_perFun_sor_clusters_Fun"]] + 
+        env_dist_matrices[["all"]][["nsamples_at_site_within_Fun_sor_clus2_Fun"]] +
+        env_dist_matrices[["all"]][["ngrasses_at_site_within_Fun_sor_clus2_Fun"]] + 
+      env_dist_matrices[["all"]][["Bac_gamma_Site_Fun"]] +
+      env_dist_matrices[["all"]][["Fun_gamma_Site_Fun"]] +
+        env_dist_matrices[["all"]][["Bac_Observed_Fun"]] +
+        env_dist_matrices[["all"]][["Fun_Observed_Fun"]] +
+      env_dist_matrices[["all"]][["Bac_Chao1_Fun"]] +
+      env_dist_matrices[["all"]][["Fun_Chao1_Fun"]] +
+        env_dist_matrices[["all"]][["Bac_InvSimpson_Fun"]] +
+        env_dist_matrices[["all"]][["Fun_InvSimpson_Fun"]] +
+      env_dist_matrices[["all"]][["Bac_Shannon_Fun"]] +
+      env_dist_matrices[["all"]][["Fun_Shannon_Fun"]],
+    method = "linear", nperm = 1000)
+# endVar:Intpred ----
+
+
+# Var:All ----
+MRM.all_Fun.linear.sor_Var_All <- MRM(betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+     env_dist_matrices[["all"]][["geodist_Fun"]] +
+      env_dist_matrices[["all"]][["GDD3yr_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["ppt3yr_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["soil_water_content_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["pH_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["phos_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["ammonium_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["avg_SRL_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["avg_SLA_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["herbivory_perc_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["nsamples_per_Site_Fun"]] + 
+      env_dist_matrices[["all"]][["nsamples_perBac_sor_clusters_Fun"]] + 
+      env_dist_matrices[["all"]][["nsamples_perFun_sor_clusters_Fun"]] + 
+      env_dist_matrices[["all"]][["ngrass_persite_Fun"]] + 
+      env_dist_matrices[["all"]][["ngrass_perBac_sor_clusters_Fun"]] + 
+      env_dist_matrices[["all"]][["ngrass_perFun_sor_clusters_Fun"]] + 
+        env_dist_matrices[["all"]][["nsamples_at_site_within_Fun_sor_clus2_Fun"]] +
+        env_dist_matrices[["all"]][["ngrasses_at_site_within_Fun_sor_clus2_Fun"]] + 
+      env_dist_matrices[["all"]][["Bac_gamma_Site_Fun"]] +
+      env_dist_matrices[["all"]][["Fun_gamma_Site_Fun"]] +
+        env_dist_matrices[["all"]][["Bac_Observed_Fun"]] +
+        env_dist_matrices[["all"]][["Fun_Observed_Fun"]] +
+      env_dist_matrices[["all"]][["Bac_Chao1_Fun"]] +
+      env_dist_matrices[["all"]][["Fun_Chao1_Fun"]] +
+        env_dist_matrices[["all"]][["Bac_InvSimpson_Fun"]] +
+        env_dist_matrices[["all"]][["Fun_InvSimpson_Fun"]] +
+      env_dist_matrices[["all"]][["Bac_Shannon_Fun"]] +
+      env_dist_matrices[["all"]][["Fun_Shannon_Fun"]],
+    method = "linear", nperm = 1000)
+# endVar:All ----
+```
+
+```{r active-test, echo=FALSE,eval=FALSE}
+# convert list of lists into dataframe  
+# by row 
+print(as.data.frame(do.call(rbind, env_dist_matrices))) 
+
+newtest2_env_dist_matrices <- rapply(env_dist_matrices, function(x) `[`(x, c(2, 3)), classes="dist", how="list")
+str(newtest2_env_dist_matrices, max.level = 2, vec.len = 1)
+
+# takes from first level list (whole), elements names distA and distB
+lapply(listoflists, `[`, c('distA', 'distB'))
+
+# Working with data frames
+# Use map_lgl(), map_dbl(), etc to return a vector instead of a list:
+mtcars |> map_dbl(sum)
+
+
+library("purrr")
+
+# A more realistic example: split a data frame into pieces, fit a
+# model to each piece, summarise and extract R^2
+mtcars |>
+  split(mtcars$cyl) |>
+  map(\(df) lm(mpg ~ wt, data = df)) |>
+  map(summary) |>
+  map_dbl("r.squared")
+
+Spatial relationships should be modelled with care: Euclidean, polynomial, or other models are required in different circumstances. For spatial analysis, consider also principal coordinates of neighbour matrices (PCNM).
+https://sites.google.com/site/mb3gustame/spatial-analysis/principal-coordinates-of-neighbour-matrices 
+```
+
+The main current hypotheses about the origin of beta diversity are as follows:
+
+1) Species composition is uniform over large areas. This hypothesis, which plays the role of a null model, emphasizes the role of biological interactions. It suggests that communities are dominated by a limited suite of competitively superior species (Pitman et al. 1999, 2001); beta diversity is small.
+
+2) Species composition fluctuates in a random, autocorrelated way. This hypothesis emphasizes spatially limited dispersal history. Models derived from neutral theory state that all species are demographically and competitively equal. Differences are created through spatially limited dispersal of species drawn at random from a metacommunity, plus possibly the appearance of newly evolved species in different areas. Neutral models differ in the details of the mechanisms that they invoke (Bell 2001, Hubbell 2001, He 2005).
+
+3) Species distributions are related to environmental conditions. This hypothesis emphasizes environmental control. Landscapes are mosaics where species composition is controlled by environmental site characteristics (Whittaker 1956, Bray and Curtis 1957, Hutchinson 1957, Gentry 1988, Tuomisto et al. 1995).
+
+Testing these hypotheses is important for understanding the functioning of ecosystems, for the conservation of biodiversity, and for ecosystem management. Regarding the establishment of natural reserves, e.g., hypothesis 1 implies that all parts of the ecosystem are equivalent. Reserves can be located anywhere. Hypothesis 2 implies that different parts of the ecosystem may, for historical reasons, sustain different species compositions, although these parts are environmentally equivalent. Portions of space supporting the different species compositions should be preserved. Reserves must be large, allowing the dynamics to go on without many species going extinct. Hypothesis 3 implies that all parts of the ecosystem are not equivalent. Reserves must represent the different types of habitat and each portion must be of sufficient size to be sustainable. The parts representing favorable dispersion routes must be especially preserved.
+(https://esajournals.onlinelibrary.wiley.com/doi/10.1890/05-0549)
+
+
+When studying the origin of beta diversity, one must consider different hypotheses and answer the following questions. (1) Is the variation in species composition among sites random, i.e., devoid of significant spatial pattern? A positive answer will support hypothesis 1. (2) Is there significant spatial patchiness (different from random) in the distributions of species? A positive answer will support hypothesis 2, and possibly hypothesis 3 if the environmental variables influencing species distributions are spatially structured. (3) Can the environmental variables explain a significant proportion of the community composition variation? A positive answer will support hypothesis 3, which is compatible with hypothesis 2.
+
+Empirical data must be used to determine the likelihood of each hypothesis in different systems and at different spatial scales. To test these hypotheses, the variation of community composition at many sites must be analyzed to determine if significant spatial patterns (different from random) are present in the data and if the environmental variables explain a significant proportion of the community composition variation. In this contribution, we explain how hypotheses about the origin of beta diversity can be tested by partitioning the spatial variation of community composition (presence– absence or abundance data) with respect to environmental variables and spatial base functions. Next we set out to assess the appropriateness and robustness of two partitioning approaches used by researchers to assess the likelihood of different mechanisms structuring beta diversity.
+
+```{r display-MRM-Spatial-rawresults-Fun, echo=FALSE,eval=TRUE}
+
+print_clean_MRM_table(MRM.all_Fun.linear.sor_Spatial, caption = "MRM results for all Fungal samples assessing βsor ~ S (Spatial - geographic distance)")
+```
+
+\
+
+##### Spatial decay plots
+
+```{r calc-All-geodist, include=FALSE, eval=TRUE, cache=TRUE}
+# Fun.All.geodist
+decay.Fun.All.geodist.exp.sor<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sor, x=env_dist_matrices[["all"]][["geodist_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+
+decay.Fun.All.geodist.exp.sim<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sim, x=env_dist_matrices[["all"]][["geodist_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+
+decay.Fun.All.geodist.exp.sne<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sne, x=env_dist_matrices[["all"]][["geodist_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+```
+
+
+```{r plot-Fun-spatial-decay, echo=FALSE, eval=TRUE,fig.height=5.2,fig.width=3.5,dpi=300, out.height='70%'}
+sor <- decay.Fun.All.geodist.exp.sor
+sim <- decay.Fun.All.geodist.exp.sim
+sne <- decay.Fun.All.geodist.exp.sne
+XLIM = c(0,1600)
+XASP = c(0,1500,3)
+
+par(mfrow = c(3, 1), # ,#c(nr, nc)
+    mar = c(2, 5, 2.2, 1)# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+    ,oma = (c(2.1, 0, 0, 0) + 0.1))
+
+plot.decay.pretty(sor, col=col_domainFun, main="Fungi - Landscape-scale\n",
+           lty=1,lwd=5,cex.main=1.1,
+           xlim = XLIM,ylim = c(0,1),col.line=col_domainFun_dk,
+           xaxp = XASP,
+           ylab="\n\nTotal\nDissimilarity",xlab="")
+mtext(paste0("βsor ~ S: pseudo-R2 = ", round(sor$pseudo.r.squared,3),
+             ", p-value = ",round(sor$p.value,3),
+             ", b = ",prettyNum(sor$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 
+
+plot.decay.pretty(sim, col=col_domainFun, 
+           lty=1,lwd=5,add=F,
+           xlim = XLIM,ylim = c(0,1),col.line=col_domainFun_dk,
+           xaxp = XASP,
+           ylab="Turnover-Resultant\nDissimilarity",xlab="")
+mtext(paste0("βsim ~ S: pseudo-R2 = ", round(sim$pseudo.r.squared,3),
+             ", p-value = ",round(sim$p.value,3),
+             ", b = ",prettyNum(sim$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 
+
+
+plot.decay.pretty(sne, col=col_domainFun, 
+           lty=1,lwd=5,add=F,
+           xlim = XLIM,ylim = c(0,(max(sne$data.y)*1.1)),
+           col.line=col_domainFun_dk,xaxp = XASP,
+           ylab="Nestedness-Resultant\nDissimilarity",xlab="")
+mtext(paste0("βsne ~ S: pseudo-R2 = ", round(sne$pseudo.r.squared,3),
+             ", p-value = ",round(sne$p.value,3),
+             ", b = ",prettyNum(sne$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 2=left, 3=top, 4=right
+mtext(paste0("Pairwise Geographic Distance (in km)"), side = 1, line = 0.85, outer = T,adj = 0.6, cex=0.7)
+```
+
+\
+
+#### Pure environmental effects (E) {.tabset .tabset-pills}
+
+##### Climate
+
+```{r display-MRM-E-Climate-rawresults-Fun, echo=FALSE,eval=TRUE}
+print_clean_MRM_table(MRM.all_Fun.linear.sor_E_Climate, caption = "MRM results for all fungal samples assessing βsor ~ E_climate (Environmental - Climate)")
+```
+
+\
+
+##### Edaphic
+
+```{r display-MRM-E-Edaphic-rawresults-Fun, echo=FALSE,eval=TRUE}
+print_clean_MRM_table(MRM.all_Fun.linear.sor_E_Edaphic, caption = "MRM results for all fungal samples assessing βsor ~ E_edaphic (Environmental - Edaphic)")
+```
+
+\
+
+##### Plant-Associated
+
+```{r display-MRM-E-Plant-rawresults-Fun, echo=FALSE,eval=TRUE}
+print_clean_MRM_table(MRM.all_Fun.linear.sor_E_Plant, caption = "MRM results for all fungal samples assessing βsor ~ E_plant (Environmental - Plant-Associated)")
+```
+
+\
+
+##### All Environmental (Climate, Edaphic, Plant-Assoc.) {.tabset .tabset-pills}
+
+###### All environmental variables (Full model)
+
+```{r display-MRM-E-All-rawresults-Fun, echo=FALSE,eval=TRUE}
+print_clean_MRM_table(MRM.all_Fun.linear.sor_E_All, caption = "MRM results full model for all fungal samples assessing βsor ~ E_all (Environmental - Climate, Edaphic, and Plant-Associated)")
+```
+
+\
+
+###### Down-selected model
+
+
+```{r calc-MRM-E-All-rawresults-DS-Fun, include=FALSE,eval=TRUE}
+MRM.all_Fun.linear.sor_E_All_DS<-MRM(
+  betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~ 
+    env_dist_matrices[["all"]][["ammonium_m.std_Fun"]] +
+    env_dist_matrices[["all"]][["herbivory_perc_m.std_Fun"]] +
+    env_dist_matrices[["all"]][["ppt3yr_m.std_Fun"]] + 
+     env_dist_matrices[["all"]][["GDD3yr_m.std_Fun"]] + 
+    env_dist_matrices[["all"]][["avg_SLA_m.std_Fun"]],
+    method = "linear", nperm = 1000)
+```
+
+All predictor variables included in down-selected MRM model if $P$-value ≤ 0.05 and the order of model terms was determined by ranking the absolute value of the regression coefficients for the significant model terms.\
+
+*Not significant:* `r  (extract_nonsignif_env_dist_pred_names(MRM.all_Fun.linear.sor_E_All))`\
+
+
+**Down-selected model summary:**\
+
+$R^2$-value = `r round(MRM.all_Fun.linear.sor_E_All[[2]][1],4)`, $P$-value = `r round(MRM.all_Fun.linear.sor_E_All[[2]][2],5)`, $F_{test}$ = `r round(MRM.all_Fun.linear.sor_E_All$F.test[1],2)`, $F_{test}-Pvalue$ = `r round(MRM.all_Fun.linear.sor_E_All$F.test[2],4)`
+
+   -These terms were significant ($P$-value < 0.05): `r (extract_sorted_env_dist_pred_names_filtered(MRM.all_Fun.linear.sor_E_All, 0.05))` (sorted by decreasing coefficient)
+   \
+
+```{r display-MRM-E-All-rawresults-DS-Fun, echo=FALSE,eval=TRUE}
+print_clean_MRM_table(MRM.all_Fun.linear.sor_E_All_DS, caption = "MRM results down-selected model for all fungal samples assessing βsor ~ E_all (Environmental - Climate, Edaphic, and Plant-Associated)")
+```
+
+\
+
+#### Mixed effects (E \* S) {.tabset .tabset-pills}
+
+##### All variables (Full model)
+
+```{r display-MRM-ES-All-rawresults-Fun, echo=FALSE,eval=TRUE}
+print_clean_MRM_table(MRM.all_Fun.linear.sor_ES_All, caption = "MRM results full mixed model for all fungal samples assessing βsor ~ E*S (Environmental - Climate, Edaphic, and Plant-Associated)")
+```
+
+\
+
+##### Down-selected model
+
+```{r calc-MRM-ES-All-rawresults-DS-Fun, echo=FALSE,eval=TRUE}
+MRM.all_Fun.linear.sor_ES_All_DS<-MRM(
+  betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~ 
+    env_dist_matrices[["all"]][["GDD3yr_m.std_Fun"]] +
+    env_dist_matrices[["all"]][["ammonium_m.std_Fun"]] +
+    env_dist_matrices[["all"]][["herbivory_perc_m.std_Fun"]] +
+   env_dist_matrices[["all"]][["avg_SLA_m.std_Fun"]] + 
+    env_dist_matrices[["all"]][["ppt3yr_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["geodist_Fun"]],
+    method = "linear", nperm = 1000)
+```
+
+\
+
+All predictor variables included in down-selected MRM model if $P$-value ≤ 0.05 and the order of model terms was determined by ranking the absolute value of the regression coefficients for the significant model terms.\
+
+*Not significant:* `r  (extract_nonsignif_env_dist_pred_names(MRM.all_Fun.linear.sor_ES_All))`\
+
+
+**Down-selected model summary:**\
+
+$R^2$-value = `r round(MRM.all_Fun.linear.sor_ES_All[[2]][1],4)`, $P$-value = `r round(MRM.all_Fun.linear.sor_ES_All[[2]][2],5)`, $F_{test}$ = `r round(MRM.all_Fun.linear.sor_ES_All$F.test[1],2)`, $F_{test}-Pvalue$ = `r round(MRM.all_Fun.linear.sor_ES_All$F.test[2],4)`
+
+   -These terms were significant ($P$-value < 0.05): `r (extract_sorted_env_dist_pred_names_filtered(MRM.all_Fun.linear.sor_ES_All, 0.05))` (sorted by decreasing coefficient)
+   \
+
+
+```{r display-MRM-ES-All-rawresults-DS-Fun, echo=FALSE,eval=TRUE}
+print_clean_MRM_table(MRM.all_Fun.linear.sor_ES_All_DS, caption = "MRM results down-selected mixed model for all fungal samples assessing βsor ~ E*S (Environmental - Climate, Edaphic, and Plant-Associated)")
+```
+
+\
+
+#### Derived measures {.tabset .tabset-pills}
+
+##### All variables (Full model)
+
+```{r display-MRM-Intpred-All-rawresults-Fun, echo=FALSE,eval=TRUE}
+print_clean_MRM_table(MRM.all_Fun.linear.sor_Var_Intpred, caption = "MRM results full model for all fungal samples assessing βsor ~ D (Derived measures)")
+```
+
+\
+
+##### Down-selected model
+
+```{r calc-MRM-Intpred-All-rawresults-DS-Fun, include=FALSE,eval=TRUE}
+cat(extract_nonsignif_env_dist_pred_names(MRM.all_Fun.linear.sor_Var_Intpred))
+cat(extract_sorted_env_dist_pred_names_filtered(MRM.all_Fun.linear.sor_Var_Intpred, 0.05))
+# , Fun_Observed, nsamples_perFun_sor_clusters, Fun_gamma_Site, Bac_Chao1"
+MRM.all_Fun.linear.sor_Var_Intpred_DS <- MRM(
+betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~
+  env_dist_matrices[["all"]][["ngrass_persite_Fun"]] +
+  env_dist_matrices[["all"]][["ngrasses_at_site_within_Fun_sor_clus2_Fun"]] +
+  env_dist_matrices[["all"]][["ngrass_perFun_sor_clusters_Fun"]] +
+  env_dist_matrices[["all"]][["Bac_Shannon_Fun"]] +
+  env_dist_matrices[["all"]][["nsamples_at_site_within_Fun_sor_clus2_Fun"]] + 
+  env_dist_matrices[["all"]][["nsamples_per_Site_Fun"]] +
+  env_dist_matrices[["all"]][["Fun_InvSimpson_Fun"]] +
+  env_dist_matrices[["all"]][["nsamples_perBac_sor_clusters_Fun"]] +
+  env_dist_matrices[["all"]][["Fun_Observed_Fun"]] + 
+  env_dist_matrices[["all"]][["nsamples_perFun_sor_clusters_Fun"]] + 
+  env_dist_matrices[["all"]][["Fun_gamma_Site_Fun"]] +
+  env_dist_matrices[["all"]][["Bac_Chao1_Fun"]],
+    method = "linear", nperm = 1000)
+```
+
+All predictor variables included in down-selected MRM model if $P$-value ≤ 0.05 and the order of model terms was determined by ranking the absolute value of the regression coefficients for the significant model terms.\
+
+*Not significant:* `r  (extract_nonsignif_env_dist_pred_names(MRM.all_Fun.linear.sor_Var_Intpred))`\
+
+
+**Down-selected model summary:**\
+
+$R^2$-value = `r round(MRM.all_Fun.linear.sor_Var_Intpred[[2]][1],4)`, $P$-value = `r round(MRM.all_Fun.linear.sor_Var_Intpred[[2]][2],5)`, $F_{test}$ = `r round(MRM.all_Fun.linear.sor_Var_Intpred$F.test[1],2)`, $F_{test}-Pvalue$ = `r round(MRM.all_Fun.linear.sor_Var_Intpred$F.test[2],4)`
+
+   -These terms were significant ($P$-value < 0.05): `r (extract_sorted_env_dist_pred_names_filtered(MRM.all_Fun.linear.sor_Var_Intpred, 0.05))` (sorted by decreasing coefficient)
+   \
+
+\
+
+```{r display-MRM-Intpred-All-rawresults-DS-Fun, echo=FALSE,eval=TRUE}
+print_clean_MRM_table(MRM.all_Fun.linear.sor_Var_Intpred_DS, caption = "MRM results down-selected model for all fungal samples assessing βsor ~ D (Derived measures)")
+```
+
+\
+
+#### All PredVar {.tabset .tabset-pills}
+
+##### All variables (Full model)
+
+\
+
+Full Model Summary:\
+
+  - $R^2$-value = `r round(MRM.all_Fun.linear.sor_Var_All[[2]][1],4)`, $P$-value = `r round(MRM.all_Fun.linear.sor_Var_All[[2]][2],5)`, $F_{test}$ = `r round(MRM.all_Fun.linear.sor_Var_All$F.test[1],2)`, $F_{test}-Pvalue$ = `r round(MRM.all_Fun.linear.sor_Var_All$F.test[2],4)`
+  
+  - These terms were significant ($P$-value < 0.05): `r (extract_sorted_env_dist_pred_names_filtered(MRM.all_Fun.linear.sor_Var_All, 0.05))` (sorted by decreasing coefficient)
+
+\
+\
+
+
+```{r display-MRM-Var-All-rawresults-Fun, echo=FALSE,eval=T}
+print_clean_MRM_table(MRM.all_Fun.linear.sor_Var_All, caption = "MRM results full model for all fungal samples assessing βsor ~ All (All variables and measures)")
+```
+
+
+\
+
+##### Down-selected model
+
+```{r calc-MRM-Var-All-rawresults-DS-Fun, include=FALSE,eval=F}
+# ordered significant factors
+as.data.frame(MRM.all_Fun.linear.sor_Var_All$coef)[order(abs(as.data.frame(MRM.all_Fun.linear.sor_Var_All$coef)[,1]), decreasing = TRUE),] %>% dplyr::filter(pval < 0.01) %>% rownames(.)
+#ngrass_perBac_sor_clusters, Bac_gamma_Site, Bac_Observed, Fun_Chao1, Bac_InvSimpson
+##Intercept, ngrass_persite, ngrasses_at_site_within_Fun_sor_clus2, Fun_Shannon, ngrass_perFun_sor_clusters, Bac_Shannon, nsamples_at_site_within_Fun_sor_clus2, nsamples_per_Site, Fun_InvSimpson, nsamples_perBac_sor_clusters, Fun_Observed, nsamples_perFun_sor_clusters, Fun_gamma_Site, Bac_Chao1
+
+MRM.all_Fun.linear.sor_Var_All_DS <- MRM(
+  betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~
+    env_dist_matrices[["all"]][["ngrass_persite_Fun"]] + 
+     env_dist_matrices[["all"]][["geodist_Fun"]] +
+      env_dist_matrices[["all"]][["GDD3yr_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["ppt3yr_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["soil_water_content_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["pH_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["phos_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["ammonium_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["avg_SRL_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["avg_SLA_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["herbivory_perc_m.std_Fun"]] + 
+      env_dist_matrices[["all"]][["nsamples_per_Site_Fun"]] + 
+      env_dist_matrices[["all"]][["nsamples_perBac_sor_clusters_Fun"]] + 
+      env_dist_matrices[["all"]][["nsamples_perFun_sor_clusters_Fun"]] + 
+      
+      # env_dist_matrices[["all"]][["ngrass_perBac_sor_clusters_Fun"]] + 
+      env_dist_matrices[["all"]][["ngrass_perFun_sor_clusters_Fun"]] + 
+        env_dist_matrices[["all"]][["nsamples_at_site_within_Fun_sor_clus2_Fun"]] +
+        env_dist_matrices[["all"]][["ngrasses_at_site_within_Fun_sor_clus2_Fun"]] + 
+      # env_dist_matrices[["all"]][["Bac_gamma_Site_Fun"]] +
+      env_dist_matrices[["all"]][["Fun_gamma_Site_Fun"]] +
+        # env_dist_matrices[["all"]][["Bac_Observed_Fun"]] +
+        env_dist_matrices[["all"]][["Fun_Observed_Fun"]] +
+      env_dist_matrices[["all"]][["Bac_Chao1_Fun"]] +
+      # env_dist_matrices[["all"]][["Fun_Chao1_Fun"]] +
+        # env_dist_matrices[["all"]][["Bac_InvSimpson_Fun"]] +
+        env_dist_matrices[["all"]][["Fun_InvSimpson_Fun"]] +
+      env_dist_matrices[["all"]][["Bac_Shannon_Fun"]] +
+      env_dist_matrices[["all"]][["Fun_Shannon_Fun"]],
+    method = "linear", nperm = 1000)
+```
+
+All predictor variables included in down-selected MRM model if $P$-value ≤ 0.05 and the order of model terms was determined by ranking the absolute value of the regression coefficients for the significant model terms.\
+
+*Not significant:* `r (extract_nonsignif_env_dist_pred_names(MRM.all_Fun.linear.sor_Var_All))`\
+
+
+**Down-selected model summary:**\
+
+$R^2$-value = `r round(MRM.all_Fun.linear.sor_Var_All_DS[[2]][1],4)`, $P$-value = `r round(MRM.all_Fun.linear.sor_Var_All_DS[[2]][2],5)`, $F_{test}$ = `r round(MRM.all_Fun.linear.sor_Var_All_DS$F.test[1],2)`, $F_{test}-Pvalue$ = `r round(MRM.all_Fun.linear.sor_Var_All_DS$F.test[2],4)`
+
+   -These terms were significant ($P$-value < 0.05): `r (extract_sorted_env_dist_pred_names_filtered(MRM.all_Fun.linear.sor_Var_All_DS, 0.05))` (sorted by decreasing coefficient)
+   \
+
+```{r display-MRM-Var-All-rawresults-DS-Fun-raw, echo=FALSE,eval=TRUE}
+print_clean_MRM_table(MRM.all_Fun.linear.sor_Var_All_DS, caption = "MRM results down-selected model for all fungal samples assessing βsor ~ All (All variables and measures)")
+```
+
+\
+\
+\
+
+## Residuals
+
+```{r include=FALSE,eval=FALSE}
+lm_resid_base <- lm(Bac_beta_sim ~ Fun_beta_sim + Bac_pool_sim, 
+                    data = df_beta_wpool)
+
+df_resid <- df_beta_wpool %>%
+  dplyr::filter(!is.na(Fun_beta_sim) & !is.na(Bac_pool_sim)) %>%
+  dplyr::mutate(Bac_beta_sim_resid = resid(lm_resid_base))
+
+lm_test <- lm(Bac_beta_sim_resid ~ Fungal_cluster_pair, data = df_resid)
+summary(lm_test)
+
+
+resid(MRM.all_Fun.linear.sor_Var_All_DS)
+```
+
+
+\
+\
+\
+
+## Decay plots of significant PredVar {.tabset .tabset-pills}
+
+\
+
+##### pH STANDARDIZED decay plots
+
+```{r calc-Fun-All-pH, include=FALSE, eval=TRUE, cache=TRUE}
+# Fun.All.pH
+decay.Fun.All.pH.exp.sor<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sor, x=env_dist_matrices[["all"]][["pH_m.std_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+
+decay.Fun.All.pH.exp.sim<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sim, x=env_dist_matrices[["all"]][["pH_m.std_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+
+decay.Fun.All.pH.exp.sne<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sne, x=env_dist_matrices[["all"]][["pH_m.std_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+```
+
+
+```{r plot-Fun-pH-decay, echo=FALSE, eval=TRUE,fig.height=5.2,fig.width=3.5,dpi=300, out.height='70%'}
+sor <- decay.Fun.All.pH.exp.sor
+sim <- decay.Fun.All.pH.exp.sim
+sne <- decay.Fun.All.pH.exp.sne
+XLIM = c(0,(max(sor$data.x)*1.1))
+XASP = c(0,4,4) # WARNING HARDCODED
+
+par(mfrow = c(3, 1), # ,#c(nr, nc)
+    mar = c(2, 5, 2.2, 1)# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+    ,oma = (c(2.1, 0, 0, 0) + 0.1))
+
+plot.decay.pretty(sor, col=col_domainFun, main="Fungi - Landscape-scale - pH\n",
+           lty=1,lwd=5,cex.main=1.1,
+           xlim = XLIM,ylim = c(0,1),col.line=col_domainFun_dk,
+           xaxp = XASP,
+           ylab="\n\nTotal\nDissimilarity",xlab="")
+mtext(paste0("βsor ~ S: pseudo-R2 = ", round(sor$pseudo.r.squared,3),
+             ", p-value = ",round(sor$p.value,3),
+             ", b = ",prettyNum(sor$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 
+
+plot.decay.pretty(sim, col=col_domainFun, 
+           lty=1,lwd=5,add=F,
+           xlim = XLIM,ylim = c(0,1),col.line=col_domainFun_dk,
+           xaxp = XASP,
+           ylab="Turnover-Resultant\nDissimilarity",xlab="")
+mtext(paste0("βsim ~ S: pseudo-R2 = ", round(sim$pseudo.r.squared,3),
+             ", p-value = ",round(sim$p.value,3),
+             ", b = ",prettyNum(sim$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 
+
+
+plot.decay.pretty(sne, col=col_domainFun, 
+           lty=1,lwd=5,add=F,
+           xlim = XLIM,ylim = c(0,(max(sne$data.y)*1.1)),
+           col.line=col_domainFun_dk,xaxp = XASP,
+           ylab="Nestedness-Resultant\nDissimilarity",xlab="")
+mtext(paste0("βsne ~ S: pseudo-R2 = ", round(sne$pseudo.r.squared,3),
+             ", p-value = ",round(sne$p.value,3),
+             ", b = ",prettyNum(sne$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 2=left, 3=top, 4=right
+mtext(paste0("Pairwise pH Dissimilarity/Distance"), side = 1, line = 0.85, outer = T,adj = 0.6, cex=0.7)
+```
+
+\
+
+##### pH NOT STANDARDIZED decay plots
+
+```{r calc-Fun-allNSTD-pH, include=FALSE, eval=TRUE, cache=TRUE}
+# Fun.allNSTD.pH
+decay.Fun.allNSTD.pH.exp.sor<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sor, x=env_dist_matrices[["allNSTD"]][["pH_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+
+decay.Fun.allNSTD.pH.exp.sim<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sim, x=env_dist_matrices[["allNSTD"]][["pH_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+
+decay.Fun.allNSTD.pH.exp.sne<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sne, x=env_dist_matrices[["allNSTD"]][["pH_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+```
+
+
+```{r plot-Fun-allNSTD-spatial-decay, echo=FALSE, eval=TRUE,fig.height=5.2,fig.width=3.5,dpi=300, out.height='70%'}
+sor <- decay.Fun.allNSTD.pH.exp.sor
+sim <- decay.Fun.allNSTD.pH.exp.sim
+sne <- decay.Fun.allNSTD.pH.exp.sne
+XLIM = c(0,(max(sor$data.x)*1.1))
+XASP = c(0,4,4) # WARNING HARDCODED
+
+par(mfrow = c(3, 1), # ,#c(nr, nc)
+    mar = c(2, 5, 2.2, 1)# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+    ,oma = (c(2.1, 0, 0, 0) + 0.1))
+
+plot.decay.pretty(sor, col=col_domainFun, main="Fungi - Landscape-scale - pH\n",
+           lty=1,lwd=5,cex.main=1.1,
+           xlim = XLIM,ylim = c(0,1),col.line=col_domainFun_dk,
+           xaxp = XASP,
+           ylab="\n\nTotal\nDissimilarity",xlab="")
+mtext(paste0("βsor ~ S: pseudo-R2 = ", round(sor$pseudo.r.squared,3),
+             ", p-value = ",round(sor$p.value,3),
+             ", b = ",prettyNum(sor$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 
+
+plot.decay.pretty(sim, col=col_domainFun, 
+           lty=1,lwd=5,add=F,
+           xlim = XLIM,ylim = c(0,1),col.line=col_domainFun_dk,
+           xaxp = XASP,
+           ylab="Turnover-Resultant\nDissimilarity",xlab="")
+mtext(paste0("βsim ~ S: pseudo-R2 = ", round(sim$pseudo.r.squared,3),
+             ", p-value = ",round(sim$p.value,3),
+             ", b = ",prettyNum(sim$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 
+
+
+plot.decay.pretty(sne, col=col_domainFun, 
+           lty=1,lwd=5,add=F,
+           xlim = XLIM,ylim = c(0,(max(sne$data.y)*1.1)),
+           col.line=col_domainFun_dk,xaxp = XASP,
+           ylab="Nestedness-Resultant\nDissimilarity",xlab="")
+mtext(paste0("βsne ~ S: pseudo-R2 = ", round(sne$pseudo.r.squared,3),
+             ", p-value = ",round(sne$p.value,3),
+             ", b = ",prettyNum(sne$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 2=left, 3=top, 4=right
+mtext(paste0("Pairwise pH Dissimilarity/Distance"), side = 1, line = 0.85, outer = T,adj = 0.6, cex=0.7)
+```
+
+\
+
+##### Fungal Shannon decay plots
+
+```{r calc-Fun-All-Fun-Shannon, include=FALSE, eval=TRUE, cache=TRUE}
+# Fun.All.Fun_Shannon
+decay.Fun.All.Fun_Shannon.exp.sor<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sor, x=env_dist_matrices[["all"]][["Fun_Shannon_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+
+decay.Fun.All.Fun_Shannon.exp.sim<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sim, x=env_dist_matrices[["all"]][["Fun_Shannon_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+
+decay.Fun.All.Fun_Shannon.exp.sne<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sne, x=env_dist_matrices[["all"]][["Fun_Shannon_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+```
+
+
+```{r plot-Fun-Fun_Shannon-decay, echo=FALSE, eval=TRUE,fig.height=5.2,fig.width=3.5,dpi=300, out.height='70%'}
+sor <- decay.Fun.All.Fun_Shannon.exp.sor
+sim <- decay.Fun.All.Fun_Shannon.exp.sim
+sne <- decay.Fun.All.Fun_Shannon.exp.sne
+XLIM = c(0,(max(sor$data.x)*1.1))
+XASP = c(0,5.5,3) # WARNING HARDCODED
+
+par(mfrow = c(3, 1), # ,#c(nr, nc)
+    mar = c(2, 5, 2.2, 1)# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+    ,oma = (c(2.1, 0, 0, 0) + 0.1))
+
+plot.decay.pretty(sor, col=col_domainFun, main="Fungi - Landscape-scale - fungal Shannon\n",
+           lty=1,lwd=5,cex.main=1.1,
+           xlim = XLIM,ylim = c(0,1),col.line=col_domainFun_dk,
+           xaxp = XASP,
+           ylab="\n\nTotal\nDissimilarity",xlab="")
+mtext(paste0("βsor ~ S: pseudo-R2 = ", round(sor$pseudo.r.squared,3),
+             ", p-value = ",round(sor$p.value,3),
+             ", b = ",prettyNum(sor$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 
+
+plot.decay.pretty(sim, col=col_domainFun, 
+           lty=1,lwd=5,add=F,
+           xlim = XLIM,ylim = c(0,1),col.line=col_domainFun_dk,
+           xaxp = XASP,
+           ylab="Turnover-Resultant\nDissimilarity",xlab="")
+mtext(paste0("βsim ~ S: pseudo-R2 = ", round(sim$pseudo.r.squared,3),
+             ", p-value = ",round(sim$p.value,3),
+             ", b = ",prettyNum(sim$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 
+
+
+plot.decay.pretty(sne, col=col_domainFun, 
+           lty=1,lwd=5,add=F,
+           xlim = XLIM,ylim = c(0,(max(sne$data.y)*1.1)),
+           col.line=col_domainFun_dk,xaxp = XASP,
+           ylab="Nestedness-Resultant\nDissimilarity",xlab="")
+mtext(paste0("βsne ~ S: pseudo-R2 = ", round(sne$pseudo.r.squared,3),
+             ", p-value = ",round(sne$p.value,3),
+             ", b = ",prettyNum(sne$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 2=left, 3=top, 4=right
+mtext(paste0("Pairwise Fungal Alpha Div (Shannon) Dissimilarity/Distance"), side = 1, line = 0.85, outer = T,adj = 0.6, cex=0.7)
+```
+
+\
+
+##### Fungal InvSimpson decay plots
+
+```{r calc-Fun-All-Fun_InvSimpson, include=FALSE, eval=TRUE, cache=TRUE}
+# Fun.All.Fun_InvSimpson
+decay.Fun.All.Fun_InvSimpson.exp.sor<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sor, x=env_dist_matrices[["all"]][["Fun_InvSimpson_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+
+decay.Fun.All.Fun_InvSimpson.exp.sim<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sim, x=env_dist_matrices[["all"]][["Fun_InvSimpson_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+
+decay.Fun.All.Fun_InvSimpson.exp.sne<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sne, x=env_dist_matrices[["all"]][["Fun_InvSimpson_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+```
+
+
+```{r plot-Fun-Fun_InvSimpson-decay, echo=FALSE, eval=TRUE,fig.height=5.2,fig.width=3.5,dpi=300, out.height='70%'}
+sor <- decay.Fun.All.Fun_InvSimpson.exp.sor
+sim <- decay.Fun.All.Fun_InvSimpson.exp.sim
+sne <- decay.Fun.All.Fun_InvSimpson.exp.sne
+XLIM = c(0,(max(sor$data.x)*1.1))
+XASP = c(0,350,3) # WARNING HARDCODED
+
+par(mfrow = c(3, 1), # ,#c(nr, nc)
+    mar = c(2, 5, 2.2, 1)# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+    ,oma = (c(2.1, 0, 0, 0) + 0.1))
+
+plot.decay.pretty(sor, col=col_domainFun, main="Fungi - Landscape-scale - fungal InvSimpson\n",
+           lty=1,lwd=5,cex.main=1.1,
+           xlim = XLIM,ylim = c(0,1),col.line=col_domainFun_dk,
+           xaxp = XASP,
+           ylab="\n\nTotal\nDissimilarity",xlab="")
+mtext(paste0("βsor ~ S: pseudo-R2 = ", round(sor$pseudo.r.squared,3),
+             ", p-value = ",round(sor$p.value,3),
+             ", b = ",prettyNum(sor$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 
+
+plot.decay.pretty(sim, col=col_domainFun, 
+           lty=1,lwd=5,add=F,
+           xlim = XLIM,ylim = c(0,1),col.line=col_domainFun_dk,
+           xaxp = XASP,
+           ylab="Turnover-Resultant\nDissimilarity",xlab="")
+mtext(paste0("βsim ~ S: pseudo-R2 = ", round(sim$pseudo.r.squared,3),
+             ", p-value = ",round(sim$p.value,3),
+             ", b = ",prettyNum(sim$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 
+
+
+plot.decay.pretty(sne, col=col_domainFun, 
+           lty=1,lwd=5,add=F,
+           xlim = XLIM,ylim = c(0,(max(sne$data.y)*1.1)),
+           col.line=col_domainFun_dk,xaxp = XASP,
+           ylab="Nestedness-Resultant\nDissimilarity",xlab="")
+mtext(paste0("βsne ~ S: pseudo-R2 = ", round(sne$pseudo.r.squared,3),
+             ", p-value = ",round(sne$p.value,3),
+             ", b = ",prettyNum(sne$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 2=left, 3=top, 4=right
+mtext(paste0("Pairwise Fungal Alpha Div (InvSimpson) Dissimilarity/Distance"), side = 1, line = 0.85, outer = T,adj = 0.6, cex=0.7)
+```
+
+\
+
+##### Fungal Observed decay plots
+
+```{r calc-Fun-All-Fun_Observed, include=FALSE, eval=TRUE, cache=TRUE}
+# Fun.All.Fun_Observed
+decay.Fun.All.Fun_Observed.exp.sor<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sor, x=env_dist_matrices[["all"]][["Fun_Observed_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+
+decay.Fun.All.Fun_Observed.exp.sim<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sim, x=env_dist_matrices[["all"]][["Fun_Observed_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+
+decay.Fun.All.Fun_Observed.exp.sne<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sne, x=env_dist_matrices[["all"]][["Fun_Observed_Fun"]], y.type="dissim", model.type="exp", perm = 1000)
+```
+
+
+```{r plot-Fun-Fun_Observed-decay, echo=FALSE, eval=TRUE,fig.height=5.2,fig.width=3.5,dpi=300, out.height='70%'}
+sor <- decay.Fun.All.Fun_Observed.exp.sor
+sim <- decay.Fun.All.Fun_Observed.exp.sim
+sne <- decay.Fun.All.Fun_Observed.exp.sne
+XLIM = c(0,(max(sor$data.x)*1.1))
+XASP = c(0,2000,5) # WARNING HARDCODED
+
+par(mfrow = c(3, 1), # ,#c(nr, nc)
+    mar = c(2, 5, 2.2, 1)# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+    ,oma = (c(2.1, 0, 0, 0) + 0.1))
+
+plot.decay.pretty(sor, col=col_domainFun, main="Fungi - Landscape-scale - fungal observed OTUs\n",
+           lty=1,lwd=5,cex.main=1.1,
+           xlim = XLIM,ylim = c(0,1),col.line=col_domainFun_dk,
+           xaxp = XASP,
+           ylab="\n\nTotal\nDissimilarity",xlab="")
+mtext(paste0("βsor ~ S: pseudo-R2 = ", round(sor$pseudo.r.squared,3),
+             ", p-value = ",round(sor$p.value,3),
+             ", b = ",prettyNum(sor$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 
+
+plot.decay.pretty(sim, col=col_domainFun, 
+           lty=1,lwd=5,add=F,
+           xlim = XLIM,ylim = c(0,1),col.line=col_domainFun_dk,
+           xaxp = XASP,
+           ylab="Turnover-Resultant\nDissimilarity",xlab="")
+mtext(paste0("βsim ~ S: pseudo-R2 = ", round(sim$pseudo.r.squared,3),
+             ", p-value = ",round(sim$p.value,3),
+             ", b = ",prettyNum(sim$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 
+
+
+plot.decay.pretty(sne, col=col_domainFun, 
+           lty=1,lwd=5,add=F,
+           xlim = XLIM,ylim = c(0,(max(sne$data.y)*1.1)),
+           col.line=col_domainFun_dk,xaxp = XASP,
+           ylab="Nestedness-Resultant\nDissimilarity",xlab="")
+mtext(paste0("βsne ~ S: pseudo-R2 = ", round(sne$pseudo.r.squared,3),
+             ", p-value = ",round(sne$p.value,3),
+             ", b = ",prettyNum(sne$second.parameter,digits=2, format="e")), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.6) # side 1=bottom, 2=left, 3=top, 4=right
+mtext(paste0("Pairwise Fungal Alpha Div (Observed OTUs) Dissimilarity/Distance"), side = 1, line = 0.85, outer = T,adj = 0.6, cex=0.7)
+```
+
+\
+
+
+\
+\
+

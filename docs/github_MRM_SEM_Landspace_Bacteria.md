@@ -1302,7 +1302,16 @@ $R^2$-value = 0.5997, $P$-value = 0.001, $F_{test}$ = 1.591615\times 10^{4}, $F_
 \
 \
 
-#### Decay plots of significant PredVar {.tabset .tabset-pills}
+## Residuals
+
+
+
+
+\
+\
+\
+
+## Decay plots of significant PredVar {.tabset .tabset-pills}
 
 \
 

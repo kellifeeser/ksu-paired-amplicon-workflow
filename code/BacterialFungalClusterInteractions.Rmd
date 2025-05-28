@@ -1,0 +1,1141 @@
+---
+title: '**RAM paired amplicons: Bacterial-Fungal Cluster (BFC) Interactions**'
+author: "Kelli Feeser"
+date: "`r Sys.Date()`"
+output:
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+    keep_md: yes
+  html_notebook:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+  html_document:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+\
+
+::: homelink
+<a href="https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html" target="_blank" style="text-align:right">Back to Home</a>
+:::
+
+\
+
+------------------------------------------------------------------------
+
+Document last updated: `r Sys.Date()`
+
+------------------------------------------------------------------------
+
+\
+
+# Set-up {.unlisted .unnumbered .hidden}
+
+```{r global_options, include=FALSE}
+# packages
+library(knitr)
+# library(kableExtra)
+
+# set up global R options
+  # to list the current values of all options but better to F1
+    #options()
+    # easier way:
+      #?options
+  # to access the value of a single option
+    #getOption("width")
+
+# set up knitr global chunk options
+  # See str(knitr::opts_chunk$get()) for a list of default chunk options.
+#knitr::opts_chunk$set(fig.width = 8)
+# knitr::opts_chunk$set(fig.path = "../figures/darksidea_plots/")
+#knitr::opts_chunk$set(fig.path = "figures/taxa_plots/prefix-")
+
+# How to use an object before it is created
+  # see https://bookdown.org/yihui/rmarkdown-cookbook/load-cache.html
+
+# changing from cache.path="../docs/code/BacterialFungalClusterInteractions_cache/html/") to cache.path="../docs/github_BacterialFungal_Cluster_Interactions_files/figure-html/")
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
+                      cache.path="../docs/github_BacterialFungal_Cluster_Interactions_files/figure-html/")
+opts_knit$set(eval.after = "fig.cap")
+knitr::opts_chunk$set(fig.pos = '!h')
+options(knitr.kable.NA = '')
+
+## preload your R variables here ##
+# variable_1 <- c("a", "b", "c")
+####
+```
+
+```{r LANL-proxies, eval=T, include=FALSE}
+# LANL proxies
+Sys.setenv('HTTP_PROXY'='http://proxyout.lanl.gov:8080')
+Sys.setenv('HTTPS_PROXY'='http://proxyout.lanl.gov:8080')
+```
+
+## load packages
+
+```{r load-packages, eval=T, include=F}
+library("ggplot2"); packageVersion("ggplot2") #‘3.4.4’
+library("vegan"); packageVersion("vegan") # # ‘2.6.4’
+library("phyloseq"); packageVersion("phyloseq") #‘1.44.0’
+library("scales"); packageVersion("scales") #‘1.2.1’
+library("swatches"); packageVersion("swatches") #‘0.5.0’
+library("ggsci"); packageVersion("ggsci") #‘3.0.0’
+library("ggpubr"); packageVersion("ggpubr") #‘0.6.0’
+library("viridis"); packageVersion("viridis") #‘0.6.4’
+library("RColorBrewer"); packageVersion("RColorBrewer") #‘1.1.3’
+library("cowplot"); packageVersion("cowplot") #‘1.1.1’
+library("dplyr"); packageVersion("dplyr") #‘1.1.3’
+library("plyr"); packageVersion("plyr") #‘1.8.9’
+library("knitr"); packageVersion("knitr") #‘1.44’
+#library("kableExtra"); packageVersion("kableExtra") #‘1.3.4’
+library("DT"); packageVersion("DT") #‘0.30’
+library("tidyverse"); packageVersion("tidyverse") #‘2.0.0’
+library("prettydoc"); packageVersion("prettydoc") #‘0.4.1’
+library("magrittr"); packageVersion("magrittr") #‘2.0.3’
+library("broom"); packageVersion("broom") #‘1.0.5’
+library("betapart"); packageVersion("betapart") #‘1.6’
+# patch see: https://stackoverflow.com/questions/76118194/error-when-loading-kableextra-in-markdown-file-after-updating-to-r-4-3-0
+# devtools::install_github("kupietz/kableExtra",force = TRUE)
+library("kableExtra")
+
+library("microbiome"); packageVersion("microbiome") #‘1.22.0’
+library("supernova"); packageVersion("supernova") #‘3.0.0’
+library("lme4"); packageVersion("lme4") #‘1.1.34’
+library("circlize"); packageVersion("circlize") #‘0.4.16’
+library("ggordiplots"); packageVersion("ggordiplots") #‘0.4.3’
+
+
+source("ksu_colors.R")
+source("../../black-sheep-club/code/sheepish_scripts.R")
+```
+
+## load cache
+
+```{r load-cache, include=FALSE, eval=T}
+# OBJECT <- if (file.exists('OBJECT.rds')) {
+#   readRDS('OBJECT.rds')
+# } else {
+#   "The value of `OBJECT` is not available yet"
+# }
+
+# knitr::load_cache('CHUNK-NAME', 'OBJECT')
+
+
+
+# knitr::load_cache('adonis-predClus-Fun-calc', 'adonis_predClus_Fun')
+# knitr::load_cache('adonis-predClus-Bac-calc', 'adonis_predClus_Bac')
+# knitr::load_cache('calc-alpha', 'fwc_alpha')
+# knitr::load_cache('calc-alpha', 'bwc_alpha')
+# knitr::load_cache('gamma-fun-calc', 'Fun_gamma2')
+# knitr::load_cache('gamma-bac-calc', 'Bac_gamma2')
+
+# knitr::load_cache('mean-diss-bycluster-Fun', 'md_Fwc_self')
+# knitr::load_cache('mean-diss-bycluster-Fun', 'md_Fwc_clus_sor_k10.df.noself')
+# knitr::load_cache('mean-diss-bycluster-Bac', 'md_Bwc_self')
+# knitr::load_cache('mean-diss-bycluster-Bac', 'md_Bwc_clus_sor_k14.df.noself')
+
+knitr::load_cache('subset-Fun-wc-byClus', 'sor.dist.list')
+knitr::load_cache('subset-Bac-wc-byClus')
+
+knitr::load_cache('calc-betadisp')
+knitr::load_cache('betadisp-boxplot-Fun', 'betadisp_clus_Fun.df')
+# knitr::load_cache('', '')
+# knitr::load_cache('', '')
+# knitr::load_cache('', '')
+
+```
+
+## load rds
+
+```{r load-rds, include=FALSE,eval=TRUE}
+##########
+# phylo #
+Bac_wholecommunity<-readRDS(file = "../processed_data/clean_rds_saves/Bac_wholecommunity.rds")
+Fun_wholecommunity <- readRDS(file="../processed_data/clean_rds_saves/Fun_wholecommunity.rds")
+##########
+
+##########
+# nmds #
+Bac_wc_sor_k5.ord <- readRDS(file = "../processed_data/clean_rds_saves/Bac_wc_sor_k5.ord.rds")
+Fun_wc_sor_k4.ord <- readRDS(file = "../processed_data/clean_rds_saves/Fun_wc_sor_k4.ord.rds")
+##########
+
+
+##########
+# misc #
+Bac_wholecommunity.r<-readRDS(file = "../processed_data/clean_rds_saves/Bac_wholecommunity.r.rds")
+Fun_wholecommunity.r<-readRDS(file = "../processed_data/clean_rds_saves/Fun_wholecommunity.r.rds")
+sd<-as(sample_data(Fun_wholecommunity), "data.frame") # metadata for phyloseq
+mv<-phylo2vegan_sd(Fun_wholecommunity) # metadata for vegan
+##########
+
+
+
+
+##########
+# colors #
+col_n14 <- c("B1"="#730025","B2"="#AF0039","B3"="#E8004C","B4"="#FF65A3","B5"="#9E4D97",
+             "B6"="#4D42B3","B7"="#7678ed","B8"="#5B7898","B9"="#17A398","B10"="#74A57F",
+             "B11"="#B6AF40","B12"="#f7b801", "B13"="#f18701", "B14"="#f35b04")
+# creation: https://coolors.co/730025-AF0039-E8004C-FF65A3-9E4D97-4D42B3-7678ed-5B7898-17A398-74A57F-B6AF40-f7b801-f18701-f35b04
+
+
+col_n10 <- c("F1"="#8E0152","F2"="#C51B7D","F3"="#DE77AE","F4"="#F1B6DA","F5"="#C5C2EA",
+             "F6"="#8DC9BB","F7"="#86C37E","F8"="#7FBC41","F9"="#4D9221","F10"="#276419")
+             
+                 # "#DBBCE2","F6"="#E6F5D0","F7"="#B8E186","F8"="#7FBC41","F9"="#4D9221","F10"="#276419")
+
+             # "#B77EBE","#B0AFDF","#92CDC8","#7BB990","#EFBC9B","#DBA8AC"
+
+# creation: https://coolors.co/8e0152-c51b7d-de77ae-f1b6da-c5c2ea-a8e0ff-8dc9bb-7fbc41-4d9221-276419
+col_clusn10 <- c("F1"="#8E0152","F2"="#C51B7D","F3"="#DE77AE","F4"="#F1B6DA","F5"="#FDE0EF",
+                 "F6"="#E6F5D0","F7"="#B8E186","F8"="#7FBC41","F9"="#4D9221","F10"="#276419")
+
+# change "F5"="#FDE0EF" to "#C5C2EA",
+  # "F6"="#E6F5D0" to "#8DC9BB", 
+  # "F7"="#B8E186" to "#86C37E"
+
+latlong_cols<-readRDS(file = "../processed_data/clean_rds_saves/latlong_cols.rds")
+##########
+```
+
+## check metadata
+
+```{r sampledata-check, include=FALSE,eval=FALSE}
+# Bin should be north
+unique(subset(sample_data(Fun_wholecommunity), Site=="ONF")$Bin)
+unique(subset(sample_data(Bac_wholecommunity), Site=="ONF")$Bin)
+
+tail(colnames(sample_data(Fun_wholecommunity)))
+tail(colnames(sample_data(Bac_wholecommunity)))
+
+# colnames
+colnames(sample_data(Fun_wholecommunity))
+
+```
+
+\
+
+# Generate figures {.hidden}
+
+## nmds
+
+```{r, eval=FALSE}
+## This script contains some essential functions for the individual level PCA and DAPC analysis and visualization
+# These functions use a covariance matrix as the input
+# Individual ID and population labels should also be supplied
+# It can be imported to any R script using: source("individual_pca_functions.R")
+# Please read each function for further details
+
+## geom_enterotype ####################
+geom_enterotype <- function(mapping = NULL, data = NULL, stat = "identity",  position = "identity",
+                            alpha = 0.3, prop = 0.5, ..., lineend = "butt", linejoin = "round", 
+                            linemitre = 1, arrow = NULL, na.rm = FALSE, parse = FALSE, 
+                            nudge_x = 0, nudge_y = 0, label.padding = unit(0.15, "lines"), 
+                            label.r = unit(0.15, "lines"), label.size = 0.1, 
+                            show.legend = TRUE, inherit.aes = TRUE, show.point=T, show.label=T, show.ellipse=T, show.line=T) {
+  ## This function is used to create an enterotype plot from two dimemsional data. Features can be turned on and off using show.point, show.label, show.ellipse, and show.line options. 
+  library(ggplot2)
+  # create new stat and geom for PCA scatterplot with ellipses
+  StatEllipse <- ggproto("StatEllipse", Stat, 
+                         required_aes = c("x", "y"), 
+                         compute_group = function(., data, scales, level = 0.75, segments = 51, ...) {
+                           library(MASS)
+                           dfn <- 2
+                           dfd <- length(data$x) - 1
+                           if (dfd < 3) {
+                             ellipse <- rbind(c(NA, NA))
+                           } else {
+                             v <- cov.trob(cbind(data$x, data$y))
+                             shape <- v$cov
+                             center <- v$center
+                             radius <- sqrt(dfn * qf(level, dfn, dfd))
+                             angles <- (0:segments) * 2 * pi/segments
+                             unit.circle <- cbind(cos(angles), sin(angles))
+                             ellipse <- t(center + radius * t(unit.circle %*% chol(shape)))
+                           }
+                           ellipse <- as.data.frame(ellipse)
+                           colnames(ellipse) <- c("x", "y")
+                           return(ellipse)
+                         })
+  
+  # write new ggproto 
+  GeomEllipse <- ggproto("GeomEllipse", Geom, 
+                         draw_group = function(data, panel_scales, coord) {
+                           n <- nrow(data)
+                           if (n == 1) 
+                             return(zeroGrob())
+                           munched <- coord_munch(coord, data, panel_scales)
+                           munched <- munched[order(munched$group), ]
+                           first_idx <- !duplicated(munched$group)
+                           first_rows <- munched[first_idx, ]
+                           grid::pathGrob(munched$x, munched$y, default.units = "native", 
+                                          id = munched$group, 
+                                          gp = grid::gpar(col = first_rows$colour, 
+                                                          fill = alpha(first_rows$fill, first_rows$alpha), lwd = first_rows$size * .pt, lty = first_rows$linetype))
+                         }, 
+                         default_aes = aes(colour = "NA", fill = "grey20", size = 0.5, linetype = 1, alpha = NA, prop = 0.5), 
+                         handle_na = function(data, params) {
+                           data
+                         }, 
+                         required_aes = c("x", "y"), 
+                         draw_key = draw_key_path
+  )
+  
+  # create a new stat for PCA scatterplot with lines which totally directs to the center
+  StatConline <- ggproto("StatConline", Stat, 
+                         compute_group = function(data, scales) {
+                           library(miscTools)
+                           library(MASS)
+                           df <- data.frame(data$x,data$y)
+                           mat <- as.matrix(df)
+                           center <- cov.trob(df)$center
+                           names(center)<- NULL 
+                           mat_insert <- insertRow(mat, 2, center )
+                           for(i in 1:nrow(mat)) {
+                             mat_insert <- insertRow( mat_insert, 2*i, center )
+                             next
+                           }
+                           mat_insert <- mat_insert[-c(2:3),]
+                           rownames(mat_insert) <- NULL
+                           mat_insert <- as.data.frame(mat_insert,center)
+                           colnames(mat_insert) =c("x","y")
+                           return(mat_insert)
+                         },
+                         required_aes = c("x", "y")
+                         
+  )
+  
+  # create a new stat for PCA scatterplot with center labels
+  StatLabel <- ggproto("StatLabel" ,Stat,
+                       compute_group = function(data, scales) {
+                         library(MASS)
+                         df <- data.frame(data$x,data$y)
+                         center <- cov.trob(df)$center
+                         names(center)<- NULL 
+                         center <- t(as.data.frame(center))
+                         center <- as.data.frame(cbind(center))
+                         colnames(center) <- c("x","y")
+                         rownames(center) <- NULL
+                         return(center)
+                       },
+                       required_aes = c("x", "y")
+  )
+  
+  
+  layer1 <- layer(data = data, mapping = mapping, stat = stat, geom = GeomPoint, 
+                  position = position, show.legend = show.legend, inherit.aes = inherit.aes, 
+                  params = list(na.rm = na.rm, ...))
+  layer2 <- layer(stat = StatEllipse, data = data, mapping = mapping, geom = GeomEllipse, position = position, show.legend = FALSE, 
+                  inherit.aes = inherit.aes, params = list(na.rm = na.rm, prop = prop, alpha = alpha, ...))
+  layer3 <- layer(data = data, mapping = mapping, stat =  StatConline, geom = GeomPath, 
+                  position = position, show.legend = show.legend, inherit.aes = inherit.aes, 
+                  params = list(lineend = lineend, linejoin = linejoin, 
+                                linemitre = linemitre, arrow = arrow, alpha=0.3, na.rm = na.rm, ...))
+  if (!missing(nudge_x) || !missing(nudge_y)) {
+    if (!missing(position)) {
+      stop("Specify either `position` or `nudge_x`/`nudge_y`", 
+           call. = FALSE)
+    }
+    position <- position_nudge(nudge_x, nudge_y)
+  }
+  layer4 <- layer(data = data, mapping = mapping, stat = StatLabel, geom = GeomLabel, 
+                  position = position, show.legend = FALSE, inherit.aes = inherit.aes, 
+                  params = list(parse = parse, label.padding = label.padding, 
+                                label.r = label.r, label.size = label.size, na.rm = na.rm, ...))
+  return(list(layer1,layer2,layer3,layer4)[c(show.point, show.ellipse, show.line, show.label)])
+}
+
+## PCA #############
+
+PCA <- function(cov_matrix, ind_label, pop_label, x_axis, y_axis, show.point=T, show.label=T, show.ellipse=T, show.line=T, alpha=0, index_exclude=vector())
+ {
+  ## This function takes a covariance matrix and performs PCA. 
+  # cov_matrix: a square covariance matrix generated by most pca softwares
+  # ind_label: a vector in the same order and length as cov_matrix; it contains the individual labels of the individuals represented in the covariance matrix
+  # pop_label: a vector in the same order and length as cov_matrix; it contains the population labels of the individuals represented in the covariance matrix
+  # x_axis: an integer that determines which principal component to plot on the x axis
+  # y_axis: an integer that determines which principal component to plot on the y axis
+  # show.point: whether to show individual points
+  # show.label: whether to show population labels
+  # show.ellipse: whether to show population-specific ellipses
+  # show.line: whether to show lines connecting population means with each individual point
+  # alpha: the transparency of ellipses
+  # index_exclude: the indices of individuals to exclude from the analysis
+  index_include <- setdiff(seq_along(ind_label), index_exclude)
+  m <- as.matrix(cov_matrix)
+  m[is.na(m)]<- median(m, na.rm = T)
+  m<-m[index_include, index_include] ## Remove 4SJH, four 3Ps individuals, and contaminated ones
+  e <- eigen(m)
+  e_value<-e$values
+  x_variance<-e_value[x_axis]/sum(e_value)*100
+  y_variance<-e_value[y_axis]/sum(e_value)*100
+  e <- as.data.frame(e$vectors)
+  e <- cbind(ind_label[index_include], pop_label[index_include], e) ## with the above individuals removed
+  #colnames(e)[3:331]<-paste0("PC",1:329)
+  colnames(e)[3:(dim(e)[1])]<-paste0("PC",1:(dim(e)[1]-2)) ## with the above individuals removed
+  colnames(e)[1:2]<-c("individual", "population")
+  assign("pca_table", e, .GlobalEnv)
+  
+  PCA_plot<-ggplot(data=e[,],aes(x=e[,x_axis+2], y=e[,y_axis+2], color=population,label=population, shape=population)) + 
+    geom_enterotype(alpha=alpha, show.point=show.point, show.label=show.label, show.ellipse=show.ellipse, show.line=show.line) +
+    scale_shape_manual(values = c(rep(c(15,16,17,18),7), 15, 16)) +
+    theme_cowplot() +
+    theme(
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank()
+    ) +
+    xlab(paste0("PC", x_axis, "(",round(x_variance,2),"%)")) +
+    ylab(paste0("PC", y_axis ,"(",round(y_variance,2),"%)")) 
+  print(PCA_plot)
+}
+
+## DAPC ########
+
+DAPC <- function (n=50, x_axis, y_axis, show.point=T, show.label=T, show.ellipse=T, show.line=T, alpha=0) {
+  ## This function should follow immediately after a PCA function. It takes the PCA output and performs a linear discriminant analysis
+  # n: the number of principal components to use for discriminant analysis
+  # x_axis: an integer that determines which linear discriminant to plot on the x axis
+  # y_axis: an integer that determines which linear discriminant to plot on the y axis
+  # show.point: whether to show individual points
+  # show.label: whether to show population labels
+  # show.ellipse: whether to show population-specific ellipses
+  # show.line: whether to show lines connecting population means with each individual point
+  # alpha: the transparency of ellipses
+  fit <- lda(population ~ ., data=pca_table[,2:(n+1)], na.action="na.omit", CV=F, output = "Scatterplot")
+  plda <- predict(object = fit,
+                  newdata = pca_table[,2:(n+1)])
+  prop.lda = fit$svd^2/sum(fit$svd^2)
+  dataset = data.frame(group = pca_table[,2], lda = plda$x)
+  DAPC_plot<- ggplot(dataset, aes(dataset[,1+x_axis], dataset[,1+y_axis], color= group, label=group, shape=group)) + 
+    geom_enterotype(show.point=show.point, show.label=show.label, show.ellipse=show.ellipse, show.line=show.line, alpha=alpha) +
+    scale_shape_manual(values = c(rep(c(15,16,17,18),7), 15, 16)) +
+    theme_cowplot() +
+    labs(x = paste0("LD", x_axis," (", percent(prop.lda[x_axis]), ")", sep=""),
+         y = paste0("LD", y_axis, " (", percent(prop.lda[y_axis]), ")", sep=""))
+  print(DAPC_plot)
+}
+
+## PCoA ########
+
+PCoA <- function(dist_matrix, ind_label, pop_label, k, x_axis, y_axis, show.point=T, show.label=T, show.ellipse=T, show.line=T, alpha=0, index_exclude=vector())
+{
+  ## This function takes a pairwise distance matrix and performs PCoA
+  # dist_matrix: a square distance matrix generated by most pca softwares
+  # ind_label: a vector in the same order and length as dist_matrix; it contains the individual labels of the individuals represented in the covariance matrix
+  # pop_label: a vector in the same order and length as dist_matrix; it contains the population labels of the individuals represented in the covariance matrix
+  # x_axis: an integer that determines which principal component to plot on the x axis
+  # y_axis: an integer that determines which principal component to plot on the y axis
+  # show.point: whether to show individual points
+  # show.label: whether to show population labels
+  # show.ellipse: whether to show population-specific ellipses
+  # show.line: whether to show lines connecting population means with each individual point
+  # alpha: the transparency of ellipses
+  # index_exclude: the indices of individuals to exclude from the analysis
+  
+  index_include <- setdiff(seq_along(ind_label), index_exclude)
+  m <- as.matrix(dist_matrix)
+  m[is.na(m)]<- median(m, na.rm = T)
+  m <- m[index_include, index_include] ## Remove 4SJH, four 3Ps individuals, and contaminated ones
+  mds <- cmdscale(as.dist(m), k=k)
+  mds <- as.data.frame(mds)
+  colnames(mds) <- paste0("dist_", 1:k)
+  mds <- cbind(ind_label[index_include], pop_label[index_include], mds)
+  colnames(mds)[1:2]<-c("individual", "population")
+  eigen_value <- cmdscale(as.dist(m), k=k, eig = T)$eig
+  var_explained <- round(eigen_value/sum(eigen_value)*100, 2)
+  assign("pcoa_table", mds, .GlobalEnv)
+  assign("var_explained", var_explained, .GlobalEnv)
+  
+  PCoA_plot<-ggplot(data=mds[,], aes(x=mds[,x_axis+2], y=mds[,y_axis+2], color=population,label=population, shape=population)) + 
+    geom_enterotype(alpha=alpha, show.point=show.point, show.label=show.label, show.ellipse=show.ellipse, show.line=show.line) +
+    scale_shape_manual(values = c(rep(c(15,16,17,18),7), 15, 16)) +
+    theme_cowplot() +
+    theme(
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank()
+    ) +
+    xlab(paste0("PCo", x_axis, "(",var_explained[x_axis],"%)")) +
+    ylab(paste0("PCo", y_axis ,"(",var_explained[y_axis],"%)"))
+  print(PCoA_plot)
+}
+```
+
+```{r, include=FALSE,eval=TRUE}
+vard_sample <- c("Site","Grass","Gradient","Bin","Grassland","Latitude","Longitude","Elevation_m")
+
+vard_climate <- c("GDD3yr_m.std","ppt3yr_m.std")
+
+vard_edaphic <- c("soil_moisture_m.std","pH_m.std","phos_m.std","ammonium_m.std","SOM_m.std")
+
+vard_plant <- c("avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std")
+
+vard_all_numeric <- c("Latitude","Longitude","Elevation_m","GDD3yr_m.std","ppt3yr_m.std","soil_moisture_m.std","pH_m.std","phos_m.std","ammonium_m.std","SOM_m.std","avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std")
+
+vard_all <- c("Site","Grass","Gradient","Bin","Grassland","Latitude","Longitude","Elevation_m","GDD3yr_m.std","ppt3yr_m.std","soil_moisture_m.std","pH_m.std","phos_m.std","ammonium_m.std","SOM_m.std","avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std")
+
+vard_all_numeric_env <- c("GDD3yr_m.std","ppt3yr_m.std","soil_moisture_m.std","pH_m.std","phos_m.std","ammonium_m.std","SOM_m.std","avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std")
+```
+
+### fun
+
+(ref:Fun-NMDS-Sor-PAM-all-fig-caption) NMDS plot showing variation in the presence/absence-based composition of root-associated fungi in relation to PAM cluster designations. NMDS plot based on Sørensen dissimilarities: k = 4, 2-dimensional stress = 0.122, non-metric fit R^2^ = 0.985, linear fit R^2^ = 0.908.
+
+```{r, echo=FALSE,eval=F, out.height="90%",fig.cap='(ref:Fun-NMDS-Sor-PAM-all-fig-caption)'}
+plot_ordination(Fun_wholecommunity, Fun_wc_sor_k4.ord, color = "Fun_sor_clusters",label = "Fun_sor_clusters") +
+  # geom_enterotype(mapping = aes(label = Fun_sor_clusters,fill="Fun_sor_clusters")) + 
+  # stat_ellipse(aes(fill=Fun_sor_clusters), alpha=0.1,
+               # type = "t",
+               # geom = "polygon", segments=3
+               # )+
+  # geom_chull()+
+  geom_text(mapping = aes(label = Fun_sor_clusters), size = 4, vjust = 1.1, show.legend = F) +
+  scale_color_manual(values = col_n10, name = "Sørensen clusters",guide = guide_legend(ncol = 2),
+                     aesthetics = c("colour", "fill"))+
+  geom_point(size = 0.8, alpha = 0.7) +
+  ggtitle("", subtitle = "ITS - Sørensen dissim. clusters based on PAM (k = 10)") +
+  theme_bw() +
+  theme(legend.position="right",
+    axis.text = element_text(color="black", size=10),
+    axis.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
+    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+
+gg_ordiplot(Fun_wc_sor_k4.ord, groups = sd$Fun_sor_clusters, 
+            pt.size = 3)$plot +
+theme_bw()
+
+
+
+gg_ordiplot(Fun_wc_sor_k4.ord, groups = sd$Fun_sor_clusters, 
+            pt.size = 2,kind = "se",conf = 0.90,
+            label = T, spiders = T, hull = T)$plot+
+  scale_color_manual(values = col_clusn10, name = "Sørensen clusters",guide = guide_legend(ncol = 2),
+                     aesthetics = c("colour", "fill"))+
+  geom_point(size = 0.8, alpha = 0.7) +
+  ggtitle("ITS - Sørensen dissim. clusters based on PAM (k = 10)", subtitle = "ellipses showing 90% CI for the standard errors about each cluster centroid") +
+  theme_bw() +
+  theme(legend.position="right",
+    axis.text = element_text(color="black", size=10),
+    axis.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
+    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+
+dune.bray <- vegdist(dune, method="bray")
+fcl <- hclust(Fun_wc_sorensen_dist, method="complete")
+
+gg_ordicluster(Fun_wc_sor_k4.ord, cluster=fcl, sd$Fun_sor_clusters
+               , prune=3
+               , col=cutree(fcl, 10), pt.size = 2
+               )
+
+gg_envfit(Fun_wc_sor_k4.ord, sd[,"pH_m.std"], groups = sd$Fun_sor_clusters, scaling = 1, choices = c(1, 2), perm = 999, alpha = 0.05,
+    angle = 20, len = 0.5, unit = "cm", arrow.col = "red", pt.size = 3, plot = TRUE)
+
+envfit(Fun_wc_sor_k4.ord, env = sd[c("Bac_sor_clusters",vard_edaphic,vard_climate,vard_plant,vard_sample)], permutations = 999)
+
+gg_ordisurf(ord = Fun_wc_sor_k4.ord, env.var = sd$ppt3yr_m.std, 
+            binwidth = 0.25, # 'binwidth' is the max minus min values of the variable divided by 15
+            pt.size = 1, var.label = "SOM")
+
+gg_ordibubble(ord = Fun_wc_sor_k4.ord, env.var = sd$ppt3yr_m.std, 
+            # binwidth = 0.25, # 'binwidth' is the max minus min values of the variable divided by 15
+            # pt.size = 1, 
+            var.label = "SOM")
+
+# SOM The contours are close to parallel show that the SOM concentration increases from upper right to lower left
+
+
+```
+
+ 
+
+### bac
+
+(ref:Bac-NMDS-Sor-PAM-all-fig-caption) NMDS plot showing variation in the presence/absence-based composition of root-associated fungi in relation to PAM cluster designations. NMDS plot based on Sørensen dissimilarities: k = 5, 2-dimensional stress = 0.055, non-metric fit R^2^ = 0.997, linear fit R^2^ = 0.981.
+
+```{r, echo=FALSE,eval=TRUE, out.height="90%",fig.cap='(ref:Bac-NMDS-Sor-PAM-all-fig-caption)'}
+# col_n10 <- c("#8E0152","#C51B7D","#DE77AE","#F1B6DA","#FDE0EF","#E6F5D0","#B8E186","#7FBC41","#4D9221","#276419")
+# "#FEC9F1", "#FA4C8E", "#", "#29235F","#3D348B","#758FB6",
+
+plot_ordination(Bac_wholecommunity, Bac_wc_sor_k5.ord, color = "Bac_sor_clusters") +
+  geom_text(mapping = aes(label = Bac_sor_clusters), size = 4, vjust = 1.1, show.legend = F) +
+  scale_color_manual(values = col_n14, name = "Sørensen clusters",guide = guide_legend(ncol = 2))+
+  geom_point(size = 0.8, alpha = 0.7) +
+  ggtitle("", subtitle = "16S - Sørensen dissim. clusters based on PAM (k = 14)") +
+  theme_bw() +
+  theme(legend.position="right",
+    axis.text = element_text(color="black", size=10),
+    axis.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
+    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+```
+
+
+## SFAF poster figures
+
+```{r}
+Fun_ordiplot_spiders1<-gg_ordiplot(Fun_wc_sor_k4.ord, groups = sd$Fun_sor_clusters, 
+            pt.size = 1,kind = "se",conf = 0.90,ellipse = TRUE,
+            label = T, spiders = T, hull = F, plot = F)
+Fun_ordiplot_spiders <- Fun_ordiplot_spiders1$plot
+
+Fun_ordiplot_spiders+
+  scale_color_manual(values = col_n10, name = "Sørensen clusters",guide = guide_legend(ncol = 2))+
+  scale_fill_manual(values = col_n10, name = "Sørensen clusters",guide = guide_legend(ncol = 2))+
+  geom_label(data = Fun_ordiplot_spiders1$df_mean.ord, aes(x = x, y = y, label = Group, color = Group), show.legend = FALSE, size=5, label.size = 2, fontface="bold")+
+  # geom_point(size = 0.8, alpha = 0.2) +
+  ggtitle("Fungal Sub-Assemblages (n = 10)", subtitle = "ellipses showing 90% CI for the standard errors about each cluster centroid") +
+  theme_bw() +
+  theme(legend.position="none",
+    plot.title = element_text(color="black", size=20),
+    plot.subtitle = element_text(color="black", size=16),
+    axis.text = element_text(color="black", size=14),
+    axis.title = element_text(color="black", size=16),
+    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75), #, fill="#E5A60C1a"
+    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+
+
+Bac_ordiplot_spiders1<-gg_ordiplot(Bac_wc_sor_k5.ord, groups = sd$Bac_sor_clusters, 
+            pt.size = 1,kind = "se",conf = 0.90,ellipse = TRUE,
+            label = T, spiders = T, hull = F, plot = F)
+Bac_ordiplot_spiders <- Bac_ordiplot_spiders1$plot
+
+Bac_ordiplot_spiders+
+  scale_color_manual(values = col_n14, name = "Sørensen clusters",guide = guide_legend(ncol = 2))+
+  scale_fill_manual(values = col_n14, name = "Sørensen clusters",guide = guide_legend(ncol = 2))+
+  geom_label(data = Bac_ordiplot_spiders1$df_mean.ord, aes(x = x, y = y, label = Group, color = Group), show.legend = FALSE, size=5, label.size = 2, fontface="bold")+
+  # geom_point(size = 0.8, alpha = 0.2) +
+  ggtitle("Bacterial Sub-Assemblages (n = 14)", subtitle = "ellipses showing 90% CI for the standard errors about each cluster centroid") +
+  theme_bw() +
+  theme(legend.position="none",
+    plot.title = element_text(color="black", size=20),
+    plot.subtitle = element_text(color="black", size=16),
+    axis.text = element_text(color="black", size=14),
+    axis.title = element_text(color="black", size=16),
+    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75), #fill="#006e901a"
+    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+```
+
+
+## pairwise 
+
+```{r pair-BFclus-stats, include=FALSE,eval=F,cache=F}
+
+
+# If we are predicting a car's miles-per-gallon (mpg) based on whether it has an automatic or manual transmission (am), we can create that linear model and get the pairwise comparisons like this:
+
+pairwise(lm(mpg ~ factor(am), data = mtcars))
+
+# add the car's displacement (disp) as a quantitative predictor:
+  # Importantly, the interpretation of the outcome is different than in other traditional t-tests. Instead of saying, "there is a difference in miles-per-gallon based on the type of transmission," we must add that this difference is found "after accounting for displacement"
+pairwise(lm(mpg ~ factor(am) + disp, data = mtcars))
+
+# create all type 2 comparison models
+models <- generate_models(
+  lm(mpg ~ hp * factor(am), data = mtcars),
+  type = 2
+)
+
+# compute the SS for the hp term
+anova_hp <- anova(models$hp$simple, models$hp$complex)
+anova_hp[["Sum of Sq"]][[2]]
+
+sd_Fun<-as(sample_data(Fun_wholecommunity), "data.frame")
+
+pairwise_(lm(factor(Bac_sor_clusters) ~ factor(Fun_sor_clusters), data = sd_Fun))
+
+# create all type 2 comparison models
+models <- generate_models(
+  glm(Bac_sor_clusters ~ Fun_sor_clusters, data = sd_Fun),
+  type = 2
+)
+
+ggplot(data = sd_Fun, aes(x=Bac_sor_clusters, y=Fun_sor_clusters))+
+  # stat_density_2d(aes(fill = ..count..), geom = "polygon", colour="white")+
+  geom_bin_2d(aes(fill = after_stat(count))) +
+  stat_bin2d(geom = "text", aes(label = ..count..), binwidth = 1) +
+  # facet_wrap( ~ Grass)+
+  scale_x_discrete(limits=c("B1","B6","B2","B3","B4","B5","B7","B8","B9","B10","B11","B12","B13","B14"))+
+  theme_pubr()+
+  scale_fill_gradientn(limits=c(0,36), 
+                       # breaks=seq(0, 40, by=10), 
+                       # colours=topo.colors(10, rev = T)
+                       # colours=terrain.colors(10, rev = T)
+                       # colours=topo.colors(10, rev = T)
+                       # colours=hcl.colors(7,"Dark Mint",rev = T)
+                       colours=hcl.colors(7,"Emrld",rev = T)
+                       # colours=viridis(3)
+                       # colours=cm.colors(36)
+                         )
+
+# print(chisq.test(x = sd_Fun$Bac_sor_clusters, y = sd_Fun$Fun_sor_clusters)[['p.value']])
+  
+
+
+```
+
+------------------------------------------------------------------------
+
+# Relationships among bacterial-fungal clusters
+
+\
+
+## Chord diagram {.tabset}
+
+\
+Evidence of cross-talk among BFCs, i.e., a bacterial cluster might correspond to > 1 fungal cluster.\
+
+### fungal emphasis
+
+```{r, echo=FALSE,eval=TRUE, fig.show="hold", out.width="30%", fig.height=6}
+  # Transform input data in a adjacency matrix
+incidence_mat <- with(sd, table(Fun_sor_clusters, Bac_sor_clusters))
+incidence_mat_s <- incidence_mat[,order(colnames(incidence_mat))]
+ 
+# Make the circular plot
+
+#fungal links
+chordDiagram(incidence_mat, transparency = 0.5
+             ,grid.col = c(col_clusn10,col_n14))
+
+chordDiagram(incidence_mat, transparency = 0.5
+             , link.sort = TRUE, link.decreasing = F
+             ,grid.col = c(col_clusn10,col_n14)
+)
+
+chordDiagram(incidence_mat, transparency = 0.5
+             , link.sort = T, link.decreasing = T
+             ,grid.col = c(col_clusn10,col_n14)
+)
+
+# incidence_mat[,1] # B1
+
+# sum(incidence_mat[,1:14])
+
+# sum(incidence_mat[1:10,])
+
+# sum(incidence_mat)
+
+```
+
+
+
+
+### bacterial emphasis 
+
+```{r, echo=FALSE,eval=TRUE, fig.show="hold", out.width="30%", fig.height=6}
+  # Transform input data in a adjacency matrix
+incidence_mat <- with(sd, table(Fun_sor_clusters, Bac_sor_clusters))
+
+chordDiagram(t(incidence_mat), transparency = 0.5
+             ,grid.col = c(col_n14,col_clusn10))
+
+
+chordDiagram(t(incidence_mat), transparency = 0.5
+             , link.sort = TRUE, link.decreasing = F
+             ,grid.col = c(col_n14,col_clusn10)
+)
+
+chordDiagram(t(incidence_mat), transparency = 0.5
+             , link.sort = TRUE, link.decreasing = T
+             ,grid.col = c(col_n14,col_clusn10)
+)
+
+
+# chordDiagram(t(incidence_mat), transparency = 0.5
+#              , link.sort = TRUE, link.decreasing = T
+#              ,col = rep(hcl.colors(14,"Blues 3",rev = F),10)
+#              ,grid.col = c(col_n14,col_clusn10)
+# )
+
+
+# chordDiagram(incidence_mat, transparency = 0.35
+#              , link.sort = TRUE, link.decreasing = T
+#              ,col = rep(hcl.colors(10,"Peach",rev = F),14)
+#              ,grid.col = c(col_clusn10,col_n14)
+# )
+
+```
+
+
+
+
+
+## heatmap
+
+```{r BFCheatmap1, include=FALSE,eval=T,cache=T, dev='png', fig.show='hide', out.width="80%",out.height="40%",dpi=200,fig.height=3, fig.width=6,cache.path="../docs/github_BacterialFungal_Cluster_Interactions_files/figure-html/",fig.path="../docs/github_BacterialFungal_Cluster_Interactions_files/figure-html/"}
+
+ggplot(data = sd, aes(x=Bac_sor_clusters, y=Fun_sor_clusters))+
+  # stat_density_2d(aes(fill = ..count..), geom = "polygon", colour="white")
+  geom_bin_2d(aes(fill = after_stat(count))) +
+  stat_bin2d(geom = "text", aes(label = ..count..), binwidth = 1) +
+  labs(x="Bacterial Clusters", y="Fungal Clusters", title = "Heatmap of BFC membership (counts)") +
+  # facet_wrap( ~ Grass)+
+  scale_x_discrete(limits=c("B1","B6","B2","B3","B4","B5","B7","B8","B9","B10","B11","B12","B13","B14"))+
+  theme_pubr(base_size = 10,
+             border = T,legend = "right")+
+  scale_fill_gradientn(limits=c(0,37), 
+                       # breaks=seq(0, 40, by=10), 
+                       # colours=topo.colors(10, rev = T)
+                       # colours=terrain.colors(10, rev = T)
+                       # colours=topo.colors(10, rev = T)
+                       # colours=hcl.colors(7,"Dark Mint",rev = T)
+                       colours=hcl.colors(7,"Emrld",rev = T, alpha = 0.9)
+                       # colours=viridis(3)
+                       # colours=cm.colors(36)
+                         )
+  # theme(aspect.ratio = 1)
+
+# print(chisq.test(x = sd$Bac_sor_clusters, y = sd$Fun_sor_clusters)[['p.value']])
+```
+
+![Heatmap of bacterial-fungal cluster (BFC) membership.](`r knitr::fig_chunk('BFCheatmap1', 'png')`)
+
+
+# logistic regressions
+
+Binary/categorical response variables necessitate logistic and/or multinomial regression models.\
+
+-    Response variables (binary or categorical)
+
+    -    F1
+  
+-    Explanatory variables (continuous and/or categorical as well as interaction terms to investigate potential combined effects of the explanatory variables)
+
+    -    F1
+  
+  
+## Binary logistic regression
+
+Logistic regression models for binary response variables allow us to estimate the probability of the outcome (e.g., yes vs. no), based on the values of the explanatory variables. We could simply model this probability directly as a function of the explanatory variables but, instead, we use the logit function, logit(p) = ln(p/(1-p)), where p is the probability of the outcome occurring, in order to determine the corresponding log odds of the outcome which we then model as a linear combination of the explanatory variables. As with standard linear regression analyses, the model coefficients can then be interpreted in order to understand the direction and strength of the relationships between the explanatory variables and the response variable.
+
+Logistic regression is implemented in R using glm() by training the model using features or variables in the dataset. 
+
+
+GLM vs. logit: GLM is a generalized linear model and Logit Model is specific to models with binary classification. While using GLM model you have to mention the parameter family which can be binomial (logit model), Poisson etc. This parameter is not required in Logit model as its only for binary output. The difference in the output can be because of regularization parameters. `GLM` with `Binomial` family and `Logit` link and the discrete `Logit` model represent the same underlying model and both fit by maximum likelihood estimation. Implementation, default optimization method, options for extensions and the availability of some results statistics differs between GLM and their `discrete` counterparts.
+
+`glm(formula, family=binomial(link = "logit"))`
+
+other methods: Two-group discriminant function analysis. A multivariate method for dichotomous outcome variables.
+
+
+```{r, include=FALSE,eval=F}
+# Convert the table to a data frame
+data <- as.data.frame(binary)
+mydata <- data
+
+# Fit the logistic regression model
+model <- glm(admit ~ gre + gpa + rank, family = binomial, data = data)
+ 
+# View the summary of the model
+summary(model)
+
+sapply(data, sd)
+
+## two-way contingency table of categorical outcome and predictors we want
+## to make sure there are not 0 cells
+xtabs(~admit + rank, data = mydata)
+
+xtabs(~Fun_sor_clus2 + Bac_sor_clusters, data = sd)
+mylogit <- glm(Fun_sor_clus2 ~ Bac_sor_clusters +SOM_m.std+ Grass, data = sd, family = "binomial")
+summary(mylogit)
+
+mylogit1 <- glm(Fun_sor_clus2 ~ Bac_sor_clusters +SOM_m.std, data = sd, family = "binomial")
+summary(mylogit1)
+
+## odds ratios only
+exp(coef(mylogit))
+
+## odds ratios and 95% CI
+exp(cbind(OR = coef(mylogit), confint(mylogit)))
+
+# The test statistic is distributed chi-squared with degrees of freedom equal to the differences in degrees of freedom between the current and the null model (i.e., the number of predictor variables in the model). To find the difference in deviance for the two models (i.e., the test statistic) we can use the command:
+with(mylogit, null.deviance - deviance) #269.0156
+
+# df
+with(mylogit, df.null - df.residual) #13
+
+# p-value
+with(mylogit, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE)) #7.093819e-50
+
+#model’s log likelihood
+logLik(mylogit) #'log Lik.' -186.4451 (df=14)
+
+# Between Subjects Models
+
+## A model with no predictors (null model)
+supernova(glm(Fun_sor_clus2 ~ NULL, data = sd, family = "binomial"))
+
+## A regression model with a single predictor
+supernova(glm(Fun_sor_clus2 ~ Bac_sor_clusters, data = sd, family = "binomial"))
+
+## A multiple regression model
+supernova(glm(Fun_sor_clus2 ~ Bac_sor_clusters + SOM_m.std+ soil_moisture_m.std, data = sd, family = "binomial"))
+lmer(Fun_sor_clus2 ~  SOM_m.std+ soil_moisture_m.std+(1 | Bac_sor_clusters), data = sd)
+
+## A multiple regression with an interaction
+supernova(glm(Fun_sor_clus2 ~ Bac_sor_clusters*Grass, data = sd, family = "binomial"))
+sd |>
+  glm(Fun_sor_clus2 ~ Bac_sor_clusters+Grass, data = sd, family = "binomial") |>
+  supernova()
+
+pairwise(glm(Fun_sor_clus2 ~ Bac_sor_clusters, data = sd, family = "binomial"))
+sd |>
+  lmer(SOM_m.std ~ Bac_sor_clusters + (1 | Fun_sor_clus2), data = _) |>
+  supernova()
+
+# Within Subjects Models
+library(lme4)
+library(tidyr)
+library(dplyr)
+
+#the model was fit with lmer(), specifying the non-independence of each Sample as a random factor.
+```
+
+# in-progress {.hidden}
+
+```{r, include=FALSE,eval=FALSE}
+library(igraph)
+library(dplyr)
+library(ggplot2)
+
+incidence_mat0<-incidence_mat
+incidence_mat0[incidence_mat0 > 0] <- 1
+edgelist<-as_edgelist(graph)
+gd <- graph_from_incidence_matrix(incidence_mat, multiple = F, weighted = T,
+                                  add.names	= NULL,directed = T
+)
+
+# by default, the graph object is directed from rows to columns.
+g1 <- graph_from_incidence_matrix(incidence_mat, multiple = F, weighted = T,
+                                  add.names	= NULL,directed = F
+)
+graph <- g1
+layout=layout_nicely(graph)
+layoutkk <- layout_with_kk(graph)
+plot.igraph(graph,layout=layoutkk,vertex.label.dist = 1.5)
+get.edgelist(graph)
+get.nodelist(graph)
+
+is_bipartite(graph)
+bipartite_graph(graph)
+
+# Read in CSV files with edge and node attributes
+original_edgelist <- read.csv("goltzius_graph.csv", stringsAsFactors = FALSE)
+original_nodelist <- read.csv("goltzius_nodes.csv", stringsAsFactors = FALSE)
+
+# Calculate various network properties, adding them as attributes
+# to each node/vertex
+V(graph)$comm <- membership(optimal.community(graph))
+V(graph)$degree <- degree(graph)
+V(graph)$closeness <- centralization.closeness(graph)$res
+V(graph)$betweenness <- centralization.betweenness(graph)$res
+V(graph)$eigen <- centralization.evcent(graph)$vector
+```
+
+
+## Computing multiple categorical factor pairwise comparisons
+
+We used `supernova::pairwise` for generating and testing all pairwise comparisons of categorical terms (BFC) in a linear model. This function computes the pooled standard error by using the mean squared error (MSE) from the full model fit (not of each group) and then weighting it based on the size of the groups in question (divide by n).\
+
+```{r pair-BFclus-stats2, include=FALSE,eval=F}
+library("supernova"); packageVersion("supernova") #‘3.0.0’
+library("lme4"); packageVersion("lme4") #‘1.1.34’
+
+# If we are predicting a car's miles-per-gallon (mpg) based on whether it has an automatic or manual transmission (am), we can create that linear model and get the pairwise comparisons like this:
+
+pairwise(lm(mpg ~ factor(am), data = mtcars))
+
+# add the car's displacement (disp) as a quantitative predictor:
+  # Importantly, the interpretation of the outcome is different than in other traditional t-tests. Instead of saying, "there is a difference in miles-per-gallon based on the type of transmission," we must add that this difference is found "after accounting for displacement"
+pairwise(lm(mpg ~ factor(am) + disp, data = mtcars))
+
+# create all type 2 comparison models
+models <- generate_models(
+  lm(mpg ~ hp * factor(am), data = mtcars),
+  type = 2
+)
+
+# compute the SS for the hp term
+anova_hp <- anova(models$hp$simple, models$hp$complex)
+anova_hp[["Sum of Sq"]][[2]]
+
+pairwise_(lm(factor(Bac_sor_clusters) ~ factor(Fun_sor_clusters), data = sd))
+
+# create all type 2 comparison models
+models <- generate_models(
+  glm(Bac_sor_clusters ~ Fun_sor_clusters, data = sd),
+  type = 2
+)
+
+ggplot(data = sd, aes(x=Bac_sor_clusters, y=Fun_sor_clusters))+
+  stat_density_2d(aes(fill = ..count..), geom = "polygon", colour="white")
+  geom_bin_2d(aes(fill = after_stat(count))) +
+  stat_bin2d(geom = "text", aes(label = ..count..), binwidth = 1) +
+  # facet_wrap( ~ Grass)+
+  scale_x_discrete(limits=c("B1","B6","B2","B3","B4","B5","B7","B8","B9","B10","B11","B12","B13","B14"))+
+  theme_pubr()+
+  scale_fill_gradientn(limits=c(0,36), 
+                       # breaks=seq(0, 40, by=10), 
+                       # colours=topo.colors(10, rev = T)
+                       # colours=terrain.colors(10, rev = T)
+                       # colours=topo.colors(10, rev = T)
+                       # colours=hcl.colors(7,"Dark Mint",rev = T)
+                       colours=hcl.colors(7,"Emrld",rev = T)
+                       # colours=viridis(3)
+                       # colours=cm.colors(36)
+                         )
+
+# print(chisq.test(x = sd$Bac_sor_clusters, y = sd$Fun_sor_clusters)[['p.value']])
+  
+
+# Yeah, it's perfectly acceptable for a logistic regression to contain only categorical predictors. Remember that we code categorical predictors numerically (e.g., 0 and 1, -1 and 1, etc.), so the distinction between categorical and continuous doesn't really exist for the regression.
+
+# As for how to plot the effect, I would typically use a bar plot with each bar representing the estimated probability of observing a specific outcome in that condition. These estimates can be calculated using the coefficients of the model. Remember that while a logistic regression produces estimates in logit space, with an inverse logit transformation you can turn predicted values into probabilities.
+
+# The below graph actually plots the proportions (so what was observed in the data that was subsequently analysed with a logistic regression, rather than what was estimated by the regression), but it should convey the general idea.
+  
+# Categorical variables are either there or not. One approach that comes to my mind, is to plot circles or squares whose size is proportional to your category's parameter (the 𝛽 or 𝜃). I.e in case of gender, 1 female, 0 male, then your 𝛽𝑓𝑒𝑚𝑎𝑙𝑒 might be say 0.5. Then print a circle whose radius is 0.5, and you can compare other features' importance in predicting your class. Alternatively you can use a pie chart, again to show importance. Using squares has the benefit that you can show the marginal rate of substitution too.
+```
+
+
+```{r, eval=FALSE}
+### You need several libraries
+library(circlize)
+library(migest)
+library(dplyr)
+ 
+### Make data
+m <- data.frame(order = 1:6,
+            country = c("Ausralia", "India", "China", "Japan", "Thailand", "Malaysia"),
+            V3 = c(1, 150000, 90000, 180000, 15000, 10000),
+            V4 = c(35000, 1, 10000, 12000, 25000, 8000),
+            V5 = c(10000, 7000, 1, 40000, 5000, 4000),
+            V6 = c(7000, 8000, 175000, 1, 11000, 18000),
+            V7 = c(70000, 30000, 22000, 120000, 1, 40000),
+            V8 = c(60000, 90000, 110000, 14000, 30000, 1),
+            r = c(255,255,255,153,51,51),
+            g = c(51, 153, 255, 255, 255, 255),
+            b = c(51, 51, 51, 51, 51, 153),
+            stringsAsFactors = FALSE)
+df1 <- m[, c(1,2, 9:11)]
+m <- m[,-(1:2)]/1e04
+m <- as.matrix(m[,c(1:6)])
+dimnames(m) <- list(orig = df1$country, dest = df1$country) # m is our adjcenacy matrix
+#Sort order of data.frame and matrix for plotting in circos
+df1 <- arrange(df1, order)
+df1$country <- factor(df1$country, levels = df1$country)
+m <- m[levels(df1$country),levels(df1$country)]
+ 
+ 
+### Define ranges of circos sectors and their colors (both of the sectors and the links)
+df1$xmin <- 0
+df1$xmax <- rowSums(m) + colSums(m)
+n <- nrow(df1)
+df1$rcol<-rgb(df1$r, df1$g, df1$b, max = 255)
+df1$lcol<-rgb(df1$r, df1$g, df1$b, alpha=200, max = 255)
+ 
+### Plot sectors (outer part)
+par(mar=rep(0,4))
+circos.clear()
+ 
+### Basic circos graphic parameters
+circos.par(cell.padding=c(0,0,0,0), track.margin=c(0,0.15), start.degree = 90, gap.degree =4)
+ 
+### Sector details
+circos.initialize(factors = df1$country, xlim = cbind(df1$xmin, df1$xmax))
+ 
+### Plot sectors
+circos.trackPlotRegion(ylim = c(0, 1), factors = df1$country, track.height=0.1,
+                      #panel.fun for each sector
+                      panel.fun = function(x, y) {
+                      #select details of current sector
+                      name = get.cell.meta.data("sector.index")
+                      i = get.cell.meta.data("sector.numeric.index")
+                      xlim = get.cell.meta.data("xlim")
+                      ylim = get.cell.meta.data("ylim")
+ 
+                      #text direction (dd) and adjusmtents (aa)
+                      theta = circlize(mean(xlim), 1.3)[1, 1] %% 360
+                      dd <- ifelse(theta < 90 || theta > 270, "clockwise", "reverse.clockwise")
+                      aa = c(1, 0.5)
+                      if(theta < 90 || theta > 270)  aa = c(0, 0.5)
+ 
+                      #plot country labels
+                      circos.text(x=mean(xlim), y=1.7, labels=name, facing = dd, cex=0.6,  adj = aa)
+ 
+                      #plot main sector
+                      circos.rect(xleft=xlim[1], ybottom=ylim[1], xright=xlim[2], ytop=ylim[2], 
+                                  col = df1$rcol[i], border=df1$rcol[i])
+ 
+                      #blank in part of main sector
+                      circos.rect(xleft=xlim[1], ybottom=ylim[1], xright=xlim[2]-rowSums(m)[i], ytop=ylim[1]+0.3, 
+                                  col = "white", border = "white")
+ 
+                      #white line all the way around
+                      circos.rect(xleft=xlim[1], ybottom=0.3, xright=xlim[2], ytop=0.32, col = "white", border = "white")
+ 
+                      #plot axis
+                      circos.axis(labels.cex=0.6, direction = "outside", major.at=seq(from=0,to=floor(df1$xmax)[i],by=5), 
+                                  minor.ticks=1, labels.away.percentage = 0.15)
+                    })
+ 
+### Plot links (inner part)
+### Add sum values to df1, marking the x-position of the first links
+### out (sum1) and in (sum2). Updated for further links in loop below.
+df1$sum1 <- colSums(m)
+df1$sum2 <- numeric(n)
+ 
+### Create a data.frame of the flow matrix sorted by flow size, to allow largest flow plotted first
+df2 <- cbind(as.data.frame(m),orig=rownames(m),  stringsAsFactors=FALSE)
+df2 <- reshape(df2, idvar="orig", varying=list(1:n), direction="long",
+           timevar="dest", time=rownames(m),  v.names = "m")
+df2 <- arrange(df2,desc(m))
+ 
+### Keep only the largest flows to avoid clutter
+df2 <- subset(df2, m > quantile(m,0.6))
+ 
+### Plot links
+for(k in 1:nrow(df2)){
+    #i,j reference of flow matrix
+    i<-match(df2$orig[k],df1$country)
+    j<-match(df2$dest[k],df1$country)
+ 
+#plot link
+circos.link(sector.index1=df1$country[i], point1=c(df1$sum1[i], df1$sum1[i] + abs(m[i, j])),
+            sector.index2=df1$country[j], point2=c(df1$sum2[j], df1$sum2[j] + abs(m[i, j])),
+            col = df1$lcol[i])
+ 
+#update sum1 and sum2 for use when plotting the next link
+df1$sum1[i] = df1$sum1[i] + abs(m[i, j])
+df1$sum2[j] = df1$sum2[j] + abs(m[i, j])
+}
+```
+
+
+

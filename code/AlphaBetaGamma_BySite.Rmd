@@ -1,0 +1,1711 @@
+---
+title: "Alpha beta gamma by Site"
+author: "Kelli Feeser"
+date: "`r Sys.Date()`"
+output:
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+    keep_md: yes
+  html_notebook:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+  html_document:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+\
+
+::: homelink
+<a href="https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html" target="_blank" style="text-align:right">Back to Home</a>
+:::
+
+\
+
+------------------------------------------------------------------------
+
+Document last updated: `r Sys.Date()`
+
+------------------------------------------------------------------------
+
+\
+
+# Set-up {.unlisted .unnumbered .hidden}
+
+```{r global_options, include=FALSE}
+# packages
+library(knitr)
+# library(kableExtra)
+
+# set up global R options
+  # to list the current values of all options but better to F1
+    #options()
+    # easier way:
+      #?options
+  # to access the value of a single option
+    #getOption("width")
+
+# set up knitr global chunk options
+  # See str(knitr::opts_chunk$get()) for a list of default chunk options.
+#knitr::opts_chunk$set(fig.width = 8)
+# knitr::opts_chunk$set(fig.path = "../figures/darksidea_plots/")
+#knitr::opts_chunk$set(fig.path = "figures/taxa_plots/prefix-")
+
+# How to use an object before it is created
+  # see https://bookdown.org/yihui/rmarkdown-cookbook/load-cache.html
+
+# changing from cache.path="../docs/code/BacterialFungalClusterInteractions_cache/html/") to cache.path="../docs/github_BacterialFungal_Cluster_Interactions_files/figure-html/")
+knitr::opts_chunk$set(warning = FALSE, 
+                      # echo = FALSE, message = FALSE,
+                      cache.path="../docs/github_AlphaBetaGamma_BySite_files/")
+# opts_knit$set(eval.after = "fig.cap")
+# knitr::opts_chunk$set(fig.pos = '!h')
+# options(knitr.kable.NA = '')
+
+## preload your R variables here ##
+# variable_1 <- c("a", "b", "c")
+####
+```
+
+```{r LANL-proxies, eval=T, include=FALSE}
+# LANL proxies
+Sys.setenv('HTTP_PROXY'='http://proxyout.lanl.gov:8080')
+Sys.setenv('HTTPS_PROXY'='http://proxyout.lanl.gov:8080')
+```
+
+## load packages
+
+```{r load-packages, eval=T, include=F}
+library("ggplot2"); packageVersion("ggplot2") #‘3.5.1’
+library("vegan"); packageVersion("vegan") # # ‘2.6.10’
+library("phyloseq"); packageVersion("phyloseq") #‘1.50.0’
+library("scales"); packageVersion("scales") #‘1.3.0’
+library("swatches"); packageVersion("swatches") #‘0.5.0’
+library("ggsci"); packageVersion("ggsci") #‘3.2.0’
+library("ggpubr"); packageVersion("ggpubr") #‘0.6.0’
+library("viridis"); packageVersion("viridis") #‘0.6.5’
+library("RColorBrewer"); packageVersion("RColorBrewer") #‘1.1.3’
+library("cowplot"); packageVersion("cowplot") #‘1.1.3’
+library("dplyr"); packageVersion("dplyr") #‘1.1.4’
+library("knitr"); packageVersion("knitr") #‘1.49’
+library("betapart"); packageVersion("betapart") #‘1.6’
+library("kableExtra"); packageVersion("kableExtra") #‘1.4.0’
+library("broom"); packageVersion("broom") #‘1.0.7’
+library("huxtable"); packageVersion("huxtable") #‘5.6.0’
+
+  # library(BiocManager)
+  # BiocManager::install("microbiome")
+
+
+source("ksu_colors.R")
+```
+
+\
+
+## load rds
+
+```{r load-rds, include=FALSE,eval=TRUE}
+##########
+# phylo #
+Bac_wholecommunity<-readRDS(file = "../processed_data/clean_rds_saves/Bac_wholecommunity.rds")
+Fun_wholecommunity <- readRDS(file="../processed_data/clean_rds_saves/Fun_wholecommunity.rds")
+##########
+
+##########
+# nmds #
+Bac_wc_sor_k5.ord <- readRDS(file = "../processed_data/clean_rds_saves/Bac_wc_sor_k5.ord.rds")
+Fun_wc_sor_k4.ord <- readRDS(file = "../processed_data/clean_rds_saves/Fun_wc_sor_k4.ord.rds")
+##########
+
+
+##########
+# misc #
+Bac_wholecommunity.r<-readRDS(file = "../processed_data/clean_rds_saves/Bac_wholecommunity.r.rds")
+Fun_wholecommunity.r<-readRDS(file = "../processed_data/clean_rds_saves/Fun_wholecommunity.r.rds")
+sd<-as(sample_data(Fun_wholecommunity), "data.frame") # metadata for phyloseq
+##########
+
+
+
+
+##########
+# colors #
+col_n14 <- c("B1"="#730025","B2"="#AF0039","B3"="#E8004C","B4"="#FF65A3","B5"="#9E4D97",
+             "B6"="#4D42B3","B7"="#7678ed","B8"="#5B7898","B9"="#17A398","B10"="#74A57F",
+             "B11"="#B6AF40","B12"="#f7b801", "B13"="#f18701", "B14"="#f35b04")
+# creation: https://coolors.co/730025-AF0039-E8004C-FF65A3-9E4D97-4D42B3-7678ed-5B7898-17A398-74A57F-B6AF40-f7b801-f18701-f35b04
+
+
+col_n10 <- c("F1"="#8E0152","F2"="#C51B7D","F3"="#DE77AE","F4"="#F1B6DA","F5"="#C5C2EA",
+             "F6"="#8DC9BB","F7"="#86C37E","F8"="#7FBC41","F9"="#4D9221","F10"="#276419")
+             
+                 # "#DBBCE2","F6"="#E6F5D0","F7"="#B8E186","F8"="#7FBC41","F9"="#4D9221","F10"="#276419")
+
+             # "#B77EBE","#B0AFDF","#92CDC8","#7BB990","#EFBC9B","#DBA8AC"
+
+# creation: https://coolors.co/8e0152-c51b7d-de77ae-f1b6da-c5c2ea-a8e0ff-8dc9bb-7fbc41-4d9221-276419
+# col_clusn10 <- c("F1"="#8E0152","F2"="#C51B7D","F3"="#DE77AE","F4"="#F1B6DA","F5"="#FDE0EF",
+#                 "F6"="#E6F5D0","F7"="#B8E186","F8"="#7FBC41","F9"="#4D9221","F10"="#276419")
+
+# change "F5"="#FDE0EF" to "#C5C2EA",
+  # "F6"="#E6F5D0" to "#8DC9BB", 
+  # "F7"="#B8E186" to "#86C37E"
+
+# latlong_cols<-readRDS(file = "../processed_data/clean_rds_saves/latlong_cols.rds")
+Site_colors_list<-readRDS(file = "../processed_data/clean_rds_saves/Site_colors_list_fixed.rds")
+names(Site_colors_list)
+latlong_sitenames<-Site_colors_list$latlong_sitenames
+color_latlong_mapping<-Site_colors_list$color_latlong_mapping
+latlong_cols<-Site_colors_list$latlong_cols
+site_levels<-Site_colors_list$site_levels_orderedfactor
+bac_grass_cols<-c("#96A13A", "#994f0b", "#537D8D", "#21295C", "#90708C")
+##########
+
+# write.csv(sd, file = "../processed_data/combined_metadata_Jul2024.csv")
+
+# to edit and save sample data see RAM_bulk_harvester.R ----
+
+# add # grass hosts per site and BF clusters to metadata
+# sample_data(Fun_wholecommunity)$ngrass_persite <- ave(as.numeric(factor(sample_data(Fun_wholecommunity)$Grass)), sample_data(Fun_wholecommunity)$Site, FUN = function(x) length(unique(x)))
+# 
+# sample_data(Fun_wholecommunity)$ngrass_perFun_sor_clusters <- ave(as.numeric(factor(sample_data(Fun_wholecommunity)$Grass)), sample_data(Fun_wholecommunity)$Fun_sor_clusters, FUN = function(x) length(unique(x)))
+# 
+# sample_data(Fun_wholecommunity)$ngrass_perBac_sor_clusters <- ave(as.numeric(factor(sample_data(Fun_wholecommunity)$Grass)), sample_data(Fun_wholecommunity)$Bac_sor_clusters, FUN = function(x) length(unique(x)))
+# 
+# 
+# sample_data(Bac_wholecommunity)$ngrass_persite <- ave(as.numeric(factor(sample_data(Bac_wholecommunity)$Grass)), sample_data(Bac_wholecommunity)$Site, FUN = function(x) length(unique(x)))
+# 
+# sample_data(Bac_wholecommunity)$ngrass_perFun_sor_clusters <- ave(as.numeric(factor(sample_data(Bac_wholecommunity)$Grass)), sample_data(Bac_wholecommunity)$Fun_sor_clusters, FUN = function(x) length(unique(x)))
+# 
+# sample_data(Bac_wholecommunity)$ngrass_perBac_sor_clusters <- ave(as.numeric(factor(sample_data(Bac_wholecommunity)$Grass)), sample_data(Bac_wholecommunity)$Bac_sor_clusters, FUN = function(x) length(unique(x)))
+
+# add n samples per site
+# sample_data(Bac_wholecommunity)$nsamples_per_Site <- ave(as.numeric(factor(sample_data(Bac_wholecommunity)$SampleID)), sample_data(Bac_wholecommunity)$Site, FUN = function(x) length(unique(x)))
+
+# sample_data(Fun_wholecommunity)$nsamples_per_Site <- ave(as.numeric(factor(sample_data(Fun_wholecommunity)$SampleID)), sample_data(Fun_wholecommunity)$Site, FUN = function(x) length(unique(x)))
+
+# add site gamma
+# sample_data(Bac_wholecommunity)$Bac_gamma_Site <- as.numeric(bwc_alpha_Site$Bac_gamma_Site)
+
+# sample_data(Bac_wholecommunity)$Fun_gamma_Site <- as.numeric(fwc_alpha_Site$Fun_gamma_Site)
+
+# sample_data(Fun_wholecommunity)$Bac_gamma_Site <- as.numeric(bwc_alpha_Site$Bac_gamma_Site)
+
+# sample_data(Fun_wholecommunity)$Fun_gamma_Site <- as.numeric(fwc_alpha_Site$Fun_gamma_Site)
+
+master_sample_mapper <- as.data.frame(cbind(
+  Fun_rowname = rownames(sample_data(Fun_wholecommunity)), 
+  Fun_X16S_ID = sample_data(Fun_wholecommunity)$X16S_ID, 
+  Fun_ITS_ID = sample_data(Fun_wholecommunity)$ITS_ID, 
+  Fun_sample_name = sample_data(Fun_wholecommunity)$sample_name, 
+  Bac_rowname = rownames(sample_data(Bac_wholecommunity)), 
+  Bac_X16S_ID = sample_data(Bac_wholecommunity)$X16S_ID, 
+  Bac_ITS_ID = sample_data(Bac_wholecommunity)$ITS_ID,
+  Bac_sample_name = sample_data(Bac_wholecommunity)$sample_name))
+
+
+# check_richness_merge_match_type ----
+check_richness_merge_match_type <- function(physeq_obj, richness_phylobj) {
+  richness_df <- estimate_richness(richness_phylobj)
+  richness_ids <- rownames(richness_df)
+  
+  sample_df <- as(sample_data(physeq_obj), "data.frame")
+  
+  if (all(richness_ids %in% rownames(sample_df))) {
+    match_type <- "rownames"
+  } else if ("X16S_ID" %in% colnames(sample_df) &&
+             all(richness_ids %in% sample_df$X16S_ID)) {
+    match_type <- "X16S_ID"
+  } else if ("ITS_ID" %in% colnames(sample_df) &&
+             all(richness_ids %in% sample_df$ITS_ID)) {
+    match_type <- "ITS_ID"
+  } else {
+    match_type <- "no match"
+  }
+  
+  cat("Best match type for richness merge:", match_type, "\n")
+}
+# library(dplyr)
+# check_richness_merge_match_type(Fun_wholecommunity, richness_phylobj = Bac_wholecommunity)
+# check_richness_merge_match_type(Bac_wholecommunity, richness_phylobj = Fun_wholecommunity)
+# ENDcheck_richness_merge_match_type ----
+
+
+# add add_crosskingdom_richness / alpha div ----
+# library(dplyr)
+# colnames(sample_data(Fun_wholecommunity1))
+# Fun_wholecommunity1<-Fun_wholecommunity
+# Bac_wholecommunity1<-Bac_wholecommunity
+
+# add_crosskingdom_richness ----
+add_crosskingdom_richness <- function(physeq_obj, richness_phylobj, prefix) {
+  # richness_phylobj <- Bac_wholecommunity1
+  # richness_phylobj <- Bac_wholecommunity1
+  richness_df <- estimate_richness(richness_phylobj)
+  cat("first richness_df rownames:", head(rownames(richness_df)), "\n")
+  richness_ids <- rownames(richness_df)
+  # cat("first richness_ids", head(richness_ids), "\n")
+  richness_df$Richness_ID <- rownames(richness_df)
+  colnames(richness_df) <- paste0(prefix, colnames(richness_df))
+  cat("richness_df column names", colnames(richness_df), "\n")
+  
+  sample_df <- as(sample_data(physeq_obj), "data.frame")
+  sample_df$SampleRow <- rownames(sample_df)  # preserve original rownames
+  cat("first sample_df rownames:", head(sample_df$SampleRow), "\n")
+  
+  # check match type/merge column
+  match_type <- NULL
+  if (all(richness_ids %in% rownames(sample_df))) {
+    match_type <- "rownames"
+  } else if ("X16S_ID" %in% colnames(sample_df) &&
+             all(richness_ids %in% sample_df$X16S_ID)) {
+    match_type <- "X16S_ID"
+  } else if ("ITS_ID" %in% colnames(sample_df) &&
+             all(richness_ids %in% sample_df$ITS_ID)) {
+    match_type <- "ITS_ID"
+  } else {
+    match_type <- "no match"
+  }
+  
+  cat("Best match type for richness merge:", match_type, "\n")
+  
+  # merge richness to sample df
+  if (match_type == "rownames") {
+    merged_df <- cbind(sample_df, richness_df[rownames(sample_df), , drop = FALSE])
+  } else if (match_type == "X16S_ID") {
+    merged_df <- merge(sample_df, richness_df, by.x = "X16S_ID", by.y = "Bac_Richness_ID", all.x = TRUE)
+    rownames(merged_df) <- merged_df$SampleRow
+  } else if (match_type == "ITS_ID") {
+    merged_df <- merge(sample_df, richness_df, by.x = "ITS_ID", by.y = "Fun_Richness_ID", all.x = TRUE)
+    rownames(merged_df) <- merged_df$SampleRow
+  } else {
+    stop("Houston, we have a problem!")
+  }
+  
+  # Clean up and assign new sample_data
+  merged_df$SampleRow <- NULL
+  sample_data(physeq_obj) <- sample_data(merged_df)
+
+  message("Richness data merged using: ", match_type)
+  return(physeq_obj)
+
+}
+
+# colnames(sample_data(Bac_wholecommunity1))
+# colnames(sample_data(Fun_wholecommunity1))
+# Fun_wholecommunity1<-Fun_wholecommunity
+# Bac_wholecommunity1<-Bac_wholecommunity
+
+# # add Fun richness
+# Fun_wholecommunity1 <- add_crosskingdom_richness(Fun_wholecommunity1, richness_phylobj = Fun_wholecommunity1, "Fun_")
+# colnames(sample_data(Fun_wholecommunity1))
+# Bac_wholecommunity1 <- add_crosskingdom_richness(Bac_wholecommunity1, richness_phylobj = Fun_wholecommunity1, "Fun_")
+# colnames(sample_data(Bac_wholecommunity1))
+# 
+# # add Bac richness
+# Fun_wholecommunity1 <- add_crosskingdom_richness(Fun_wholecommunity1, richness_phylobj = Bac_wholecommunity1, "Bac_")
+# colnames(sample_data(Fun_wholecommunity1))
+# Bac_wholecommunity1 <- add_crosskingdom_richness(Bac_wholecommunity1, richness_phylobj = Bac_wholecommunity1, "Bac_")
+# colnames(sample_data(Bac_wholecommunity1))
+# 
+# Bac_wholecommunity <- Bac_wholecommunity1
+# Fun_wholecommunity <- Fun_wholecommunity1
+# ENDadd_crosskingdom_richness ----
+
+
+## save ----
+# saveRDS(Bac_wholecommunity,file = "../processed_data/clean_rds_saves/Bac_wholecommunity.rds")
+# saveRDS(Fun_wholecommunity,file="../processed_data/clean_rds_saves/Fun_wholecommunity.rds")
+## ENDsave ----
+
+
+## rel abund ----
+# Fun_wholecommunity.r  = transform_sample_counts(Fun_wholecommunity, function(x) x / sum(x) )
+# Bac_wholecommunity.r  = transform_sample_counts(Bac_wholecommunity, function(x) x / sum(x) )
+
+# saveRDS(Bac_wholecommunity.r,file = "../processed_data/clean_rds_saves/Bac_wholecommunity.r.rds")
+# saveRDS(Fun_wholecommunity.r,file="../processed_data/clean_rds_saves/Fun_wholecommunity.r.rds")
+## ENDrel abund ----
+
+# colnames(sample_data(Bac_wholecommunity))
+# colnames(sample_data(Fun_wholecommunity))
+```
+
+\
+
+# Regional species pool: 𝛄 - Gamma diversity of sites ($\gamma_{site}$) and species richness ($\alpha_{site}$)
+
+\
+\
+
+## Calculate site gamma ($\gamma_{site}$) {.hidden .unlisted .unnumbered}
+
+```{r gamma-Bac-calc-site, echo=FALSE, eval=TRUE, cache=TRUE}
+bwc_alpha_Site <- data.frame(sample_data(Bac_wholecommunity),
+                        estimate_richness(Bac_wholecommunity))
+
+# add Site gamma to *wc_alpha_Site
+if (!"Bac_gamma_Site" %in% colnames(bwc_alpha_Site)) { bwc_alpha_Site <- bwc_alpha_Site %>% left_join(data.frame("Site" = names(Bac_gamma_Site), "Bac_gamma_Site" = Bac_gamma_Site), by = "Site") }
+
+# add sample number per site
+if (!"nsamples_per_Site" %in% colnames(bwc_alpha_Site)) {
+  bwc_alpha_Site$nsamples_per_Site <- ave(as.numeric(factor(bwc_alpha_Site$SampleID)), bwc_alpha_Site$Site, FUN = function(x) length(unique(x)))
+}
+
+# add gamma_over_n per site
+if (!"Bac_Gamma_over_n" %in% colnames(bwc_alpha_Site)) {
+  bwc_alpha_Site$Bac_Gamma_over_n <- (bwc_alpha_Site$Bac_gamma_Site / bwc_alpha_Site$nsamples_per_Site)
+}
+
+Bac_gamma_Site<-vegan::specnumber(phylo2vegan_OTU(Bac_wholecommunity),
+                  groups = phylo2vegan_sd(Bac_wholecommunity)$Site,
+                  MARGIN=1) # MARGIN = 1, finds # of species; MARGIN = 2, finds frequencies of species
+
+Bac_gamma_Site2<-prettyNum(Bac_gamma_Site,big.mark = ',')
+
+Bac_gamma_Site2<-cbind(prettyNum(Bac_gamma_Site,big.mark = ','),
+  (as.data.frame(attr(md_bwc_Site, "n"))[,2]))
+  
+# mean observed alpha by Site
+Bac_obs_mean_alpha<-aggregate(Observed~Site,bwc_alpha_Site,mean)
+
+# obs/site gamma
+bwc_alpha_Site$Obs_overSitegamma<-bwc_alpha_Site$Observed/bwc_alpha_Site$Bac_gamma_Site
+
+Bac_Obs_overSitegamma_mean<-aggregate(Obs_overSitegamma~Site,bwc_alpha_Site,mean)
+
+Bac_Obs_overSitegamma_sd<-as.data.frame(aggregate(bwc_alpha_Site$Obs_overSitegamma, list(bwc_alpha_Site$Site), FUN=sd))
+colnames(Bac_Obs_overSitegamma_sd)[1]<-"Site"
+colnames(Bac_Obs_overSitegamma_sd)[2]<-"Obs_overSitegamma_sd"
+
+# add sd to mean of prop gamma per sample by Site 
+Bac_Obs_overSitegamma_mean2<-cbind(Bac_Obs_overSitegamma_mean,"Obs_overSitegamma_sd"=Bac_Obs_overSitegamma_sd$Obs_overSitegamma_sd)
+colnames(Bac_Obs_overSitegamma_mean2)[2]<-"Obs_overSitegamma_mean"
+
+# aggregate # of grass hosts per site
+ngrass_persite.df<-aggregate(ngrass_persite~Site,sd,mean)
+
+# aggregate gamma_over_n
+Bac_Gamma_over_n_persite.df<-aggregate(Bac_Gamma_over_n~Site,bwc_alpha_Site,mean)
+
+
+# Bac_gamma_SiteFREQ<-vegan::specnumber(phylo2vegan_OTU(Bac_wholecommunity),
+#                   groups = phylo2vegan_sd(Bac_wholecommunity)$Site,
+#                   MARGIN=2) # MARGIN = 1, finds # of species; MARGIN = 2, finds frequencies of species
+
+# does BLM have 4689 unique otus?
+# BLM<-subset_samples(Bac_wholecommunity,Site=="BLM")
+# BLM <- prune_taxa(taxa_sums(BLM) > 0, BLM)
+
+
+Bac_gamma_Site3temp<-as.data.frame(
+  cbind("Gamma (# total unique OTUs)" = Bac_gamma_Site,
+        "ngrass_persite" = as.numeric(ngrass_persite.df$ngrass_persite),
+        "n (# of samples per site)"=(as.data.frame(attr(md_bwc_Site, "n"))[,2]),
+        "Gamma_over_n" = as.numeric(round(Bac_Gamma_over_n_persite.df$Bac_Gamma_over_n,1)),
+        "Observed mean 𝝰" = as.numeric(round(Bac_obs_mean_alpha$Observed,1)),
+        "mean prop. of gamma / sample" = as.numeric(Bac_Obs_overSitegamma_mean2$Obs_overSitegamma_mean),
+        "sd prop. of gamma / sample" = as.numeric(Bac_Obs_overSitegamma_mean2$Obs_overSitegamma_sd)
+        )
+)
+
+Bac_gamma_Site3<-cbind("Gamma (# total unique OTUs)"=Bac_gamma_Site2[,1],
+                       "n (# of samples per site)"=(as.data.frame(attr(md_bwc_Site, "n"))[,2]),
+                       "# of grass hosts per site" = Bac_gamma_Site3temp$ngrass_persite,
+                       "Gamma / n" = prettyNum(Bac_gamma_Site3temp$Gamma_over_n, big.mark = ","),
+                       "Observed mean 𝝰" = prettyNum(Bac_gamma_Site3temp$`Observed mean 𝝰`,big.mark = ","),
+                       "mean prop. of gamma detected per sample" = round(Bac_gamma_Site3temp$`mean prop. of gamma / sample`,3),
+                       "SD prop. of gamma detected per sample" = round(Bac_gamma_Site3temp$`sd prop. of gamma / sample`,3)
+  )
+```
+
+```{r gamma-Fun-calc-site, echo=FALSE, eval=TRUE, cache=TRUE}
+fwc_alpha_Site <- data.frame(sample_data(Fun_wholecommunity),
+                        estimate_richness(Fun_wholecommunity))
+
+# add Site gamma to *wc_alpha_Site
+if (!"Fun_gamma_Site" %in% colnames(fwc_alpha_Site)) { fwc_alpha_Site <- fwc_alpha_Site %>% left_join(data.frame("Site" = names(Fun_gamma_Site), "Fun_gamma_Site" = Fun_gamma_Site), by = "Site") }
+
+# add sample number per site
+if (!"nsamples_per_Site" %in% colnames(fwc_alpha_Site)) {
+  fwc_alpha_Site$nsamples_per_Site <- ave(as.numeric(factor(fwc_alpha_Site$SampleID)), fwc_alpha_Site$Site, FUN = function(x) length(unique(x)))
+}
+
+# add gamma_over_n per site
+if (!"Fun_Gamma_over_n" %in% colnames(fwc_alpha_Site)) {
+  fwc_alpha_Site$Fun_Gamma_over_n <- (fwc_alpha_Site$Fun_gamma_Site / fwc_alpha_Site$nsamples_per_Site)
+}
+
+Fun_gamma_Site<-vegan::specnumber(phylo2vegan_OTU(Fun_wholecommunity),
+                  groups = phylo2vegan_sd(Fun_wholecommunity)$Site,
+                  MARGIN=1) # MARGIN = 1, finds # of species; MARGIN = 2, finds frequencies of species
+
+Fun_gamma_Site2<-prettyNum(Fun_gamma_Site,big.mark = ',')
+
+Fun_gamma_Site2<-cbind(prettyNum(Fun_gamma_Site,big.mark = ','),
+  (as.data.frame(attr(md_Fwc_Site, "n"))[,2]))
+  
+# mean observed alpha by Site
+Fun_obs_mean_alpha<-aggregate(Observed~Site,fwc_alpha_Site,mean)
+
+# obs/site gamma
+fwc_alpha_Site$Obs_overSitegamma<-fwc_alpha_Site$Observed/fwc_alpha_Site$Fun_gamma_Site
+
+Fun_Obs_overSitegamma_mean<-aggregate(Obs_overSitegamma~Site,fwc_alpha_Site,mean)
+
+Fun_Obs_overSitegamma_sd<-as.data.frame(aggregate(fwc_alpha_Site$Obs_overSitegamma, list(fwc_alpha_Site$Site), FUN=sd))
+colnames(Fun_Obs_overSitegamma_sd)[1]<-"Site"
+colnames(Fun_Obs_overSitegamma_sd)[2]<-"Obs_overSitegamma_sd"
+
+# add sd to mean of prop gamma per sample by Site 
+Fun_Obs_overSitegamma_mean2<-cbind(Fun_Obs_overSitegamma_mean,"Obs_overSitegamma_sd"=Fun_Obs_overSitegamma_sd$Obs_overSitegamma_sd)
+colnames(Fun_Obs_overSitegamma_mean2)[2]<-"Obs_overSitegamma_mean"
+
+# aggregate # of grass hosts per site
+ngrass_persite.df<-aggregate(ngrass_persite~Site,sd,mean)
+
+# aggregate gamma_over_n
+Fun_Gamma_over_n_persite.df<-aggregate(Fun_Gamma_over_n~Site,fwc_alpha_Site,mean)
+
+# Fun_gamma_SiteFREQ<-vegan::specnumber(phylo2vegan_OTU(Fun_wholecommunity),
+#                   groups = phylo2vegan_sd(Fun_wholecommunity)$Site,
+#                   MARGIN=2) # MARGIN = 1, finds # of species; MARGIN = 2, finds frequencies of species
+
+# does BLM have 983 unique otus?
+# BLM<-subset_samples(Fun_wholecommunity,Site=="BLM")
+# BLM <- prune_taxa(taxa_sums(BLM) > 0, BLM)
+
+
+Fun_gamma_Site3temp<-as.data.frame(
+  cbind("Gamma (# total unique OTUs)" = Fun_gamma_Site,
+        "ngrass_persite" = as.numeric(ngrass_persite.df$ngrass_persite),
+        "n (# of samples per site)"=(as.data.frame(attr(md_Fwc_Site, "n"))[,2]),
+        "Gamma_over_n" = as.numeric(round(Fun_Gamma_over_n_persite.df$Fun_Gamma_over_n,1)),
+        "Observed mean 𝝰" = as.numeric(round(Fun_obs_mean_alpha$Observed,1)),
+        "mean prop. of gamma / sample" = as.numeric(Fun_Obs_overSitegamma_mean2$Obs_overSitegamma_mean),
+        "sd prop. of gamma / sample" = as.numeric(Fun_Obs_overSitegamma_mean2$Obs_overSitegamma_sd)
+        )
+)
+
+Fun_gamma_Site3<-cbind("Gamma (# total unique OTUs)"=Fun_gamma_Site2[,1],
+                       "n (# of samples per site)"=(as.data.frame(attr(md_Fwc_Site, "n"))[,2]),
+                       "# of grass hosts per site" = Fun_gamma_Site3temp$ngrass_persite,
+                       "Gamma / n" = prettyNum(Fun_gamma_Site3temp$Gamma_over_n, big.mark = ","),
+                       "Observed mean 𝝰" = prettyNum(Fun_gamma_Site3temp$`Observed mean 𝝰`,big.mark = ","),
+                       "mean prop. of gamma detected per sample" = round(Fun_gamma_Site3temp$`mean prop. of gamma / sample`,3),
+                       "SD prop. of gamma detected per sample" = round(Fun_gamma_Site3temp$`sd prop. of gamma / sample`,3)
+  )
+```
+
+\
+
+## BvF summary stats
+
+```{r diversity-summary-inline-group-labels, echo=F, message=FALSE, warning=FALSE}
+
+compare_symbol <- function(bac, fun, tol = 1e-6) {
+  if (abs(bac - fun) < tol) "=" else if (bac > fun) ">" else "<"
+}
+
+# Raw data
+bac_vals <- list(
+  gamma = Bac_gamma_Site,
+  alpha = bwc_alpha_Site$Observed,
+  mean_alpha = Bac_obs_mean_alpha$Observed
+)
+
+fun_vals <- list(
+  gamma = Fun_gamma_Site,
+  alpha = fwc_alpha_Site$Observed,
+  mean_alpha = Fun_obs_mean_alpha$Observed
+)
+
+# Function to generate summary rows
+make_rows <- function(label, bac_vec, fun_vec, digits_range = 1, digits_mean = 0, digits_sd = 0) {
+  tibble(
+    Metric = c("min", "max", "mean ± sd"),
+    Bacteria = c(
+      round(min(bac_vec), digits_range),
+      round(max(bac_vec), digits_range),
+      paste0(round(mean(bac_vec), digits_mean), " ± ", round(sd(bac_vec), digits_sd))
+    ),
+    `B > F` = c(
+      compare_symbol(min(bac_vec), min(fun_vec)),
+      compare_symbol(max(bac_vec), max(fun_vec)),
+      compare_symbol(mean(bac_vec), mean(fun_vec))
+    ),
+    Fungi = c(
+      round(min(fun_vec), digits_range),
+      round(max(fun_vec), digits_range),
+      paste0(round(mean(fun_vec), digits_mean), " ± ", round(sd(fun_vec), digits_sd))
+    )
+  ) %>%
+    add_row(Metric = paste0("**_", label, "_**"), Bacteria = "", `B > F` = "", Fungi = "", .before = 1)
+}
+
+# Combine all rows
+diversity_table <- bind_rows(
+  make_rows("γ<sub>site</sub> diversity", bac_vals$gamma, fun_vals$gamma, digits_range = 0),
+  make_rows("Sample-level α", bac_vals$alpha, fun_vals$alpha, digits_range = 0),
+  make_rows("Site mean α", bac_vals$mean_alpha, fun_vals$mean_alpha, digits_range = 0)
+)
+
+# Final table
+diversity_table %>%
+  kable(format = "html", escape = FALSE, align = c("l", "c", "c", "c"),
+        caption = "Summary of Alpha and Gamma Diversity Metrics by Kingdom") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
+  column_spec(2:4, extra_css = "text-align: center;")
+```
+
+
+\
+\
+
+## Tables of gamma and alpha diversity metrics with derived measures by Site for Bacteria and Fungi {.tabset .tabset-pills}
+
+\
+
+### Bacteria-Archaea
+
+\
+
+```{r, echo=TRUE,message=TRUE,eval=TRUE}
+Bac_gamma_Site3 %>%
+  kbl(caption = "Gamma diversity of sites: bacteria",
+            align = 'c',
+      # col.names = c("Number of OTUs","Number of samples")
+      # ,format.args = format(list(big.mark = ',', digit))
+      ) %>%
+  kable_styling() %>%
+  scroll_box(width = "90%", height = "250px")
+```
+
+
+\
+\
+
+### Fungi
+
+\
+
+```{r, echo=TRUE,message=TRUE,eval=TRUE}
+Fun_gamma_Site3 %>%
+  kbl(caption = "Gamma diversity of sites: fungi",
+            align = 'c',
+      # col.names = c("Number of OTUs","Number of samples")
+
+      # ,format.args = format(list(big.mark = ',', digit))
+      ) %>%
+  kable_styling() %>%
+  scroll_box(width = "90%", height = "250px")
+```
+
+\
+\
+
+
+# Mean beta dissimilarities by Site
+
+\
+
+## Background 
+
+\
+
+If two groups of sampling units are truly different (e.g. in their species composition), then average of the within-group compositional dissimilarities should be less than the average of the dissimilarities between two random collection of sampling units drawn from the entire population.\
+
+**Within-group (Site) values should be << the overall/global average if true difference in location (differences in mean *or* dispersion) exists.**\
+
+This difference may be one of location (differences in mean) or one of spread (differences in within-group distance). That is, it may find a significant difference between two groups simply because one of those groups has a greater dissimilarities among its sampling units.\
+\
+
+
+```{r mean-diss-bySite-Bac-NEW, include=FALSE,eval=TRUE, cache=TRUE}
+Bac_wc_sorensen_distmat <- as.matrix(betapart::beta.pair(vegan::decostand(phylo2vegan_OTU(Bac_wholecommunity), method = "pa"), index.family = "sorensen")$beta.sor)
+
+Bac_wc_sorensen_dist<-as.dist(Bac_wc_sorensen_distmat)
+
+# Function meandist calculates a matrix of mean within-cluster dissimilarities (diagonal) and between-cluster dissimilarities (off-diagonal elements), and an attribute n of grouping counts. 
+md_Bwc_Site<-meandist(Bac_wc_sorensen_dist, 
+                      phylo2vegan_sd(Bac_wholecommunity)$Site)
+
+md_Bwc_Site.r <- round(md_Bwc_Site,digits = 3)
+
+# Diagonal elements = mean within-group dissimilarity
+  # extract the diagonals directly from matrix, preserving names in 
+  # vectorized output
+  md_Bwc_Site.df.self <- diag(md_Bwc_Site.r)
+
+# Off-diagonals = mean between-group dissimilarity
+  md_Bwc_Site.df.noself <- md_Bwc_Site.r
+  diag(md_Bwc_Site.df.noself) <- NA
+  md_Bwc_Site.df.noself_vec <- as.vector(md_Bwc_Site.df.noself)
+
+### not needed?
+# md_Bwc_Site.df <- as.data.frame(unclass(md_Bwc_Site.r))
+
+# md_Bwc_Site.df.noself <- as.matrix(md_Bwc_Site.df)
+# md_Bwc_Site.df.self <- diag(md_Bwc_Site.df.noself)
+# md_bwc_self <- md_Bwc_Site.df.self
+# min(md_bwc_self)
+# max(md_bwc_self)
+
+# diag(md_Bwc_Site.df.noself) <- "NA"
+# md_Bwc_Site.df.noself <- as.numeric(md_Bwc_Site.df.noself)
+# min(md_Bwc_Site.df.noself, na.rm=T)
+# max(md_Bwc_Site.df.noself, na.rm=T)
+
+#mrpp
+#  mrpp() decides whether it needs to calculate the dissimilarity matrix based on the class of the object identified with the dat argument.  If the object is not of class ‘dist’, mrpp() calls vegdist()
+# str(md_bwc_Site.r)
+# summary(md_bwc_Site)
+```
+
+```{r mean-diss-bySite-Fun-NEW, include=FALSE,eval=TRUE, cache=TRUE}
+Fun_wc_sorensen_distmat <- as.matrix(beta.pair(decostand(phylo2vegan_OTU(Fun_wholecommunity), method = "pa"), index.family = "sorensen")$beta.sor)
+
+Fun_wc_sorensen_dist<-as.dist(Fun_wc_sorensen_distmat)
+
+# Function meandist calculates a matrix of mean within-cluster dissimilarities (diagonal) and between-cluster dissimilarities (off-diagonal elements), and an attribute n of grouping counts. 
+md_Fwc_Site<-meandist(Fun_wc_sorensen_dist, 
+                      phylo2vegan_sd(Fun_wholecommunity)$Site)
+
+md_Fwc_Site.r <- round(md_Fwc_Site,digits = 3)
+
+# Diagonal elements = mean within-group dissimilarity
+  # extract the diagonals directly from matrix, preserving names in 
+  # vectorized output
+  md_Fwc_Site.df.self <- diag(md_Fwc_Site.r)
+
+# Off-diagonals = mean between-group dissimilarity
+  md_Fwc_Site.df.noself <- md_Fwc_Site.r
+  diag(md_Fwc_Site.df.noself) <- NA
+  md_Fwc_Site.df.noself_vec <- as.vector(md_Fwc_Site.df.noself)
+
+### not needed?
+# md_Fwc_Site.df <- as.data.frame(unclass(md_Fwc_Site.r))
+
+# md_Fwc_Site.df.noself <- as.matrix(md_Fwc_Site.df)
+# md_Fwc_Site.df.self <- diag(md_Fwc_Site.df.noself)
+# md_Fwc_self <- md_Fwc_Site.df.self
+# min(md_Fwc_self)
+# max(md_Fwc_self)
+
+# diag(md_Fwc_Site.df.noself) <- "NA"
+# md_Fwc_Site.df.noself <- as.numeric(md_Fwc_Site.df.noself)
+# min(md_Fwc_Site.df.noself, na.rm=T)
+# max(md_Fwc_Site.df.noself, na.rm=T)
+
+#mrpp
+#  mrpp() decides whether it needs to calculate the dissimilarity matrix based on the class of the object identified with the dat argument.  If the object is not of class ‘dist’, mrpp() calls vegdist()
+# str(md_Fwc_Site.r)
+# summary(md_Fwc_Site)
+```
+
+
+```{r REMOVE?mean-diss-bySite-Bac, include=FALSE,eval=TRUE, cache=TRUE}
+Bac_wc_sorensen_distmat <- as.matrix(beta.pair(decostand(phylo2vegan_OTU(Bac_wholecommunity), method = "pa"), index.family = "sorensen")$beta.sor)
+
+Bac_wc_sorensen_dist<-as.dist(Bac_wc_sorensen_distmat)
+
+# Function meandist calculates a matrix of mean within-cluster dissimilarities (diagonal) and between-cluster dissimilarities (off-diagonal elements), and an attribute n of grouping counts. 
+md_bwc_Site<-meandist(Bac_wc_sorensen_dist, phylo2vegan_sd(Bac_wholecommunity)$Site)
+
+md_bwc_Site.r <- round(md_bwc_Site,digits = 3)
+
+md_bwc_Site.df<-as.data.frame(unclass(md_bwc_Site.r))
+
+md_bwc_Site.df.noself <- as.matrix(md_bwc_Site.df)
+md_bwc_Site.df.self <- diag(md_bwc_Site.df.noself)
+md_bwc_self <- md_bwc_Site.df.self
+# min(md_bwc_self)
+# max(md_bwc_self)
+
+diag(md_bwc_Site.df.noself) <- "NA"
+md_bwc_Site.df.noself<-as.numeric(md_bwc_Site.df.noself)
+# min(md_bwc_Site.df.noself, na.rm=T)
+# max(md_bwc_Site.df.noself, na.rm=T)
+
+#mrpp
+#  mrpp() decides whether it needs to calculate the dissimilarity matrix based on the class of the object identified with the dat argument.  If the object is not of class ‘dist’, mrpp() calls vegdist()
+# str(md_bwc_Site)
+```
+
+
+```{r REMOVE?mean-diss-bySite-Fun, include=FALSE,eval=TRUE, cache=TRUE}
+Fun_wc_sorensen_distmat <- as.matrix(beta.pair(decostand(phylo2vegan_OTU(Fun_wholecommunity), method = "pa"), index.family = "sorensen")$beta.sor)
+
+Fun_wc_sorensen_dist<-as.dist(Fun_wc_sorensen_distmat)
+
+# Function meandist calculates a matrix of mean within-cluster dissimilarities (diagonal) and between-cluster dissimilarities (off-diagonal elements), and an attribute n of grouping counts. 
+md_Fwc_Site<-meandist(Fun_wc_sorensen_dist, phylo2vegan_sd(Fun_wholecommunity)$Site)
+
+md_Fwc_Site.r <- round(md_Fwc_Site,digits = 3)
+
+md_Fwc_Site.df<-as.data.frame(unclass(md_Fwc_Site.r))
+
+md_Fwc_Site.df.noself <- as.matrix(md_Fwc_Site.df)
+md_Fwc_Site.df.self <- diag(md_Fwc_Site.df.noself)
+md_Fwc_self <- md_Fwc_Site.df.self
+# min(md_Fwc_self)
+# max(md_Fwc_self)
+
+diag(md_Fwc_Site.df.noself) <- "NA"
+md_Fwc_Site.df.noself<-as.numeric(md_Fwc_Site.df.noself)
+# min(md_Fwc_Site.df.noself, na.rm=T)
+# max(md_Fwc_Site.df.noself, na.rm=T)
+```
+
+\
+
+## Bacterial vs. fungal mean dissimilarity by Site
+
+```{r compare-meandist-summary, echo=TRUE, message=FALSE, warning=FALSE}
+# Extract summaries
+sum_bac <- summary(md_bwc_Site)
+sum_fun <- summary(md_Fwc_Site)
+
+# Extract key values
+mean_bac_within <- round(sum_bac$W, 4)
+mean_fun_within <- round(sum_fun$W, 4)
+mean_bac_between <- round(sum_bac$B, 4)
+mean_fun_between <- round(sum_fun$B, 4)
+mean_bac_overall <- round(sum_bac$D, 4)
+mean_fun_overall <- round(sum_fun$D, 4)
+
+# Comparison symbol
+compare_symbol <- function(bac, fun, tol = 1e-6) {
+  if (abs(bac - fun) < tol) {
+    "="
+  } else if (bac > fun) {
+    ">"
+  } else {
+    "<"
+  }
+}
+
+comp_col <- c(
+  compare_symbol(mean_bac_within, mean_fun_within),
+  compare_symbol(mean_bac_between, mean_fun_between),
+  compare_symbol(mean_bac_overall, mean_fun_overall)
+)
+
+# Build comparison table
+summary_table <- tibble(
+  Metric = c("Mean within-group", "Mean between-group", "Overall mean"),
+  Bacteria = c(mean_bac_within, mean_bac_between, mean_bac_overall),
+  `B < F` = comp_col,
+  Fungi = c(mean_fun_within, mean_fun_between, mean_fun_overall)
+)
+
+# Print side-by-side comparison table
+summary_table %>%
+  kable(format = "html", caption = "Comparison of bacterial and fungal mean within- and between-Site Sørensen pairwise dissimilarities") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
+  column_spec(2:4, extra_css = "text-align: center;")
+```
+
+[*Between-Kingdom Comparisons*]{.underline}
+
+Among all samples, `r if (mean_fun_overall > mean_bac_overall) "fungi" else "bacteria"` had the higher overall mean Sørensen dissimilarity value across all sites and samples, with a value of `r max(mean_fun_overall, mean_bac_overall)` compared to `r min(mean_fun_overall, mean_bac_overall)` for `r if (mean_fun_overall > mean_bac_overall) "bacteria" else "fungi"`.
+
+Within-site dissimilarity (`r mean_fun_within` for fungi, `r mean_bac_within` for bacteria) was `r if (mean_fun_within > mean_bac_within) "greater" else "lower"` for fungi, suggesting `r if (mean_fun_within > mean_bac_within) "higher spatial turnover or within-site heterogeneity" else "greater compositional cohesion within sites"` for the fungal community.
+
+[*Among-Kingdom Comparisons*]{.underline}
+
+For **bacteria**, the within-group dissimilarity (`r mean_bac_within`) was `r if (mean_bac_within < mean_bac_overall) "lower" else "higher"` than the overall average (`r mean_bac_overall`), indicating that samples from the same site were `r if (mean_bac_within < mean_bac_overall) "more compositionally similar" else "no more similar"` than samples across all sites. This pattern suggests that `r if (mean_bac_within < mean_bac_overall) "site identity explains some of the bacterial compositional variation" else "there may be high dispersion or weak clustering by site"`.
+
+Similarly, for **fungi**, within-site dissimilarity was `r if (mean_fun_within < mean_fun_overall) "lower" else "higher"` than the overall dissimilarity, suggesting that fungal samples from the same site were `r if (mean_fun_within < mean_fun_overall) "more similar to each other" else "not particularly cohesive"` compared to the global average.
+
+In both domains, a **between-group mean dissimilarity** (`r mean_bac_between` for bacteria, `r mean_fun_between` for fungi) greater than the within-group value suggests that Site did influence the presence/absence-based of compositional structure of communities — either due to differences in **mean community composition** (location) or **dispersion** (variability within sites).
+
+```{r five-num-summary-bacteria-fungi, echo=F, message=FALSE, warning=F}
+# Define function
+five_num_summary_with_plot <- function(bac_vec, fun_vec, subcaption = "Bacteria vs Fungi Distances") {
+  if (length(bac_vec) != length(fun_vec)) {
+    stop("Vectors must be the same length")
+  }
+
+  # Paired statistical tests
+  ttest_res <- tryCatch(t.test(bac_vec, fun_vec, paired = TRUE), error = function(e) NULL)
+  wilcox_res <- tryCatch(wilcox.test(bac_vec, fun_vec, paired = TRUE, exact = FALSE), error = function(e) NULL)
+
+  ttest_p <- if (!is.null(ttest_res)) signif(ttest_res$p.value, 4) else NA
+  wilcox_p <- if (!is.null(wilcox_res)) signif(wilcox_res$p.value, 4) else NA
+
+  # Compute summaries
+  bac_summary <- c(min(bac_vec, na.rm = TRUE),
+                   quantile(bac_vec, 0.25, na.rm = TRUE),
+                   median(bac_vec, na.rm = TRUE),
+                   mean(bac_vec, na.rm = TRUE),
+                   quantile(bac_vec, 0.75, na.rm = TRUE),
+                   max(bac_vec, na.rm = TRUE))
+
+  fun_summary <- c(min(fun_vec, na.rm = TRUE),
+                   quantile(fun_vec, 0.25, na.rm = TRUE),
+                   median(fun_vec, na.rm = TRUE),
+                   mean(fun_vec, na.rm = TRUE),
+                   quantile(fun_vec, 0.75, na.rm = TRUE),
+                   max(fun_vec, na.rm = TRUE))
+
+  # Comparison symbol column
+  comp_symbol <- ifelse(
+    abs(bac_summary - fun_summary) < 1e-6, "=",
+    ifelse(bac_summary > fun_summary, ">", "<")
+  )
+
+  # Final summary table
+  summary_df <- tibble(
+    Statistic = c("Min", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max"),
+    Bacteria = bac_summary,
+    `B > F` = comp_symbol,
+    Fungi = fun_summary,
+    Comparison = c(
+      "", "",
+      if (!is.na(wilcox_p)) paste0("Wilcoxon p = ", wilcox_p) else "",
+      if (!is.na(ttest_p)) paste0("t-test p = ", ttest_p) else "",
+      "", ""
+    )
+  )
+  
+  # Make long format for plotting
+  plot_df <- data.frame(
+    Kingdom = rep(c("Bacteria-Archaea", "Fungi"), each = length(bac_vec)),
+    Distance = c(bac_vec, fun_vec)
+  )
+
+  # Boxplot
+  p <- ggplot(plot_df, aes(x = Kingdom, y = Distance, fill = Kingdom)) +
+    geom_boxplot(alpha = 0.7, width = 0.6) +
+    geom_jitter(width = 0.1, size = 1, alpha = 0.3) +
+    theme_minimal() +
+    labs(
+      title = "Within-Site Mean Pairwise Dissimilarities by Kingdom",
+      subtitle = subcaption,
+      y = "Distance",
+      x = NULL
+    ) +
+    # scale_y_continuous(limits = c(0.25,1.05))+
+    stat_compare_means(paired=T, label.y=0.9)+
+    scale_fill_manual(values = domain_cols) +
+    theme(legend.position = "none",
+          axis.text = element_text(size=12,color="black"))
+
+  # Display table
+  print(
+    summary_df %>%
+      kable(format = "html", digits = 4, caption = "Five-number summary and paired stat tests for bacterial vs fungal mean within Site dissimilarities") %>%
+      kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE) %>%
+    column_spec(2:4, extra_css = "text-align: center;")
+)
+  
+
+  # Show plot
+  print(p)
+}
+bac_dist_vec <- md_bwc_Site.df.noself
+fun_dist_vec <- md_Fwc_Site.df.noself
+
+# Call function
+# five_num_summary_compare(bac_dist_vec, fun_dist_vec)
+
+# Call function with custom subcaption
+five_num_summary_with_plot(bac_dist_vec, fun_dist_vec, subcaption = "All within-Site pairwise values, no strata or blocking")
+```
+
+
+## strat by F1 vs non-F1 [in-progress]
+
+
+```{r five-num-summary-strat-by-Fun-sor-clus2, echo=FALSE, eval=FALSE}
+# Diagonal elements = mean within-group dissimilarity
+  # extract the diagonals directly from the matrix, preserving names:
+  # keep names from the matrix/Add group names to the vectorized output
+  md_Fwc_Site.df.self <- diag(md_Fwc_Site.r)
+  md_bwc_Site.df.self <- diag(md_bwc_Site.r)
+
+  # Should return Site names (or groups from your Site factor)
+  # names(md_Fwc_Site.df.self)
+  # names(md_bwc_Site.df.self)
+
+# off-diagonals = mean between-group dissimilarity
+md_Fwc_Site.df.noself <- md_Fwc_Site.r
+diag(md_Fwc_Site.df.noself) <- NA
+md_Fwc_Site.df.noself_vec <- as.vector(md_Fwc_Site.df.noself)
+names(md_Fwc_Site.df.noself_vec) #<- NULL  # You can keep row-pair labels if desired
+
+#  Extract site-level + strata group info
+# Get site info and clustering group (assuming each site maps to one Fun_sor_clus2 group)
+  site_meta_Fun <- as(sample_data(Fun_wholecommunity), "data.frame") %>%
+    select(Site, Fun_sor_clus2) %>%
+    distinct() # one row per site
+  # row.names(site_meta_Fun) <- as(sample_data(Fun_wholecommunity), "data.frame")$sample_name
+  
+  site_meta_Bac <- as(sample_data(Bac_wholecommunity), "data.frame") %>%
+    select(Site, Fun_sor_clus2) %>%
+    distinct() # one row per site
+  # row.names(site_meta_Bac) <- as(sample_data(Bac_wholecommunity), "data.frame")$sample_name
+
+
+fun_df.meandist <- data.frame(Site = names(md_Fwc_Site.df.self),
+                     Fun_dist = md_Fwc_Site.df.self) %>%
+  inner_join(site_meta_Fun, by = "Site")
+
+bac_df.meandist <- data.frame(Site = names(md_bwc_Site.df.self),
+                     Bac_dist = md_bwc_Site.df.self) %>%
+  inner_join(site_meta_Bac, by = "Site")
+
+dist_by_site_Fun_sor_clus2 <- inner_join(bac_df.meandist, fun_df.meandist, by = c("Site", "Fun_sor_clus2"))
+```
+
+
+\
+\
+\
+
+
+
+\
+
+\
+
+
+# Beta dispersion (variance) by site
+
+Implementation of Marti Anderson's PERMDISP2 procedure for the analysis of multivariate homogeneity of group dispersions (variances). `vegan::betadisper()` is a multivariate analogue of Levene's test for homogeneity of variances.  
+
+## Calculate betadisp dispersions by site {.hidden .unlisted .unnumbered}
+
+```{r calc-betadisp-site, include=T,eval=TRUE,cache=TRUE}
+# Fun
+Fun_wc_sorensen_distmat <- as.matrix(sor.dist.list$Fun_wholecommunity)
+
+Fun_wc_sorensen_dist<-as.dist(Fun_wc_sorensen_distmat)
+
+## Calculate multivariate dispersions
+betadisp_Site_Fun_addC <- betadisper(Fun_wc_sorensen_dist,
+                            group = phylo2vegan_sd(Fun_wholecommunity)$Site,
+                            type = "median", # type = "median" (distance from each sample unit to the spatial median of its group)
+                            bias.adjust = T, # adjust for small sample bias in beta div estimates?
+                            sqrt.dist = FALSE,
+                            add = "lingoes")
+
+# Bac
+Bac_wc_sorensen_distmat <- as.matrix(beta.pair(decostand(phylo2vegan_OTU(Bac_wholecommunity), method = "pa"), index.family = "sorensen")$beta.sor)
+
+Bac_wc_sorensen_dist<-as.dist(Bac_wc_sorensen_distmat)
+
+## Calculate multivariate dispersions
+betadisp_Site_Bac_addC <- betadisper(Bac_wc_sorensen_dist,
+                            group = phylo2vegan_sd(Bac_wholecommunity)$Site,
+                            type = "median", # type = "median" (distance from each sample unit to the spatial median of its group)
+                            bias.adjust = T, # adjust for small sample bias in beta div estimates?
+                            sqrt.dist = FALSE,
+                            add = "lingoes")
+```
+
+```{r perform_anova_betadisper-function}
+perform_anova_betadisper <- function(betadisper_object, grouping) {
+
+  # Perform ANOVA 
+  anova_result <- anova(betadisper_object)
+  
+  tidy_aov <- tidy(anova_result)
+  tidy_df <- as.data.frame(tidy_aov)
+  
+  tidy_df$term[1] <- paste0(grouping)
+
+  sum_squares_regression <- tidy_df$sumsq[1]
+  sum_squares_residuals <- tidy_df$sumsq[2]
+
+  R_squared <- sum_squares_regression /
+            (sum_squares_regression + sum_squares_residuals)*100
+
+  tidier_df <- data.frame(Term = character(),df = numeric(),
+                          SumSq = numeric(),MeanSq = numeric(),
+                          F.statistic = numeric(),
+                          R_squared = numeric(),p.value = character(),
+                          stringsAsFactors = FALSE)
+  
+  tidier_df[1,"Term"] <- tidy_df$term[1]
+  tidier_df[2,"Term"] <- tidy_df$term[2]
+  tidier_df[1:2,2] <- (tidy_df$df)[1:2]
+  tidier_df$SumSq <- round(tidy_df$sumsq[1:2],2)
+  tidier_df$MeanSq <- round(tidy_df$meansq[1:2],3)
+  tidier_df$F.statistic <- round(tidy_df$statistic,2)
+  tidier_df[1,"R_squared"] <- round(R_squared,2)
+  tidier_df[2,"R_squared"] <- 100-(round(R_squared,2))
+  tidier_df[1,"P.value"] <- prettyNum(tidy_df$p.value[1],digits=2)
+
+  # Return ANOVA results for the specified taxa_of_interest
+  return(tidier_df)
+}
+```
+
+## Results: Homogeneity of multivariate dispersions - site dispersions {.tabset}
+
+
+### Bac 
+
+\
+range of site dispersions:
+
+```{r}
+summary(betadisp_Site_Bac_addC$group.distances)
+```
+
+\
+
+```{r}
+betadisp_Site_Bac_addC
+```
+
+\
+
+#### Perform ANOVA {.hidden .unlisted .unnumbered}
+
+probably removing in favor of perm F test (following)
+
+`betadisp_Site_Bac.aov <- perform_anova_betadisper(betadisp_Site_Bac_addC, "Site")`
+
+```{r, echo=TRUE,eval=F,message=TRUE}
+betadisp_Site_Bac.aov<-perform_anova_betadisper(betadisp_Site_Bac_addC, "Site")
+```
+
+```{r, echo=TRUE,eval=F,message=TRUE}
+betadisp_Site_Bac.aov %>% kbl() %>% kable_styling()
+```
+\
+
+#### Permutation test for F with post-hoc Tukey's HSD {.tabset}
+
+\
+`vegan::permutest(betadisp_Site_Bac_addC, permutations = 999)`
+
+```{r permutest-Site-pF-Bac, echo=F, cache=T}
+## Permutation test for F
+betadisp_Site_Bac.pmod <- permutest(betadisp_Site_Bac_addC, permutations = 999)
+
+bdr2Bac<-prettyNum(betadisp_Site_Bac.pmod$tab$`Sum Sq`[1]/(sum(betadisp_Site_Bac.pmod$tab$`Sum Sq`)),digits=3)
+```
+
+```{r, echo=F,message=TRUE}
+betadisp_Site_Bac.pmod
+```
+
+
+\
+\
+
+[Impact of site on explainable variability of beta dispersions:]{.underline}
+
+Permuted $F$ = `r prettyNum(betadisp_Site_Bac.pmod$tab$F[1],digits=5)`\
+
+Calculated $R^2$ = `r bdr2Bac`\
+
+Site had a significant influence on bacterial community variance, explaining a calculated `r as.numeric(bdr2Bac)*100`% of the beta dispersion variability (permuted $F$ = `r round(betadisp_Site_Bac.pmod$tab$F[1],3)`).\
+\
+
+[**Post-hoc: compute Tukey HSD**]{.underline}\
+
+`stats::TukeyHSD(betadisp_Site_Bac_addC, ordered = T)`
+
+```{r, message=FALSE,results='hide'}
+## Tukey's Honest Significant Differences
+(betadisp_Site_Bac_addC.HSD <- TukeyHSD(betadisp_Site_Bac_addC, ordered = T, conf.level = 0.95))
+bdHSDBacs<-subset(as.data.frame(betadisp_Site_Bac_addC.HSD$group),`p adj` < 0.05)
+# plot(betadisp_Site_Bac_addC.HSD)
+```
+
+
+```{r, echo=TRUE}
+bdHSDBacs %>%
+  kbl(caption = "Bacteria: sites with significantly different beta dispersion, subset to p.adj < 0.05 (Tukey HSD)",
+            align = 'c',
+      digits = c(3,3,3,4)
+      # col.names = c("Number of OTUs","Number of samples")
+      # format.args = format(list(big.mark = ',', digit))
+      ) %>%
+  kable_styling() %>%
+  scroll_box(width = "60%", height = "350px")
+```
+
+\
+
+Of a total of `r nrow((betadisp_Site_Bac_addC.HSD)$group)` pairwise site-site comparisons, only `r nrow(bdHSDBacs)` were significantly different.
+
+\
+\
+
+### Fun {.unnumbered}
+
+\
+range of site dispersions:
+
+```{r}
+summary(betadisp_Site_Fun_addC$group.distances)
+```
+
+\
+
+```{r}
+betadisp_Site_Fun_addC
+```
+
+\
+
+
+#### Permutation test for F with post-hoc Tukey's HSD {.tabset}
+
+\
+`vegan::permutest(betadisp_Site_Fun_addC, permutations = 999)`
+
+```{r permutest-Site-pF-Fun, cache=TRUE}
+## Permutation test for F
+betadisp_Site_Fun.pmod <- permutest(betadisp_Site_Fun_addC, permutations = 999, pairwise = F)
+bdr2Fun<-prettyNum(betadisp_Site_Fun.pmod$tab$`Sum Sq`[1]/(sum(betadisp_Site_Fun.pmod$tab$`Sum Sq`)),digits=3)
+```
+
+```{r, echo=TRUE,message=TRUE}
+betadisp_Site_Fun.pmod
+```
+
+\
+\
+
+[Impact of site on explainable variability of beta dispersions:]{.underline}
+
+Permuted $F$ = `r round(betadisp_Site_Fun.pmod$tab$F[1],3)`\
+
+Calculated $R^2$ = `r bdr2Fun`\
+\
+
+Site had a very large influence on fungal community variance, explaining a calculated `r as.numeric(bdr2Fun)*100`% of the beta dispersion variability (permuted $F$ = `r round(betadisp_Site_Fun.pmod$tab$F[1],3)`).
+\
+
+[**Post-hoc: compute Tukey HSD**]{.underline}\
+
+`stats::TukeyHSD(betadisp_Site_Fun_addC, ordered = T)`
+
+```{r, message=FALSE,results='hide'}
+## Tukey's Honest Significant Differences
+(betadisp_Site_Fun_addC.HSD <- TukeyHSD(betadisp_Site_Fun_addC, ordered = T, conf.level = 0.95))
+bdHSDFuns<-subset(as.data.frame(betadisp_Site_Fun_addC.HSD$group),`p adj` < 0.05)
+# plot(betadisp_Site_Fun_addC.HSD)
+```
+
+```{r, echo=F}
+bdHSDFuns %>%
+  kbl(caption = "Fungi: sites with significantly different beta dispersion, subset to p.adj < 0.05 (Tukey HSD)",
+            align = 'c',
+      digits = c(3,3,3,4)
+      # col.names = c("Number of OTUs","Number of samples")
+      # format.args = format(list(big.mark = ',', digit))
+      ) %>%
+  kable_styling() %>%
+  scroll_box(width = "60%", height = "350px")
+```
+
+\
+
+Of a total of `r nrow((betadisp_Site_Fun_addC.HSD)$group)` pairwise site-site comparisons, `r nrow(bdHSDFuns)` were significantly different.
+
+\
+\
+
+
+
+## Table set-up {.unnumbered .unlisted .hidden}
+
+```{r}
+Bac_gamma_Site.df <- (data.frame(
+  "Site"=rownames(Bac_gamma_Site3temp),
+  "n (# of samples per site)"=as.numeric(Bac_gamma_Site3temp$`n (# of samples per site)`),
+  "# of grass hosts per site"=as.numeric(Bac_gamma_Site3temp$ngrass_persite),
+  "Gamma (# total unique OTUs)"=as.numeric(Bac_gamma_Site3temp$`Gamma (# total unique OTUs)`),
+  "Gamma / n" = as.numeric(Bac_gamma_Site3temp$Gamma_over_n),
+  "Observed mean 𝝰" = as.numeric(Bac_gamma_Site3temp$`Observed mean 𝝰`),
+  "mean prop. of gamma detected per sample" = as.numeric(round(Bac_gamma_Site3temp$`mean prop. of gamma / sample`,3)),
+                       "SD prop. of gamma detected per sample" = as.numeric(round(Bac_gamma_Site3temp$`sd prop. of gamma / sample`,3))
+  ,check.names=F))
+
+Bac_gamma_Site.df$Bac_Site_betadisp<-betadisp_Site_Bac_addC$group.distances
+
+Bac_gamma_Site.df$Site_unordered <- as.factor(Bac_gamma_Site.df$Site)
+Bac_gamma_Site.df$Site <- as.factor(Bac_gamma_Site.df$Site)
+Bac_gamma_Site.df$Site <- factor(Bac_gamma_Site.df$Site,levels=c(site_levels),ordered = T)
+
+
+Fun_gamma_Site.df <- (data.frame(
+  "Site"=rownames(Fun_gamma_Site3temp),
+  "n (# of samples per site)"=as.numeric(Fun_gamma_Site3temp$`n (# of samples per site)`),
+  "# of grass hosts per site"=as.numeric(Fun_gamma_Site3temp$ngrass_persite),
+  "Gamma (# total unique OTUs)"=as.numeric(Fun_gamma_Site3temp$`Gamma (# total unique OTUs)`),
+  "Gamma / n" = as.numeric(Fun_gamma_Site3temp$Gamma_over_n),
+  "Observed mean 𝝰" = as.numeric(Fun_gamma_Site3temp$`Observed mean 𝝰`),
+  "mean prop. of gamma detected per sample" = as.numeric(round(Fun_gamma_Site3temp$`mean prop. of gamma / sample`,3)),
+                       "SD prop. of gamma detected per sample" = as.numeric(round(Fun_gamma_Site3temp$`sd prop. of gamma / sample`,3))
+  ,check.names=F))
+
+Fun_gamma_Site.df$Fun_Site_betadisp<-betadisp_Site_Fun_addC$group.distances
+
+Fun_gamma_Site.df$Site_unordered <- as.factor(Fun_gamma_Site.df$Site)
+Fun_gamma_Site.df$Site <- as.factor(Fun_gamma_Site.df$Site)
+Fun_gamma_Site.df$Site <- factor(Fun_gamma_Site.df$Site,levels=c(site_levels),ordered = T)
+
+# saveRDS(Fun_gamma_Site.df,file="../processed_data/clean_rds_saves/Fun_gamma_Site.df.rds")
+# saveRDS(Bac_gamma_Site.df,file="../processed_data/clean_rds_saves/Bac_gamma_Site.df.rds")
+# saveRDS(fwc_alpha_Site,file="../processed_data/clean_rds_saves/fwc_alpha_Site.rds")
+# saveRDS(bwc_alpha_Site,file="../processed_data/clean_rds_saves/bwc_alpha_Site.rds")
+```
+
+
+## Tables: Gamma diversity and beta dispersion {.tabset}
+
+\
+
+### Bac
+
+```{r}
+Bac_gamma_Site.df$BetaDisp <- round(Bac_gamma_Site.df$Bac_Site_betadisp,4)
+Bac_gamma_Site.df[,c(1:8,11)] %>% kbl() %>% kable_styling() %>%
+  scroll_box(width = "95%", height = "350px")
+```
+
+\
+
+### Fun
+
+```{r, echo=TRUE}
+Fun_gamma_Site.df$BetaDisp <- round(Fun_gamma_Site.df$Fun_Site_betadisp,4)
+Fun_gamma_Site.df[,c(1:8,11)] %>% kbl() %>% kable_styling() %>%
+  scroll_box(width = "95%", height = "350px")
+```
+
+\
+
+## ANOSIM {.tabset}
+
+\
+
+```{r, include=FALSE,eval=FALSE}
+# Fun ----
+## Has permustats() method
+# betadisp_Site_Fun.pstat <- permustats(betadisp_Site_Fun.pmod)
+# densityplot(betadisp_Site_Fun.pstat, scales = list(x = list(relation = "free")))
+# qqmath(betadisp_Site_Fun.pstat, scales = list(relation = "free"))
+Fun_Site.anosim <- with(phylo2vegan_sd(Fun_wholecommunity), anosim(Fun_wc_sorensen_distmat, Site))
+summary(Fun_Site.anosim)
+plot(Fun_Site.anosim, main="ANOSIM: between vs within site fungal dissimilarities")
+
+betadisp_Site_Fun.aov<-perform_anova_betadisper(betadisp_Site_Fun_addC, "Site")
+# Fun ----
+
+
+# Bac ----
+summary(betadisp_Site_Bac_addC$group.distances)
+
+## Permutation test for F
+betadisp_Site_Bac.pmod <- permutest(betadisp_Site_Bac_addC, permutations = 999, pairwise = F)
+## Tukey's Honest Significant Differences
+(betadisp_Site_Bac_addC.HSD <- TukeyHSD(betadisp_Site_Bac_addC))
+plot(betadisp_Site_Bac_addC.HSD)
+
+betadisp_Site_Bac_addC.HSD.df <- as.data.frame(betadisp_Site_Bac_addC.HSD$group)
+# subset(betadisp_Site_Bac_addC.HSD.df, "p adj" < 0.05)
+# betadisp_Site_Bac_addC.HSD.df[betadisp_Site_Bac_addC.HSD.df$`p adj` < 0.05]
+## Has permustats() method
+# betadisp_Site_Bac.pstat <- permustats(betadisp_Site_Bac.pmod)
+# densityplot(betadisp_Site_Bac.pstat, scales = list(x = list(relation = "free")))
+# qqmath(betadisp_Site_Bac.pstat, scales = list(relation = "free"))
+Bac_Site.anosim <- with(phylo2vegan_sd(Bac_wholecommunity), anosim(Bac_wc_sorensen_distmat, Site))
+summary(Bac_Site.anosim)
+plot(Bac_Site.anosim, main="ANOSIM: between vs within site bacterial dissimilarities")
+
+betadisp_Site_Bac.aov<-perform_anova_betadisper(betadisp_Site_Bac_addC, "Site")
+# Bac ----
+Bac_Site_nestedGrass.anosim <- with(phylo2vegan_sd(Bac_wholecommunity), anosim(Bac_wc_sorensen_distmat, Grass, strata=Site))
+summary(Bac_Site_nestedGrass.anosim)
+plot(Bac_Site_nestedGrass.anosim, main="ANOSIM: between vs within grass host\nbacterial dissimilarities within site strata")
+
+
+Fun_Site_nestedGrass.anosim <- with(phylo2vegan_sd(Fun_wholecommunity), anosim(Fun_wc_sorensen_distmat, Grass, strata=Site))
+summary(Fun_Site_nestedGrass.anosim)
+plot(Fun_Site_nestedGrass.anosim, main="ANOSIM: between vs within grass host\nfungal dissimilarities within site strata")
+
+## Calculate multivariate dispersions
+betadisp_Site_Grass_Bac_addC <- betadisper(Bac_wc_sorensen_dist,
+                            group = phylo2vegan_sd(Bac_wholecommunity)$Site_Grass,
+                            type = "median", bias.adjust = T, 
+                            sqrt.dist = FALSE,add = "lingoes")
+# permutest(betadisp_Site_Grass_Bac_addC, pairwise = F, permutations = 99)
+betadisp_Site_Grass_Bac.aov<-perform_anova_betadisper(betadisp_Site_Grass_Bac_addC, "Site_Grass")
+(betadisp_Site_Grass_Bac_addC.HSD <- TukeyHSD(betadisp_Site_Grass_Bac_addC))
+plot(betadisp_Site_Grass_Bac_addC.HSD)
+
+
+Bac_Site_Grass.anosim <- with(phylo2vegan_sd(Bac_wholecommunity), anosim(Bac_wc_sorensen_distmat, Site_Grass))
+
+#Fun
+betadisp_Site_Grass_Fun_addC <- betadisper(Fun_wc_sorensen_dist,
+                            group = phylo2vegan_sd(Fun_wholecommunity)$Site_Grass,
+                            type = "median", bias.adjust = T, 
+                            sqrt.dist = FALSE,add = "lingoes")
+Fun_Site_Grass.anosim <- with(phylo2vegan_sd(Fun_wholecommunity), anosim(Fun_wc_sorensen_distmat, Site_Grass))
+
+permutest(betadisp_Site_Bac_addC, permutations = 999, pairwise = F)
+## Tukey's Honest Significant Differences
+(betadisp_Site_Bac_addC.HSD <- TukeyHSD(betadisp_Site_Bac_addC))
+plot(betadisp_Site_Bac_addC.HSD)
+
+```
+
+
+
+### Bac
+
+```{r Bac-Site-ANOSIM-calc, echo=TRUE,eval=TRUE,cache=TRUE}
+Bac_Site.anosim <- with(phylo2vegan_sd(Bac_wholecommunity), anosim(Bac_wc_sorensen_distmat, Site))
+Bac_Site.anosim
+```
+
+![](../docs/figures/ANOSIM/Bacterial_Site_ANOSIM.png){width="100%"} 
+
+\
+
+### Fun
+
+```{r Fun-Site-ANOSIM-calc, echo=TRUE,eval=TRUE,cache=TRUE}
+Fun_Site.anosim <- with(phylo2vegan_sd(Fun_wholecommunity), anosim(Fun_wc_sorensen_distmat, Site))
+Fun_Site.anosim
+```
+
+![](../docs/figures/ANOSIM/Fungal_Site_ANOSIM.png){width="100%"} 
+
+\
+
+
+\
+
+# Tables: alpha beta gamma diversity of sites {.tabset}
+
+\
+\
+
+## Bac
+
+```{r,eval=T,include=T}
+Bac_gamma_Site.dfclean<-Bac_gamma_Site.df[,c(1:8,11)]
+Bac_gamma_Site.dfclean$`Gamma (# total unique OTUs)`<-prettyNum(Bac_gamma_Site.dfclean$`Gamma (# total unique OTUs)`, big.mark=",")
+
+Bac_gamma_Site.dfclean$`Observed mean 𝝰`<-prettyNum(Bac_gamma_Site.dfclean$`Observed mean 𝝰`, big.mark=",")
+
+Bac_gamma_Site.dfclean%>% kbl(caption = "Bacteria: alpha beta gamma diversity of sites",
+            align = 'c'
+      # col.names = c("Number of OTUs","Number of samples")
+      # ,format.args = list(format(c(Fun_gamma_Site.df[,4]),big.mark = ','))
+      ) %>% kable_styling() %>%
+  scroll_box(width = "95%", height = "500px")
+```
+
+\
+
+## Fun 
+
+```{r,eval=T,include=T}
+Fun_gamma_Site.dfclean<-Fun_gamma_Site.df[,c(1:8,11)]
+Fun_gamma_Site.dfclean$`Gamma (# total unique OTUs)`<-prettyNum(Fun_gamma_Site.dfclean$`Gamma (# total unique OTUs)`, big.mark=",")
+
+Fun_gamma_Site.dfclean$`Observed mean 𝝰`<-prettyNum(Fun_gamma_Site.dfclean$`Observed mean 𝝰`, big.mark=",")
+
+Fun_gamma_Site.dfclean%>% kbl(caption = "Fungi: alpha beta gamma diversity of sites",
+            align = 'c'
+      # col.names = c("Number of OTUs","Number of samples")
+      # ,format.args = list(format(c(Fun_gamma_Site.df[,4]),big.mark = ','))
+      ) %>% kable_styling() %>%
+  scroll_box(width = "95%", height = "500px")
+```
+
+\
+\
+
+# Statistical testing
+
+\
+
+## normality and density plot of site gamma {.tabset}
+
+\
+
+### Bac
+
+```{r, include=T,eval=T,warning=FALSE,fig.height=8,out.width='40%',fig.show='hold'}
+shapiro.test(Bac_gamma_Site.df$`Gamma (# total unique OTUs)`)
+ggqqplot(Bac_gamma_Site.df$`Gamma (# total unique OTUs)`)
+ggdensity(Bac_gamma_Site.df$`Gamma (# total unique OTUs)`, 
+          main = "Density plot of site gamma diversity (Bacteria)",
+          xlab = "Size of regional species pool",
+          add = "mean",xlim = c(2000, 9000),rug=T)
+```
+
+\
+
+### Fun
+
+```{r, include=T,eval=T,warning=FALSE,fig.height=8,out.width='40%',fig.show='hold'}
+shapiro.test(Fun_gamma_Site.df$`Gamma (# total unique OTUs)`)
+ggqqplot(Fun_gamma_Site.df$`Gamma (# total unique OTUs)`)
+ggdensity(Fun_gamma_Site.df$`Gamma (# total unique OTUs)`, 
+          main = "Density plot of site gamma diversity (Fungi)",
+          xlab = "Size of regional species pool",
+          add = "mean",xlim = c(0, 1450),rug=T)
+```
+
+\
+
+## kruskal.tests
+
+[in-progress]
+
+### Predictor: Size of Contra-kingdom Regional Species Pool (Response contra-kindgom gamma)
+
+Does bacterial gamma influence fungal gamma? yes
+
+```{r}
+# does fun gamma vary by gamma of bac
+kruskal.test(fwc_alpha_Site$Fun_gamma_Site~bwc_alpha_Site$Bac_gamma_Site)
+```
+
+    - after normalizing by nsamples per site?
+```{r}
+# does fun gamma vary by gamma of bac
+kruskal.test(fwc_alpha_Site$Fun_Gamma_over_n~bwc_alpha_Site$Bac_Gamma_over_n)
+```
+        - still yes
+
+
+Does fungal gamma influence bacterial gamma? yes
+
+```{r}
+# does bac gamma vary by gamma of fun
+kruskal.test(bwc_alpha_Site$Bac_gamma_Site~fwc_alpha_Site$Fun_gamma_Site)
+```
+
+    - after normalizing by nsamples per site?
+```{r}
+# does bac gamma vary by gamma of fun
+kruskal.test(bwc_alpha_Site$Bac_Gamma_over_n~fwc_alpha_Site$Fun_Gamma_over_n)
+```
+        - still yes
+
+
+
+
+\
+\
+
+### Predictor: Contra-kingdom Richness (Response Richness)
+
+Does bacterial richness influence fungal richness? no
+
+```{r}
+# does sample alpha vary by Observed of bac
+kruskal.test(fwc_alpha_Site$Observed~bwc_alpha_Site$Observed)
+```
+
+Does fungal richness influence bacterial richness? YES
+
+```{r}
+# does bac sample alpha vary by Observed of fun
+kruskal.test(bwc_alpha_Site$Observed~fwc_alpha_Site$Observed)
+```
+
+
+
+
+
+### Predictor: # of grass hosts per site
+
+
+```{r}
+# does sample alpha vary by ngrass_persite
+kruskal.test(fwc_alpha_Site$Observed~fwc_alpha_Site$ngrass_persite)
+```
+
+
+```{r}
+# does site gamma vary by ngrass_persite
+kruskal.test(Fun_gamma_Site2[,1]~Fun_gamma_Site3temp$ngrass_persite)
+# does site gamma/n vary by ngrass_persite
+kruskal.test(Fun_gamma_Site3temp$`Gamma_over_n`~Fun_gamma_Site3temp$ngrass_persite)
+# does site obs_mean_alpha vary by ngrass_persite
+kruskal.test(Fun_gamma_Site.df$`Observed mean 𝝰`~Fun_gamma_Site.df$`# of grass hosts per site`)
+# does site mean prop. of gamma detected per sample vary by ngrass_persite YES
+kruskal.test(Fun_gamma_Site.df$`mean prop. of gamma detected per sample`~Fun_gamma_Site.df$`# of grass hosts per site`)
+```
+
+
+
+# aov gamma {.hidden .unlisted}
+
+```{r, include=FALSE,eval=FALSE}
+
+Bac_gamma_Site.df2<-Bac_gamma_Site.df
+colnames(Bac_gamma_Site.df2)[2]<-"gamma"
+colnames(Bac_gamma_Site.df2)[3]<-"n"
+colnames(Bac_gamma_Site.df2)[4]<-"alpha_e"
+colnames(Bac_gamma_Site.df2)[5]<-"alpha_o"
+
+Fun_gamma_Site.df2<-Fun_gamma_Site.df
+colnames(Fun_gamma_Site.df2)[2]<-"gamma"
+colnames(Fun_gamma_Site.df2)[3]<-"n"
+colnames(Fun_gamma_Site.df2)[4]<-"alpha_e"
+colnames(Fun_gamma_Site.df2)[5]<-"alpha_o"
+
+# Bac_gamma_Site.df2$ae_over_gamma<- round(Bac_gamma_Site.df2$alpha_e/Bac_gamma_Site.df2$gamma,3)
+Bac_gamma_Site.df2$ao_over_gamma<- round(Bac_gamma_Site.df2$alpha_o/Bac_gamma_Site.df2$gamma,3)
+
+# Fun_gamma_Site.df2$ae_over_gamma<- round(Fun_gamma_Site.df2$alpha_e/Fun_gamma_Site.df2$gamma,3)
+Fun_gamma_Site.df2$ao_over_gamma<- round(Fun_gamma_Site.df2$alpha_o/Fun_gamma_Site.df2$gamma,3)
+
+
+# summary stats
+paste(round(min(Bac_gamma_Site.df2$gamma),0),round(max(Bac_gamma_Site.df2$gamma),0),round(mean(Bac_gamma_Site.df2$gamma),0),round(sd(Bac_gamma_Site.df2$gamma),0),sep = ", ")
+paste(round(min(Fun_gamma_Site.df2$gamma),0),round(max(Fun_gamma_Site.df2$gamma),0),round(mean(Fun_gamma_Site.df2$gamma),0),round(sd(Fun_gamma_Site.df2$gamma),0),sep = ", ")
+
+paste(round(min(Bac_gamma_Site.df2$ao_over_gamma),3),round(max(Bac_gamma_Site.df2$ao_over_gamma),3),round(mean(Bac_gamma_Site.df2$ao_over_gamma),3),round(sd(Bac_gamma_Site.df2$ao_over_gamma),3),sep = ", ")
+paste(round(min(Fun_gamma_Site.df2$ao_over_gamma),3),round(max(Fun_gamma_Site.df2$ao_over_gamma),3),round(mean(Fun_gamma_Site.df2$ao_over_gamma),3),round(sd(Fun_gamma_Site.df2$ao_over_gamma),3),sep = ", ")
+
+
+
+
+ggqqplot(Fun_gamma_Site.df$`Number of OTUs`)
+shapiro.test(Fun_gamma_Site.df$`Number of OTUs`)
+shapiro.test(Bac_gamma_Site.df$`Number of OTUs`)
+
+shapiro.test(Bac_gamma_Site.df2$gamma) # normal
+shapiro.test(Bac_gamma_Site.df2$alpha_e) # not normal
+shapiro.test(Bac_gamma_Site.df2$alpha_e) # not normal
+shapiro.test(Fun_gamma_Site.df2$gamma) # normal
+shapiro.test(Fun_gamma_Site.df2$alpha_e) # not normal
+shapiro.test(Fun_gamma_Site.df2$alpha_e) # not normal
+
+wilcox.test(Bac_gamma_Site.df2$ao_over_gamma, Fun_gamma_Site.df2$ao_over_gamma, paired = TRUE)
+
+(kruskal.test(gamma~alpha_e,data=Bac_gamma_Site.df2))
+(kruskal.test(alpha_e~gamma,data=Bac_gamma_Site.df2))
+
+(kruskal.test(gamma~alpha_e,data=Fun_gamma_Site.df2))
+(kruskal.test(alpha_e~gamma,data=Fun_gamma_Site.df2))
+
+(kruskal.test(Bac_gamma_Site.df2$gamma~Fun_gamma_Site.df2$gamma))
+(kruskal.test(Bac_gamma_Site.df2$gamma~Fun_gamma_Site.df2$gamma))
+
+t.test(Bac_gamma_Site.df2$gamma, Fun_gamma_Site.df2$gamma, paired = TRUE)
+(kruskal.test(Observed~Grass,data=bwc_alpha_Site))
+
+
+Fun_aov_alpha_e <- aov(alpha_e~gamma,data=Fun_gamma_Site.df2)
+summary(Fun_aov_alpha_e)
+summary(aov(gamma~alpha_e,data=Fun_gamma_Site.df2))
+
+TukeyHSD(Fun_aov_alpha_e)
+
+# 1. Homogeneity of variances
+plot(Fun_aov_alpha_e, 1)
+```
+
+# plot alpha obs v exp {.hidden .unlisted}
+
+```{r, eval=FALSE}
+ggplot(aes(x=Bac_gamma_Site.df$`Observed mean 𝝰`,y=Fun_gamma_Site.df$`Observed mean 𝝰`,color=Site),data=Bac_gamma_Site.df)+
+  geom_point(size=3)+
+  scale_color_manual(values = latlong_cols)+
+  # geom_abline(aes(slope = 1,intercept=0),data=Fun_gamma_Site.df, color="black")+
+ labs(y="Fungi: Obs mean alpha",x="Bacteria: Obs mean alpha",color="Site")+
+  theme_bw() +
+  theme(legend.position="right",
+    axis.text = element_text(color="black", size=10),
+    axis.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
+    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+
+ggplot(aes(x=Bac_gamma_Site.df$`Observed mean 𝝰`,y=Bac_gamma_Site.df$`Expected mean 𝝰`,color=Site),data=Bac_gamma_Site.df)+
+  geom_point(size=3)+
+  scale_color_manual(values = latlong_cols)+
+  scale_x_continuous(limits = c(0,2000))+
+  scale_y_continuous(limits = c(0,750))+
+  geom_abline(aes(slope = 1,intercept=0),data=Fun_gamma_Site.df, color="black")+
+  labs(y="Gamma_over_n",x="Observed mean alpha",color="Site",title = "Bacteria")+
+  theme_bw() +
+  theme(legend.position="right",
+    axis.text = element_text(color="black", size=10),
+    axis.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
+    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+
+
+ggplot(aes(x=Fun_gamma_Site.df$`Observed mean 𝝰`,y=Fun_gamma_Site.df$`Expected mean 𝝰`,color=Site),data=Fun_gamma_Site.df)+
+  geom_point(size=3)+
+  scale_x_continuous(limits = c(0,300))+
+  scale_y_continuous(limits = c(0,100))+
+  scale_color_manual(values = latlong_cols)+
+  geom_abline(aes(slope = 1,intercept=0),data=Fun_gamma_Site.df, color="black")+
+  labs(y="Gamma_over_n",x="Observed mean alpha",color="Site",title = "Fungi")+
+  theme_bw() +
+  theme(legend.position="right",
+    axis.text = element_text(color="black", size=10),
+    axis.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
+    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+
+ggplot(aes(x=Fun_gamma_Site.df$`Observed mean 𝝰`,y=Fun_gamma_Site.df$`Expected mean 𝝰`,color=Site),data=Fun_gamma_Site.df)+
+  geom_point(size=3)+
+  scale_x_continuous(limits = c(0,300))+
+  scale_y_continuous(limits = c(0,100))+
+  scale_color_manual(values = latlong_cols)+
+  geom_abline(aes(slope = 1,intercept=0),data=Fun_gamma_Site.df, color="black")+
+  labs(y="Gamma_over_n",x="Observed mean alpha",color="Site",title = "Fungi")+
+  theme_bw() +
+  theme(legend.position="right",
+    axis.text = element_text(color="black", size=10),
+    axis.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
+    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+
+```
+
+# beta disp by grass landscape {.hidden .unlisted}
+
+```{r, include=FALSE,eval=FALSE}
+Bac_landGrass.anosim <- with(phylo2vegan_sd(Bac_wholecommunity), anosim(Bac_wc_sorensen_distmat, Grass))
+summary(Bac_landGrass.anosim)
+plot(Bac_landGrass.anosim, main="ANOSIM: between vs within grass host\nbacterial dissimilarities (landscape)")
+
+Fun_landGrass.anosim <- with(phylo2vegan_sd(Fun_wholecommunity), anosim(Fun_wc_sorensen_distmat, Grass))
+summary(Fun_landGrass.anosim)
+plot(Fun_landGrass.anosim, main="ANOSIM: between vs within grass host\nfungal dissimilarities (landscape)")
+```

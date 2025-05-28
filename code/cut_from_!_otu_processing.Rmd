@@ -1,0 +1,293 @@
+
+
+
+# Replace ITS taxonomy table with updated
+
+```{r, eval=F}
+tax_table(Fun_min2_rare10116)<-UNITE_alleuk.its.all.newphyla.taxa
+saveRDS(Fun_min2_rare10116, file = "clean_rds_saves/Fun_min2_rare10116_noEDGE_v2.rds")
+saveRDS(Fun_min2_rare10116, file = "clean_rds_saves/Fun_min2_rare10116_v2.rds")
+```
+
+
+
+# Subset by Grass Hosts
+
+**Foundational Grasses** (n=6) \
+6 plant hosts (family Poaceae): \
+  - ANGE (*Andropogon gerardii* / Big bluestem) \
+  - BUDA (*Bouteloua dactyloides* / Buffalograss) \
+  - BOER (*B. eriopoda* / Black grama) \
+  - BOGR (*B. gracilis* / Blue grama) \
+  - BOCU (*B. curtipendula* / Sideoats grama) - note: only present in EDGE sites \
+  - SCSC (*Schizachyrium scoparium* / Little bluestem)  \
+\
+
+## Subset 16S non-EDGE sites (post rarefaction)
+
+```{r, echo=T}
+BacArch_min2_rare9048<-readRDS(file = "clean_rds_saves/BacArch_min2_rare9048_v1.rds")
+```
+
+### 16S Big bluestem
+
+```{r, eval=F}
+BacArch_min2_rare9048_noEDGE_ANGE <- subset_samples(BacArch_min2_rare9048, Grass=="ANGE")
+
+BacArch_min2_rare9048_noEDGE_ANGE <- prune_taxa(taxa_sums(BacArch_min2_rare9048_noEDGE_ANGE) > 0, BacArch_min2_rare9048_noEDGE_ANGE)
+
+BacArch_min2_rare9048_noEDGE_ANGE
+# otu_table()   OTU Table:         [ 14268 taxa and 106 samples ]
+
+saveRDS(BacArch_min2_rare9048_noEDGE_ANGE, file = "clean_rds_saves/BacArch_min2_rare9048_noEDGE_ANGE_v1.rds")
+```
+
+### 16S Buffalograss
+
+```{r, eval=F}
+BacArch_min2_rare9048_noEDGE_BUDA <- subset_samples(BacArch_min2_rare9048, Grass=="BUDA")
+
+BacArch_min2_rare9048_noEDGE_BUDA <- prune_taxa(taxa_sums(BacArch_min2_rare9048_noEDGE_BUDA) > 0, BacArch_min2_rare9048_noEDGE_BUDA)
+
+BacArch_min2_rare9048_noEDGE_BUDA
+# otu_table()   OTU Table:         [ 11048 taxa and 83 samples ]
+
+saveRDS(BacArch_min2_rare9048_noEDGE_BUDA, file = "clean_rds_saves/BacArch_min2_rare9048_noEDGE_BUDA_v1.rds")
+```
+
+### 16S Black grama
+```{r, eval=F}
+BacArch_min2_rare9048_noEDGE_BOER <- subset_samples(BacArch_min2_rare9048, Grass=="BOER")
+
+BacArch_min2_rare9048_noEDGE_BOER <- prune_taxa(taxa_sums(BacArch_min2_rare9048_noEDGE_BOER) > 0, BacArch_min2_rare9048_noEDGE_BOER)
+
+BacArch_min2_rare9048_noEDGE_BOER
+# otu_table()   OTU Table:         [ 8374 taxa and 84 samples ]
+
+saveRDS(BacArch_min2_rare9048_noEDGE_BOER, file = "clean_rds_saves/BacArch_min2_rare9048_noEDGE_BOER_v1.rds")
+```
+
+
+
+### 16S Little bluestem
+```{r, eval=F}
+BacArch_min2_rare9048_noEDGE_SCSC <- subset_samples(BacArch_min2_rare9048, Grass=="SCSC")
+
+BacArch_min2_rare9048_noEDGE_SCSC <- prune_taxa(taxa_sums(BacArch_min2_rare9048_noEDGE_SCSC) > 0, BacArch_min2_rare9048_noEDGE_SCSC)
+
+BacArch_min2_rare9048_noEDGE_SCSC
+# otu_table()   OTU Table:         [ 17568 taxa and 174 samples ]
+
+saveRDS(BacArch_min2_rare9048_noEDGE_SCSC, file = "clean_rds_saves/BacArch_min2_rare9048_noEDGE_SCSC_v1.rds")
+```
+
+\
+
+
+## Subset ITS non-EDGE sites (post rarefaction)
+```{r, echo=T}
+#old phyla
+Fun_min2_rare10116<-readRDS(file = "clean_rds_saves/Fun_min2_rare10116_v1.rds")
+
+#new phyla
+Fun_min2_rare10116<-readRDS(file = "clean_rds_saves/Fun_min2_rare10116_v2.rds")
+# otu_table()   OTU Table:         [ 6749 taxa and 509 samples ]
+
+get_taxa_unique(Fun_min2_rare10116, taxonomic.rank = "Phylum")
+```
+
+### ITS Big bluestem
+```{r, eval=F}
+Fun_min2_rare10116_noEDGE_ANGE <- subset_samples(Fun_min2_rare10116, Grass=="ANGE")
+
+Fun_min2_rare10116_noEDGE_ANGE <- prune_taxa(taxa_sums(Fun_min2_rare10116_noEDGE_ANGE) > 0, Fun_min2_rare10116_noEDGE_ANGE)
+
+Fun_min2_rare10116_noEDGE_ANGE
+# otu_table()   OTU Table:         [ 2985 taxa and 98 samples ]
+
+
+
+saveRDS(Fun_min2_rare10116_noEDGE_ANGE, file = "clean_rds_saves/Fun_min2_rare10116_noEDGE_ANGE_v1.rds")
+```
+
+### ITS Buffalograss
+```{r, eval=F}
+Fun_min2_rare10116_noEDGE_BUDA <- subset_samples(Fun_min2_rare10116, Grass=="BUDA")
+
+Fun_min2_rare10116_noEDGE_BUDA <- prune_taxa(taxa_sums(Fun_min2_rare10116_noEDGE_BUDA) > 0, Fun_min2_rare10116_noEDGE_BUDA)
+
+Fun_min2_rare10116_noEDGE_BUDA
+# otu_table()   OTU Table:         [ 2369 taxa and 80 samples ]
+
+saveRDS(Fun_min2_rare10116_noEDGE_BUDA, file = "clean_rds_saves/Fun_min2_rare10116_noEDGE_BUDA_v1.rds")
+```
+
+### ITS Black grama
+```{r, eval=F}
+Fun_min2_rare10116_noEDGE_BOER <- subset_samples(Fun_min2_rare10116, Grass=="BOER")
+
+Fun_min2_rare10116_noEDGE_BOER <- prune_taxa(taxa_sums(Fun_min2_rare10116_noEDGE_BOER) > 0, Fun_min2_rare10116_noEDGE_BOER)
+
+Fun_min2_rare10116_noEDGE_BOER
+# otu_table()   OTU Table:         [ 1662 taxa and 78 samples ]
+
+saveRDS(Fun_min2_rare10116_noEDGE_BOER, file = "clean_rds_saves/Fun_min2_rare10116_noEDGE_BOER_v1.rds")
+```
+
+
+### ITS Blue grama
+```{r, eval=F}
+Fun_min2_rare10116_noEDGE_BOGR <- subset_samples(Fun_min2_rare10116, Grass=="BOGR")
+
+Fun_min2_rare10116_noEDGE_BOGR <- prune_taxa(taxa_sums(Fun_min2_rare10116_noEDGE_BOGR) > 0, Fun_min2_rare10116_noEDGE_BOGR)
+
+Fun_min2_rare10116_noEDGE_BOGR
+# otu_table()   OTU Table:         [ 2668 taxa and 92 samples ]
+
+saveRDS(Fun_min2_rare10116_noEDGE_BOGR, file = "clean_rds_saves/Fun_min2_rare10116_noEDGE_BOGR_v1.rds")
+```
+
+### ITS Little bluestem
+```{r, eval=F}
+Fun_min2_rare10116_noEDGE_SCSC <- subset_samples(Fun_min2_rare10116, Grass=="SCSC")
+
+Fun_min2_rare10116_noEDGE_SCSC <- prune_taxa(taxa_sums(Fun_min2_rare10116_noEDGE_SCSC) > 0, Fun_min2_rare10116_noEDGE_SCSC)
+
+Fun_min2_rare10116_noEDGE_SCSC
+# otu_table()   OTU Table:         [ 4347 taxa and 161 samples ]
+
+saveRDS(Fun_min2_rare10116_noEDGE_SCSC, file = "clean_rds_saves/Fun_min2_rare10116_noEDGE_SCSC_v1.rds")
+```
+
+
+\
+\
+
+
+\
+\
+
+
+# Export savepoint for clean phyloseq objects / OTU table
+
+```{r eval=FALSE}
+# all non-EDGE samples
+saveRDS(BacArch_min2_rare9048, file = "clean_rds_saves/BacArch_min2_rare9048_v1.rds")
+saveRDS(Fun_min2_rare10116, file = "clean_rds_saves/Fun_min2_rare10116_v1.rds")
+
+# *Blue grama* samples, excluding EDGE samples
+saveRDS(BacArch_min2_rare9048_noEDGE_BOGR, file = "clean_rds_saves/BacArch_min2_rare9048_noEDGE_BOGR_v1.rds")
+saveRDS(Fun_min2_rare10116_noEDGE_BOGR, file = "clean_rds_saves/Fun_min2_rare10116_noEDGE_BOGR_v1.rds")
+
+```
+
+
+
+
+# Taxonomy tables
+
+## Unique BacArch Phyla detected
+
+```{r echo-clean-phyla-setup-16S, echo=TRUE,message=FALSE,results='hide'}
+BacArch_min2_rare9048.Phyla.A <- tax_glom(BacArch_min2_rare9048, taxrank="Phylum")
+
+BacArch_min2_rare9048.Phyla <- prune_taxa(taxa_sums(BacArch_min2_rare9048.Phyla.A) > 0, BacArch_min2_rare9048.Phyla.A)
+
+BA_Phyla<-get_taxa_unique(BacArch_min2_rare9048.Phyla, taxonomic.rank="Phylum")
+uniq_BAphyla<-data.frame(matrix(ncol=4,nrow=length(BA_Phyla)))
+row.names(uniq_BAphyla)<-BA_Phyla
+colnames(uniq_BAphyla)<-c("BacArch_Phylum","reads_assigned","percentage_BacArch_reads", "OTU_count")
+uniq_BAphyla[,1]<-BA_Phyla
+uniq_BAphyla[,2]<-taxa_sums(BacArch_min2_rare9048.Phyla)
+# uniq_BAphyla[,2]<-sample_sums(BacArch_min2_rare9048.Phyla)
+uniq_BAphyla[,3]<-taxa_sums(BacArch_min2_rare9048.Phyla)/sum(sample_sums(BacArch_min2_rare9048.Phyla))
+```
+
+```{r, include=FALSE}
+uniq_BAphyla[1,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[1,1]))
+uniq_BAphyla[2,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[2,1]))
+uniq_BAphyla[3,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[3,1]))
+uniq_BAphyla[4,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[4,1]))
+uniq_BAphyla[5,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[5,1]))
+uniq_BAphyla[6,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[6,1]))
+uniq_BAphyla[7,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[7,1]))
+uniq_BAphyla[8,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[8,1]))
+uniq_BAphyla[9,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[9,1]))
+uniq_BAphyla[10,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[10,1]))
+uniq_BAphyla[11,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[11,1]))
+uniq_BAphyla[12,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[12,1]))
+uniq_BAphyla[13,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[13,1]))
+uniq_BAphyla[14,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[14,1]))
+uniq_BAphyla[15,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[15,1]))
+uniq_BAphyla[16,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[16,1]))
+uniq_BAphyla[17,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[17,1]))
+uniq_BAphyla[18,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[18,1]))
+uniq_BAphyla[19,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[19,1]))
+uniq_BAphyla[20,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[20,1]))
+uniq_BAphyla[21,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[21,1]))
+uniq_BAphyla[22,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[22,1]))
+uniq_BAphyla[23,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[23,1]))
+uniq_BAphyla[24,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[24,1]))
+uniq_BAphyla[25,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[25,1]))
+uniq_BAphyla[26,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[26,1]))
+uniq_BAphyla[27,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[27,1]))
+uniq_BAphyla[28,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[28,1]))
+uniq_BAphyla[29,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[29,1]))
+uniq_BAphyla[30,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[30,1]))
+uniq_BAphyla[31,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[31,1]))
+uniq_BAphyla[32,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[32,1]))
+uniq_BAphyla[33,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[33,1]))
+uniq_BAphyla[34,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[34,1]))
+uniq_BAphyla[35,4]<-ntaxa(subset_taxa(BacArch_min2_rare9048, Phylum==uniq_BAphyla[35,1]))
+
+```
+
+
+\
+
+```{r echo-clean-phyla-setup-ITS, echo=TRUE,message=FALSE,results='hide'}
+Fun_min2_rare10116.Phyla.A <- tax_glom(Fun_min2_rare10116, taxrank="Phylum")
+
+Fun_min2_rare10116.Phyla <- prune_taxa(taxa_sums(Fun_min2_rare10116.Phyla.A) > 0, Fun_min2_rare10116.Phyla.A)
+```
+
+```{r, include=F, eval=F}
+unrare_BacArch<-unrare_BacArch.NO_chlrpst.mito_Unclcyano.bac.arch
+
+unrarefied_16S_NOuncl_Domain_noEuk.Phyla.A <- tax_glom(unrarefied_16S_NOuncl_Domain_noEuk, taxrank="Phylum")
+
+unrarefied_16S_NOuncl_Domain_noEuk.Phyla.B <- prune_taxa(taxa_sums(unrarefied_16S_NOuncl_Domain_noEuk.Phyla.A) > 0, unrarefied_16S_NOuncl_Domain_noEuk.Phyla.A)
+
+unrarefied_16S_NOuncl_Domain_noEuk.Phyla.r  = transform_sample_counts(unrarefied_16S_NOuncl_Domain_noEuk.Phyla.B, function(x) x / sum(x) )
+
+unrarefied_16S_NOuncl_Domain_noEuk.Phyla.B<-saveRDS(unrarefied_16S_NOuncl_Domain_noEuk.Phyla.B, file="../processed_data/intermediate_rds_saves/unrarefied_16S_NOuncl_Domain_noEuk.Phyla.B.rds")
+```
+
+
+```{r unique-bac-arch-phyla-set-up, eval=FALSE, echo=F, message=FALSE, warning=FALSE, include=T, results="asis"}
+
+unrarefied_16S_NOuncl_Domain_noEuk.Phyla.B<-readRDS(file="../processed_data/intermediate_rds_saves/unrarefied_16S_NOuncl_Domain_noEuk.Phyla.B.rds")
+
+BA_Phyla<-get_taxa_unique(unrarefied_16S_NOuncl_Domain_noEuk.Phyla.B, taxonomic.rank="Phylum")
+uniq_BAphyla<-data.frame(matrix(ncol=4,nrow=length(BA_Phyla)))
+row.names(uniq_BAphyla)<-BA_Phyla
+colnames(uniq_BAphyla)<-c("BacArch_Phylum","reads_assigned","percentage_BacArch_reads", "OTU_count")
+uniq_BAphyla[,1]<-BA_Phyla
+uniq_BAphyla[,2]<-taxa_sums(unrarefied_16S_NOuncl_Domain_noEuk.Phyla.B)
+# uniq_BAphyla[,2]<-sample_sums(unrarefied_16S_NOuncl_Domain_noEuk.Phyla.B)
+uniq_BAphyla[,3]<-taxa_sums(unrarefied_16S_NOuncl_Domain_noEuk.Phyla.B)/sum(sample_sums(unrarefied_16S_NOuncl_Domain_noEuk))
+
+
+
+
+saveRDS(uniq_BAphyla, file = "../processed_data/intermediate_rds_saves/uniq_BAphyla.rds")
+
+```
+\
+\
+
+```{r eval=T, echo=F}
+uniq_BAphyla<-readRDS(file = "../processed_data/intermediate_rds_saves/uniq_BAphyla.rds")
+```
+
+

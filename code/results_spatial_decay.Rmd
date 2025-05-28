@@ -1,0 +1,122 @@
+---
+title: "Results: Spatial Structure in Paired Bacterial and Fungal Communities"
+output:
+  bookdown::html_document2:
+    toc: true
+    number_sections: true
+bibliography: references.bib
+csl: apa.csl
+---
+
+# Results
+
+## Pure Spatial Effects {.tabset}
+
+### Custom Functions
+
+```{r load-functions, include=FALSE}
+library(dplyr)
+library(tibble)
+library(geosphere)
+library(vegan)
+library(glue)
+library(purrr)
+library(tidyr)
+
+# Function to generate decay df from dissimilarity and spatial matrices
+pairwise_decay_df <- function(comm_dist, geo_dist) {
+  comm_mat <- as.matrix(comm_dist)
+  geo_mat <- as.matrix(geo_dist)
+  stopifnot(identical(rownames(comm_mat), rownames(geo_mat)))
+  idx <- which(lower.tri(comm_mat), arr.ind = TRUE)
+  tibble(
+    Sample1 = rownames(comm_mat)[idx[, 1]],
+    Sample2 = rownames(comm_mat)[idx[, 2]],
+    CommDist = comm_mat[idx],
+    GeoDist = geo_mat[idx]
+  )
+}
+
+# Mantel test summary with glue output
+mantel_summary <- function(comm_dist, geo_dist, label) {
+  m <- mantel(comm_dist, geo_dist, permutations = 999)
+  glue("{label}: Mantel r = {round(m$statistic, 2)}, p = {signif(m$signif, 3)}")
+}
+ENDCHUNK
+
+### Bacterial {.tabset .tabset-pills}
+
+#### Global
+
+```{r bac-global}
+decay_bac_global <- pairwise_decay_df(comm_dist_all$Bac, dist1)
+mantel_bac_global <- mantel(comm_dist_all$Bac, dist1, permutations = 999)
+bac_r <- round(mantel_bac_global$statistic, 2)
+bac_p <- signif(mantel_bac_global$signif, 3)
+ENDCHUNK
+
+**Figure 1A.**  
+Global spatial decay in bacterial community dissimilarity.  
+`r glue("Mantel r = {bac_r}, p = {bac_p}")`  
+A positive spatial signal indicates geographic separation contributes to bacterial compositional differences across all samples.
+
+#### F1 vs. non-F1
+
+```{r bac-f1-nf1}
+decay_bac_f1 <- pairwise_decay_df(comm_dist_F1$Bac, dist1)
+decay_bac_nf1 <- pairwise_decay_df(comm_dist_non_F1$Bac, dist2)
+
+mantel_bac_f1 <- mantel(comm_dist_F1$Bac, dist1, permutations = 999)
+mantel_bac_nf1 <- mantel(comm_dist_non_F1$Bac, dist2, permutations = 999)
+
+bac_f1_r <- round(mantel_bac_f1$statistic, 2)
+bac_f1_p <- signif(mantel_bac_f1$signif, 3)
+bac_nf1_r <- round(mantel_bac_nf1$statistic, 2)
+bac_nf1_p <- signif(mantel_bac_nf1$signif, 3)
+ENDCHUNK
+
+**Figure 1B.**  
+Comparison of bacterial spatial decay across groups:
+- **F1** group: `r glue("Mantel r = {bac_f1_r}, p = {bac_f1_p}")`
+- **non-F1** group: `r glue("Mantel r = {bac_nf1_r}, p = {bac_nf1_p}")`
+
+Bacterial community dissimilarity increases with spatial distance in non-F1, suggesting distance–decay; F1 shows relatively weak spatial dependence.
+
+### Fungal {.tabset .tabset-pills}
+
+#### Global
+
+```{r fun-global}
+decay_fun_global <- pairwise_decay_df(comm_dist_all$Fun, dist1)
+mantel_fun_global <- mantel(comm_dist_all$Fun, dist1, permutations = 999)
+fun_r <- round(mantel_fun_global$statistic, 2)
+fun_p <- signif(mantel_fun_global$signif, 3)
+ENDCHUNK
+
+**Figure 2A.**  
+Global spatial decay in fungal community dissimilarity.  
+`r glue("Mantel r = {fun_r}, p = {fun_p}")`  
+Fungal dissimilarity does not strongly increase with distance globally, consistent with scale-invariant spatial structure across F1-dominated samples.
+
+#### F1 vs. non-F1
+
+```{r fun-f1-nf1}
+decay_fun_f1 <- pairwise_decay_df(comm_dist_F1$Fun, dist1)
+decay_fun_nf1 <- pairwise_decay_df(comm_dist_non_F1$Fun, dist2)
+
+mantel_fun_f1 <- mantel(comm_dist_F1$Fun, dist1, permutations = 999)
+mantel_fun_nf1 <- mantel(comm_dist_non_F1$Fun, dist2, permutations = 999)
+
+fun_f1_r <- round(mantel_fun_f1$statistic, 2)
+fun_f1_p <- signif(mantel_fun_f1$signif, 3)
+fun_nf1_r <- round(mantel_fun_nf1$statistic, 2)
+fun_nf1_p <- signif(mantel_fun_nf1$signif, 3)
+ENDCHUNK
+
+**Figure 2B.**  
+Comparison of fungal spatial decay across groups:
+- **F1** group: `r glue("Mantel r = {fun_f1_r}, p = {fun_f1_p}")`
+- **non-F1** group: `r glue("Mantel r = {fun_nf1_r}, p = {fun_nf1_p}")`
+
+Non-F1 fungal communities show clear spatial structuring, while F1 fungal communities exhibit minimal decay, supporting scale-invariant compositional structure.
+

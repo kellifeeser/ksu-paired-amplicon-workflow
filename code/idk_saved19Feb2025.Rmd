@@ -1,0 +1,108 @@
+```{r calc-DD-BF-all, echo=TRUE,message=FALSE, results='hide',cache=TRUE}
+# (MRM(betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~ env_dist_matrices[["all"]][["soil_water_content_m.std_Bac"]],nperm=1000))
+#$r.squared R2 0.1529891     pval 0.0010000
+  
+
+decay.SWC.Bac_all.exp.sor<-decay.model(y=betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]], x=env_dist_matrices[["all"]][["soil_water_content_m.std_Bac"]], y.type="dissim", model.type="exp")
+# $aic -264040.7
+# $pseudo.r.squared 0.1566976
+
+decay.SWC.Bac_all.exp.sim<-decay.model(y=betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sim"]], x=env_dist_matrices[["all"]][["soil_water_content_m.std_Bac"]], y.type="dissim", model.type="exp")
+# $aic -241756
+# $pseudo.r.squared 0.1260104
+
+decay.SWC.Bac_all.exp.sne<-decay.model(y=betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sne"]], x=env_dist_matrices[["all"]][["soil_water_content_m.std_Bac"]], y.type="dissim", model.type="exp")
+# $aic -264040.7
+# $pseudo.r.squared 0.1566976 0.0003461677
+
+
+decay.SWC.Fun_all.exp.sor<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]], x=env_dist_matrices[["all"]][["soil_water_content_m.std_Fun"]], y.type="dissim", model.type="exp")
+# $aic -130861.6
+# $pseudo.r.squared 0.0211216
+
+decay.SWC.Fun_all.exp.sim<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sim"]], x=env_dist_matrices[["all"]][["soil_water_content_m.std_Fun"]], y.type="dissim", model.type="exp")
+# $aic -117996.9
+# $pseudo.r.squared 0.01433185
+
+decay.SWC.Fun_all.exp.sne<-decay.model(y=betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sne"]], x=env_dist_matrices[["all"]][["soil_water_content_m.std_Fun"]], y.type="dissim", model.type="exp")
+# $aic -442536.6
+# $pseudo.r.squared 0.003166138
+
+# Site-block bootstrap
+
+# Assessing the differences between parameters of two distance-decay models computed with decay.model().
+zdepDDBF_All_sor<-zdep(decay.SWC.Bac_all.exp.sor, decay.SWC.Fun_all.exp.sor, resamples=500, st.val = c(1, 0))
+
+zdepDDBF_All_sim<-zdep(decay.SWC.Bac_all.exp.sim, decay.SWC.Fun_all.exp.sim, resamples=500, st.val = c(1, 0))
+
+zdepDDBF_All_sne<-zdep(decay.SWC.Bac_all.exp.sne, decay.SWC.Fun_all.exp.sne, resamples=500, st.val = c(1, 0))
+
+# plot.decay.pretty(decay.SWC.Fun_F1.exp.sor, col="#C51B7D", add=F, main="F1", 
+#            xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+#            col.line="#8E0152",xaxp = c(0,1500,3),
+#            ylab="",xlab="")
+# 
+# plot.decay.pretty(decay.SWC.Fun_nonF1.exp.sor, col="#7FBC41", add=T, main="non-F1",
+#            xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+#            col.line="#276419",xaxp = c(0,1500,3),
+#            ylab="",xlab="")
+# mtext("Distance between Communities (in km)", side = 1, line = -2, outer = TRUE)
+```
+
+
+```{r plot-DD-BF-all,echo=FALSE,fig.dim=c(7,4.5),fig.dpi=250,fig.cap='(ref:DD-BF-all-fig-caption)',cache=TRUE}
+par(mfrow = c(3, 2),#c(nr, nc) 
+    mar = c(2, 5, 2.5, 0),# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+    oma = (c(3, 2, 2, 0) + 0.1))
+
+plot.decay.pretty(decay.SWC.Bac_all.exp.sor, col="#006e90", main="Bacteria\n",
+           lty=1,lwd=5,cex.main=1.1,
+           xlim = c(0,1600),ylim = c(0,1),col.line="#004E66",
+           xaxp = c(0,1500,3),
+           ylab="Total\nDissimilarity",xlab="")
+# text(2, 0.1, paste0("a = ", round(decay.SWC.Bac_all.exp.sor$first.parameter,3),", b = ",formatC(decay.SWC.Bac_all.exp.sor$second.parameter,digits=3, format="e")),adj = c(0,0), cex=0.8)
+mtext(paste0("βsor ~ S: pseudo-R2 = ", round(decay.SWC.Bac_all.exp.sor$pseudo.r.squared,3),
+             ", p-value = ",round(decay.SWC.Bac_all.exp.sor$p.value,3)), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.7) # side 1=bottom, 2=left, 3=top, 4=right
+
+plot.decay.pretty(decay.SWC.Fun_all.exp.sor, col="#f18f01", add=F, main="Fungi\n", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,cex.main=1.1,
+           col.line="#B76E01",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext(paste0("βsor ~ S: pseudo-R2 = ", round(decay.SWC.Fun_all.exp.sor$pseudo.r.squared,3),
+             ", p-value = ",round(decay.SWC.Bac_all.exp.sor$p.value,3)), side = 3, line = 0.25, outer = F,adj = c(0,0), cex=0.7) # side 1=bottom, 2=left, 3=top, 4=right
+mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
+
+# turnover
+plot.decay.pretty(decay.SWC.Bac_all.exp.sim, col="#006e90", 
+           lty=1,lwd=5,cex.main=1,
+           xlim = c(0,1600),ylim = c(0,1),col.line="#004E66",
+           xaxp = c(0,1500,3),
+           ylab="Turnover-Resultant\nDissim.",xlab="")
+mtext(paste0("βsim ~ S: pseudo-R2 = ", round(decay.SWC.Bac_all.exp.sim$pseudo.r.squared,3),
+             ", p-value = ",round(decay.SWC.Bac_all.exp.sim$p.value,3)), side = 3, line = 0.5, outer = F,adj = c(0,0), cex=0.7) # side 1=bottom, 2=left, 3=top, 4=right
+
+plot.decay.pretty(decay.SWC.Fun_all.exp.sim, col="#f18f01", add=F, 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line="#B76E01",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext(paste0("βsim ~ S: pseudo-R2 = ", round(decay.SWC.Fun_all.exp.sim$pseudo.r.squared,3),
+             ", p-value = ",round(decay.SWC.Fun_all.exp.sim$p.value,3)), side = 3, line = 0.5, outer = F,adj = c(0,0), cex=0.7) # side 1=bottom, 2=left, 3=top, 4=right
+
+
+#nestedness
+plot.decay.pretty(decay.SWC.Bac_all.exp.sne, col="#006e90", 
+           lty=1,lwd=5,cex.main=1,
+           xlim = c(0,1600),ylim = c(0,1),col.line="#004E66",
+           xaxp = c(0,1500,3),
+           ylab="Nestedness-Resultant\nDissim.",xlab="")
+mtext(paste0("βsne ~ S: pseudo-R2 = ", round(decay.SWC.Bac_all.exp.sne$pseudo.r.squared,3),
+             ", p-value = ",round(decay.SWC.Bac_all.exp.sne$p.value,3)), side = 3, line = 0.5, outer = F,adj = c(0,0), cex=0.7) # side 1=bottom, 2=left, 3=top, 4=right
+
+plot.decay.pretty(decay.SWC.Fun_all.exp.sne, col="#f18f01", add=F, 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line="#B76E01",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext(paste0("βsne ~ S: pseudo-R2 = ", round(decay.SWC.Fun_all.exp.sne$pseudo.r.squared,3),
+             ", p-value = ",round(decay.SWC.Fun_all.exp.sne$p.value,3)), side = 3, line = 0.5, outer = F,adj = c(0,0), cex=0.7) # side 1=bottom, 2=left, 3=top, 4=right
+
+```

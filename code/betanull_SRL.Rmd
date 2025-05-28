@@ -1,0 +1,27 @@
+# avg_SRL {.tabset .tabset-pills .unnumbered}
+
+## **Bacteria** {.unnumbered}
+```{r}
+ggplot(data=Bac.by.sample.dat_cmeta, aes(y=avg_SRL, x=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point()+
+  stat_smooth(method = "loess", level=0.8, se=F, alavg_SRLa=0.5)+
+  stat_smooth(inherit.aes = F, method = "lm", level=0.8, aes(y=avg_SRL, x=abund_null_dev_stoch), col="black", linewidth=2)
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~avg_SRL, data = Bac.by.sample.dat_cmeta)))$adj.r.squared,2)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~avg_SRL, data = Bac.by.sample.dat_cmeta)))$coefficients[2,1],2)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~avg_SRL, data = Bac.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\
+
+## **Fungi** {.unnumbered}
+```{r}
+ggplot(data=Fun.by.sample.dat_cmeta, aes(y=avg_SRL, x=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point()+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.5)+
+  stat_smooth(inherit.aes = F, method = "lm", level=0.8, aes(y=avg_SRL, x=abund_null_dev_stoch), col="black", linewidth=2)
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~avg_SRL, data = Fun.by.sample.dat_cmeta)))$adj.r.squared,2)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~avg_SRL, data = Fun.by.sample.dat_cmeta)))$coefficients[2,1],2)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~avg_SRL, data = Fun.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\

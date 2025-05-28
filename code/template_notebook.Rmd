@@ -1,0 +1,217 @@
+---
+title: '**template notebook**'
+author: "Kelli Feeser"
+date: "`r Sys.Date()`"
+output:
+  html_notebook:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+    keep_md: yes
+  html_document:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+\
+
+::: homelink
+<a href="https://kellifeeser.github.io/hfd-microbiome/index.html" target="_blank" style="text-align:right">Back to Home</a>
+:::
+
+\
+
+------------------------------------------------------------------------
+
+Document last updated: `r Sys.Date()`
+
+------------------------------------------------------------------------
+
+\
+
+# Set-up project naming from reproducible code {.unlisted .unnumbered .hidden}
+
+```{r project-naming, include=F, eval=T}
+PROJECT <- 'HFD Microbiome - 12 week experiment'
+PROJABBV <- 'HFD12wk'
+
+DATASET1 <- 'Bac'
+# DATASET2 <- 'Fun'
+
+RDS1 <- 'hfd_12wk_min2_rare13006'
+# RDS2 <- 'Fun_min2_rare10116_v2'
+
+PROJABBV_fig_path=paste0("../docs/figures/taxa_plots/",PROJABBV)
+```
+
+# Set-up {.unlisted .unnumbered .hidden}
+
+
+```{r global_options, include=FALSE,eval=TRUE}
+library(knitr)
+
+# set up global R options
+  # to list the current values of all options but better to F1
+    #options()
+    # easier way:
+      #?options
+  # to access the value of a single option
+    #getOption("width")
+
+# figure guidelines
+  # save as vector (.ai, .eps, .pdf)
+  # resolution: min 300 dpi
+  # dimensions: 
+    # Nature Research Journals
+      # 1 col width = 88mm (3.45 in)
+      # 2 col width = 180mm (7.08 in)
+    # All Other Journals
+      # 1 col width = 85mm (3.34 in)
+      # 2 col width = 175mm (6.88 in)
+  # file size should be < 50 MB
+
+# text
+  # font: sans-serif (helvetica or arial)
+  # size: min 5pt, max 7pt
+
+## ~~create directories~~ ##
+###########################################
+dir.create("../processed_data/clean_rds_saves/tax_dat/", showWarnings = T,recursive=T)
+dir.create("../docs/figures/taxa_plots/", showWarnings = T,recursive=T)
+dir.create("../processed_data/taxonomy/", showWarnings = T,recursive=T)
+###########################################
+
+
+
+## ~~preload your R variables here~~ ##
+###########################################
+# variable_1 <- c("a", "b", "c")
+####
+
+###########################################
+
+## ~~set up knitr global chunk options~~ ##
+###########################################
+  # See str(knitr::opts_chunk$get()) for a list of default chunk options.
+####
+
+# knitr::opts_chunk$set(echo = FALSE, warning = FALSE,
+                      # message = FALSE,
+                      # )
+
+knitr::opts_knit$set(echo = FALSE,
+                     # cache.path="../docs/code/taxonomy_1_setup_12wk_cache_files/",
+                     fig.path = PROJABBV_fig_path,
+                     fig.width = 6.8,
+                     eval.after = "fig.cap",
+                     fig.pos = '!h'
+                     )
+
+options(knitr.kable.NA = '')
+###########################################
+
+```
+
+```{r LANL-proxies, eval=T, include=FALSE}
+# LANL proxies
+Sys.setenv('HTTP_PROXY'='http://proxyout.lanl.gov:8080')
+Sys.setenv('HTTPS_PROXY'='http://proxyout.lanl.gov:8080')
+```
+
+## load packages
+
+```{r load-packages, eval=T, include=F}
+library("ggplot2"); packageVersion("ggplot2") #‘3.4.4’
+library("vegan"); packageVersion("vegan") # # ‘2.6.4’
+library("phyloseq"); packageVersion("phyloseq") #‘1.44.0’
+library("scales"); packageVersion("scales") #‘1.2.1’
+library("swatches"); packageVersion("swatches") #‘0.5.0’
+library("ggsci"); packageVersion("ggsci") #‘3.0.0’
+library("ggpubr"); packageVersion("ggpubr") #‘0.6.0’
+library("viridis"); packageVersion("viridis") #‘0.6.4’
+library("RColorBrewer"); packageVersion("RColorBrewer") #‘1.1.3’
+library("cowplot"); packageVersion("cowplot") #‘1.1.1’
+library("dplyr"); packageVersion("dplyr") #‘1.1.3’
+library("plyr"); packageVersion("plyr") #‘1.8.9’
+library("knitr"); packageVersion("knitr") #‘1.44’
+#library("kableExtra"); packageVersion("kableExtra") #‘1.3.4’
+library("DT"); packageVersion("DT") #‘0.30’
+library("tidyverse"); packageVersion("tidyverse") #‘2.0.0’
+library("magrittr"); packageVersion("magrittr") #‘2.0.3’
+library("broom"); packageVersion("broom") #‘1.0.5’
+# patch see: https://stackoverflow.com/questions/76118194/error-when-loading-kableextra-in-markdown-file-after-updating-to-r-4-3-0
+# devtools::install_github("kupietz/kableExtra",force = TRUE)
+library("kableExtra")
+
+source("hfd_colors.R")
+source("../../black-sheep-club/code/sheepish_scripts.R")
+```
+
+## load cache
+
+```{r load-cache, include=FALSE, eval=T}
+# How to use an object before it is created
+  # see https://bookdown.org/yihui/rmarkdown-cookbook/load-cache.html
+
+# OBJECT <- if (file.exists('OBJECT.rds')) {
+#   readRDS('OBJECT.rds')
+# } else {
+#   "The value of `OBJECT` is not available yet"
+# }
+
+# knitr::load_cache('CHUNK-NAME', 'OBJECT')
+
+# knitr::load_cache('', '')
+# knitr::load_cache('', '')
+# knitr::load_cache('', '')
+
+```
+
+## load rds
+
+```{r load-rds, include=FALSE,eval=TRUE}
+###.###.######.###.###
+# phylo #
+###.###.###
+Bac<-readRDS(file = paste0("../processed_data/clean_rds_saves/",RDS1,".rds"))
+Bac
+###.###.######.###.###
+
+
+
+###.###.######.###.###
+# misc #
+##
+# Bac_wholecommunity.r<-readRDS(file = "../processed_data/clean_rds_saves/Bac_wholecommunity.r.rds")
+sd<-as(sample_data(Bac), "data.frame") # metadata 
+# write.csv(sd, file = "../processed_data/metadata_12wk.csv")
+
+
+###.###.######.###.###
+# colors #
+###.###.###
+
+
+###.###.######.###.###
+```
+
+

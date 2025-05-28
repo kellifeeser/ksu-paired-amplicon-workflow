@@ -1,0 +1,1724 @@
+---
+title: '**RAM paired amplicons taxa queries:** Distribution and diversity of *Darksidea* and *Monosporascus* sp. with variable input data'
+author: "Kelli Feeser"
+subtitle: "`r params$INPUT_DATA_DESCR` "
+date: "`r Sys.Date()`"
+params:
+  PROJABBV: "noEDGEnoMP"
+  INPUT_DATA_DESCR: "Input data subset to a) exclude EDGE samples, and b) exclude fungal samples with [m]{.underline}issing bacterial [p]{.underline}air ('noEDGEnoMP')"
+output:
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    fig.caption: yes
+    keep_md: yes
+  html_notebook:
+    code_folding: hide
+    df_print: paged
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    fig.caption: yes
+  prettydoc::html_pretty:
+    toc: yes
+    fig.caption: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+\
+
+::: homelink
+<a href="https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html" target="_blank" style="text-align:right">Back to Home</a>
+:::
+
+\
+
+------------------------------------------------------------------------
+
+Document last updated: `r Sys.Date()`
+
+------------------------------------------------------------------------
+
+\
+
+# Set-up project naming from reproducible code {.unlisted .unnumbered}
+
+```{r project-naming, include=F, eval=T}
+PROJECT_PAGENAME <- 'RAM paired amplicons'
+PROJECT_SUBPAGENAME <- 'Queries of taxa of interest with variable input data'
+INPUT_DATA_DESCR <- "Input data subset to a) exclude EDGE samples, and b) exclude fungal samples with [m]{.underline}issing bacterial pair ('noEDGEnoMP')"
+PROJABBV <- 'noEDGEnoMP'
+
+bindingIsLocked("params", env = .GlobalEnv)
+unlockBinding("params", env = .GlobalEnv)
+params$INPUT_DATA_DESCR <- INPUT_DATA_DESCR
+
+# DATASET1 <- 'Bac'
+# DATASET2 <- 'Fun'
+
+RDS1 <- 'Fun_wholecommunity.rds'
+# RDS2 <- ''
+
+#create paths for directories (sans prefix)
+FIG_PATHDIR=paste0("../docs/figures/darksidea_plots/",PROJABBV)
+CACHE_PATHDIR=paste0("../docs/github_darksidea_cache/github_darksidea_",PROJABBV,"_files/")
+# occupancy/abundance/tax frequencies
+OAF_PATHDIR=paste0("../docs/processed_data/OTU_occurrencefrequency/",PROJABBV)
+
+
+FIG_PATH=paste0("../docs/figures/darksidea_plots/",PROJABBV,"/RAM_",PROJABBV,"-")
+CACHE_PATH=paste0("../docs/github_darksidea_cache/github_darksidea_",PROJABBV,"_files/RAM_",PROJABBV,"_")
+# occupancy/abundance/tax frequencies
+OAF_PATH=paste0("../docs/processed_data/OTU_occurrencefrequency/",PROJABBV,"/RAM_",PROJABBV,"_Freq_OTU_Occurrence_")
+```
+
+```{r global-options, include = FALSE}
+library(knitr)
+
+# set up global R options
+  # to list the current values of all options but better to F1
+    #options()
+    # easier way:
+      #?options
+  # to access the value of a single option
+    #getOption("width")
+
+# figure guidelines
+  # save as vector (.ai, .eps, .pdf)
+  # resolution: min 300 dpi
+  # dimensions: 
+    # Nature Research Journals
+      # 1 col width = 88mm (3.45 in)
+      # 2 col width = 180mm (7.08 in)
+    # All Other Journals
+      # 1 col width = 85mm (3.34 in)
+      # 2 col width = 175mm (6.88 in)
+  # file size should be < 50 MB
+
+# text
+  # font: sans-serif (helvetica or arial)
+  # size: min 5pt, max 7pt
+
+## ~~create directories~~ ##
+###########################################
+dir.create(FIG_PATHDIR, showWarnings = T,recursive=T)
+dir.create(CACHE_PATHDIR, showWarnings = T,recursive=T)
+dir.create(OAF_PATHDIR, showWarnings = T,recursive=T)
+###########################################
+
+
+# set up knitr global chunk options
+  # See str(knitr::opts_chunk$get()) for a list of default chunk options.
+#knitr::opts_chunk$set(fig.width = 8)
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.path = FIG_PATH,
+                      cache.path = CACHE_PATH,
+                      eval.after = "fig.cap",
+                      fig.pos = '!h'
+                      )
+```
+
+```{r LANL-proxies, eval=T, include=FALSE}
+# LANL proxies
+Sys.setenv('HTTP_PROXY'='http://proxyout.lanl.gov:8080')
+Sys.setenv('HTTPS_PROXY'='http://proxyout.lanl.gov:8080')
+```
+
+# Set-up {.unlisted .unnumbered .hidden}
+
+## load packages
+
+```{r load packages, eval=T, include=F}
+library("ggplot2"); packageVersion("ggplot2") #‘3.4.4’
+library("vegan"); packageVersion("vegan") # # ‘2.6.4’
+library("phyloseq"); packageVersion("phyloseq") #‘1.44.0’
+library("scales"); packageVersion("scales") #‘1.2.1’
+library("swatches"); packageVersion("swatches") #‘0.5.0’
+library("ggsci"); packageVersion("ggsci") #‘3.0.0’
+library("ggpubr"); packageVersion("ggpubr") #‘0.6.0’
+library("viridis"); packageVersion("viridis") #‘0.6.4’
+library("RColorBrewer"); packageVersion("RColorBrewer") #‘1.1.3’
+library("cowplot"); packageVersion("cowplot") #‘1.1.1’
+library("dplyr"); packageVersion("dplyr") #‘1.1.3’
+library("plyr"); packageVersion("plyr") #‘1.8.9’
+library("knitr"); packageVersion("knitr") #‘1.44’
+#install.packages('kableExtra', dependencies=TRUE, repos='http://cran.rstudio.com/')
+#library("kableExtra"); packageVersion("kableExtra") #‘1.3.4’
+library("DT"); packageVersion("DT") #‘0.30’
+library("tidyverse"); packageVersion("tidyverse") #‘2.0.0’
+library("prettydoc"); packageVersion("prettydoc") #‘0.4.1’
+library("magrittr"); packageVersion("magrittr") #‘2.0.3’
+library("broom"); packageVersion("broom") #‘1.0.5’
+library("kableExtra")
+
+# library("devtools")
+# devtools::install_github("vmikk/metagMisc")
+# library("metagMisc"); packageVersion("metagMisc") #‘2.0.3’
+
+
+
+  # if (!require("BiocManager", quietly = TRUE))
+  #     install.packages("BiocManager")
+  # BiocManager::install(version = "3.11")
+  # 
+  # BiocManager::install("microbiome")
+library("microbiome"); packageVersion("microbiome") #‘1.22.0’
+
+source("ksu_colors.R")
+source("../../black-sheep-club/code/sheepish_scripts.R")
+```
+
+## load rds
+
+```{r load-rds, include=FALSE,eval=TRUE}
+###.###.######.###.###
+# phylo #
+###.###.###
+Fun<-readRDS(file = paste0("../processed_data/clean_rds_saves/",RDS1))
+Fun
+###.###.######.###.###
+```
+
+(ref:OA-AllG-allOTUs-fig-caption) Occupancy-abundance figure overlayed with generalist framework results from OTU down-selection for co-occurrence (top 2.5% of distribution). Plot contains data from all samples and OTUs. I have added in the generalist vs. specialist (GvS) OTU annotations. 'Generalist' OTUs have the highest 2.5% of occurrence:abundance distribution, 'specialists' are in the lowest lowest 2.5%, 'NS' are the non-significant OTUs falling in the middle 95%, 'singletons' are OTUs that only appeared in a single sample and thus were excluded from GvS analyses. GvS calculations were run independently for the full dataset (all grass hosts) and for the by-host data. Note both axes are shown on a log scale.
+
+(ref:OA-BOGR-allOTUs-fig-caption) Occupancy-abundance figure overlayed with generalist framework results from OTU down-selection for co-occurrence (top 2.5% of distribution). Plot contains data from all OTUs associated with *Blue grama* hosts. I have added in the generalist vs. specialist (GvS) OTU annotations. 'Generalist' OTUs have the highest 2.5% of occurrence:abundance distribution, 'specialists' are in the lowest lowest 2.5%, 'NS' are the non-significant OTUs falling in the middle 95%, 'singletons' are OTUs that only appeared in a single sample and thus were excluded from GvS analyses. GvS calculations were run independently for the full dataset (all grass hosts) and for the by-host data. Note both axes are shown on a log scale.
+
+(ref:OA-BOER-allOTUs-fig-caption) Occupancy-abundance figure overlayed with generalist framework results from OTU down-selection for co-occurrence (top 2.5% of distribution). Plot contains data from all OTUs associated with *Black grama* hosts. I have added in the generalist vs. specialist (GvS) OTU annotations. 'Generalist' OTUs have the highest 2.5% of occurrence:abundance distribution, 'specialists' are in the lowest lowest 2.5%, 'NS' are the non-significant OTUs falling in the middle 95%, 'singletons' are OTUs that only appeared in a single sample and thus were excluded from GvS analyses. GvS calculations were run independently for the full dataset (all grass hosts) and for the by-host data. Note both axes are shown on a log scale.
+
+(ref:OA-BUDA-allOTUs-fig-caption) Occupancy-abundance figure overlayed with generalist framework results from OTU down-selection for co-occurrence (top 2.5% of distribution). Plot contains data from all OTUs associated with *Buffalograss* hosts. I have added in the generalist vs. specialist (GvS) OTU annotations. 'Generalist' OTUs have the highest 2.5% of occurrence:abundance distribution, 'specialists' are in the lowest lowest 2.5%, 'NS' are the non-significant OTUs falling in the middle 95%, 'singletons' are OTUs that only appeared in a single sample and thus were excluded from GvS analyses. GvS calculations were run independently for the full dataset (all grass hosts) and for the by-host data. Note both axes are shown on a log scale.
+
+# Data Overview {.unnumbered}
+
+`r INPUT_DATA_DESCR`
+
+------------------------------------------------------------------------
+
+### OTU tables {.unnumbered}
+
+```{r make-Darksidea-stats-Fun_Genus_Mean_Abund, eval=T, include=F, cache=F}
+dat_Genus.r <- Fun %>%
+  tax_glom(taxrank = "Genus") %>%
+  transform_sample_counts(function(x) {x / sum(x)} ) %>%
+  psmelt()
+# dat_Genus.r$Genus <- factor(dat_Genus.r$Genus)
+# saveRDS(dat_Genus.r, file="../processed_data/clean_rds_saves/dat_Genus.r.rds")
+
+# dat_Genus.r <- readRDS(file="../processed_data/clean_rds_saves/dat_Genus.r.rds")
+dat_Genus.r$Genus <- factor(dat_Genus.r$Genus)
+
+Darksidea_Genus_stats <- dat_Genus.r %>% 
+  as_tibble %>%
+  group_by(Genus) %>%
+  reframe(
+  av = mean(Abundance)*100,
+  sd = sd(Abundance,na.rm = T)*100) %>% 
+  filter(Genus=="Darksidea")
+
+dat_OTU.r <- Fun %>% 
+  transform_sample_counts(function(x) {x / sum(x)} ) %>% 
+  psmelt()
+dat_OTU.r$Genus <- factor(dat_OTU.r$Genus)
+dat_OTU.r$OTU <- factor(dat_OTU.r$OTU)
+
+Darksidea_OTU_stats <- dat_OTU.r %>% 
+  as_tibble %>%
+  filter(Genus=="Darksidea") %>% 
+  group_by(OTU) %>%
+  reframe(
+  av = mean(Abundance)*100,
+  sd = sd(Abundance,na.rm = T)*100) 
+
+###############
+# Monosporascus
+Monosporascus_Genus_stats <- dat_Genus.r %>% 
+  as_tibble %>%
+  group_by(Genus) %>%
+  reframe(
+  av = mean(Abundance)*100,
+  sd = sd(Abundance,na.rm = T)*100) %>% 
+  filter(Genus=="Monosporascus")
+
+Monosporascus_OTU_stats <- dat_OTU.r %>% 
+  as_tibble %>%
+  filter(Genus=="Monosporascus") %>% 
+  group_by(OTU) %>%
+  reframe(
+  av = mean(Abundance)*100,
+  sd = sd(Abundance,na.rm = T)*100) 
+###############
+
+Fun_merged <- merge_samples(Fun, "Edge",fun=mean)
+Fun_merged.Genus.A <- tax_glom(Fun_merged, taxrank="Genus")
+Fun_merged.Genus <- prune_taxa(taxa_sums(Fun_merged.Genus.A) > 0, Fun_merged.Genus.A)
+Fun_merged.Genus.r  = transform_sample_counts(Fun_merged.Genus, function(x) x / sum(x) )
+  #731
+
+sample_names(Fun_merged.Genus.r)<-"Fun_Genus_Mean"
+Fun_Genus_Mean_Abund <- merge(tax_table(Fun_merged.Genus.r)[,c("Domain","Phylum","Class","Order","Family","Genus")], t(otu_table(Fun_merged.Genus.r)), by=0, all=TRUE)
+colnames(Fun_Genus_Mean_Abund)[1]<-"Fun_OTU"
+Fun_Genus_Mean_Abund$Fun_Genus_Mean<-as.numeric(Fun_Genus_Mean_Abund$Fun_Genus_Mean*100)
+Fun_Genus_Mean_Abund <-Fun_Genus_Mean_Abund[order(Fun_Genus_Mean_Abund$Fun_Genus_Mean, decreasing = T),]
+
+Fun_Genus_Mean_Abund2 <- Fun_Genus_Mean_Abund 
+
+colnames(Fun_Genus_Mean_Abund2)[8] <- "Mean rel abund (%)"
+# Fun_Genus_Mean_Abund2$Rank_RA <- rank(Fun_Genus_Mean_Abund2$`Abundance (%)`,ties.method	= "max")
+
+Fun_Genus_Mean_Abund2$Rank_RA<-(dplyr::dense_rank(desc(Fun_Genus_Mean_Abund2$`Mean rel abund (%)`)))
+
+Fun_Genus_Mean_Abund2$Percentile<-(dplyr::percent_rank(desc(Fun_Genus_Mean_Abund2$`Mean rel abund (%)`)))*100
+
+
+# round mean rel abundance
+    # Round values less than 0.0001 to 5 decimal places
+    # Round values between 0.0001 and 0.001 to 4 decimal places
+    # Round values between 0.001 and 0.01 to 3 decimal places
+    # Round values between 0.01 and 0.1 to 2 decimal places
+    # Round values between 0.1 and 10 to 1 decimal place
+    # Round values greater than 10 to 0 decimal places.
+
+
+Fun_Genus_Mean_Abund2$`Mean rel abund (%)` <- ifelse(
+  Fun_Genus_Mean_Abund2$`Mean rel abund (%)` < 0.0001,
+  round(Fun_Genus_Mean_Abund2$`Mean rel abund (%)`, 5),
+  ifelse(
+    Fun_Genus_Mean_Abund2$`Mean rel abund (%)` < 0.001,
+    round(Fun_Genus_Mean_Abund2$`Mean rel abund (%)`, 4),
+    ifelse(
+      Fun_Genus_Mean_Abund2$`Mean rel abund (%)` < 0.01,
+      round(Fun_Genus_Mean_Abund2$`Mean rel abund (%)`, 3),
+      ifelse(
+        Fun_Genus_Mean_Abund2$`Mean rel abund (%)` < 0.1,
+        round(Fun_Genus_Mean_Abund2$`Mean rel abund (%)`, 2),
+        ifelse(
+          Fun_Genus_Mean_Abund2$`Mean rel abund (%)` > 10,
+          round(Fun_Genus_Mean_Abund2$`Mean rel abund (%)`, 0),
+          round(Fun_Genus_Mean_Abund2$`Mean rel abund (%)`, 1)
+        )
+      )
+    )
+  )
+)
+
+
+#Fun_Genus_Mean_Abund2$Percentile <- round(Fun_Genus_Mean_Abund2$Percentile,1)
+
+MAX_RANK_VALUE<-max(Fun_Genus_Mean_Abund2[,9])
+
+colnames(Fun_Genus_Mean_Abund2)[9] <- paste0("Rank_RA (max ",MAX_RANK_VALUE,")")
+```
+
+```{r calc_occurrence-data-manipulation, include=F,eval=T,cache=F}
+
+Fun_Sev <-subset_samples(Fun, Site=="SEV")
+Fun_Sev_no1x <- prune_taxa(taxa_sums(Fun_Sev) > 0, Fun_Sev)
+
+# taxa_frequency = 
+  # "count" - just counts OTU occurrence (number of samples)
+  # "percentage" - (default) Frequency of occurrence 
+      # proportion of sampling units that contains the OTU 
+      # (sample units in which OTU occurred / total # of sample units)
+  # "relfreq" - Relative occurrence frequency
+      # aka relative frequency of OTU 
+      # (frequency of each OTU [see 'percentage'] / sum of the frequency of all OTUs)
+
+
+occ_otu_null <- calc_occurrence(Fun, justdf = T)
+occ_otu_site <- calc_occurrence(Fun, variable = "Site", justdf = T)
+occ_otu_grass_allsites <- calc_occurrence(Fun, "Grass", justdf = T)
+occ_otu_grass_SEVonly <- calc_occurrence(Fun_Sev, variable = "Grass", justdf = T)
+
+
+tax_table1<-as.data.frame(tax_table(Fun))
+tax_table <- tibble::rownames_to_column(tax_table1, "OTU")
+
+colnames(occ_otu_site)[1] <- "OTU"
+
+colnames(occ_otu_null)[1] <- "OTU"
+colnames(occ_otu_null)[2] <- "global_occurrence"
+
+colnames(occ_otu_grass_allsites)[1] <- "OTU"
+colnames(occ_otu_grass_allsites)[2] <- "ANGE_allsites"
+colnames(occ_otu_grass_allsites)[3] <- "BOER_allsites"
+colnames(occ_otu_grass_allsites)[4] <- "BOGR_allsites"
+colnames(occ_otu_grass_allsites)[5] <- "BUDA_allsites"
+colnames(occ_otu_grass_allsites)[6] <- "SCSC_allsites"
+
+
+colnames(occ_otu_grass_SEVonly)[1] <- "OTU"
+colnames(occ_otu_grass_SEVonly)[2] <- "BOER_SEVonly"
+colnames(occ_otu_grass_SEVonly)[3] <- "BOGR_SEVonly"
+
+
+
+OTU_freq_occurr_bySite_Grass<-
+  tax_table %>% 
+  left_join(occ_otu_null,by = "OTU") %>% 
+  left_join(occ_otu_grass_SEVonly,by = "OTU") %>% 
+  left_join(occ_otu_grass_allsites,by = "OTU") %>% 
+  left_join(occ_otu_site,by = "OTU")
+
+#head(OTU_freq_occurr_bySite_Grass)
+
+OTU_freq_occurr_bySite_Grass_Monosporascus <- subset(OTU_freq_occurr_bySite_Grass, Genus == "Monosporascus")
+OTU_freq_occurr_bySite_Grass_Monosporascus$Domain<-as.factor(OTU_freq_occurr_bySite_Grass_Monosporascus$Domain)
+OTU_freq_occurr_bySite_Grass_Monosporascus$OTU<-as.factor(OTU_freq_occurr_bySite_Grass_Monosporascus$OTU)
+
+OTU_freq_occurr_bySite_Grass_Xylariales <- subset(OTU_freq_occurr_bySite_Grass, Order == "Xylariales")
+OTU_freq_occurr_bySite_Grass_Darksidea <- subset(OTU_freq_occurr_bySite_Grass, Genus == "Darksidea")
+
+# write to docs/processed_data
+write.csv(OTU_freq_occurr_bySite_Grass, file=paste0(OAF_PATH,"bySitexGrass_OTU_alltaxa.csv"))
+
+write.csv(OTU_freq_occurr_bySite_Grass_Monosporascus, file=paste0(OAF_PATH,"bySitexGrass_genus_Monosporascus.csv"))
+
+write.csv(OTU_freq_occurr_bySite_Grass_Xylariales, file=paste0(OAF_PATH,"bySitexGrass_order_Xylariales.csv"))
+
+write.csv(OTU_freq_occurr_bySite_Grass_Darksidea, file=paste0(OAF_PATH,"bySitexGrass_genus_Darksidea.csv"))
+
+# write to ../processed_data
+# write.csv(OTU_freq_occurr_bySite_Grass, file="../processed_data/OTU_occurrencefrequency/noEDGEnoMP/RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_OTU_alltaxa.csv")
+
+# write.csv(OTU_freq_occurr_bySite_Grass_Monosporascus, file="../processed_data/OTU_occurrencefrequency/noEDGEnoMP/RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_genus_Monosporascus.csv")
+
+# write.csv(OTU_freq_occurr_bySite_Grass_Xylariales, file="../processed_data/OTU_occurrencefrequency/noEDGEnoMP/RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_order_Xylariales.csv")
+
+# write.csv(OTU_freq_occurr_bySite_Grass_Darksidea, file="../processed_data/OTU_occurrencefrequency/noEDGEnoMP/RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_genus_Darksidea.csv")
+
+```
+
+Taxonomy assigned using SINTAX algorithm (USEARCH v11)\
+Reference database: most current UNITE UNITE USEARCH/UTAX release for eukaryotes
+
+-   version no 9.0, release date 2023-07-18
+
+-   taxon group: All eukaryotes
+
+-   location: <https://dx.doi.org/10.15156/BIO/2938084>
+
+-   citation: Abarenkov, Kessy; Zirk, Allan; Piirmann, Timo; Pöhönen, Raivo; Ivanov, Filipp; Nilsson, R. Henrik; Kõljalg, Urmas (2023): UNITE USEARCH/UTAX release for eukaryotes. Version 18.07.2023. UNITE Community. <https://doi.org/10.15156/BIO/2938084>
+
+All EDGE samples have been excluded\
+ITS OTU table rarefied to `r prettyNum(max(sample_sums(Fun)),big.mark = ",")` seqs/sample
+
+**Fungal (ITS) Dataset:**
+
+-   `r prettyNum(ntaxa(Fun),big.mark = ",")` OTUs
+-   `r prettyNum(nsamples(Fun),big.mark = ",")` samples\
+-   `r prettyNum(length(get_taxa_unique(Fun, taxonomic.rank = "Genus")),big.mark = ",")` unique genera detected, inc. *Darksidea*\
+
+------------------------------------------------------------------------
+
+### Available metadata {.unnumbered}
+
+Note that numeric metadata has been mean standardized.
+
+```{r mean-std-metadata, eval=TRUE,include=FALSE}
+#######
+# Fun #
+#######
+#Fun_m.std <- perform_mean_standardization(Fun)
+# coll_GDD,GDD30yr,GDD3yr,GDD2015,ppt30yr,ppt3yr,ppt2015,soil_moisture,GWC,perc_moisture,pH,phos,ammonium,nitrate,SOM,herbivory_perc,avg_SLA,avg_SRL
+
+#saveRDS(Fun_m.std, file="../processed_data/clean_rds_saves/Fun_m.std.rds")
+
+# Fun_m.std <- readRDS(file="../processed_data/clean_rds_saves/Fun_m.std.rds")
+
+
+# saveRDS(Fun.Genus, file="../processed_data/clean_rds_saves/Fun.Genus.rds")
+# Fun.Genus_m.std <- perform_mean_standardization(Fun.Genus)
+# saveRDS(Fun.Genus_m.std, file="../processed_data/clean_rds_saves/Fun.Genus_m.std.rds")
+# Fun.Genus_m.std <- readRDS(file="../processed_data/clean_rds_saves/Fun.Genus_m.std.rds")
+
+#######
+# Bac #
+#######
+# Bac_m.std <- perform_mean_standardization(Bac)
+# coll_GDD,GDD30yr,GDD3yr,GDD2015,ppt30yr,ppt3yr,ppt2015,soil_moisture,GWC,perc_moisture,pH,phos,ammonium,nitrate,SOM,herbivory_perc,avg_SLA,avg_SRL
+
+# saveRDS(Bac_m.std, file="../processed_data/clean_rds_saves/Bac_m.std.rds")
+
+# Bac_m.std <- readRDS(file="../processed_data/clean_rds_saves/Bac_m.std.rds")
+
+
+```
+
+```{r, echo=F, eval=F}
+sd_Fun<-sample_data(Fun)
+colnames(sd_Fun)
+```
+
+[*Sampling Variables:*]{.underline}
+
+-   **Grass host** (n=5)
+    -   ANGE (*Andropogon gerardii* / Big bluestem)
+    -   SCSC (*Schizachyrium scoparium* / Little bluestem)
+    -   BOER (*Bouteloua eriopoda* / Black grama)
+    -   BOGR (*B. gracilis* / Blue grama)
+    -   BUDA (*B. dactyloides* / Buffalograss)
+-   **Grassland type** (n=4)
+    -   desert, shortgrass, mixed grass, and tallgrass
+-   **Site** (n=21)
+-   GPS coordinates - **latitude** and **longitude**
+-   '**Longitudinal Gradient**' (n=4)
+    -   North, North Central, South Central, South
+-   '**Latitudinal Bin**' (n=3)
+    -   East, Middle, West
+-   **Elevation** (in meters)\
+
+[*Climate Data:*]{.underline}
+
+-   **GDD** = growing degree days (determined over 3- and 30-year windows and in 2015)
+-   **ppt** = mean annual precipitation (determined over 3- and 30-year windows and in 2015)\
+    \*Data from PRISM Climate Group 2019 (Oregon State University)\
+
+[*Edaphic Variables:*]{.underline}
+
+-   **ammonium** (NH~4~^+^)
+-   **nitrate** (NO~3~^--^)
+-   **SOM** (via LoI)
+-   **phosphorous** (total P)
+-   **pH**
+-   **soil_moisture** = percentage by weight of water in soil (by sample, Rudgers et al. called this a climate variable)\
+    \*soils combined within each Grass Host x Site combination\
+
+[*Plant Traits:*]{.underline}
+
+-   **avg_SLA**: specific leaf area
+-   **avg_SRL**: specific root length
+    -   Large values of specific leaf area (SLA) and specific root length (SRL) reflect large plant investment in resource acquisition; small values indicate investment in plant tissue longevity
+-   **herbivory_perc**: average site level damage estimate for herbivory, averaged over all species and individuals at the site; could be used to indicate herbivory pressure at the site level
+    -   ranges from 1:17\
+
+------------------------------------------------------------------------
+
+\
+
+## Links to download csv files of OTU occurrence frequencies by Site-by-Grass host combinations {.unnumbered}
+
+`colnames` and/or `indices` = explanation
+
+-   `OTU` = OTU ID number (fungal)
+
+-   `Domain` : `Species` `([,c(3:9)])` = taxonomic classifications for each OTU
+
+-   `global_occurrence` `[,10]` = proportion of samples with OTU detected over of total number of samples (max of 1)
+
+-   Sevilleta-site only (`r nsamples(Fun_Sev)` samples total, of which `r nrow(subset(sample_data(Fun_Sev), Grass=="BOER"))` were associated with *Black grama* and `r nrow(subset(sample_data(Fun_Sev), Grass=="BOGR"))` with *Blue grama*)
+
+    -   `BOER_SEVonly` `[,11]`
+
+    -   `BOGR_SEVonly` `[,12]`
+
+-   By grass host `([,c(13:17)])` = splitting samples by grass host, proportion of samples with OTU detected over of total number of samples per host. Denominator ranged from 75 - 157 (samples per grass host).
+
+    -   `ANGE_allsites`, `BOER_allsites`, `BOGR_allsites`, `BUDA_allsites`, `SCSC_allsites`
+
+-   By site `([,c(18:39)])` = splitting samples by site, proportion of samples with OTU detected over of total number of samples per site. Denominator ranged from 6 - 42 (samples per site).\
+
+\
+
+[OTU-level frequency of occurrence]{.underline}
+
+All OTUs
+
+-   [RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_OTU_alltaxa.csv](https://github.com/kellifeeser/ksu-paired-amplicon-workflow/blob/master/processed_data/OTU_occurrencefrequency/noEDGEnoMP/RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_OTU_alltaxa.csv "RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_OTU_alltaxa.csv")
+
+OTUs assigned to genus *Darksidea* (n = 3)
+
+-   [RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_genus_Darksidea.csv](https://github.com/kellifeeser/ksu-paired-amplicon-workflow/blob/master/processed_data/OTU_occurrencefrequency/noEDGEnoMP/RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_genus_Darksidea.csv "RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_genus_Darksidea.csv")
+
+OTUs assigned to genus *Monosporascus* (n = 2)
+
+-   [RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_genus_Monosporascus.csv](https://github.com/kellifeeser/ksu-paired-amplicon-workflow/blob/master/processed_data/OTU_occurrencefrequency/noEDGEnoMP/RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_genus_Monosporascus.csv "RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_genus_Monosporascus.csv")
+
+OTUs assigned to order *Xylariales* (order containing *Monosporascus*)(n = 99)
+
+-   [RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_order_Xylariales.csv](https://github.com/kellifeeser/ksu-paired-amplicon-workflow/blob/master/processed_data/OTU_occurrencefrequency/noEDGEnoMP/RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_order_Xylariales.csv "RAM_noEDGEnoMP_Freq_OTU_Occurrence_bySitexGrass_order_Xylariales.csv")
+
+\
+\
+\
+
+------------------------------------------------------------------------
+
+## OTU-level relative abundance {.unnumbered}
+
+Relative abundance of each OTU were averaged across all samples for these results.
+
+***Darksidea***
+
+This dataset contains `r ntaxa(subset_taxa(Fun, Genus=="Darksidea"))` OTUs belonging to genus *Darksidea*.
+
+At the OTU/species-level, all *Darksidea* OTUs were classified as "`r sort(get_taxa_unique(subset_taxa(Fun, Genus=="Darksidea"), taxonomic.rank = "Species"))`".\
+
+Mean and sd of *Darksidea* OTUs abundance across all samples:
+
+-   `r Darksidea_OTU_stats %>% dplyr::slice(1) %$% OTU`: `r round(Darksidea_OTU_stats %>% dplyr::slice(1) %$% av,3)` ± `r round(Darksidea_OTU_stats %>% dplyr::slice(1) %$% sd,2)`%
+-   `r Darksidea_OTU_stats %>% dplyr::slice(2) %$% OTU`: `r prettyNum(Darksidea_OTU_stats %>% dplyr::slice(2) %$% av,digits=2)` ± `r round(Darksidea_OTU_stats %>% dplyr::slice(2) %$% sd,3)`%
+-   `r Darksidea_OTU_stats %>% dplyr::slice(3) %$% OTU`: `r prettyNum(Darksidea_OTU_stats %>% dplyr::slice(3) %$% av,digits=2)` ± `r round(Darksidea_OTU_stats %>% dplyr::slice(3) %$% sd,2)`%
+    -   Global sum: `r prettyNum(sum(Darksidea_OTU_stats$av),digits=2)`%
+
+***Monosporascus***
+
+This dataset contains `r ntaxa(subset_taxa(Fun, Genus=="Monosporascus"))` OTUs belonging to genus *Monosporascus*.
+
+At the OTU/species-level, all *Monosporascus* OTUs were classified as "`r sort(get_taxa_unique(subset_taxa(Fun, Genus=="Monosporascus"), taxonomic.rank = "Species"))`".
+
+Mean and sd of *Monosporascus* OTUs abundance across all samples:
+
+-   `r Monosporascus_OTU_stats %>% dplyr::slice(1) %$% OTU`: `r prettyNum(Monosporascus_OTU_stats %>% dplyr::slice(1) %$% av,digits=2)` ± `r prettyNum(Monosporascus_OTU_stats %>% dplyr::slice(1) %$% sd,digits=1)`%
+-   `r Monosporascus_OTU_stats %>% dplyr::slice(2) %$% OTU`: `r prettyNum(Monosporascus_OTU_stats %>% dplyr::slice(2) %$% av,digits=2)` ± `r round(Monosporascus_OTU_stats %>% dplyr::slice(2) %$% sd,3)`%
+    -   Global sum: `r prettyNum(sum(Monosporascus_OTU_stats$av),digits=2)`%
+
+------------------------------------------------------------------------
+
+## Genus-level relative abundance {.unnumbered}
+
+Relative abundance of each OTU were averaged across all samples for these results.\
+
+***Darksidea***
+
+This dataset contains `r ntaxa(subset_taxa(Fun, Genus=="Darksidea"))` OTUs belonging to genus *Darksidea*.
+
+At the species-level, all *Darksidea* OTUs were classified as "`r sort(get_taxa_unique(subset_taxa(Fun, Genus=="Darksidea"), taxonomic.rank = "Species"))`".
+
+Across all samples, *Darksidea* had an average relative abundance of `r round(Darksidea_Genus_stats$av,3)` ± `r round(Darksidea_Genus_stats$sd,2)`%.\
+
+***Monosporascus***
+
+This dataset contains `r ntaxa(subset_taxa(Fun, Genus=="Monosporascus"))` OTUs belonging to genus *Monosporascus*.
+
+At the species-level, all *Monosporascus* OTUs were classified as "`r sort(get_taxa_unique(subset_taxa(Fun, Genus=="Monosporascus"), taxonomic.rank = "Species"))`".
+
+Across all samples, *Monosporascus* had an average relative abundance of `r prettyNum(Monosporascus_Genus_stats$av,digits=2)` ± `r round(Monosporascus_Genus_stats$sd,3)`% (sum of all relative abundances is 100%).\
+\
+
+```{r, echo=F, eval=T, warning=F}
+datatable(Fun_Genus_Mean_Abund2, caption = "SEARCHABLE table of genus-level taxonomy relative abundance & abundance rank and percentile, across all non-EDGE samples.    Notes: 'Abundance' is expressed as mean relative abundance percentage of genera across all non-EDGE samples. 'Rank_RA' indicates the rank of each genus by mean global relative abundance (rank of 1 is the most abundant, 416 is the least [gapless variant of ties.method = 'min']). 'Percentile' indicates the proportion of taxa with a higher mean relative abundance (0 is the most abundant).",
+          rownames = FALSE,
+          filter = 'top',
+          #width=680,
+          #style = "font-size: 8px",
+          options = list(searching = T,
+                         order = list(list(7, 'desc')), #sort by decreasing abundance
+                         initComplete = JS(
+              "function(settings, json) {",
+              "  var table = settings.oInstance.api();",
+              "  var darksideaIndex = table.column(6).data().indexOf('Darksidea');",
+              "  var darksideaRow = table.row(darksideaIndex).node();",
+              "  var fusariumIndex = table.column(6).data().indexOf('Fusarium');",
+              "  var fusariumRow = table.row(fusariumIndex).node();",
+              "  var monosporascusIndex = table.column(6).data().indexOf('Monosporascus');",
+              "  var monosporascusRow = table.row(monosporascusIndex).node();",
+              "  var tbody = table.table().body();",
+              "  $(darksideaRow).prependTo(tbody);",
+              "  $(darksideaRow).css('background-color', '#94D747');",
+              "  $(fusariumRow).insertAfter(darksideaRow);",
+              "  $(fusariumRow).css('background-color', '#EF9F43');",
+              "  $(monosporascusRow).insertAfter(fusariumRow);", # Placing Monosporascus after Fusarium
+              "  $(monosporascusRow).css('background-color', '#9CD2E8');", # 
+              "}"
+            ),
+            scrollX=TRUE,
+                         columnDefs = list(list(visible = FALSE, targets = c('Fun_OTU', 'Domain', 'Order')), #domain
+                                           list(width = '16%', targets = c('Class', 'Family', 'Genus')), #family
+                                           list(width = '25%', targets = 'Mean rel abund (%)'), #mean RA
+                                           list(width = '25%', targets = colnames(Fun_Genus_Mean_Abund2)[9]) 
+                                           #list(width = '125%', targets = 8) #rank RA
+                                           #,list(width = '110%', targets = 9) #percentile
+                                           )
+                         )
+          ) %>% formatRound('Percentile', 1)
+
+```
+
+\
+\
+
+```{r extract_rao-function, include=F,eval=T}
+extract_rao <- function(phylo_obj, spe.gen_res) {
+  
+  colnames(spe.gen_res)[1] <- "OTU"
+  
+  # convert to relative abundance
+  phylo_obj.r  = transform_sample_counts(phylo_obj, function(x) x / sum(x) )
+  phylo_obj.r_comm.tab<-as.data.frame(phylo2vegan_OTU(phylo_obj.r))
+  
+  # create presence/absence matrix
+  phylo_obj.r_comm.tab.bin<-ceiling(phylo_obj.r_comm.tab/max(phylo_obj.r_comm.tab))
+  
+  phylo_obj_OA<-data.frame(matrix(ncol = 3, nrow = ncol(phylo_obj.r_comm.tab.bin)))
+  x <- c("RelAbund", "Occurrence", "sign")
+  colnames(phylo_obj_OA) <- x
+  
+  # report mean abundance across all samples (only if present)
+  phylo_obj_OA$RelAbund<-(average_if_gt_zero(phylo_obj.r_comm.tab)*100)
+  
+  # report occurrence
+  phylo_obj_OA$Occurrence<-(colSums(phylo_obj.r_comm.tab.bin)/dim(phylo_obj.r_comm.tab.bin)[1])
+  row.names(phylo_obj_OA)<-names(phylo_obj.r_comm.tab)
+  phylo_obj_OA$OTU <- row.names(phylo_obj_OA)
+  
+  # add spe.gen results
+  phylo_obj_OA_sign<-merge(phylo_obj_OA,spe.gen_res[,-(2:5)],
+                           by = "OTU", all.x=T, no.dups=F) %>%
+    select(-sign.x)
+
+  colnames(phylo_obj_OA_sign)[4] <- "Sign"
+
+  phylo_obj_OA_sign_tax<-cbind(phylo_obj_OA_sign,as(tax_table(phylo_obj), "matrix"))
+
+  phylo_obj_OA_sign_tax$Genus<-factor(phylo_obj_OA_sign_tax$Genus)
+
+  phylo_obj_OA_sign_tax$Sign <- phylo_obj_OA_sign_tax$Sign %>% replace_na('Singletons')
+  
+  phylo_obj_OA_sign_tax$Sign <- factor(phylo_obj_OA_sign_tax$Sign)
+  
+  phylo_obj_OA_sign_tax$Sign <- factor(phylo_obj_OA_sign_tax$Sign, 
+                                       levels = c("Generalists","Specialists","NS","Singletons"))
+  
+  phylo_obj_OA_sign_tax
+  
+  # print(levels(phylo_obj_OA_sign_tax$Sign))
+  
+  }
+```
+
+```{r darksidea-data-manipulation, include=F, eval=TRUE, warning=F, cache=T}
+
+# AllG
+fun_AllG <- Fun
+fun_AllG_OTU_spegen_res <- read.csv(file="../analyses/spe.gen/GvS_AllGrasses/GvS_Res_ITS_AllGrasses_nperm100.csv")
+fun_AllG_OTU_OA_sign_tax <- extract_rao(fun_AllG, fun_AllG_OTU_spegen_res)
+
+# BOGR
+fun_BOGR <- readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_noEDGE_BOGR_v1.rds")
+fun_BOGR_OTU_spegen_res <- read.csv(file="../analyses/spe.gen/GvS_Bluegrama/GvS_Res_ITS_BOGR_nperm500.csv")
+fun_BOGR_OTU_OA_sign_tax <- extract_rao(fun_BOGR, fun_BOGR_OTU_spegen_res)
+
+# BOER
+fun_BOER <- readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_noEDGE_BOER_v1.rds")
+fun_BOER_OTU_spegen_res <- read.csv(file="../analyses/spe.gen/GvS_Blackgrama/GvS_Res_ITS_BOER_nperm500.csv")
+fun_BOER_OTU_OA_sign_tax <- extract_rao(fun_BOER, fun_BOER_OTU_spegen_res)
+
+# BUDA
+fun_BUDA <- readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_noEDGE_BUDA_v1.rds")
+fun_BUDA_OTU_spegen_res <- read.csv(file="../analyses/spe.gen/GvS_Buffalograss/GvS_Res_ITS_BUDA_nperm500.csv")
+fun_BUDA_OTU_OA_sign_tax <- extract_rao(fun_BUDA, fun_BUDA_OTU_spegen_res)
+
+# ANGE
+fun_ANGE <- readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_noEDGE_ANGE_v1.rds")
+fun_ANGE_OTU_spegen_res <- read.csv(file="../analyses/spe.gen/GvS_BigBluestem/GvS_Res_ITS_ANGE_nperm500.csv")
+fun_ANGE_OTU_OA_sign_tax <- extract_rao(fun_ANGE, fun_ANGE_OTU_spegen_res)
+
+# SCSC
+fun_SCSC <- readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_noEDGE_SCSC_v1.rds")
+fun_SCSC_OTU_spegen_res <- read.csv(file="../analyses/spe.gen/GvS_LittleBluestem/GvS_Res_ITS_SCSC_nperm500.csv")
+fun_SCSC_OTU_OA_sign_tax <- extract_rao(fun_SCSC, fun_SCSC_OTU_spegen_res)
+
+```
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+# Occupancy-abundance, OTU-level {.tabset .unnumbered}
+
+[only showing results for EDGE samples excluded, no missing pairs]
+
+\
+
+## ***Darksidea*** {.tabset .tabset-pills .unnumbered}
+
+*Darksidea* sp. only detected under *Blue grama* and *Black grama* hosts. Figures below show data from all samples and sites, or samples associated with specific grass hosts as indicated.
+
+### All Grasses {.unnumbered}
+
+```{r, echo=F,eval=T,fig.width=8, fig.cap='(ref:OA-AllG-allOTUs-fig-caption)', cache=T}
+# OTUs - abundance vs occurrence plot 
+ggplot(fun_AllG_OTU_OA_sign_tax, aes(y = (RelAbund/100), x = Occurrence, color = Sign, shape = Sign)) +
+  geom_jitter(size = 1.8, alpha=0.4,width = 0.02,height = 0.025) +
+  scale_shape_manual(
+    values = c(
+      "Darksidea" = 17,
+      "Generalists" = 16,
+      "Specialists" = 16,
+      "NS" = 16,
+      "Singletons" = 1),
+    guide = "legend") +
+  scale_color_manual(
+    values = c(
+      "Generalists" = "#4dac26",
+      "Specialists" = "#d01c8b",
+      "NS" = "grey40",
+      "Singletons" = "grey"),
+    guide = "legend"
+  ) +
+  geom_point(
+    data = subset(fun_AllG_OTU_OA_sign_tax, Genus == "Darksidea"),
+    aes(y = (RelAbund/100), x = Occurrence, size = "Darksidea"),
+    color = "black", shape = 17, size = 8, alpha=1
+  ) +
+  labs(
+    y = "Mean relative abundance, if present",
+    x = "Frequency of OTU occurrence by sample\n(proportion of samples with OTU present)",
+    title = "Occupancy-abundance: fungal OTUs from all grass hosts"
+    ,subtitle = expression("OTUs belonging to " * italic("Darksidea") * " represented as black triangles (n=3)")
+    # ,caption = "Note that both axes are shown on a log scale. Plot contains data from all samples and OTUs. I have added in the generalist vs. specialist (GvS) OTU annotations. 'Generalist' OTUs have the highest 2.5% of occurrence:abundance distribution, 'specialists' are in the lowest lowest 2.5%, 'NS' are the non-significant OTUs falling in the middle 95%, 'singletons' are OTUs that only appeared in a single sample and thus were excluded from GvS analyses. GvS calculations were run independently for the full dataset (all grass hosts) and for the by-host data."
+  ) +
+  scale_y_log10(labels = scales::percent,limits = c(0.00009, 0.5), breaks=c(0.0001, 0.001, 0.01, 0.1, 0.5)) +
+  scale_x_log10(limits = c(0.0015, 1), breaks=c(0.002, 0.01, 0.1, 0.2, 1)) +
+  # scale_size_manual(
+  #   values = c(italic("Darksidea") = 5),
+  #   guide = "legend"
+  # ) +
+  guides(
+    color = guide_legend(title = NULL,override.aes = list(size=3,alpha = 0.8)),
+    shape = guide_legend(title = NULL),
+    size = guide_legend(title = NULL)
+  ) +
+  theme_bw() +
+  theme(
+    plot.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    axis.text.x = element_text(color="black", size=13),
+    axis.text.y = element_text(color="black", size=13),
+    legend.text = element_text(color="black", size=11),
+    legend.title = element_blank(),
+    legend.position=c(.8,.87),
+    legend.key.height = unit(0.4, 'cm'),
+    plot.title = element_text(color="black", size=14),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+```
+
+### All Grasses (no *Darksidea*) {.unnumbered}
+
+```{r, echo=F,eval=T,fig.width=8, fig.cap='(ref:OA-AllG-allOTUs-fig-caption)', cache=T}
+# OTUs - abundance vs occurrence plot 
+ggplot(fun_AllG_OTU_OA_sign_tax, aes(y = (RelAbund/100), x = Occurrence, color = Sign, shape = Sign)) +
+  geom_jitter(size = 1.8, alpha=0.4,width = 0.02,height = 0.025) +
+  scale_shape_manual(
+    values = c(
+      "Darksidea" = 17,
+      "Generalists" = 16,
+      "Specialists" = 16,
+      "NS" = 16,
+      "Singletons" = 1),
+    guide = "legend") +
+  scale_color_manual(
+    values = c(
+      "Generalists" = "#4dac26",
+      "Specialists" = "#d01c8b",
+      "NS" = "grey40",
+      "Singletons" = "grey"),
+    guide = "legend"
+  # ) +
+  # geom_point(
+  #   data = subset(fun_AllG_OTU_OA_sign_tax, Genus == "Darksidea"),
+  #   aes(y = (RelAbund/100), x = Occurrence, size = "Darksidea"),
+  #   color = "black", shape = 17, size = 8, alpha=1
+  ) +
+  labs(
+    y = "Mean relative abundance, if present",
+    x = "Frequency of OTU occurrence by sample\n(proportion of samples with OTU present)",
+    title = "Occupancy-abundance: fungal OTUs from all grass hosts"
+    # ,subtitle = expression("OTUs belonging to " * italic("Darksidea") * " represented as black triangles (n=3)")
+    # ,caption = "Note that both axes are shown on a log scale. Plot contains data from all samples and OTUs. I have added in the generalist vs. specialist (GvS) OTU annotations. 'Generalist' OTUs have the highest 2.5% of occurrence:abundance distribution, 'specialists' are in the lowest lowest 2.5%, 'NS' are the non-significant OTUs falling in the middle 95%, 'singletons' are OTUs that only appeared in a single sample and thus were excluded from GvS analyses. GvS calculations were run independently for the full dataset (all grass hosts) and for the by-host data."
+  ) +
+  scale_y_log10(labels = scales::percent,limits = c(0.00009, 0.5), breaks=c(0.0001, 0.001, 0.01, 0.1, 0.5)) +
+  scale_x_log10(limits = c(0.0015, 1), breaks=c(0.002, 0.01, 0.1, 0.2, 1)) +
+  # scale_size_manual(
+  #   values = c(italic("Darksidea") = 5),
+  #   guide = "legend"
+  # ) +
+  guides(
+    color = guide_legend(title = NULL,override.aes = list(size=3,alpha = 0.8)),
+    shape = guide_legend(title = NULL),
+    size = guide_legend(title = NULL)
+  ) +
+  theme_bw() +
+  theme(
+    plot.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    axis.text.x = element_text(color="black", size=13),
+    axis.text.y = element_text(color="black", size=13),
+    legend.text = element_text(color="black", size=11),
+    legend.title = element_blank(),
+    legend.position=c(.8,.87),
+    legend.key.height = unit(0.4, 'cm'),
+    plot.title = element_text(color="black", size=14),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+# ggsave(filename = "../figures/darksidea_plots/OccAbund_GvS_ITS_AllGrasses.pdf", plot = last_plot(), device = "pdf",width=10, height = 5, units = "in", dpi=300)
+```
+
+### *Blue grama* {.unnumbered}
+
+```{r, echo=F,eval=T,fig.width=8, fig.cap='(ref:OA-BOGR-allOTUs-fig-caption)', cache=T}
+# OTUs - abundance vs occurrence plot 
+ggplot(fun_BOGR_OTU_OA_sign_tax, aes(y = (RelAbund/100), x = Occurrence, color = Sign, shape = Sign)) +
+  geom_jitter(size = 1.8, alpha=0.4,width = 0.02,height = 0.025) +
+  scale_shape_manual(
+    values = c(
+      "Darksidea" = 17,
+      "Generalists" = 16,
+      "Specialists" = 16,
+      "NS" = 16,
+      "Singletons" = 1),
+    guide = "legend") +
+  scale_color_manual(
+    values = c(
+      "Generalists" = "#4dac26",
+      "Specialists" = "#d01c8b",
+      "NS" = "grey40",
+      "Singletons" = "grey"),
+    guide = "legend"
+  ) +
+  geom_point(
+    data = subset(fun_BOGR_OTU_OA_sign_tax, Genus == "Darksidea"),
+    aes(y = (RelAbund/100), x = Occurrence, size = "Darksidea"),
+    color = "black", shape = 17, size = 8, alpha=1
+  ) +
+  labs(
+    y = "Mean relative abundance, if present",
+    x = "Frequency of OTU occurrence by sample\n(proportion of samples with OTU present)",
+    title = expression("Occupancy-abundance: fungal OTUs from " * italic("Blue grama")),
+    subtitle = expression("OTUs belonging to " * italic("Darksidea") * " represented as black triangles (n=2)")
+    # ,caption = "Note that both axes are shown on a log scale. Plot contains data from all samples and OTUs. I have added in the generalist vs. specialist (GvS) OTU annotations. 'Generalist' OTUs have the highest 2.5% of occurrence:abundance distribution, 'specialists' are in the lowest lowest 2.5%, 'NS' are the non-significant OTUs falling in the middle 95%, 'singletons' are OTUs that only appeared in a single sample and thus were excluded from GvS analyses. GvS calculations were run independently for the full dataset (all grass hosts) and for the by-host data."
+  ) +
+  scale_y_log10(labels = scales::percent,limits = c(0.00004, 0.6), breaks=c(0.0001, 0.001, 0.01, 0.1, 0.6)) +
+  scale_x_log10(limits = c(0.009, 1), breaks=c(0.01, 0.025, 0.1, 0.2, 1)) +
+                #,expand = expansion(mult = c(0.055, 0))) +
+  # scale_size_manual(
+  #   values = c(italic("Darksidea") = 5),
+  #   guide = "legend"
+  # ) +
+  guides(
+    color = guide_legend(title = NULL,override.aes = list(size=3,alpha = 0.8)),
+    shape = guide_legend(title = NULL),
+    size = guide_legend(title = NULL)
+  ) +
+  theme_bw() +
+  theme(
+    plot.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    axis.text.x = element_text(color="black", size=13),
+    axis.text.y = element_text(color="black", size=13),
+    legend.text = element_text(color="black", size=11),
+    legend.title = element_blank(),
+    legend.position=c(.8,.87),
+    legend.key.height = unit(0.4, 'cm'),
+    plot.title = element_text(color="black", size=14),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+```
+
+### *Blue grama* (no *Darksidea*) {.unnumbered}
+
+```{r, echo=F,eval=T,fig.width=8, fig.cap='(ref:OA-BOGR-allOTUs-fig-caption)', cache=T}
+# OTUs - abundance vs occurrence plot 
+ggplot(fun_BOGR_OTU_OA_sign_tax, aes(y = (RelAbund/100), x = Occurrence, color = Sign, shape = Sign)) +
+  geom_jitter(size = 1.8, alpha=0.4,width = 0.02,height = 0.025) +
+  scale_shape_manual(
+    values = c(
+      "Darksidea" = 17,
+      "Generalists" = 16,
+      "Specialists" = 16,
+      "NS" = 16,
+      "Singletons" = 1),
+    guide = "legend") +
+  scale_color_manual(
+    values = c(
+      "Generalists" = "#4dac26",
+      "Specialists" = "#d01c8b",
+      "NS" = "grey40",
+      "Singletons" = "grey"),
+    guide = "legend"
+  # ) +
+  # geom_point(
+  #   data = subset(fun_BOGR_OTU_OA_sign_tax, Genus == "Darksidea"),
+  #   aes(y = (RelAbund/100), x = Occurrence, size = "Darksidea"),
+  #   color = "black", shape = 17, size = 8, alpha=1
+  ) +
+  labs(
+    y = "Mean relative abundance, if present",
+    x = "Frequency of OTU occurrence by sample\n(proportion of samples with OTU present)",
+    title = expression("Occupancy-abundance: fungal OTUs from " * italic("Blue grama"))
+    # ,subtitle = expression("OTUs belonging to " * italic("Darksidea") * " represented as black triangles (n=2)")
+    # ,caption = "Note that both axes are shown on a log scale. Plot contains data from all samples and OTUs. I have added in the generalist vs. specialist (GvS) OTU annotations. 'Generalist' OTUs have the highest 2.5% of occurrence:abundance distribution, 'specialists' are in the lowest lowest 2.5%, 'NS' are the non-significant OTUs falling in the middle 95%, 'singletons' are OTUs that only appeared in a single sample and thus were excluded from GvS analyses. GvS calculations were run independently for the full dataset (all grass hosts) and for the by-host data."
+  ) +
+  # scale_y_log10(labels = scales::percent,limits = c(0.00004, 0.6), breaks=c(0.0001, 0.001, 0.01, 0.1, 0.6)) +
+  # scale_x_log10(limits = c(0.009, 1), breaks=c(0.01, 0.025, 0.1, 0.2, 1)) +
+  scale_y_log10(labels = scales::percent,limits = c(0.00004, 0.61), breaks=c(0.0001, 0.001, 0.01, 0.1, 0.6)) +
+  scale_x_log10(limits = c(0.007, 1), breaks=c(0.01, 0.025, 0.1, 0.2, 1)) +
+  guides(
+    color = guide_legend(title = NULL,override.aes = list(size=3,alpha = 0.8)),
+    shape = guide_legend(title = NULL),
+    size = guide_legend(title = NULL)
+  ) +
+  theme_bw() +
+  theme(
+    plot.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    axis.text.x = element_text(color="black", size=13),
+    axis.text.y = element_text(color="black", size=13),
+    legend.text = element_text(color="black", size=11),
+    legend.title = element_blank(),
+    legend.position=c(.8,.87),
+    legend.key.height = unit(0.4, 'cm'),
+    plot.title = element_text(color="black", size=14),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+ggsave(filename = "../figures/darksidea_plots/OccAbund_GvS_ITS_Bluegrama.pdf", plot = last_plot(), device = "pdf",width=10, height = 5, units = "in", dpi=300)
+```
+
+### *Black grama* {.unnumbered}
+
+```{r, echo=F,eval=T,fig.width=8, fig.cap='(ref:OA-BOER-allOTUs-fig-caption)', cache=T}
+# OTUs - abundance vs occurrence plot 
+ggplot(fun_BOER_OTU_OA_sign_tax, aes(y = (RelAbund/100), x = Occurrence, color = Sign, shape = Sign)) +
+  geom_jitter(size = 1.8, alpha=0.4,width = 0.02,height = 0.025) +
+  scale_shape_manual(
+    values = c(
+      "Darksidea" = 17,
+      "Generalists" = 16,
+      "Specialists" = 16,
+      "NS" = 16,
+      "Singletons" = 1),
+    guide = "legend") +
+  scale_color_manual(
+    values = c(
+      "Generalists" = "#4dac26",
+      "Specialists" = "#d01c8b",
+      "NS" = "grey40",
+      "Singletons" = "grey"),
+    guide = "legend"
+  ) +
+  geom_point(
+    data = subset(fun_BOER_OTU_OA_sign_tax, Genus == "Darksidea"),
+    aes(y = (RelAbund/100), x = Occurrence, size = "Darksidea"),
+    color = "black", shape = 17, size = 8, alpha=1
+  ) +
+  labs(
+    y = "Mean relative abundance, if present",
+    x = "Frequency of OTU occurrence by sample\n(proportion of samples with OTU present)",
+    title = expression("Occupancy-abundance: fungal OTUs from " * italic("Black grama")),
+    subtitle = expression("OTUs belonging to " * italic("Darksidea") * " represented as black triangles (n=3)")
+  ) +
+  #scale_y_log10(labels = scales::percent,limits = c(0.00006, 0.6), breaks=c(0.0001, 0.001, 0.01, 0.1, 0.6)) +
+  scale_y_log10(labels = scales::percent,limits = c(0.00006, 0.6), breaks=c(0.0001, 0.001, 0.01, 0.1, 0.6)) +
+  scale_x_log10(limits = c(0.01, 1), breaks=c(0.012, 0.025, 0.1, 0.2, 1)) +
+  # scale_size_manual(
+  #   values = c(italic("Darksidea") = 5),
+  #   guide = "legend"
+  # ) +
+  guides(
+    color = guide_legend(title = NULL,override.aes = list(size=3,alpha = 0.8)),
+    shape = guide_legend(title = NULL),
+    size = guide_legend(title = NULL)
+  ) +
+  theme_bw() +
+  theme(
+    plot.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    axis.text.x = element_text(color="black", size=13),
+    axis.text.y = element_text(color="black", size=13),
+    legend.text = element_text(color="black", size=11),
+    legend.title = element_blank(),
+    legend.position=c(.8,.87),
+    legend.key.height = unit(0.4, 'cm'),
+    plot.title = element_text(color="black", size=14),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+```
+
+\
+
+***Monosporascus***\
+
+*Monosporascus* sp. only detected under *Blue grama* and *Buffalograss* hosts. Figures below show data from all samples and sites, or samples associated with specific grass hosts as indicated.
+
+## ***Monosporascus*** {.tabset .tabset-pills .unnumbered}
+
+*Monosporascus* sp. only detected at sites FCT and FMT (OTU4769) and CNF (OTU8515) under *Blue grama* and *Buffalograss* (*B. dactyloides*) hosts. Figures below show data from all samples and sites, or samples associated with specific grass hosts as indicated.
+
+### All Grasses {.unnumbered}
+
+```{r, echo=F,eval=T,fig.width=8, fig.cap='(ref:OA-AllG-allOTUs-fig-caption)', cache=T}
+# OTUs - abundance vs occurrence plot 
+ggplot(fun_AllG_OTU_OA_sign_tax, aes(y = (RelAbund/100), x = Occurrence, color = Sign, shape = Sign)) +
+  geom_jitter(size = 1.8, alpha=0.4,width = 0.02,height = 0.025) +
+  scale_shape_manual(
+    values = c(
+      "Monosporascus" = 15,
+      "Generalists" = 16,
+      "Specialists" = 16,
+      "NS" = 16,
+      "Singletons" = 1),
+    guide = "legend") +
+  scale_color_manual(
+    values = c(
+      "Generalists" = "#4dac26",
+      "Specialists" = "#d01c8b",
+      "NS" = "grey40",
+      "Singletons" = "grey"),
+    guide = "legend"
+  ) +
+  geom_point(
+    data = subset(fun_AllG_OTU_OA_sign_tax, Genus == "Monosporascus"),
+    aes(y = (RelAbund/100), x = Occurrence, size = "Monosporascus"),
+    color = "black", shape = 15, size = 8, alpha=1
+  ) +
+  labs(
+    y = "Mean relative abundance, if present",
+    x = "Frequency of OTU occurrence by sample\n(proportion of samples with OTU present)",
+    title = "Occupancy-abundance: fungal OTUs from all grass hosts",
+    subtitle = expression("OTUs belonging to " * italic("Monosporascus") * " represented as black squares (n=2)")
+    # ,caption = "Note that both axes are shown on a log scale. Plot contains data from all samples and OTUs. I have added in the generalist vs. specialist (GvS) OTU annotations. 'Generalist' OTUs have the highest 2.5% of occurrence:abundance distribution, 'specialists' are in the lowest lowest 2.5%, 'NS' are the non-significant OTUs falling in the middle 95%, 'singletons' are OTUs that only appeared in a single sample and thus were excluded from GvS analyses. GvS calculations were run independently for the full dataset (all grass hosts) and for the by-host data."
+  ) +
+  scale_y_log10(labels = scales::percent,limits = c(0.00009, 0.5), breaks=c(0.0001, 0.001, 0.01, 0.1, 0.5)) +
+  scale_x_log10(limits = c(0.0015, 1), breaks=c(0.002, 0.01, 0.1, 0.2, 1)) +
+  # scale_size_manual(
+  #   values = c(italic("Monosporascus") = 5),
+  #   guide = "legend"
+  # ) +
+  guides(
+    color = guide_legend(title = NULL,override.aes = list(size=3,alpha = 0.8)),
+    shape = guide_legend(title = NULL),
+    size = guide_legend(title = NULL)
+  ) +
+  theme_bw() +
+  theme(
+    plot.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    axis.text.x = element_text(color="black", size=13),
+    axis.text.y = element_text(color="black", size=13),
+    legend.text = element_text(color="black", size=11),
+    legend.title = element_blank(),
+    legend.position=c(.8,.87),
+    legend.key.height = unit(0.4, 'cm'),
+    plot.title = element_text(color="black", size=14),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+```
+
+### *Blue grama* {.unnumbered}
+
+```{r, echo=F,eval=T,fig.width=8, fig.cap='(ref:OA-BOGR-allOTUs-fig-caption)', cache=T}
+# OTUs - abundance vs occurrence plot 
+ggplot(fun_BOGR_OTU_OA_sign_tax, aes(y = (RelAbund/100), x = Occurrence, color = Sign, shape = Sign)) +
+  geom_jitter(size = 1.8, alpha=0.4,width = 0.02,height = 0.025) +
+  scale_shape_manual(
+    values = c(
+      "Monosporascus" = 15,
+      "Generalists" = 16,
+      "Specialists" = 16,
+      "NS" = 16,
+      "Singletons" = 1),
+    guide = "legend") +
+  scale_color_manual(
+    values = c(
+      "Generalists" = "#4dac26",
+      "Specialists" = "#d01c8b",
+      "NS" = "grey40",
+      "Singletons" = "grey"),
+    guide = "legend"
+  ) +
+  geom_point(
+    data = subset(fun_BOGR_OTU_OA_sign_tax, Genus == "Monosporascus"),
+    aes(y = (RelAbund/100), x = Occurrence, size = "Monosporascus"),
+    color = "black", shape = 15, size = 8, alpha=1
+  ) +
+  labs(
+    y = "Mean relative abundance, if present",
+    x = "Frequency of OTU occurrence by sample\n(proportion of samples with OTU present)",
+    title = expression("Occupancy-abundance: fungal OTUs from " * italic("Blue grama")),
+    subtitle = expression("OTUs belonging to " * italic("Monosporascus") * " represented as black squares (n=2)")
+    # ,caption = "Note that both axes are shown on a log scale. Plot contains data from all samples and OTUs. I have added in the generalist vs. specialist (GvS) OTU annotations. 'Generalist' OTUs have the highest 2.5% of occurrence:abundance distribution, 'specialists' are in the lowest lowest 2.5%, 'NS' are the non-significant OTUs falling in the middle 95%, 'singletons' are OTUs that only appeared in a single sample and thus were excluded from GvS analyses. GvS calculations were run independently for the full dataset (all grass hosts) and for the by-host data."
+  ) +
+  scale_y_log10(labels = scales::percent,limits = c(0.00004, 0.6), breaks=c(0.0001, 0.001, 0.01, 0.1, 0.6)) +
+  scale_x_log10(limits = c(0.009, 1), breaks=c(0.01, 0.025, 0.1, 0.2, 1)) +
+                #,expand = expansion(mult = c(0.055, 0))) +
+  # scale_size_manual(
+  #   values = c(italic("Monosporascus") = 5),
+  #   guide = "legend"
+  # ) +
+  guides(
+    color = guide_legend(title = NULL,override.aes = list(size=3,alpha = 0.8)),
+    shape = guide_legend(title = NULL),
+    size = guide_legend(title = NULL)
+  ) +
+  theme_bw() +
+  theme(
+    plot.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    axis.text.x = element_text(color="black", size=13),
+    axis.text.y = element_text(color="black", size=13),
+    legend.text = element_text(color="black", size=11),
+    legend.title = element_blank(),
+    legend.position=c(.8,.87),
+    legend.key.height = unit(0.4, 'cm'),
+    plot.title = element_text(color="black", size=14),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+```
+
+### *Buffalograss* {.unnumbered}
+
+```{r, echo=F,eval=T,fig.width=8, fig.cap='(ref:OA-BUDA-allOTUs-fig-caption)', cache=T}
+# OTUs - abundance vs occurrence plot 
+ggplot(fun_BUDA_OTU_OA_sign_tax, aes(y = (RelAbund/100), x = Occurrence, color = Sign, shape = Sign)) +
+  geom_jitter(size = 1.8, alpha=0.4,width = 0.02,height = 0.025) +
+  scale_shape_manual(
+    values = c(
+      "Monosporascus" = 15,
+      "Generalists" = 16,
+      "Specialists" = 16,
+      "NS" = 16,
+      "Singletons" = 1),
+    guide = "legend") +
+  scale_color_manual(
+    values = c(
+      "Generalists" = "#4dac26",
+      "Specialists" = "#d01c8b",
+      "NS" = "grey40",
+      "Singletons" = "grey"),
+    guide = "legend"
+  ) +
+  geom_point(
+    data = subset(fun_BUDA_OTU_OA_sign_tax, Genus == "Monosporascus"),
+    aes(y = (RelAbund/100), x = Occurrence, size = "Monosporascus"),
+    color = "black", shape = 15, size = 8, alpha=1
+  ) +
+  labs(
+    y = "Mean relative abundance, if present",
+    x = "Frequency of OTU occurrence by sample\n(proportion of samples with OTU present)",
+    title = expression("Occupancy-abundance: fungal OTUs from " * italic("Buffalograss")),
+    subtitle = expression("OTUs belonging to " * italic("Monosporascus") * " represented as black squares (n=1)")
+  ) +
+  #scale_y_log10(labels = scales::percent,limits = c(0.00006, 0.6), breaks=c(0.0001, 0.001, 0.01, 0.1, 0.6)) +
+  scale_y_log10(labels = scales::percent,limits = c(0.00006, 0.6), breaks=c(0.0001, 0.001, 0.01, 0.1, 0.6)) +
+  scale_x_log10(limits = c(0.01, 1), breaks=c(0.012, 0.025, 0.1, 0.2, 1)) +
+  # scale_size_manual(
+  #   values = c(italic("Monosporascus") = 5),
+  #   guide = "legend"
+  # ) +
+  guides(
+    color = guide_legend(title = NULL,override.aes = list(size=3,alpha = 0.8)),
+    shape = guide_legend(title = NULL),
+    size = guide_legend(title = NULL)
+  ) +
+  theme_bw() +
+  theme(
+    plot.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    axis.text.x = element_text(color="black", size=13),
+    axis.text.y = element_text(color="black", size=13),
+    legend.text = element_text(color="black", size=11),
+    legend.title = element_blank(),
+    legend.position=c(.8,.87),
+    legend.key.height = unit(0.4, 'cm'),
+    plot.title = element_text(color="black", size=14),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+```
+
+\
+
+------------------------------------------------------------------------
+
+# Distribution of *Darksidea* OTUs {.unnumbered}
+
+n=3 *Darksidea* OTUs
+
+[At the SEV only:]{.underline}
+
+-   Of the 2 grasses present at the SEV (*Blue* and *Black grama*),
+
+    -   0 OTUs detected in *Blue* *grama* associated soils
+
+    -   1 / 3 OTUs detected in 11.1% of *Black* *grama* associated soils
+
+[Across all sites]{.underline}
+
+-   Mean occurrence frequency of the 3 OTUs across all sites and samples: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea",]$global_occurrence)*100,digits=2)`%
+
+-   At least 1 OTU detected in all 5 grasses
+
+    -   ANGE (*Andropogon gerardii* / Big bluestem) associated soils
+
+        -   Lowest occurrence frequencies
+
+        -   1 / 3 OTUs detected with an occurrence frequency of `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$ANGE_allsites >0,]$ANGE_allsites, na.rm = TRUE)*100,digits=2)`%, others not present\
+
+    -   BOER (*Bouteloua eriopoda* / Black grama) associated soils
+
+        -   3 / 3 OTUs detected with mean occurrence frequency of `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$BOER_allsites >0,]$BOER_allsites, na.rm = TRUE)*100,digits=2)`%\
+            \
+
+    -   BOGR (*B. gracilis* / Blue grama) associated soils
+
+        -   2 / 3 OTUs detected with mean occurrence frequency of `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$BOGR_allsites >0,]$BOGR_allsites, na.rm = TRUE)*100,digits=3)`%, when present\
+            \
+
+    -   BUDA (*B. dactyloides* / Buffalograss) associated soils
+
+        -   2 / 3 OTUs detected with mean occurrence frequency of `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$BUDA_allsites >0,]$BUDA_allsites, na.rm = TRUE)*100,digits=3)`%, when present\
+            \
+
+    -   SCSC (*Schizachyrium scoparium* / Little bluestem) associated soils
+
+        -   3 / 3 OTUs detected with mean occurrence frequency of `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$SCSC_allsites >0,]$SCSC_allsites, na.rm = TRUE)*100,digits=2)`%\
+            \
+
+[By Site]{.underline}
+
+-   23 sites in dataset
+
+-   1 site had all 3 *Darksidea* OTUs detected, with the following mean frequency
+
+    -   BLM: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$BLM >0,]$BLM, na.rm = TRUE)*100,digits=3)`%\
+
+-   9 sites had 2 of 3 *Darksidea* OTUs detected, with the following mean frequencies (when present)
+
+    -   OTUs `OTU9749` and `OTU5613`
+        -   CPR: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$CPR >0,]$CPR, na.rm = TRUE)*100,digits=3)`%
+        -   FCP: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$FCP >0,]$FCP, na.rm = TRUE)*100,digits=3)`%
+        -   FMT: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$FMT >0,]$FMT, na.rm = TRUE)*100,digits=2)`%
+        -   HAR: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$HAR >0,]$HAR, na.rm = TRUE)*100,digits=3)`%
+        -   HPG: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$HPG >0,]$HPG, na.rm = TRUE)*100,digits=3)`%
+        -   KNZ: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$KNZ >0,]$KNZ, na.rm = TRUE)*100,digits=3)`%
+        -   LBJ: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$LBJ >0,]$LBJ, na.rm = TRUE)*100,digits=2)`%
+        -   RNF: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$RNF >0,]$RNF, na.rm = TRUE)*100,digits=3)`%
+    -   OTUs `OTU7431` and `OTU5613`
+        -   GMT: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$GMT >0,]$GMT, na.rm = TRUE)*100,digits=3)`%
+
+-   5 sites had 1 of 3 *Darksidea* OTUs detected, with the following mean frequencies (when present)
+
+    -   OTU `OTU9749`
+        -   CNF: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$CNF >0,]$CNF, na.rm = TRUE)*100,digits=3)`%
+        -   DMT: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$DMT >0,]$DMT, na.rm = TRUE)*100,digits=3)`%
+        -   KAE: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$KAE >0,]$KAE, na.rm = TRUE)*100,digits=3)`%
+        -   SEV: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$SEV >0,]$SEV, na.rm = TRUE)*100,digits=3)`%
+    -   OTU `OTU5613`
+        -   SCP: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$SCP >0,]$SCP, na.rm = TRUE)*100,digits=4)`%
+
+-   8 sites had no *Darksidea* OTUs detected (BNP, CAD, GNF, LAR, NWP, ONF, SFA, UHC)\
+    \
+
+------------------------------------------------------------------------
+
+# Distribution of *Monosporascus* OTUs {.unnumbered}
+
+n=2 *Monosporascus* OTUs
+
+[Not detected at the SEV]{.underline}
+
+-   Of the 2 grasses present at the SEV (*Blue* and *Black grama*),
+
+    -   0 OTUs detected in *Blue grama* associated soils
+
+    -   0 OTUs detected in *Black grama* associated soils
+
+[Across all sites]{.underline}
+
+-   Mean occurrence frequency of the 2 OTUs across all sites and samples: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Monosporascus",]$global_occurrence)*100,digits=2)`%
+
+-   No OTUs detected in 3 grasses
+
+    -   ANGE (*Andropogon gerardii* / Big bluestem) associated soils
+    -   BOER (*Bouteloua eriopoda* / Black grama) associated soils
+    -   SCSC (*Schizachyrium scoparium* / Little bluestem) associated soils\
+        \
+
+-   At least 1 OTU detected in 2 grasses
+
+    -   BOGR (*B. gracilis* / Blue grama) associated soils
+
+        -   2 / 2 OTUs detected with mean occurrence frequency of `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Monosporascus" & OTU_freq_occurr_bySite_Grass$BOGR_allsites >0,]$BOGR_allsites, na.rm = TRUE)*100,digits=2)`%, when present\
+            \
+
+    -   BUDA (*B. dactyloides* / Buffalograss) associated soils
+
+        -   1 / 2 OTUs detected with mean occurrence frequency of `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Monosporascus" & OTU_freq_occurr_bySite_Grass$BUDA_allsites >0,]$BUDA_allsites, na.rm = TRUE)*100,digits=3)`%, when present\
+            \
+
+[By Site]{.underline}
+
+-   23 sites in dataset
+
+-   0 sites had neither of the *Monosporascus* OTUs detected
+
+-   3 sites had 1 of 2 *Monosporascus* OTUs detected, with the following mean frequencies (when present)
+
+    -   OTU `OTU8515`
+        -   CNF: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Monosporascus" & OTU_freq_occurr_bySite_Grass$CNF >0,]$CNF, na.rm = TRUE)*100,digits=3)`%
+    -   OTU `OTU4769`
+        -   FCP: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Monosporascus" & OTU_freq_occurr_bySite_Grass$FCP >0,]$FCP, na.rm = TRUE)*100,digits=3)`%
+        -   FMT: `r prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Monosporascus" & OTU_freq_occurr_bySite_Grass$FMT >0,]$FMT, na.rm = TRUE)*100,digits=2)`%
+
+-   20 sites had no *Monosporascus* OTUs detected (BLM, BNP, CAD, CPR, DMT, GMT, GNF, HAR, HPG, KAE, KNZ, LAR, LBJ, NWP, ONF, RNF, SCP, SEV, SFA, UHC)\
+    \
+
+```{r distribution-stats, include=F, eval=F}
+View(t(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Monosporascus",]))
+
+# At the SEV only
+OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea",]$BOGR_SEVonly
+OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea",]$BOER_SEVonly
+
+OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Monosporascus",]$BOGR_SEVonly
+OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Monosporascus",]$BOER_SEVonly
+
+
+
+# OTU occurrence by site and grass
+OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea",]
+
+OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Monosporascus",]
+
+
+prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea",]$global_occurrence)*100,digits=2)
+
+prettyNum(mean(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea" & OTU_freq_occurr_bySite_Grass$BOER_allsites >0,]$BOER_allsites, na.rm = TRUE)*100,digits=2)
+
+# idk
+View(OTU_freq_occurr_bySite_Grass[OTU_freq_occurr_bySite_Grass$Genus=="Darksidea",c(1,20:39)])
+
+mean(OTU_freq_occurr_bySite_Grass$ANGE_allsites[Genus=="Darksidea"])
+
+```
+
+------------------------------------------------------------------------
+
+# Metadata variables impacting presence of *Darksidea* OTUs {.unnumbered}
+
+*Methods*: For discrete metadata factors (e.g., Grass Host, Site), calculating occurrence for *Darksidea* OTUs by factor level and assessing significance of Occurrence \~ Factor via Kruskal-Wallis rank sum test ("KW"). For continuous metadata variables, I have converted the *Darksidea* OTU table to presence/absence, and assessed significance via a one-way ANOVA. All statistical tests in this section are single-term only. All continuous metadata variables have been mean standardized with the exceptions of elevation, latitude, and longitude.
+
+-   Furthermore I calculated the variance explained by each variable
+
+    -   Kruskal-Wallis: $\eta^2$ (effect size, essentially equivalent to $R^2$) using $\eta$$p^2 = (F * dfn)/(F * dfn + dfd)$, given $F(dfn, dfd)$=$\eta^2/(k-1)$. Because these are single term-based statistics and consequently, no other variable accounts for variance in the dependent variable, $\eta$$p²$ equals $\eta^2$.
+    -   ANOVA: traditional $R^2$ as calculated using sum of squares from the regression / total sum of squares
+
+```{r KW, include=FALSE,eval=TRUE,cache=F}
+#KW for factors
+occ_otu_site_long <- calc_occurrence(Fun, variable = "Site", justdf = T, long=T)
+occ_otu_site_kw <- kruskal.test(Occurrence ~ Site, data = occ_otu_site_long)
+
+occ_otu_grass_long <- calc_occurrence(Fun, variable = "Grass", justdf = T, long=T)
+occ_otu_grass_kw <- kruskal.test(Occurrence ~ Grass, data = occ_otu_grass_long)
+
+occ_otu_Bin_long <- calc_occurrence(Fun, variable = "Bin", justdf = T, long=T)
+occ_otu_Bin_kw <- kruskal.test(Occurrence ~ Bin, data = occ_otu_Bin_long)
+
+# occ_otu_Gradient_long <- calc_occurrence(Fun, variable = "Gradient", justdf = T, long=T)
+# occ_otu_Gradient_kw <- kruskal.test(Occurrence ~ Gradient, data = occ_otu_Gradient_long)
+
+occ_otu_Grassland_long <- calc_occurrence(Fun, variable = "Grassland", justdf = T, long=T)
+occ_otu_Grassland_kw <- kruskal.test(Occurrence ~ Grassland, data = occ_otu_Grassland_long)
+```
+
+```{r eta-sq, include=FALSE,eval=F}
+# Calculate Eta-squared
+prettyNum(((occ_otu_Bin_kw$statistic/occ_otu_Bin_kw$parameter)*occ_otu_Bin_kw$parameter)/(((occ_otu_Bin_kw$statistic/occ_otu_Bin_kw$parameter)*occ_otu_Bin_kw$parameter)+(509-occ_otu_Bin_kw$parameter+1))*100, digits=4)
+
+prettyNum(((occ_otu_grass_kw$statistic/occ_otu_grass_kw$parameter)*occ_otu_grass_kw$parameter)/(((occ_otu_grass_kw$statistic/occ_otu_grass_kw$parameter)*occ_otu_grass_kw$parameter)+(509-occ_otu_grass_kw$parameter+1))*100, digits=4)
+
+prettyNum(((occ_otu_site_kw$statistic/occ_otu_site_kw$parameter)*occ_otu_site_kw$parameter)/(((occ_otu_site_kw$statistic/occ_otu_site_kw$parameter)*occ_otu_site_kw$parameter)+(509-occ_otu_site_kw$parameter+1))*100, digits=4)
+
+prettyNum(((occ_otu_Gradient_kw$statistic/occ_otu_Gradient_kw$parameter)*occ_otu_Gradient_kw$parameter)/(((occ_otu_Gradient_kw$statistic/occ_otu_Gradient_kw$parameter)*occ_otu_Gradient_kw$parameter)+(509-occ_otu_Gradient_kw$parameter+1))*100, digits=3)
+
+prettyNum(((occ_otu_Grassland_kw$statistic/occ_otu_Grassland_kw$parameter)*occ_otu_Grassland_kw$parameter)/(((occ_otu_Grassland_kw$statistic/occ_otu_Grassland_kw$parameter)*occ_otu_Grassland_kw$parameter)+(509-occ_otu_Grassland_kw$parameter+1))*100, digits=4)
+
+```
+
+```{r perform-anova-for-taxa-function, include=FALSE,eval=F}
+perform_anova_for_taxa <- function(phylo_obj, taxa_of_interest, ContinuousVar) {
+  # Subset the  phyloseq object to include only the specified taxa_of_interest 
+  subset_phylo_obj <- subset_taxa(phylo_obj, Genus == taxa_of_interest)
+  #glom instead as input
+  subset_phylo_glom <- tax_glom(subset_phylo_obj, taxrank = "Genus")
+
+  #convert phylo object to presence/absence
+  phylo_obj_presence <- convert_phylo_to_presence_absence(subset_phylo_glom)
+  
+  # Convert phyloseq object to data frames
+  otu_df <- phylo2vegan_OTU(phylo_obj_presence)
+  sample_data_df <- phylo2vegan_sd(phylo_obj_presence)
+
+    # Subset the sample data to include only the specified taxa_of_interest and the ContinuousVar
+  subset_data <- subset(sample_data_df, select = c(ContinuousVar))
+
+  # Perform ANOVA for the specified taxa_of_interest against the ContinuousVar
+  anova_result <- aov(otu_df ~ subset_data[[ContinuousVar]])
+  tidy_aov <- tidy(anova_result)
+  tidy_df <- as.data.frame(tidy_aov)
+  
+  tidy_df$term[1] <- paste0(ContinuousVar)
+
+  sum_squares_regression <- tidy_df$sumsq[1]
+  sum_squares_residuals <- tidy_df$sumsq[2]
+
+  R_squared <- sum_squares_regression /
+            (sum_squares_regression + sum_squares_residuals)*100
+
+  tidier_df <- data.frame(statistic = numeric(),
+                          R_squared = numeric(),p.value = character(),
+                          stringsAsFactors = FALSE)
+  
+  #tidier_df[1,"predictor"] <- tidy_df$term[1]
+  tidier_df[1,"statistic"] <- tidy_df$statistic[1]
+  tidier_df[1,"R_squared"] <- R_squared
+  tidier_df[1,"p.value"] <- tidy_df$p.value[1]
+
+  # Return ANOVA results for the specified taxa_of_interest
+  return(tidier_df)
+}
+```
+
+```{r perform-anova-for-taxa, include=FALSE,eval=F}
+# aov for continuous
+
+# numeric metadata
+#coll_GDD,GDD30yr,GDD3yr,GDD2015,ppt30yr,ppt3yr,ppt2015,soil_moisture,GWC,perc_moisture,pH,phos,ammonium,nitrate,SOM,herbivory_perc,avg_SLA,avg_SRL
+ContinuousVar.list <- c("Latitude","Longitude","Elevation_m",
+                        "GDD3yr_m.std","ppt3yr_m.std","soil_moisture_m.std",
+                        "pH_m.std","phos_m.std","ammonium_m.std",
+                        "nitrate_m.std","SOM_m.std","herbivory_perc_m.std",
+                        "avg_SLA_m.std","avg_SRL_m.std")
+
+tidy_aov_for_taxa_ContinuousVar.list = vector("list", length = length(ContinuousVar.list))
+
+TAXA<-c("Darksidea")
+
+for (ContinuousVar in ContinuousVar.list) {
+  
+  #current_variable <- ContinuousVar.list[i]
+  
+  tidy_aov_for_taxa_ContinuousVar <- perform_anova_for_taxa(Fun, "Darksidea", ContinuousVar)
+  
+  tidy_aov_for_taxa_ContinuousVar$ContinuousVar <- ContinuousVar 
+  
+  tidy_aov_for_taxa_ContinuousVar.list[[ContinuousVar]] <- (as.data.frame(tidy_aov_for_taxa_ContinuousVar))
+
+  }
+
+tidy_aov_for_taxa_ContinuousVar_out = do.call(rbind, tidy_aov_for_taxa_ContinuousVar.list)
+tidy_aov_for_taxa_ContinuousVar_out$p.value <- as.numeric(tidy_aov_for_taxa_ContinuousVar_out$p.value)
+
+tidy_aov_for_taxa_ContinuousVar_out$Significance <- ifelse(tidy_aov_for_taxa_ContinuousVar_out$p.value > 0.05, "NS", as.character(tidy_aov_for_taxa_ContinuousVar_out$p.value))
+
+tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar <- as.factor(tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar)
+
+prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="Latitude",]$R_squared, digits=3)
+prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="ppt3yr_m.std",]$p.value, digits=3)
+
+saveRDS(tidy_aov_for_taxa_ContinuousVar_out, file = paste0(OAF_PATHDIR,"/",PROJABBV,"_tidy_aov_for_taxa_ContinuousVar_out.rds"))
+```
+
+```{r, include=F,eval=T}
+# tidy_aov_for_taxa_ContinuousVar_out <- readRDS(file = paste0(OAF_PATHDIR,"/",PROJABBV,"_tidy_aov_for_taxa_ContinuousVar_out.rds"))
+
+tidy_aov_for_taxa_ContinuousVar_out <- readRDS(file = "../docs/processed_data/OTU_occurrencefrequency/tidy_aov_for_taxa_ContinuousVar_out.rds")
+```
+
+*Darksidea* OTU occurrence frequency significantly influenced by
+
+[*Sampling Variables:*]{.underline}
+
+-   **Site**: (KW; $\eta^2$ = `r prettyNum(((occ_otu_site_kw$statistic/occ_otu_site_kw$parameter)*occ_otu_site_kw$parameter)/(((occ_otu_site_kw$statistic/occ_otu_site_kw$parameter)*occ_otu_site_kw$parameter)+(509-occ_otu_site_kw$parameter+1))*100, digits=4)`, p-value \< 2.2e-16, $\chi^2$ = `r prettyNum(occ_otu_site_kw$statistic, digits=4)`)
+-   **Grassland type**: (KW; $\eta^2$ = `r prettyNum(((occ_otu_Grassland_kw$statistic/occ_otu_Grassland_kw$parameter)*occ_otu_Grassland_kw$parameter)/(((occ_otu_Grassland_kw$statistic/occ_otu_Grassland_kw$parameter)*occ_otu_Grassland_kw$parameter)+(509-occ_otu_Grassland_kw$parameter+1))*100, digits=4)`, p-value = `r prettyNum(occ_otu_Grassland_kw$p.value, digits=3)`, $\chi^2$ = `r prettyNum(occ_otu_Grassland_kw$statistic, digits=4)`)
+-   **Grass host**: (KW; $\eta^2$ = `r prettyNum(((occ_otu_grass_kw$statistic/occ_otu_grass_kw$parameter)*occ_otu_grass_kw$parameter)/(((occ_otu_grass_kw$statistic/occ_otu_grass_kw$parameter)*occ_otu_grass_kw$parameter)+(509-occ_otu_grass_kw$parameter+1))*100, digits=4)`, p-value = `r prettyNum(occ_otu_grass_kw$p.value, digits=3)`, $\chi^2$ = `r prettyNum(occ_otu_grass_kw$statistic, digits=4)`)
+-   **Latitudinal Bin**: (KW; $\eta^2$ = `r prettyNum(((occ_otu_Bin_kw$statistic/(length(unique(occ_otu_Bin_long$Bin)) - 1))*(length(unique(occ_otu_Bin_long$Bin)) - 1))/((occ_otu_Bin_kw$statistic/(length(unique(occ_otu_Bin_long$Bin)) - 1))*(length(unique(occ_otu_Bin_long$Bin)) - 1)+(509-length(unique(occ_otu_Bin_long$Bin))))*100, digits=3)`, p-value = `r prettyNum(occ_otu_Bin_kw$p.value, digits=4)`, $\chi^2$ = `r prettyNum(occ_otu_Bin_kw$statistic, digits=4)`)
+-   **Elevation** (in meters): (AOV; $R^2$ = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="Elevation_m",]$R_squared, digits=3)`, p-value = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="Elevation_m",]$p.value, digits=3)`)
+-   **Latitude**: (AOV; $R^2$ = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="Latitude",]$R_squared, digits=3)`, p-value = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="Latitude",]$p.value, digits=3)`)
+-   **Longitude:** (AOV; $R^2$ = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="Longitude",]$R_squared, digits=3)`, p-value = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="Longitude",]$p.value, digits=3)`)
+
+[*Climate Data:*]{.underline}
+
+-   **GDD** = growing degree days: (AOV; $R^2$ = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="GDD3yr_m.std",]$R_squared, digits=3)`, p-value = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="GDD3yr_m.std",]$p.value, digits=3)`)
+-   **ppt** = mean annual precipitation: (AOV; $R^2$ = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="ppt3yr_m.std",]$R_squared, digits=3)`, p-value = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="ppt3yr_m.std",]$p.value, digits=3)`)
+
+[*Edaphic Variables:*]{.underline}
+
+-   **soil_moisture**: (AOV; $R^2$ = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="soil_moisture_m.std",]$R_squared, digits=3)`, p-value = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="soil_moisture_m.std",]$p.value, digits=2)`)
+-   **ammonium**: (AOV; $R^2$ = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="ammonium_m.std",]$R_squared, digits=3)`, p-value = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="ammonium_m.std",]$p.value, digits=3)`)
+-   **nitrate**: (AOV; $R^2$ = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="nitrate_m.std",]$R_squared, digits=3)`, p-value = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="nitrate_m.std",]$p.value, digits=3)`)
+-   **phosphorous**: (AOV; $R^2$ = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="phos_m.std",]$R_squared, digits=3)`, p-value = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="phos_m.std",]$p.value, digits=2)`)
+-   ~~**SOM**~~ (via LoI): *NS*
+-   ~~**pH**~~: *NS*
+
+[*Plant Traits:*]{.underline}
+
+-   **avg_SRL**: (AOV; $R^2$ = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="avg_SRL_m.std",]$R_squared, digits=3)`, p-value = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="avg_SRL_m.std",]$p.value, digits=3)`)
+-   **herbivory_perc**: (AOV; $R^2$ = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="herbivory_perc_m.std",]$R_squared, digits=3)`, p-value = `r prettyNum(tidy_aov_for_taxa_ContinuousVar_out[tidy_aov_for_taxa_ContinuousVar_out$ContinuousVar=="herbivory_perc_m.std",]$p.value, digits=3)`)
+-   ~~**avg_SLA**~~: *NS*
+
+# IGNORE/OLD {.hidden .unlisted .unnumbered}
+
+```{r, include=F, eval=F}
+# create container array (dim = c(nrow, ncol, n_df))
+adonis.out_predGrass.list = vector("list", length = length(comm.names.by.grass[1:2]))
+
+for (comm in comm.names.by.grass[1:2]) {
+  adonis.temp_predGrass <- adonis2(phyloseq::distance(get(comm), method="bray") ~ Grass, 
+          data = (as(sample_data(get(comm)), "data.frame")))
+  
+  adonis.temp_predGrass$comm <- comm 
+  
+  adonis.out_predGrass.list[[comm]] <- (as.data.frame(adonis.temp_predGrass))
+
+  }
+
+adonis.out.array_predGrass = do.call(rbind, adonis.out_predGrass.list)
+
+Fun.OTU.glom_Darksidea <- Fun %>% 
+  transform_sample_counts(function(x) {x / sum(x)} ) %>% 
+  subset_taxa(Genus=="Darksidea")
+
+Fun.OTU.glom_Darksidea_dat <- Fun %>% 
+  transform_sample_counts(function(x) {x / sum(x)} ) %>% 
+  subset_taxa(Genus=="Darksidea") %>% 
+  psmelt()
+
+Fun.Genus.glom_Darksidea <- subset_taxa(Fun.Genus.r, Genus=="Darksidea")
+
+Fun.OTU.glom_Darksidea2 <- prune_taxa(taxa_sums(Fun.OTU.glom_Darksidea) > 0, Fun.OTU.glom_Darksidea)
+otu_table(Fun.OTU.glom_Darksidea2)
+Fun.Genus.glom_Darksidea2 <- prune_taxa(taxa_sums(Fun.Genus.glom_Darksidea) > 0, Fun.Genus.glom_Darksidea)
+adonis2(phyloseq::distance(Fun.Genus.glom_Darksidea, method="bray") ~ Grass, 
+          data = (as(sample_data(Fun.Genus.glom_Darksidea), "data.frame")))
+
+
+```
+
+```{r, include=FALSE,eval=FALSE}
+knitr::kable((as.data.frame(subset(adonis.out.array_predGrass, 
+                    comm==comm.names.by.grass[1])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+knitr::kable((as.data.frame(subset(adonis.out.array_predGrass, 
+                    comm==comm.names.by.grass[2])))[,1:5], "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+
+```
+
+```{r, include=FALSE,eval=FALSE}
+# Histogram overlaid with kernel density curve
+ggplot(Fun.OTU.glom_Darksidea_dat, aes(x=Occurrence, fill=Phylum)) + 
+    geom_histogram(aes(y=after_stat(density)),      # Histogram with density instead of count on y-axis
+                   binwidth=.001,
+                   position="identity") +
+    geom_density(alpha=.2) + # Overlay with transparent density plot
+  # scale_x_log10()+
+  geom_vline(aes(xintercept=mean(Occurrence, na.rm=T)),   # Ignore NA values for mean
+               color="red", linetype="dashed", linewidth=1)
+
+
+```
+
+```{r, include=F,eval=F}
+# intersect(fun_AllGrasses_OA$OTU,fun_OTU_spegen_AllG_res$OTU))
+
+
+
+fun_AllGrasses_tax_results1<-cbind(fun_AllGrasses_OTU3, fun_AllGrasses_OA)
+colnames(fun_AllGrasses_tax_results1)[8] <- "Abundance_count"
+fun_AllGrasses_tax_results2<-subset(fun_AllGrasses_tax_results1, select=-c(Abundance_count,Occurrence))
+fun_AllGrasses_tax_table.mat<-as.matrix(fun_AllGrasses_tax_results2)
+fun_AllGrasses_tax_table<-tax_table(fun_AllGrasses_tax_table.mat)
+
+
+# Convert to relative abundance
+fun_OTU_relabundA <- Fun %>% 
+        transform_sample_counts(function(x) {x / sum(x)} ) %>%
+        psmelt() %>% select(OTU, Sample, Site, Grass, Latitude, Longitude, 
+                            Grassland, Gradient, Bin, Abundance) %>% 
+        mutate(Abundance = Abundance*100) 
+
+fun_OTU_relabund <- fun_OTU_relabundA %>% 
+        spread(Sample, Abundance) 
+
+# Convert to presence/absence 
+fun_OTU_pa <- fun_OTU_relabund
+fun_OTU_pa[,-(1:8)]=sapply(fun_OTU_pa[,-(1:8)],function(x) replace(x,x>0,1))
+
+# Calculate frequency of occurrence (presence) for each OTU
+fun_OTU_occurrence_frequency <- rowSums(fun_OTU_PA_mat)
+
+# Create a copy of the OTU matrix
+fun_OTU_mat <- phylo2vegan_OTU(Fun)
+
+
+
+
+
+# Add frequency of occurrence as a column to the relative abundance data
+fun_relabund_OTU <- fun_relabund_OTU %>% 
+  left_join(data.frame(OTU = rownames(fun_OTU_mat), Frequency = fun_OTU_occurrence_frequency),
+            by = "OTU")
+
+
+# Merge relative abundance data with taxonomy from 'Fun'
+fun_OTU_RA_PA_freq_psmelt <- merge(
+  fun_relabund_OTU,
+  as.data.frame(sample_data(Fun)),
+  by = "Sample",
+  all.x = TRUE
+) %>%
+  merge(
+    as.data.frame(tax_table(Fun)),
+    by = "OTU",
+    all.x = TRUE
+  )
+
+
+# Cleaning up merged data
+rownames(fun_OTU_RA_PA_freq_psmelt) <- fun_OTU_RA_PA_freq_psmelt$OTU
+fun_OTU_RA_PA_freq_psmelt$OTU <- NULL
+fun_OTU_RA_PA_freq_psmelt$Sample <- NULL
+```

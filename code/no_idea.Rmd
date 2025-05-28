@@ -1,0 +1,336 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r auto-populate-rank-names-to-plot, results='asis'}
+Bac.rank.namkes<-as.vector(rank_names(Bac))
+min_nname_Bac_Phylum<-length(unique(Bac_Phylum_Mean_Abund$Phylum[Bac_Phylum_Mean_Abund$Bac_Phylum_Mean > 0.5]))
+
+Bac.rank.names<-rank_names(Bac)[2:6]
+Fun.rank.names<-rank_names(Fun)[2:7]
+
+
+for(rank in Bac.rank.names) {
+  
+  cat('\n # Set min plotting threshold to 0.5% relative abundance (all-sample a.k.a global mean) \n')
+  
+  cat('\n')
+  
+   cat('min_nname_Bac_', rank, '<-length(unique(Bac_', rank, '_Mean_Abund$', 
+       rank, '[Bac_', rank, '_Mean_Abund$Bac_', rank, '_Mean > 0.5]))',
+       sep = '')
+  
+  cat('\n \n ')
+
+    cat('if (min_nname_Bac_', rank, ' < 10){
+  ) (Bac.', rank, '.Phylum.names.to.plot<-top_n(Bac_', rank, '_Mean_Abund, min_nname_Bac_', rank, ', Bac.', rank, '_Mean)$',rank, ' 
+} else {
+  Bac.', rank, '.names.to.plot<-top_n(Bac_', rank, '_Mean_Abund, 10, Bac.', rank, '_Mean)$', rank, '
+}', sep = '')
+
+
+    cat('\n \n')
+
+}
+
+```
+
+
+## AllG (All Grasses) {.unnumbered}
+## ANGE (*Andropogon gerardii* / Big bluestem) {.unnumbered}
+## BOER (*B. eriopoda* / Black grama) {.unnumbered}
+## BOGR (*B. gracilis* / Blue grama) {.unnumbered}
+## BUDA (*Bouteloua dactyloides* / Buffalograss) {.unnumbered}
+## SCSC (*Schizachyrium scoparium* / Little bluestem) {.unnumbered}
+
+
+```{r, eval=T}
+Fun.AllG_otu <- as.data.frame(t(otu_table(Fun.AllG)))
+
+# Read in the OTU table for all of the data and transpose with R	
+	#survey.all = read.csv('../processed_data/AL_Survey.all.Fun_97_nosing.csv', header=T, row.names=1)
+
+# Create presence absence matrix
+Fun.AllG_otu.pres.abs = decostand(x=Fun.AllG_otu, method="pa")
+
+# Create distance matrix for beta diversity metrics, index.family="sorensen"
+Fun.AllG_otu.dist = beta.pair(Fun.AllG_otu.pres.abs, index.family="sor")
+
+# Total dissimilarity: pair-wise Sorensen dissimilarity (monotonic transformation of beta div)
+	Fun.AllG_otu.dist.sor.matrix <- matrix(Fun.AllG_otu.dist$beta.sor)
+	# length(Fun.AllG_otu.dist.sor.matrix)
+	if (file.exists('../processed_data/nestedness/Fun.AllG_otu.dist.sor.matrix.txt')){
+	  # 
+	} else {
+    write.table(Fun.AllG_otu.dist.sor.matrix, file = '../processed_data/nestedness/Fun.AllG_otu.dist.sor.matrix.txt')
+  }
+  
+# Spatial turnover / species replacement: Simpson 
+	Fun.AllG_otu.dist.sim.matrix <- matrix(Fun.AllG_otu.dist$beta.sim)
+	# length(Fun.AllG_otu.dist.sim.matrix)
+		if (file.exists('../processed_data/nestedness/survey.dist.sim.matrix.txt')){
+	  # 
+	} else {
+    write.table(Fun.AllG_otu.dist.sim.matrix, file = '../processed_data/nestedness/Fun.AllG_otu.dist.sim.matrix.txt')
+  }
+
+# Nestedness-resultant dissimilarity
+	Fun.AllG_otu.dist.sne.matrix <- matrix(Fun.AllG_otu.dist$beta.sne)
+	# length(Fun.AllG_otu.dist.sne.matrix)
+	if (file.exists('../processed_data/nestedness/survey.dist.sne.matrix.txt')){
+	  # 
+	} else {
+    write.table(Fun.AllG_otu.dist.sne.matrix, file = '../processed_data/nestedness/Fun.AllG_otu.dist.sne.matrix.txt')
+  }
+
+Fun.AllG_soil_moisture.sor.mrm <- MRM(Fun.AllG_otu.dist$beta.sor ~ Fun.soil_moisture.matrix, nperm=1000)
+Fun.AllG_soil_moisture.sim.mrm <- MRM(Fun.AllG_otu.dist$beta.sim ~ Fun.soil_moisture.matrix, nperm=1000)
+Fun.AllG_soil_moisture.sne.mrm <- MRM(Fun.AllG_otu.dist$beta.sne ~ Fun.soil_moisture.matrix, nperm=1000)
+
+Fun.AllG_soil_moisture.sor.b.m <- c(Fun.AllG_soil_moisture.sor.mrm$coef[1,1], Fun.AllG_soil_moisture.sor.mrm$coef[2,1])
+Fun.AllG_soil_moisture.sim.b.m <- c(Fun.AllG_soil_moisture.sim.mrm$coef[1,1], Fun.AllG_soil_moisture.sim.mrm$coef[2,1])
+Fun.AllG_soil_moisture.sne.b.m <- c(Fun.AllG_soil_moisture.sne.mrm$coef[1,1], Fun.AllG_soil_moisture.sne.mrm$coef[2,1])
+
+```
+
+
+# cut occurrence code
+
+# occurrence - scripts dont work, go back to Darksidea to find one that does
+
+  #r occurrence-calc-function-notworking, include=F,eval=F}
+    #calc_occurrence <- function(phylo_obj, metadata_factor, tax_rank, taxa_of_interest = NULL) {
+    #   if (!is.null(taxa_of_interest)) {
+    #     # Filter OTU table based on taxa_of_interest at OTU level if provided
+    #     if (tax_rank == "OTU") {
+    #       taxa_indices <- taxa_of_interest
+    #       filtered_phylo_obj <- prune_taxa(phylo_obj, taxa_indices)
+    #     } else {
+    #       # Filter OTU table based on taxa_of_interest at tax_rank level if provided
+    #       taxa_indices <- taxa_names(phylo_obj)[tax_table(phylo_obj)[, tax_rank] %in% taxa_of_interest]
+    #       filtered_phylo_obj <- prune_taxa(phylo_obj, taxa_indices)
+    #     }
+    #   } else {
+    #     filtered_phylo_obj <- phylo_obj
+    #   }
+    #   
+    #   # Calculate occurrence matrix
+    #   occurrence_matrix <- table(sample_data(filtered_phylo_obj)[, metadata_factor], tax_table(filtered_phylo_obj)[, tax_rank]) > 0
+    #   
+    #   # Calculate frequency of occurrence by factor level
+    #   frequency_by_factor <- apply(occurrence_matrix, 1, function(x) sum(x) / length(x))
+    #   
+    #   return(frequency_by_factor)
+    # }
+
+
+  # #r occurrence-calc-function-notworking2, include=F,eval=F}
+  # calc_occurrence.test <- function(phylo_obj, metadata_factor, tax_rank, taxa_of_interest = NULL) {
+  #   if (!is.null(taxa_of_interest)) {
+  #     # Filter OTU table based on taxa_of_interest at OTU level if provided
+  #     if (tax_rank == "OTU") {
+  #       taxa_indices <- taxa_of_interest
+  #       filtered_phylo_obj <- prune_taxa(phylo_obj, taxa_indices)
+  #     } else {
+  #       # Filter OTU table based on taxa_of_interest at tax_rank level if provided
+  #       taxa_indices <- taxa_names(phylo_obj)[tax_table(phylo_obj)[, tax_rank] %in% taxa_of_interest]
+  #       filtered_phylo_obj <- prune_taxa(phylo_obj, taxa_indices)
+  #     }
+  #   } else {
+  #     filtered_phylo_obj <- phylo_obj
+  #   }
+  #   
+  #   # Calculate occurrence matrix
+  #   occurrence_matrix <- table(sample_data(filtered_phylo_obj)[, metadata_factor], tax_table(filtered_phylo_obj)[, tax_rank]) > 0
+  #   
+  #   # Calculate frequency of occurrence by factor level
+  #   frequency_by_factor <- apply(occurrence_matrix, 1, function(x) sum(x) / length(x))
+  #   
+  #   return(frequency_by_factor)
+  # }
+  # 
+  # calc_occurrence.test <- function(phylo_obj, metadata_factor, tax_rank, taxa_of_interest = NULL) {
+  #   if (!is.null(taxa_of_interest)) {
+  #     # Filter OTU table based on taxa_of_interest at OTU level if provided
+  #     if (tax_rank == "OTU") {
+  #       taxa_indices <- taxa_of_interest
+  #       filtered_phylo_obj <- prune_taxa(phylo_obj, taxa_indices)
+  #     } else {
+  #       # Filter OTU table based on taxa_of_interest at tax_rank level if provided
+  #       taxa_indices <- taxa_names(phylo_obj)[tax_table(phylo_obj)[, tax_rank] %in% taxa_of_interest]
+  #       #filtered_phylo_obj <- prune_taxa(phylo_obj, taxa_indices)
+  #     }
+  #   } else {
+  #     filtered_phylo_obj <- phylo_obj
+  #   }
+  #   
+  #   # Calculate occurrence matrix
+  #   occurrence_matrix <- table(sample_data(filtered_phylo_obj)[, metadata_factor], tax_table(filtered_phylo_obj)[, tax_rank]) > 0
+  #   
+  #   # Calculate frequency of occurrence by factor level
+  #   frequency_by_factor <- apply(occurrence_matrix, 1, function(x) sum(x) / length(x))
+  #   
+  #   return(frequency_by_factor)
+  # }
+  # taxa_at_rank <- taxa_names(phylo_obj)[, tax_rank]
+  # taxa_indices <- taxa_at_rank[taxa_at_rank %in% taxa_of_interest]
+  # filtered_phylo_obj <- prune_taxa(c(taxa_indices),Fun)
+  # 
+  # #working
+  # #input (Fun, "SampleID", "Genus", c("Darksidea"))
+  # taxa_at_rank <- tax_table(Fun)[, c("Genus")]
+  # taxa_indices <- as.vector(unique(as.data.frame(taxa_at_rank[taxa_at_rank %in% c("Darksidea")])[,1]))
+  # filtered_phylo_obj <- prune_taxa(taxa_indices,Fun)
+  # taxa_names(Fun)
+  # head(tax_table(Fun)[, c("Genus","Species")])
+  # 
+  # 
+  # 
+  # #if "genus" and output is otu
+  # taxa_at_rank <- tax_table(Fun)[, c("Genus")]
+  # taxa_indices <- row.names(as.data.frame(taxa_at_rank[taxa_at_rank %in% c("Darksidea")]))
+  # filtered_phylo_obj <- prune_taxa(taxa_indices,Fun)
+  # head(otu_table(filtered_phylo_obj))
+  # sd_f<-sample_data(filtered_phylo_obj)[, "SampleID"]
+  # head(sample_data(filtered_phylo_obj))
+  # occurrence_matrix <- table(sample_data(filtered_phylo_obj)[, "SampleID"], tax_table(filtered_phylo_obj)[, "Genus"]) > 0
+  # 
+  # taxa_at_rank <- tax_table(Fun)[, c("Genus")]
+  # taxa_indices <- as.vector(unique(as.data.frame(taxa_at_rank[taxa_at_rank %in% c("Darksidea")])[,1]))
+  # filtered_phylo_obj <- prune_taxa(taxa_indices,Fun)
+  # 
+  # #working
+  # #input (Fun, "SampleID", "OTU", c("Darksidea"))
+  # 
+  # 
+  # 
+  # 
+  # taxa_indices<-taxa_names(phylo_obj)[tax_table(phylo_obj)[, "Genus"] %in% c("Darksidea")]
+  # filtered_phylo_obj <- prune_taxa(c(taxa_indices),Fun)
+  # 
+  # occ_genus_Darksidea_sample <- calc_occurrence.test(Fun, "SampleID", "Genus", c("Darksidea"))
+  # occ_genus_Darksidea_sample
+  # 
+  # 
+  # 
+  # #if tax_rank == rank of taxa_of_interest
+  # #if tax_rank != rank of taxa_of_interest
+  # #rank of taxa_of_interest is genus and tax_rank = OTU
+  # #rank of taxa_of_interest is genus and tax_rank = Species
+  # #if is.null(taxa_of_interest)
+  # 
+  # phylo_obj<-Fun
+  # tax_rank<-"Genus"
+  # taxa_of_interest<-c("Darksidea")
+  # metadata_factor<-"Grass"
+
+  #this works best rn - still ignore
+  # calc_occurrence <- function(phylo_obj, metadata_factor, tax_rank, taxa_of_interest = NULL) {
+  #   
+  #   print(phylo_obj)
+  #   tax_table_cols <- colnames(tax_table(phylo_obj))
+  #   
+  #   if (metadata_factor=="SampleID") {
+  #     stop("Don't use 'SampleID', try 'sample_name' instead")
+  #   } else if (!is.null(taxa_of_interest)) {
+  #     
+  #     if (tax_rank %in% tax_table_cols) {
+  #       taxa_col_indices <- which(apply(tax_table(phylo_obj), 2, function(x) any(x %in% taxa_of_interest)))
+  #       
+  #       if (length(taxa_col_indices) > 0) {
+  #         rank_interesting_taxa <- tax_table_cols[max(taxa_col_indices)]
+  #         interesting_otu_names<-taxa_names(phylo_obj)[tax_table(phylo_obj)[, tax_rank] %in% taxa_of_interest]
+  #         if (rank_interesting_taxa == rank_interesting_taxa && tax_rank == "OTU") {
+  #           filtered_phylo_obj <- prune_taxa(interesting_otu_names, phylo_obj)
+  #           print("Computing occurrence at OTU-level")
+  #         } else if (tax_rank == rank_interesting_taxa && tax_rank == "Species") {
+  #           filtered_phylo_obj <- prune_taxa(interesting_otu_names, phylo_obj)
+  #           filtered_phylo_obj <- tax_glom(filtered_phylo_obj, taxrank = "Species")
+  #           print("Agglomerating to rank 'Species'")
+  #         } else if (tax_rank == rank_interesting_taxa && tax_rank == "Genus") {
+  #           filtered_phylo_obj <- prune_taxa(interesting_otu_names, phylo_obj)
+  #           filtered_phylo_obj <- tax_glom(filtered_phylo_obj, taxrank = "Genus")
+  #           print("Agglomerating to rank 'Genus'")
+  #         } else {
+  #           stop("Invalid combination of taxonomic ranks and taxa_of_interest provided.")
+  #         }
+  #       } else {
+  #         stop("Taxa of interest not found in the taxonomic table.")
+  #       }
+  #     } else {
+  #       stop("Taxonomic ranks required for filtering not found in the phylo_obj.")
+  #     }
+  #   } else {
+  #     filtered_phylo_obj <- phylo_obj
+  #     print("No taxa of interest input, computing occurrence for entire OTU table")
+  #   }
+  #   
+  #   # print(filtered_phylo_obj)
+  #   
+  #   #subset metadata
+  #   occ_meta<-sample_data(filtered_phylo_obj)
+  #   #occ_meta
+  #   #print("Full metadata")
+  #   #print(head(occ_meta))
+  #   occ_meta_sub <- subset(occ_meta, select = c("SampleID",metadata_factor))
+  #   #print(head(occ_meta_sub))
+  #   
+  #   # Calculate occurrence matrix, convert to presence/absence
+  #   occ_matrix <- otu_table(filtered_phylo_obj) %>%
+  #     as.data.frame() %>%
+  #     t() %>%
+  #     {ifelse(. > 1, 1, .)} %>%
+  #     as.data.frame() %>%
+  #     rownames_to_column(var = "SampleID") %>%
+  #     inner_join(occ_meta_sub, by = "SampleID") %>%
+  #     select(SampleID,last_col(),c(everything(),-last_col(),SampleID))
+  #   print("Sanity check: preview of occurrence matrix")
+  #   print(head(occ_matrix))
+  #   
+  #   # Calculate frequency of occurrence by factor level
+  #   frequency_by_factor <- occ_matrix %>%
+  #     group_by(.data[[metadata_factor]]) %>%
+  #     summarise_at(vars(starts_with("OTU")), 
+  #                  ~ sum(. > 0) / n(), 
+  #                  .names = "{.col}_frequency",
+  #                  .preserve = T) %>%
+  #     ungroup()
+  #   print("Sanity check: preview of occurrence by factor")
+  #   print(head(frequency_by_factor))
+  #   
+  #   return(frequency_by_factor)
+  # }
+  # 
+  # # Example usage with taxa_of_interest specified at the genus level
+  # # Replace 'phylo_obj', 'SampleType' (metadata factor), and 'Genus' (taxonomic rank)
+  # result_genus <- calc_occurrence(Fun, "Grass", "Genus", c("Darksidea"))
+  # 
+  # # Example usage with taxa_of_interest specified at the OTU level
+  # # Replace 'phylo_obj', 'SampleType' (metadata factor), and 'otus_of_interest' (list of OTUs)
+  # result_otu <- calc_occurrence(Fun, "Gr", "OTU", otus_of_interest)
+
+
+
+
+
+  #r occurrence-calc-ignore, include=F,eval=F}
+    # str(sample_data(Fun))
+    # Fun_sd <- sample_data(Fun)
+    # head(Fun_sd)
+    # 
+    # metadata_factor<-"Grass"
+    # 
+    # meta_sub <- subset(Fun_sd, select = c("SampleID",metadata_factor))
+    # phylo_obj<-Fun
+    # tax_rank<-"Genus"
+    # taxa_of_interest<-c("Darksidea")
+    # 
+    # # Example usage with taxa_of_interest specified at the genus level
+    # # Replace 'phylo_obj', 'SampleType' (metadata factor), and 'Genus' (taxonomic rank)
+    # occ_genus_Darksidea_sample <- calc_occurrence(Fun, "SampleID", "Genus", c("Darksidea"))
+    # head(sample_data())
+    # # Example usage with taxa_of_interest specified at the OTU level
+    # # Replace 'phylo_obj', 'SampleType' (metadata factor), and 'otus_of_interest' (list of OTUs)
+    # result_otu <- calc_occurrence(phylo_obj, "SampleType", "OTU", otus_of_interest)

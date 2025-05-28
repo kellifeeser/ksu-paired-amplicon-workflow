@@ -1,0 +1,1568 @@
+---
+title: "**KSU paired amplicons: Beta-null deviations**"
+subtitle: "16S and ITS OTU tables (EDGE samples excluded), by Grass Host"
+author: "Kelli Feeser"
+date: '2023-09-20'
+output:
+  html_document: 
+    code_folding: hide
+    css: test.css
+    number_sections: yes
+    theme: cosmo
+    toc: yes
+    toc_depth: 2
+  html_notebook:
+    code_folding: hide
+    df_print: paged
+    number_sections: yes
+    theme: cosmo
+    toc: yes
+    toc_depth: 2
+editor_options:
+  chunk_output_type: inline
+---
+
+\
+
+------------------------------------------------------------------------
+
+# Set-up & data import -------------------------------------------------------
+
+\
+
+```{r LANL proxies, eval=T, include=FALSE}
+# LANL proxies
+Sys.setenv('HTTP_PROXY'='http://proxyout.lanl.gov:8080')
+Sys.setenv('HTTPS_PROXY'='http://proxyout.lanl.gov:8080')
+```
+
+## install packages {.hidden}
+
+```{r eval=FALSE, warning=FALSE, include=T}
+install.packages("~/Downloads/densEstBayes_1.0-2.2.tar.gz", repos = NULL, type="source")
+install.packages("densEstBayes")
+install.packages("~/Downloads/reldist_1.7-2.tar.gz", repos = NULL, type="source")
+# install.packages("~/Downloads/dotCall64_1.0-2.tar.gz", repos = NULL, type="source")
+# install.packages("bipartite")
+# install.packages("~/Downloads/statnet.common_4.1.4.tar", repos = NULL, type="source")
+
+install.packages("~/Downloads/carData_3.0-3.tar", repos = NULL, type="source")
+install.packages("~/Downloads/pbkrtest_0.4-7.tar", repos = NULL, type="source")
+install.packages("~/Downloads/car_3.0-0.tar", repos = NULL, type="source")
+
+install.packages("~/Downloads/rstatix_0.6.0.tar", repos = NULL, type="source")
+install.packages("~/Downloads/ggpubr_0.3.0.tar", repos = NULL, type="source")
+```
+
+\
+
+## load packages and sources {.hidden}
+
+```{r eval=T, include=F}
+library("phyloseq"); packageVersion("phyloseq") #‘1.44.0’
+library("reldist"); packageVersion("reldist") #‘1.7.2’
+library("vegan"); packageVersion("vegan") #‘2.6.4’
+library("bipartite"); packageVersion("bipartite") #‘3.4.4’
+library("ggplot2"); packageVersion("ggplot2") #‘3.4.4’
+library("ggpubr"); packageVersion("ggpubr") #‘0.6.0’
+library("stats"); packageVersion("stats") #‘4.3.1’
+library("corrplot"); packageVersion("corrplot") #‘0.92’
+library("dplyr"); packageVersion("dplyr") #‘1.1.3’
+library("reshape2"); packageVersion("reshape2") #‘1.4.4’
+library("ggtext"); packageVersion("ggtext") #‘0.1.2’
+
+source("PANullDevFctsOikos.r")
+
+#save the two R files below in your working directory
+# source("MetacommunityDynamicsFctsOikos.r")
+# source("PANullDevFctsOikos.r")
+
+
+library(carData)
+library(rstatix)
+library(cowplot)
+```
+
+```{r, include=F, eval=T}
+combined_metadata<-read.csv(file="../metadata/combined_metadata.csv")
+```
+
+-   ANGE (*Andropogon gerardii* / Big bluestem)\
+-   SCSC (*Schizachyrium scoparium* / Little bluestem)\
+-   BOER (*B. eriopoda* / Black grama)\
+-   BOGR (*B. gracilis* / Blue grama)\
+-   BUDA (*Bouteloua dactyloides* / Buffalograss)\
+
+# output-top-predvar {.hidden}
+
+## BOGR
+
+```{r output-top-predvar-BOGR, include=FALSE, cache=T}
+Bac.BOGR_dev_vals_raw<-read.csv(file="../processed_data/BetaNullDeviation/Bac.BOGR_BnullDev_abund_bysample.csv")
+Fun.BOGR_dev_vals_raw<-read.csv(file="../processed_data/BetaNullDeviation/Fun.BOGR_BnullDev_abund_bysample.csv")
+
+Bac.BOGR_dev_vals<-Bac.BOGR_dev_vals_raw
+Fun.BOGR_dev_vals<-Fun.BOGR_dev_vals_raw
+  
+names(Bac.BOGR_dev_vals)[1] <- "X16S_ID"
+names(Bac.BOGR_dev_vals)[2] <- "Bac.Observed"
+names(Bac.BOGR_dev_vals)[3] <- "Bac.beta_div_metacomm_mean"
+names(Bac.BOGR_dev_vals)[4] <- "Bac.abund_null_dev_stoch"
+names(Bac.BOGR_dev_vals)[5] <- "Bac.abund_null_dev_det"
+
+names(Fun.BOGR_dev_vals)[1] <- "ITS_ID"
+names(Fun.BOGR_dev_vals)[2] <- "Fun.Observed"
+names(Fun.BOGR_dev_vals)[3] <- "Fun.beta_div_metacomm_mean"
+names(Fun.BOGR_dev_vals)[4] <- "Fun.abund_null_dev_stoch"
+names(Fun.BOGR_dev_vals)[5] <- "Fun.abund_null_dev_det"
+
+
+Bac.BOGR_dev_vals_dat <- merge(Bac.BOGR_dev_vals, combined_metadata, by = "X16S_ID")
+Fun.BOGR_dev_vals_dat <- merge(Fun.BOGR_dev_vals, combined_metadata, by = "ITS_ID")
+
+BOGR_dev_vals_dat <-merge(Bac.BOGR_dev_vals_dat, Fun.BOGR_dev_vals_dat)
+
+BOGR_dev_vals_dat$Bin<-factor(BOGR_dev_vals_dat$Bin)
+levels(BOGR_dev_vals_dat$Bin)
+BOGR_dev_vals_dat$Bin<-factor(BOGR_dev_vals_dat$Bin, levels=c("North","North Central", "South Central", "South"))
+
+BOGR_dev_vals_dat$Gradient<-factor(BOGR_dev_vals_dat$Gradient)
+levels(BOGR_dev_vals_dat$Gradient)
+BOGR_dev_vals_dat$Gradient<-factor(BOGR_dev_vals_dat$Gradient, levels=c("West","Middle", "East"))
+
+
+Bac.BOGR_dev_vals_dat_longish <- data.frame(Bac.BOGR_dev_vals_dat, 
+                                            "Domain" = rep("Bacteria",
+                                                    nrow(Bac.BOGR_dev_vals_dat)),
+                                            stringsAsFactors = T)
+names(Bac.BOGR_dev_vals_dat_longish)[2:5] <- names(Bac.BOGR_dev_vals_raw)[2:5]
+
+Fun.BOGR_dev_vals_dat_longish <- data.frame(Fun.BOGR_dev_vals_dat, 
+                                            "Domain" = rep("Fungi",
+                                                    nrow(Fun.BOGR_dev_vals_dat)),
+                                            stringsAsFactors = T)
+names(Fun.BOGR_dev_vals_dat_longish)[2:5] <- names(Fun.BOGR_dev_vals_raw)[2:5]
+
+BOGR_dev_vals_dat_long <- rbind(Bac.BOGR_dev_vals_dat_longish,Fun.BOGR_dev_vals_dat_longish)
+
+BOGR_dev_vals_dat_numeric<-subset(BOGR_dev_vals_dat, 
+                                  select = -c(X16S_ID,sample_name,ITS_ID,
+                                              Site, Site_Grass, Replicate,
+                                              Site.Rep, Grass, Edge, SiteName,
+                                              Grass_Rep, CollectionDate, MAT_degC,
+                                              MAP_mm, Gradient, Bin, Grassland,
+                                              julianday))
+
+BOGR.cor.res_rho_no = cor(BOGR_dev_vals_dat_numeric[,c(24:25,28:29)],
+                            BOGR_dev_vals_dat_numeric[,c(1:21)], 
+                            method = "spearman")
+
+BOGR.cor.res_rhot <- t(BOGR.cor.res_rho_no)
+BOGR.cor.res_rho = data.frame("predictor" = row.names(BOGR.cor.res_rhot),
+                              "bac_rho" = BOGR.cor.res_rhot[,1],
+                              "fun_rho" = BOGR.cor.res_rhot[,3])
+
+
+top_dev_pred_Bac.BOGR <- with(BOGR.cor.res_rho, subset(predictor, bac_rho > 0.2 |  bac_rho < -0.2))
+
+top_dev_pred_Fun.BOGR <- with(BOGR.cor.res_rho, subset(predictor, fun_rho > 0.2 |  fun_rho < -0.2))
+
+BOGR.cor.res_pval = cor.mtest(BOGR_dev_vals_dat_numeric, method = "spearman")$p
+
+  # view p-val associated b/w comm and pred.var
+    # BOGR.cor.res_pval["Bac.abund_null_dev_stoch","avg_SLA"]
+
+top_dev_pred_Bac.BOGR_dat_unmelt <- subset(BOGR_dev_vals_dat, select = c("sample_name", "Bac.abund_null_dev_stoch", paste(top_dev_pred_Bac.BOGR)))
+top_dev_pred_Fun.BOGR_dat_unmelt <- subset(BOGR_dev_vals_dat, select = c("sample_name", "Fun.abund_null_dev_stoch", paste(top_dev_pred_Fun.BOGR)))
+
+top_dev_pred_Bac.BOGR_dat <- melt(top_dev_pred_Bac.BOGR_dat_unmelt, measure.vars=c(paste(top_dev_pred_Bac.BOGR)))
+
+top_dev_pred_Fun.BOGR_dat <- melt(top_dev_pred_Fun.BOGR_dat_unmelt, measure.vars=c(paste(top_dev_pred_Fun.BOGR)))
+```
+
+\
+
+## BOER
+
+```{r output-top-predvar-BOER, include=FALSE, cache=T}
+Bac.BOER_dev_vals_raw<-read.csv(file="../processed_data/BetaNullDeviation/Bac.BOER_BnullDev_abund_bysample.csv")
+Fun.BOER_dev_vals_raw<-read.csv(file="../processed_data/BetaNullDeviation/Fun.BOER_BnullDev_abund_bysample.csv")
+
+Bac.BOER_dev_vals<-Bac.BOER_dev_vals_raw
+Fun.BOER_dev_vals<-Fun.BOER_dev_vals_raw
+  
+names(Bac.BOER_dev_vals)[1] <- "X16S_ID"
+names(Bac.BOER_dev_vals)[2] <- "Bac.Observed"
+names(Bac.BOER_dev_vals)[3] <- "Bac.beta_div_metacomm_mean"
+names(Bac.BOER_dev_vals)[4] <- "Bac.abund_null_dev_stoch"
+names(Bac.BOER_dev_vals)[5] <- "Bac.abund_null_dev_det"
+
+names(Fun.BOER_dev_vals)[1] <- "ITS_ID"
+names(Fun.BOER_dev_vals)[2] <- "Fun.Observed"
+names(Fun.BOER_dev_vals)[3] <- "Fun.beta_div_metacomm_mean"
+names(Fun.BOER_dev_vals)[4] <- "Fun.abund_null_dev_stoch"
+names(Fun.BOER_dev_vals)[5] <- "Fun.abund_null_dev_det"
+
+
+Bac.BOER_dev_vals_dat <- merge(Bac.BOER_dev_vals, combined_metadata, by = "X16S_ID")
+Fun.BOER_dev_vals_dat <- merge(Fun.BOER_dev_vals, combined_metadata, by = "ITS_ID")
+
+BOER_dev_vals_dat <-merge(Bac.BOER_dev_vals_dat, Fun.BOER_dev_vals_dat)
+
+BOER_dev_vals_dat$Bin<-factor(BOER_dev_vals_dat$Bin)
+levels(BOER_dev_vals_dat$Bin)
+BOER_dev_vals_dat$Bin<-factor(BOER_dev_vals_dat$Bin, levels=c("North","North Central", "South Central", "South"))
+
+BOER_dev_vals_dat$Gradient<-factor(BOER_dev_vals_dat$Gradient)
+levels(BOER_dev_vals_dat$Gradient)
+BOER_dev_vals_dat$Gradient<-factor(BOER_dev_vals_dat$Gradient, levels=c("West","Middle", "East"))
+
+
+Bac.BOER_dev_vals_dat_longish <- data.frame(Bac.BOER_dev_vals_dat, 
+                                            "Domain" = rep("Bacteria",
+                                                    nrow(Bac.BOER_dev_vals_dat)),
+                                            stringsAsFactors = T)
+names(Bac.BOER_dev_vals_dat_longish)[2:5] <- names(Bac.BOER_dev_vals_raw)[2:5]
+
+Fun.BOER_dev_vals_dat_longish <- data.frame(Fun.BOER_dev_vals_dat, 
+                                            "Domain" = rep("Fungi",
+                                                    nrow(Fun.BOER_dev_vals_dat)),
+                                            stringsAsFactors = T)
+names(Fun.BOER_dev_vals_dat_longish)[2:5] <- names(Fun.BOER_dev_vals_raw)[2:5]
+
+BOER_dev_vals_dat_long <- rbind(Bac.BOER_dev_vals_dat_longish,Fun.BOER_dev_vals_dat_longish)
+
+BOER_dev_vals_dat_numeric<-subset(BOER_dev_vals_dat, 
+                                  select = -c(X16S_ID,sample_name,ITS_ID,
+                                              Site, Site_Grass, Replicate,
+                                              Site.Rep, Grass, Edge, SiteName,
+                                              Grass_Rep, CollectionDate, MAT_degC,
+                                              MAP_mm, Gradient, Bin, Grassland,
+                                              julianday))
+
+BOER.cor.res_rho_no = cor(BOER_dev_vals_dat_numeric[,c(24:25,28:29)],
+                            BOER_dev_vals_dat_numeric[,c(1:21)], 
+                            method = "spearman")
+
+BOER.cor.res_rhot <- t(BOER.cor.res_rho_no)
+BOER.cor.res_rho = data.frame("predictor" = row.names(BOER.cor.res_rhot),
+                              "bac_rho" = BOER.cor.res_rhot[,1],
+                              "fun_rho" = BOER.cor.res_rhot[,3])
+
+
+top_dev_pred_Bac.BOER <- with(BOER.cor.res_rho, subset(predictor, bac_rho > 0.2 |  bac_rho < -0.2))
+
+top_dev_pred_Fun.BOER <- with(BOER.cor.res_rho, subset(predictor, fun_rho > 0.2 |  fun_rho < -0.2))
+
+BOER.cor.res_pval = cor.mtest(BOER_dev_vals_dat_numeric, method = "spearman")$p
+
+  # view p-val associated b/w comm and pred.var
+    # BOER.cor.res_pval["Bac.abund_null_dev_stoch","avg_SLA"]
+
+top_dev_pred_Bac.BOER_dat_unmelt <- subset(BOER_dev_vals_dat, select = c("sample_name", "Bac.abund_null_dev_stoch", paste(top_dev_pred_Bac.BOER)))
+top_dev_pred_Fun.BOER_dat_unmelt <- subset(BOER_dev_vals_dat, select = c("sample_name", "Fun.abund_null_dev_stoch", paste(top_dev_pred_Fun.BOER)))
+
+top_dev_pred_Bac.BOER_dat <- melt(top_dev_pred_Bac.BOER_dat_unmelt, measure.vars=c(paste(top_dev_pred_Bac.BOER)))
+
+top_dev_pred_Fun.BOER_dat <- melt(top_dev_pred_Fun.BOER_dat_unmelt, measure.vars=c(paste(top_dev_pred_Fun.BOER)))
+```
+
+\
+
+## BUDA
+
+```{r output-top-predvar-BUDA, include=FALSE, cache=T}
+Bac.BUDA_dev_vals_raw<-read.csv(file="../processed_data/BetaNullDeviation/Bac.BUDA_BnullDev_abund_bysample.csv")
+Fun.BUDA_dev_vals_raw<-read.csv(file="../processed_data/BetaNullDeviation/Fun.BUDA_BnullDev_abund_bysample.csv")
+
+Bac.BUDA_dev_vals<-Bac.BUDA_dev_vals_raw
+Fun.BUDA_dev_vals<-Fun.BUDA_dev_vals_raw
+  
+names(Bac.BUDA_dev_vals)[1] <- "X16S_ID"
+names(Bac.BUDA_dev_vals)[2] <- "Bac.Observed"
+names(Bac.BUDA_dev_vals)[3] <- "Bac.beta_div_metacomm_mean"
+names(Bac.BUDA_dev_vals)[4] <- "Bac.abund_null_dev_stoch"
+names(Bac.BUDA_dev_vals)[5] <- "Bac.abund_null_dev_det"
+
+names(Fun.BUDA_dev_vals)[1] <- "ITS_ID"
+names(Fun.BUDA_dev_vals)[2] <- "Fun.Observed"
+names(Fun.BUDA_dev_vals)[3] <- "Fun.beta_div_metacomm_mean"
+names(Fun.BUDA_dev_vals)[4] <- "Fun.abund_null_dev_stoch"
+names(Fun.BUDA_dev_vals)[5] <- "Fun.abund_null_dev_det"
+
+
+Bac.BUDA_dev_vals_dat <- merge(Bac.BUDA_dev_vals, combined_metadata, by = "X16S_ID")
+Fun.BUDA_dev_vals_dat <- merge(Fun.BUDA_dev_vals, combined_metadata, by = "ITS_ID")
+
+BUDA_dev_vals_dat <-merge(Bac.BUDA_dev_vals_dat, Fun.BUDA_dev_vals_dat)
+
+BUDA_dev_vals_dat$Bin<-factor(BUDA_dev_vals_dat$Bin)
+levels(BUDA_dev_vals_dat$Bin)
+BUDA_dev_vals_dat$Bin<-factor(BUDA_dev_vals_dat$Bin, levels=c("North","North Central", "South Central", "South"))
+
+BUDA_dev_vals_dat$Gradient<-factor(BUDA_dev_vals_dat$Gradient)
+levels(BUDA_dev_vals_dat$Gradient)
+BUDA_dev_vals_dat$Gradient<-factor(BUDA_dev_vals_dat$Gradient, levels=c("West","Middle", "East"))
+
+
+Bac.BUDA_dev_vals_dat_longish <- data.frame(Bac.BUDA_dev_vals_dat, 
+                                            "Domain" = rep("Bacteria",
+                                                    nrow(Bac.BUDA_dev_vals_dat)),
+                                            stringsAsFactors = T)
+names(Bac.BUDA_dev_vals_dat_longish)[2:5] <- names(Bac.BUDA_dev_vals_raw)[2:5]
+
+Fun.BUDA_dev_vals_dat_longish <- data.frame(Fun.BUDA_dev_vals_dat, 
+                                            "Domain" = rep("Fungi",
+                                                    nrow(Fun.BUDA_dev_vals_dat)),
+                                            stringsAsFactors = T)
+names(Fun.BUDA_dev_vals_dat_longish)[2:5] <- names(Fun.BUDA_dev_vals_raw)[2:5]
+
+BUDA_dev_vals_dat_long <- rbind(Bac.BUDA_dev_vals_dat_longish,Fun.BUDA_dev_vals_dat_longish)
+
+BUDA_dev_vals_dat_numeric<-subset(BUDA_dev_vals_dat, 
+                                  select = -c(X16S_ID,sample_name,ITS_ID,
+                                              Site, Site_Grass, Replicate,
+                                              Site.Rep, Grass, Edge, SiteName,
+                                              Grass_Rep, CollectionDate, MAT_degC,
+                                              MAP_mm, Gradient, Bin, Grassland,
+                                              julianday))
+
+BUDA.cor.res_rho_no = cor(BUDA_dev_vals_dat_numeric[,c(24:25,28:29)],
+                            BUDA_dev_vals_dat_numeric[,c(1:21)], 
+                            method = "spearman")
+
+BUDA.cor.res_rhot <- t(BUDA.cor.res_rho_no)
+BUDA.cor.res_rho = data.frame("predictor" = row.names(BUDA.cor.res_rhot),
+                              "bac_rho" = BUDA.cor.res_rhot[,1],
+                              "fun_rho" = BUDA.cor.res_rhot[,3])
+
+
+top_dev_pred_Bac.BUDA <- with(BUDA.cor.res_rho, subset(predictor, bac_rho > 0.2 |  bac_rho < -0.2))
+
+top_dev_pred_Fun.BUDA <- with(BUDA.cor.res_rho, subset(predictor, fun_rho > 0.2 |  fun_rho < -0.2))
+
+BUDA.cor.res_pval = cor.mtest(BUDA_dev_vals_dat_numeric, method = "spearman")$p
+
+  # view p-val associated b/w comm and pred.var
+    # BUDA.cor.res_pval["Bac.abund_null_dev_stoch","avg_SLA"]
+
+top_dev_pred_Bac.BUDA_dat_unmelt <- subset(BUDA_dev_vals_dat, select = c("sample_name", "Bac.abund_null_dev_stoch", paste(top_dev_pred_Bac.BUDA)))
+top_dev_pred_Fun.BUDA_dat_unmelt <- subset(BUDA_dev_vals_dat, select = c("sample_name", "Fun.abund_null_dev_stoch", paste(top_dev_pred_Fun.BUDA)))
+
+top_dev_pred_Bac.BUDA_dat <- melt(top_dev_pred_Bac.BUDA_dat_unmelt, measure.vars=c(paste(top_dev_pred_Bac.BUDA)))
+
+top_dev_pred_Fun.BUDA_dat <- melt(top_dev_pred_Fun.BUDA_dat_unmelt, measure.vars=c(paste(top_dev_pred_Fun.BUDA)))
+```
+
+\
+
+## ANGE
+
+```{r output-top-predvar-ANGE, include=FALSE, cache=T}
+Bac.ANGE_dev_vals_raw<-read.csv(file="../processed_data/BetaNullDeviation/Bac.ANGE_BnullDev_abund_bysample.csv")
+Fun.ANGE_dev_vals_raw<-read.csv(file="../processed_data/BetaNullDeviation/Fun.ANGE_BnullDev_abund_bysample.csv")
+
+Bac.ANGE_dev_vals<-Bac.ANGE_dev_vals_raw
+Fun.ANGE_dev_vals<-Fun.ANGE_dev_vals_raw
+  
+names(Bac.ANGE_dev_vals)[1] <- "X16S_ID"
+names(Bac.ANGE_dev_vals)[2] <- "Bac.Observed"
+names(Bac.ANGE_dev_vals)[3] <- "Bac.beta_div_metacomm_mean"
+names(Bac.ANGE_dev_vals)[4] <- "Bac.abund_null_dev_stoch"
+names(Bac.ANGE_dev_vals)[5] <- "Bac.abund_null_dev_det"
+
+names(Fun.ANGE_dev_vals)[1] <- "ITS_ID"
+names(Fun.ANGE_dev_vals)[2] <- "Fun.Observed"
+names(Fun.ANGE_dev_vals)[3] <- "Fun.beta_div_metacomm_mean"
+names(Fun.ANGE_dev_vals)[4] <- "Fun.abund_null_dev_stoch"
+names(Fun.ANGE_dev_vals)[5] <- "Fun.abund_null_dev_det"
+
+
+Bac.ANGE_dev_vals_dat <- merge(Bac.ANGE_dev_vals, combined_metadata, by = "X16S_ID")
+Fun.ANGE_dev_vals_dat <- merge(Fun.ANGE_dev_vals, combined_metadata, by = "ITS_ID")
+
+ANGE_dev_vals_dat <-merge(Bac.ANGE_dev_vals_dat, Fun.ANGE_dev_vals_dat)
+
+ANGE_dev_vals_dat$Bin<-factor(ANGE_dev_vals_dat$Bin)
+levels(ANGE_dev_vals_dat$Bin)
+ANGE_dev_vals_dat$Bin<-factor(ANGE_dev_vals_dat$Bin, levels=c("North","North Central", "South Central", "South"))
+
+ANGE_dev_vals_dat$Gradient<-factor(ANGE_dev_vals_dat$Gradient)
+levels(ANGE_dev_vals_dat$Gradient)
+ANGE_dev_vals_dat$Gradient<-factor(ANGE_dev_vals_dat$Gradient, levels=c("West","Middle", "East"))
+
+
+Bac.ANGE_dev_vals_dat_longish <- data.frame(Bac.ANGE_dev_vals_dat, 
+                                            "Domain" = rep("Bacteria",
+                                                    nrow(Bac.ANGE_dev_vals_dat)),
+                                            stringsAsFactors = T)
+names(Bac.ANGE_dev_vals_dat_longish)[2:5] <- names(Bac.ANGE_dev_vals_raw)[2:5]
+
+Fun.ANGE_dev_vals_dat_longish <- data.frame(Fun.ANGE_dev_vals_dat, 
+                                            "Domain" = rep("Fungi",
+                                                    nrow(Fun.ANGE_dev_vals_dat)),
+                                            stringsAsFactors = T)
+names(Fun.ANGE_dev_vals_dat_longish)[2:5] <- names(Fun.ANGE_dev_vals_raw)[2:5]
+
+ANGE_dev_vals_dat_long <- rbind(Bac.ANGE_dev_vals_dat_longish,Fun.ANGE_dev_vals_dat_longish)
+
+ANGE_dev_vals_dat_numeric<-subset(ANGE_dev_vals_dat, 
+                                  select = -c(X16S_ID,sample_name,ITS_ID,
+                                              Site, Site_Grass, Replicate,
+                                              Site.Rep, Grass, Edge, SiteName,
+                                              Grass_Rep, CollectionDate, MAT_degC,
+                                              MAP_mm, Gradient, Bin, Grassland,
+                                              julianday))
+
+ANGE.cor.res_rho_no = cor(ANGE_dev_vals_dat_numeric[,c(24:25,28:29)],
+                            ANGE_dev_vals_dat_numeric[,c(1:21)], 
+                            method = "spearman")
+
+ANGE.cor.res_rhot <- t(ANGE.cor.res_rho_no)
+ANGE.cor.res_rho = data.frame("predictor" = row.names(ANGE.cor.res_rhot),
+                              "bac_rho" = ANGE.cor.res_rhot[,1],
+                              "fun_rho" = ANGE.cor.res_rhot[,3])
+
+
+top_dev_pred_Bac.ANGE <- with(ANGE.cor.res_rho, subset(predictor, bac_rho > 0.2 |  bac_rho < -0.2))
+
+top_dev_pred_Fun.ANGE <- with(ANGE.cor.res_rho, subset(predictor, fun_rho > 0.2 |  fun_rho < -0.2))
+
+ANGE.cor.res_pval = cor.mtest(ANGE_dev_vals_dat_numeric, method = "spearman")$p
+
+  # view p-val associated b/w comm and pred.var
+    # ANGE.cor.res_pval["Bac.abund_null_dev_stoch","avg_SLA"]
+
+top_dev_pred_Bac.ANGE_dat_unmelt <- subset(ANGE_dev_vals_dat, select = c("sample_name", "Bac.abund_null_dev_stoch", paste(top_dev_pred_Bac.ANGE)))
+top_dev_pred_Fun.ANGE_dat_unmelt <- subset(ANGE_dev_vals_dat, select = c("sample_name", "Fun.abund_null_dev_stoch", paste(top_dev_pred_Fun.ANGE)))
+
+top_dev_pred_Bac.ANGE_dat <- melt(top_dev_pred_Bac.ANGE_dat_unmelt, measure.vars=c(paste(top_dev_pred_Bac.ANGE)))
+
+top_dev_pred_Fun.ANGE_dat <- melt(top_dev_pred_Fun.ANGE_dat_unmelt, measure.vars=c(paste(top_dev_pred_Fun.ANGE)))
+```
+
+\
+
+## SCSC
+
+```{r output-top-predvar-SCSC, include=FALSE, cache=T}
+Bac.SCSC_dev_vals_raw<-read.csv(file="../processed_data/BetaNullDeviation/Bac.SCSC_BnullDev_abund_bysample.csv")
+Fun.SCSC_dev_vals_raw<-read.csv(file="../processed_data/BetaNullDeviation/Fun.SCSC_BnullDev_abund_bysample.csv")
+
+Bac.SCSC_dev_vals<-Bac.SCSC_dev_vals_raw
+Fun.SCSC_dev_vals<-Fun.SCSC_dev_vals_raw
+  
+names(Bac.SCSC_dev_vals)[1] <- "X16S_ID"
+names(Bac.SCSC_dev_vals)[2] <- "Bac.Observed"
+names(Bac.SCSC_dev_vals)[3] <- "Bac.beta_div_metacomm_mean"
+names(Bac.SCSC_dev_vals)[4] <- "Bac.abund_null_dev_stoch"
+names(Bac.SCSC_dev_vals)[5] <- "Bac.abund_null_dev_det"
+
+names(Fun.SCSC_dev_vals)[1] <- "ITS_ID"
+names(Fun.SCSC_dev_vals)[2] <- "Fun.Observed"
+names(Fun.SCSC_dev_vals)[3] <- "Fun.beta_div_metacomm_mean"
+names(Fun.SCSC_dev_vals)[4] <- "Fun.abund_null_dev_stoch"
+names(Fun.SCSC_dev_vals)[5] <- "Fun.abund_null_dev_det"
+
+
+Bac.SCSC_dev_vals_dat <- merge(Bac.SCSC_dev_vals, combined_metadata, by = "X16S_ID")
+Fun.SCSC_dev_vals_dat <- merge(Fun.SCSC_dev_vals, combined_metadata, by = "ITS_ID")
+
+SCSC_dev_vals_dat <-merge(Bac.SCSC_dev_vals_dat, Fun.SCSC_dev_vals_dat)
+
+SCSC_dev_vals_dat$Bin<-factor(SCSC_dev_vals_dat$Bin)
+levels(SCSC_dev_vals_dat$Bin)
+SCSC_dev_vals_dat$Bin<-factor(SCSC_dev_vals_dat$Bin, levels=c("North","North Central", "South Central", "South"))
+
+SCSC_dev_vals_dat$Gradient<-factor(SCSC_dev_vals_dat$Gradient)
+levels(SCSC_dev_vals_dat$Gradient)
+SCSC_dev_vals_dat$Gradient<-factor(SCSC_dev_vals_dat$Gradient, levels=c("West","Middle", "East"))
+
+
+Bac.SCSC_dev_vals_dat_longish <- data.frame(Bac.SCSC_dev_vals_dat, 
+                                            "Domain" = rep("Bacteria",
+                                                    nrow(Bac.SCSC_dev_vals_dat)),
+                                            stringsAsFactors = T)
+names(Bac.SCSC_dev_vals_dat_longish)[2:5] <- names(Bac.SCSC_dev_vals_raw)[2:5]
+
+Fun.SCSC_dev_vals_dat_longish <- data.frame(Fun.SCSC_dev_vals_dat, 
+                                            "Domain" = rep("Fungi",
+                                                    nrow(Fun.SCSC_dev_vals_dat)),
+                                            stringsAsFactors = T)
+names(Fun.SCSC_dev_vals_dat_longish)[2:5] <- names(Fun.SCSC_dev_vals_raw)[2:5]
+
+SCSC_dev_vals_dat_long <- rbind(Bac.SCSC_dev_vals_dat_longish,Fun.SCSC_dev_vals_dat_longish)
+
+SCSC_dev_vals_dat_numeric<-subset(SCSC_dev_vals_dat, 
+                                  select = -c(X16S_ID,sample_name,ITS_ID,
+                                              Site, Site_Grass, Replicate,
+                                              Site.Rep, Grass, Edge, SiteName,
+                                              Grass_Rep, CollectionDate, MAT_degC,
+                                              MAP_mm, Gradient, Bin, Grassland,
+                                              julianday))
+
+SCSC.cor.res_rho_no = cor(SCSC_dev_vals_dat_numeric[,c(24:25,28:29)],
+                            SCSC_dev_vals_dat_numeric[,c(1:21)], 
+                            method = "spearman")
+
+SCSC.cor.res_rhot <- t(SCSC.cor.res_rho_no)
+SCSC.cor.res_rho = data.frame("predictor" = row.names(SCSC.cor.res_rhot),
+                              "bac_rho" = SCSC.cor.res_rhot[,1],
+                              "fun_rho" = SCSC.cor.res_rhot[,3])
+
+
+top_dev_pred_Bac.SCSC <- with(SCSC.cor.res_rho, subset(predictor, bac_rho > 0.2 |  bac_rho < -0.2))
+
+top_dev_pred_Fun.SCSC <- with(SCSC.cor.res_rho, subset(predictor, fun_rho > 0.2 |  fun_rho < -0.2))
+
+SCSC.cor.res_pval = cor.mtest(SCSC_dev_vals_dat_numeric, method = "spearman")$p
+
+  # view p-val associated b/w comm and pred.var
+    # SCSC.cor.res_pval["Bac.abund_null_dev_stoch","avg_SLA"]
+
+top_dev_pred_Bac.SCSC_dat_unmelt <- subset(SCSC_dev_vals_dat, select = c("sample_name", "Bac.abund_null_dev_stoch", paste(top_dev_pred_Bac.SCSC)))
+top_dev_pred_Fun.SCSC_dat_unmelt <- subset(SCSC_dev_vals_dat, select = c("sample_name", "Fun.abund_null_dev_stoch", paste(top_dev_pred_Fun.SCSC)))
+
+top_dev_pred_Bac.SCSC_dat <- melt(top_dev_pred_Bac.SCSC_dat_unmelt, measure.vars=c(paste(top_dev_pred_Bac.SCSC)))
+
+top_dev_pred_Fun.SCSC_dat <- melt(top_dev_pred_Fun.SCSC_dat_unmelt, measure.vars=c(paste(top_dev_pred_Fun.SCSC)))
+```
+
+\
+\
+
+## find intersect of pred var {.hidden}
+
+```{r, include=F, eval=F}
+intersect(top_dev_pred_Bac.BOER, top_dev_pred_Bac.BOGR)
+
+intersect(intersect(top_dev_pred_Bac.BOER, top_dev_pred_Bac.BOGR), top_dev_pred_Bac.BUDA)
+
+intersect(intersect(top_dev_pred_Bac.BOER, top_dev_pred_Bac.BOGR), top_dev_pred_Bac.SCSC)
+
+intersect(intersect(intersect(top_dev_pred_Bac.BOER, top_dev_pred_Bac.BOGR), top_dev_pred_Bac.SCSC), top_dev_pred_Bac.BUDA)
+
+Bac.predvar_all <- intersect(top_dev_pred_Bac.ANGE, top_dev_pred_Bac.BOGR, top_dev_pred_Bac.BOER, top_dev_pred_Bac.BUDA, top_dev_pred_Bac.SCSC)
+```
+
+## combine top pred var {.hidden}
+
+```{r combine-top-predvar, include=FALSE, cache=TRUE}
+
+#combine all top_dev_pred_Bac.*_dat
+top_dev_pred_Bac.BOGR_dat$Grass<-"BOGR"
+top_dev_pred_Bac.BOER_dat$Grass<-"BOER"
+top_dev_pred_Bac.BUDA_dat$Grass<-"BUDA"
+top_dev_pred_Bac.ANGE_dat$Grass<-"ANGE"
+top_dev_pred_Bac.SCSC_dat$Grass<-"SCSC"
+
+top_dev_pred_Bac_dat <- rbind(top_dev_pred_Bac.ANGE_dat, top_dev_pred_Bac.BOGR_dat,
+                                   top_dev_pred_Bac.BOER_dat, top_dev_pred_Bac.BUDA_dat,
+                                   top_dev_pred_Bac.SCSC_dat)
+
+#combine all top_dev_pred_Fun.*_dat
+top_dev_pred_Fun.BOGR_dat$Grass<-"BOGR"
+top_dev_pred_Fun.BOER_dat$Grass<-"BOER"
+top_dev_pred_Fun.BUDA_dat$Grass<-"BUDA"
+top_dev_pred_Fun.ANGE_dat$Grass<-"ANGE"
+top_dev_pred_Fun.SCSC_dat$Grass<-"SCSC"
+
+top_dev_pred_Fun_dat <- rbind(top_dev_pred_Fun.ANGE_dat, top_dev_pred_Fun.BOGR_dat,
+                                   top_dev_pred_Fun.BOER_dat, top_dev_pred_Fun.BUDA_dat,
+                                   top_dev_pred_Fun.SCSC_dat)
+
+SCSC.cor.res_rho
+SCSC.cor.res_pval
+```
+
+## combine rho mats {.hidden}
+
+```{r combine-rho-mats, include=FALSE, cache=TRUE}
+#combine all *.cor.res_rho
+BOGR.cor.res_rho$Grass<-"BOGR"
+BOER.cor.res_rho$Grass<-"BOER"
+BUDA.cor.res_rho$Grass<-"BUDA"
+ANGE.cor.res_rho$Grass<-"ANGE"
+SCSC.cor.res_rho$Grass<-"SCSC"
+
+all.cor.res_rho <- rbind(ANGE.cor.res_rho, BOGR.cor.res_rho,
+                                   BOER.cor.res_rho, BUDA.cor.res_rho,
+                                   SCSC.cor.res_rho)
+```
+
+## combine pvals {.hidden}
+
+```{r combine-rho-pval-mats, include=FALSE, cache=TRUE}
+#combine all *.cor.res_pval
+# BOGR.cor.res_pval$Grass<-"BOGR"
+# BOER.cor.res_pval$Grass<-"BOER"
+# BUDA.cor.res_pval$Grass<-"BUDA"
+# ANGE.cor.res_pval$Grass<-"ANGE"
+# SCSC.cor.res_pval$Grass<-"SCSC"
+
+# all.cor.res_pval <- rbind(ANGE.cor.res_pval, BOGR.cor.res_pval,
+#                                   BOER.cor.res_pval, BUDA.cor.res_pval,
+#                                   SCSC.cor.res_pval)
+```
+
+# plot top pred var {.tabset .tabset-pills}
+
+
+
+
+```{r, include=F}
+hist(top_dev_pred_Bac_dat$Bac.abund_null_dev_stoch, xlim = c(-0.3,0.6), freq=F)
+hist(top_dev_pred_Fun_dat$Fun.abund_null_dev_stoch, xlim = c(-0.3,0.6), freq=F)
+hist(combined_metadata$herbivory_perc, freq=F)
+```
+
+```{r, include=F}
+qqplot(top_dev_pred_Bac_dat$Bac.abund_null_dev_stoch, qchisq(ppoints(top_dev_pred_Bac_dat$Bac.abund_null_dev_stoch), df = 3)); abline(0, 1, col = 2, lty = 2)
+
+```
+
+
+\
+
+## **Bacteria** {.unnumbered}
+
+𝛃~[NULL]{.smallcaps}~ deviation values:\
+- min: `r round(min(top_dev_pred_Bac_dat$Bac.abund_null_dev_stoch),2)`\
+- max: `r round(max(top_dev_pred_Bac_dat$Bac.abund_null_dev_stoch),2)`\
+- median: `r round(median(top_dev_pred_Bac_dat$Bac.abund_null_dev_stoch),2)`\
+- mean: `r round(mean(top_dev_pred_Bac_dat$Bac.abund_null_dev_stoch),2)`
+
+```{r, fig.height=7, fig.width=9, echo=F, message=F}
+top_dev_pred_Bac_dat2 <- subset(top_dev_pred_Bac_dat, 
+                                !(variable %in% c("perc_moisture","GWC",
+                                                  "coll_GDD","ppt2015",
+                                                  "ppt30yr","GDD2015",
+                                                  "GDD30yr")))
+top_dev_pred_Bac_dat2$variable<-factor(top_dev_pred_Bac_dat2$variable)
+
+#top_dev_pred_Bac_dat2[top_dev_pred_Bac_dat2$variable=="Longitude"]
+
+top_dev_pred_Bac_dat3 <- top_dev_pred_Bac_dat2
+#top_dev_pred_Bac_dat3$variable<-as.factor(top_dev_pred_Bac_dat3$variable)
+levels(top_dev_pred_Bac_dat3$variable) <- c(levels(top_dev_pred_Bac_dat3$variable), 'Longitude')
+
+top_dev_pred_Bac_dat3$variable <- factor(top_dev_pred_Bac_dat2$variable, 
+                                         levels = c("Latitude", "Longitude","Elevation_m",
+                                            "SOM", "pH","soil_moisture","phos",
+                                            "ammonium","nitrate",
+                                            "GDD3yr","ppt3yr",
+                                            "herbivory_perc","avg_SLA","avg_SRL"))
+
+ggplot(data=top_dev_pred_Bac_dat3, aes(x=Bac.abund_null_dev_stoch, y=value, col=variable)) +
+  geom_point() +
+  facet_grid(variable ~ Grass, scales = "free_y", drop = F)+
+  labs(col="Metadata factor \ncorrelated with \ndeviation values",
+       title = "Impact of all significant metadata* on &beta;<sub><i>NULL</i></sub> deviation values<span> by Grass Host</span>",
+       subtitle = "* rho > | 0.2 |") +
+  guides(col=guide_legend(ncol=1))+
+  stat_smooth(method = "loess")+
+  theme_bw() +
+  theme(
+    plot.background = element_blank(),
+    plot.title = element_markdown(lineheight = 1.1),
+    panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=10),
+    axis.text.y = element_text(color="black", size=10),
+    strip.text.y = element_text(color="black", size=10, angle = 0),
+    strip.text.x = element_text(color="black", size=12),
+    legend.position="right",
+    axis.title.x = element_text(color="black", size=10),
+    axis.title.y = element_text(color="black", size=10),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+# summary(lm(Bac.abund_null_dev_stoch~avg_SLA, data=top_dev_pred_Bac.BOGR_dat_unmelt))
+# summary(lm(Bac.abund_null_dev_stoch~avg_SRL, data=top_dev_pred_Bac.BOGR_dat_unmelt))
+```
+
+## **Fungi** {.unnumbered}
+
+𝛃~[NULL]{.smallcaps}~ deviation values:\
+- min: `r round(min(top_dev_pred_Fun_dat$Fun.abund_null_dev_stoch),2)`\
+- max: `r round(max(top_dev_pred_Fun_dat$Fun.abund_null_dev_stoch),2)`\
+- median: `r round(median(top_dev_pred_Fun_dat$Fun.abund_null_dev_stoch),2)`\
+- mean: `r round(mean(top_dev_pred_Fun_dat$Fun.abund_null_dev_stoch),2)`
+
+```{r, fig.height=7, fig.width=9, echo=F, message=F}
+top_dev_pred_Fun_dat2 <- subset(top_dev_pred_Fun_dat, 
+                                !(variable %in% c("perc_moisture","GWC",
+                                                  "coll_GDD","ppt2015",
+                                                  "ppt30yr","GDD2015",
+                                                  "GDD30yr")))
+top_dev_pred_Fun_dat2$variable<-factor(top_dev_pred_Fun_dat2$variable)
+
+#top_dev_pred_Fun_dat2[top_dev_pred_Fun_dat2$variable=="Longitude"]
+
+top_dev_pred_Fun_dat3 <- top_dev_pred_Fun_dat2
+#top_dev_pred_Fun_dat3$variable<-as.factor(top_dev_pred_Fun_dat3$variable)
+levels(top_dev_pred_Fun_dat3$variable) <- c(levels(top_dev_pred_Fun_dat3$variable), 'Longitude')
+
+top_dev_pred_Fun_dat3$variable <- factor(top_dev_pred_Fun_dat2$variable, 
+                                         levels = c("Latitude", "Longitude","Elevation_m",
+                                            "SOM", "pH","soil_moisture","phos",
+                                            "ammonium","nitrate",
+                                            "GDD3yr","ppt3yr",
+                                            "herbivory_perc","avg_SLA","avg_SRL"))
+
+ggplot(data=top_dev_pred_Fun_dat3, aes(x=Fun.abund_null_dev_stoch, y=value, col=variable)) +
+  geom_point() +
+  facet_grid(variable ~ Grass, scales = "free_y")+
+  labs(col="Metadata factor \ncorrelated with \ndeviation values",
+       title = "Impact of all significant metadata* on &beta;<sub><i>NULL</i></sub> deviation values<span>by Grass Host</span>",
+       subtitle = "* rho > | 0.2 |") +
+  guides(col=guide_legend(ncol=1))+
+  stat_smooth(method = "loess")+
+  theme_bw() +
+  theme(
+    plot.background = element_blank(),
+     plot.title = element_markdown(lineheight = 1.1),
+    panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=10),
+    axis.text.y = element_text(color="black", size=10),
+    strip.text.y = element_text(color="black", size=10, angle = 0),
+    strip.text.x = element_text(color="black", size=12),
+    legend.position="right",
+    axis.title.x = element_text(color="black", size=10),
+    axis.title.y = element_text(color="black", size=10),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+# summary(lm(Fun.abund_null_dev_stoch~avg_SLA, data=top_dev_pred_Fun.BOGR_dat_unmelt))
+# summary(lm(Fun.abund_null_dev_stoch~avg_SRL, data=top_dev_pred_Fun.BOGR_dat_unmelt))
+```
+
+#  {.unnumbered}
+
+*Climate Data:* \
+- GDD = growing degree days (determined over 3- and 30-year windows and 2015) \
+- ppt = mean annual precipitation (determined a 30-year) \
+\
+
+*Plant Traits:* \
+- avg_SLA: specific leaf area \
+- avg_SRL: specific root length \
+  - Large values of specific leaf area (SLA) and specific root length (SRL) reflect large plant investment in resource acquisition; small values indicate investment in plant tissue longevity \
+- herbivory_perc: average site level damage estimate for herbivory, averaged over all species and individuals at the site; could be used to indicate herbivory pressure at the site level \
+  - ranges from 1:17 \
+
+
+# plot top pred var by grass {.tabset .tabset-pills .unnumbered}
+
+```{r}
+top_dev_pred_Bac_dat2 <- subset(top_dev_pred_Bac_dat, 
+                                !(variable %in% c("perc_moisture","GWC",
+                                                  "coll_GDD","ppt2015",
+                                                  "ppt30yr","GDD2015",
+                                                  "GDD30yr")))
+top_dev_pred_Bac_dat2$variable<-factor(top_dev_pred_Bac_dat2$variable)
+
+#top_dev_pred_Bac_dat2[top_dev_pred_Bac_dat2$variable=="Longitude"]
+
+top_dev_pred_Bac_dat3 <- top_dev_pred_Bac_dat2
+#top_dev_pred_Bac_dat3$variable<-as.factor(top_dev_pred_Bac_dat3$variable)
+levels(top_dev_pred_Bac_dat3$variable) <- c(levels(top_dev_pred_Bac_dat3$variable), 'Longitude')
+
+top_dev_pred_Bac_dat3$variable <- factor(top_dev_pred_Bac_dat2$variable, 
+                                         levels = c("Latitude", "Longitude","Elevation_m",
+                                            "SOM", "pH","soil_moisture","phos",
+                                            "ammonium","nitrate",
+                                            "GDD3yr","ppt3yr",
+                                            "herbivory_perc","avg_SLA","avg_SRL"))
+```
+
+## Bacteria: BOER {.unnumbered}
+```{r, message=F, echo=F}
+ggplot(data=subset(top_dev_pred_Bac_dat3, Grass=="BOER"), aes(y=Bac.abund_null_dev_stoch, x=value, col=variable)) +
+  geom_point() +
+  facet_wrap(.~variable, scales = "free_x")+
+  stat_smooth(method = "loess")+
+  theme_bw() +
+  theme(
+    plot.background = element_blank(),
+     plot.title = element_markdown(lineheight = 1.1),
+    panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=10),
+    axis.text.y = element_text(color="black", size=10),
+    strip.text.y = element_text(color="black", size=10, angle = 0),
+    strip.text.x = element_text(color="black", size=12),
+    legend.position="right",
+    axis.title.x = element_text(color="black", size=10),
+    axis.title.y = element_text(color="black", size=10),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+```
+
+```{r}
+subset(BOER.cor.res_rho, predictor %in% subset(top_dev_pred_Bac_dat3, Grass=="BOER")$variable)[,1:2]
+```
+
+
+## Fungi: BOER {.unnumbered}
+```{r, message=F, echo=F}
+ggplot(data=subset(top_dev_pred_Fun_dat3, Grass=="BOER"), aes(x=Fun.abund_null_dev_stoch, y=value, col=variable)) +
+  geom_point() +
+  facet_wrap(.~variable, scales = "free_y")+
+  stat_smooth(method = "loess")
+```
+
+```{r}
+subset(BOER.cor.res_rho, predictor %in% subset(top_dev_pred_Fun_dat3, Grass=="BOER")$variable)[,c(1,3)]
+```
+
+
+## Bacteria: BOGR {.unnumbered}
+```{r, message=F, echo=F}
+ggplot(data=subset(top_dev_pred_Bac_dat3, Grass=="BOGR"), aes(x=Bac.abund_null_dev_stoch, y=value, col=variable)) +
+  geom_point() +
+  facet_wrap(.~variable, scales = "free_y")+
+  stat_smooth(method = "loess")
+```
+
+```{r}
+subset(BOGR.cor.res_rho, predictor %in% subset(top_dev_pred_Bac_dat3, Grass=="BOGR")$variable)[,1:2]
+```
+
+
+## Fungi: BOGR {.unnumbered}
+```{r, message=F, echo=F}
+ggplot(data=subset(top_dev_pred_Fun_dat3, Grass=="BOGR"), aes(x=Fun.abund_null_dev_stoch, y=value, col=variable)) +
+  geom_point() +
+  facet_wrap(.~variable, scales = "free_y")+
+  stat_smooth(method = "loess")
+```
+
+```{r}
+subset(BOGR.cor.res_rho, predictor %in% subset(top_dev_pred_Bac_dat3, Grass=="BOGR")$variable)[,c(1,3)]
+```
+
+## Bacteria: BUDA {.unnumbered}
+```{r, message=F, echo=F, eval=T, cache=T}
+ggplot(data=subset(top_dev_pred_Bac_dat3, Grass=="BUDA"), aes(x=Bac.abund_null_dev_stoch, y=value, col=variable)) +
+  geom_point() +
+  facet_wrap(.~variable, scales = "free_y")+
+  stat_smooth(method = "loess")
+```
+
+```{r}
+subset(BUDA.cor.res_rho, predictor %in% subset(top_dev_pred_Bac_dat3, Grass=="BUDA")$variable)[,1:2]
+```
+
+
+## Fungi: BUDA {.unnumbered}
+```{r, message=F, echo=F, eval=T, cache=T}
+ggplot(data=subset(top_dev_pred_Fun_dat3, Grass=="BUDA"), aes(x=Fun.abund_null_dev_stoch, y=value, col=variable)) +
+  geom_point() +
+  facet_wrap(.~variable, scales = "free_y")+
+  stat_smooth(method = "loess")
+```
+
+```{r}
+subset(BUDA.cor.res_rho, predictor %in% subset(top_dev_pred_Bac_dat3, Grass=="BUDA")$variable)[,c(1,3)]
+```
+
+
+## Bacteria: ANGE {.unnumbered}
+```{r, message=F, echo=F, eval=T, cache=T}
+ggplot(data=subset(top_dev_pred_Bac_dat3, Grass=="ANGE"), aes(x=Bac.abund_null_dev_stoch, y=value, col=variable)) +
+  geom_point() +
+  facet_wrap(.~variable, scales = "free_y")+
+  stat_smooth(method = "loess")
+```
+
+```{r}
+subset(ANGE.cor.res_rho, predictor %in% subset(top_dev_pred_Bac_dat3, Grass=="ANGE")$variable)[,1:2]
+```
+
+
+## Fungi: ANGE {.unnumbered}
+```{r, message=F, echo=F, eval=T, cache=T}
+ggplot(data=subset(top_dev_pred_Fun_dat3, Grass=="ANGE"), aes(x=Fun.abund_null_dev_stoch, y=value, col=variable)) +
+  geom_point() +
+  facet_wrap(.~variable, scales = "free_y")+
+  stat_smooth(method = "loess")
+```
+
+```{r}
+subset(ANGE.cor.res_rho, predictor %in% subset(top_dev_pred_Bac_dat3, Grass=="ANGE")$variable)[,c(1,3)]
+```
+
+## Bacteria: SCSC {.unnumbered}
+```{r, message=F, echo=F, eval=T, cache=T}
+ggplot(data=subset(top_dev_pred_Bac_dat3, Grass=="SCSC"), aes(x=Bac.abund_null_dev_stoch, y=value, col=variable)) +
+  geom_point() +
+  facet_wrap(.~variable, scales = "free_y")+
+  stat_smooth(method = "loess")
+```
+
+```{r}
+subset(SCSC.cor.res_rho, predictor %in% subset(top_dev_pred_Bac_dat3, Grass=="SCSC")$variable)[,1:2]
+```
+
+
+## Fungi: SCSC {.unnumbered}
+```{r, message=F, echo=F, eval=T, cache=T}
+ggplot(data=subset(top_dev_pred_Fun_dat3, Grass=="SCSC"), aes(x=Fun.abund_null_dev_stoch, y=value, col=variable)) +
+  geom_point() +
+  facet_wrap(.~variable, scales = "free_y")+
+  stat_smooth(method = "loess")
+```
+
+```{r}
+subset(SCSC.cor.res_rho, predictor %in% subset(top_dev_pred_Bac_dat3, Grass=="SCSC")$variable)[,c(1,3)]
+```
+\
+
+
+```{r}
+cor(combined_metadata$ammonium,combined_metadata$phos, use="pairwise.complete.obs")
+```
+
+```{r}
+cor(combined_metadata$ammonium,combined_metadata$nitrate, use="pairwise.complete.obs")
+```
+
+```{r}
+cor(combined_metadata$soil_moisture,combined_metadata$GDD3yr, use="pairwise.complete.obs")
+cor(combined_metadata$soil_moisture,combined_metadata$phos, use="pairwise.complete.obs")
+cor(combined_metadata$soil_moisture,combined_metadata$ammonium, use="pairwise.complete.obs")
+
+cor(combined_metadata$ammonium,combined_metadata$GDD3yr, use="pairwise.complete.obs")
+
+```
+
+```{r}
+cor(combined_metadata$soil_moisture,combined_metadata$pH, use="pairwise.complete.obs")
+```
+
+
+```{r, include=FALSE}
+Bac.by.sample.dat<-read.csv(file="../processed_data/BetaNullDeviation/Bac_BnullDev_abund_bysample.csv", stringsAsFactors = T)
+Fun.by.sample.dat<-read.csv(file="../processed_data/BetaNullDeviation/Fun_BnullDev_abund_bysample.csv", stringsAsFactors = T)
+combined_metadata_E<-subset(combined_metadata, Edge=="no")
+
+Bac.by.sample.dat_cmeta<-merge(Bac.by.sample.dat, combined_metadata_E, by = "X16S_ID")
+Fun.by.sample.dat_cmeta <- merge(Fun.by.sample.dat, combined_metadata_E, by = "ITS_ID")
+
+
+dom_joiner <- subset(combined_metadata_E, select = c(X16S_ID, ITS_ID, sample_name))
+
+Bac.by.sample.dat_wname<-merge(Bac.by.sample.dat, dom_joiner, by = "X16S_ID")
+Fun.by.sample.dat_wname<-merge(Fun.by.sample.dat, dom_joiner, by = "ITS_ID", all.y=T)
+
+Bac.by.sample.dat_wname2 <- subset(Bac.by.sample.dat_wname, select = -c(ITS_ID, X16S_ID))
+#row.names(Bac.by.sample.dat_wname2) <- Bac.by.sample.dat_wname2$sample_name
+Fun.by.sample.dat_wname2 <- subset(Fun.by.sample.dat_wname, select = -c(ITS_ID, X16S_ID))
+
+AllD.by.sample.dat_rbind<-rbind(Bac.by.sample.dat_wname2, Fun.by.sample.dat_wname2)
+
+AllD.by.sample.dat_cmetaA<-merge(AllD.by.sample.dat_rbind, combined_metadata_E, 
+                                by = "sample_name", all.x=T)
+AllD.by.sample.dat_cmeta <- subset(AllD.by.sample.dat_cmetaA, 
+                                   select = -c(Grass.x, ITS_ID, X16S_ID, Edge,
+                                               MAP_mm, MAT_degC,perc_moisture,GWC,
+                                               coll_GDD,ppt2015,ppt30yr,
+                                               GDD2015,GDD30yr, julianday, 
+                                               CollectionDate))
+names(AllD.by.sample.dat_cmeta)[11] <- "Grass"
+
+AllD.by.sample.dat_cmeta$Domain <- factor(AllD.by.sample.dat_cmeta$Domain)
+levels(AllD.by.sample.dat_cmeta$Domain)
+
+#AllD.by.sample.dat_cmeta_long <- melt(AllD.by.sample.dat_cmeta, id.vars = c(Domain),
+ #                                     measure.vars = c())
+
+# AllD.by.sample.dat_wname<-merge(Bac.by.sample.dat_wname, Fun.by.sample.dat, 
+#                                 by = "ITS_ID", all=T,
+#                                 suffixes = c("Bac","Fun"))
+# AllD.by.sample.dat_wname2 <- subset(AllD.by.sample.dat_wname, select = -c(GrassFun, ITS_ID, X16S_ID))
+# AllD.by.sample.dat_wname_long <- melt(AllD.by.sample.dat_wname2, id.vars = c(DomainBac, DomainFun),
+#                                       measure.vars = c())
+# AllD.by.sample.dat<-merge(Bac.by.sample.dat, Fun.by.sample.dat, by = "sample_name", all = T,
+#                           suffixes = c("Bac","Fun"))
+```
+
+
+```{r, message=F}
+# round(IQR(subset(AllD.by.sample.dat_cmeta, Domain=="Bacteria")$abund_null_dev_stoch),3)
+# round(IQR(subset(AllD.by.sample.dat_cmeta, Domain=="Fungi")$abund_null_dev_stoch),3)
+
+soil_moisture_dev_dom<-ggplot(data=subset(AllD.by.sample.dat_cmeta, !is.na(Domain)), aes(x=soil_moisture, y=abund_null_dev_stoch, col=Domain)) +
+  geom_point(alpha=0.85)+
+  scale_color_manual(values = c("#006e90", "#f18f01"))+
+  geom_hline(yintercept=0, col="gray40", lty=2, show.legend = F)+
+  labs(x="Soil Moisture", y="Deviation Value")+
+  # stat_smooth(inherit.aes = F, method = "lm", level=0.8, 
+  #             aes(x=soil_moisture, y=abund_null_dev_stoch), col="black", linewidth=2, alpha=0.85)+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.85, linewidth=2)+
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="right",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=16),
+    legend.text  = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+pH_dev_dom<-ggplot(data=subset(AllD.by.sample.dat_cmeta, !is.na(Domain)), aes(x=pH, y=abund_null_dev_stoch, col=Domain)) +
+  geom_point(alpha=0.85)+
+  scale_color_manual(values = c("#006e90", "#f18f01"))+
+  geom_hline(yintercept=0, col="gray40", lty=2, show.legend = F)+
+  labs(x="pH", y="")+
+  # stat_smooth(inherit.aes = F, method = "lm", level=0.8, 
+  #             aes(x=soil_moisture, y=abund_null_dev_stoch), col="black", linewidth=2, alpha=0.85)+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.85, linewidth=2)+
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nitrate_dev_dom<-ggplot(data=subset(AllD.by.sample.dat_cmeta, !is.na(Domain)), aes(x=nitrate, y=abund_null_dev_stoch, col=Domain)) +
+  geom_point(alpha=0.85)+
+  scale_color_manual(values = c("#006e90", "#f18f01"))+
+  geom_hline(yintercept=0, col="gray40", lty=2, show.legend = F)+
+  labs(x="Nitrate", y="")+
+  # stat_smooth(inherit.aes = F, method = "lm", level=0.8, 
+  #             aes(x=soil_moisture, y=abund_null_dev_stoch), col="black", linewidth=2, alpha=0.85)+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.85, linewidth=2)+
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+avg_SLA_dev_dom<-ggplot(data=subset(AllD.by.sample.dat_cmeta, !is.na(Domain)), aes(x=avg_SLA, y=abund_null_dev_stoch, col=Domain)) +
+  geom_point(alpha=0.85)+
+  scale_color_manual(values = c("#006e90", "#f18f01"))+
+  geom_hline(yintercept=0, col="gray40", lty=2, show.legend = F)+
+  labs(x="Specific Leaf Area", y="Deviation Value")+
+  # stat_smooth(inherit.aes = F, method = "lm", level=0.8, 
+  #             aes(x=soil_moisture, y=abund_null_dev_stoch), col="black", linewidth=2, alpha=0.85)+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.85, linewidth=2)+
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+avg_SRL_dev_dom<-ggplot(data=subset(AllD.by.sample.dat_cmeta, !is.na(Domain)), aes(x=avg_SRL, y=abund_null_dev_stoch, col=Domain)) +
+  geom_point(alpha=0.85)+
+  scale_color_manual(values = c("#006e90", "#f18f01"))+
+  geom_hline(yintercept=0, col="gray40", lty=2, show.legend = F)+
+  labs(x="Specific Root Length", y="")+
+  # stat_smooth(inherit.aes = F, method = "lm", level=0.8, 
+  #             aes(x=soil_moisture, y=abund_null_dev_stoch), col="black", linewidth=2, alpha=0.85)+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.85, linewidth=2)+
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+dev_dom_leg<-get_legend(soil_moisture_dev_dom)
+soil_moisture_dev_dom_noleg<-soil_moisture_dev_dom+theme(legend.position = "none")
+```
+
+
+```{r, message=F}
+plot_grid(soil_moisture_dev_dom_noleg, pH_dev_dom, nitrate_dev_dom, avg_SLA_dev_dom, avg_SRL_dev_dom,dev_dom_leg)
+```
+
+
+
+```{r}
+ggplot(data=subset(AllD.by.sample.dat_cmeta, !is.na(Domain)), aes(x=soil_moisture, y=abund_null_dev_stoch, col=Domain)) +
+  geom_point(alpha=0.85)+
+  scale_color_manual(values = c("#006e90", "#f18f01"))+
+  geom_hline(yintercept=0, col="gray40", lty=2, show.legend = F)+
+  labs(x="Soil Moisture", y="Deviation Value")+
+  # stat_smooth(inherit.aes = F, method = "lm", level=0.8, 
+  #             aes(x=soil_moisture, y=abund_null_dev_stoch), col="black", linewidth=2, alpha=0.85)+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.85, linewidth=2)+
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+```
+
+
+
+# soil moisture {.tabset .tabset-pills .unnumbered}
+
+## **Bacteria** {.unnumbered}
+```{r, message=F}
+b.smg<-ggplot(data=Bac.by.sample.dat_cmeta, aes(x=soil_moisture, y=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point(alpha=0.5)+
+  geom_hline(yintercept=0, col="gray40", lty=2)+
+  scale_color_manual(values = bac_grass_cols)+
+  scale_y_continuous(limits = c(-0.4,.6))+
+  labs(y="Deviation values", x="Soil Moisture", col="Grass Host")+
+  # stat_smooth(inherit.aes = F, method = "lm", level=0.8, 
+  #             aes(x=soil_moisture, y=abund_null_dev_stoch), col="black", linewidth=2, alpha=0.85)+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.85, linewidth=2)+
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~soil_moisture, data = Bac.by.sample.dat_cmeta)))$adj.r.squared,2)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~soil_moisture, data = Bac.by.sample.dat_cmeta)))$coefficients[2,1],2)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~soil_moisture, data = Bac.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\
+
+## **Fungi** {.unnumbered}
+```{r, messgae=F}
+f.smg<-ggplot(data=Fun.by.sample.dat_cmeta, aes(x=soil_moisture, y=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point(alpha=0.5)+
+  geom_hline(yintercept=0, col="gray40", lty=2)+
+  scale_y_continuous(limits = c(-0.4,.6))+
+  scale_color_manual(values = bac_grass_cols)+
+  labs(y="Deviation values", x="Soil Moisture", col="Grass Host")+
+  # stat_smooth(inherit.aes = F, method = "lm", level=0.8, 
+  #             aes(x=soil_moisture, y=abund_null_dev_stoch), col="black", linewidth=2, alpha=0.85)+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.85, linewidth=2)+
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="right",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~soil_moisture, data = Fun.by.sample.dat_cmeta)))$adj.r.squared,2)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~soil_moisture, data = Fun.by.sample.dat_cmeta)))$coefficients[2,1],2)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~soil_moisture, data = Fun.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\
+
+```{r}
+plot_grid(b.smg,f.smg, rel_widths = c(.44,.55))
+```
+
+
+
+# pH {.tabset .tabset-pills .unnumbered}
+
+## **Bacteria** {.unnumbered}
+```{r}
+ggplot(data=Bac.by.sample.dat_cmeta, aes(y=pH, x=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point()+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.5)+
+  stat_smooth(inherit.aes = F, method = "lm", level=0.8, aes(y=pH, x=abund_null_dev_stoch), col="black", linewidth=2)
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~pH, data = Bac.by.sample.dat_cmeta)))$adj.r.squared,2)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~pH, data = Bac.by.sample.dat_cmeta)))$coefficients[2,1],2)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~pH, data = Bac.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\
+
+## **Fungi** {.unnumbered}
+```{r}
+ggplot(data=Fun.by.sample.dat_cmeta, aes(y=pH, x=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point()+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.5)+
+  stat_smooth(inherit.aes = F, method = "lm", level=0.8, aes(y=pH, x=abund_null_dev_stoch), col="black", linewidth=2)
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~pH, data = Fun.by.sample.dat_cmeta)))$adj.r.squared,2)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~pH, data = Fun.by.sample.dat_cmeta)))$coefficients[2,1],3)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~pH, data = Fun.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\
+
+# nitrate {.tabset .tabset-pills .unnumbered}
+
+## **Bacteria** {.unnumbered}
+```{r}
+ggplot(data=Bac.by.sample.dat_cmeta, aes(y=nitrate, x=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point()+
+  stat_smooth(method = "loess", level=0.8, se=F, alnitratea=0.5)+
+  stat_smooth(inherit.aes = F, method = "lm", level=0.8, aes(y=nitrate, x=abund_null_dev_stoch), col="black", linewidth=2)
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~nitrate, data = Bac.by.sample.dat_cmeta)))$adj.r.squared,2)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~nitrate, data = Bac.by.sample.dat_cmeta)))$coefficients[2,1],2)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~nitrate, data = Bac.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\
+
+## **Fungi** {.unnumbered}
+```{r}
+ggplot(data=Fun.by.sample.dat_cmeta, aes(y=nitrate, x=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point()+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.5)+
+  stat_smooth(inherit.aes = F, method = "lm", level=0.8, aes(y=nitrate, x=abund_null_dev_stoch), col="black", linewidth=2)
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~nitrate, data = Fun.by.sample.dat_cmeta)))$adj.r.squared,2)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~nitrate, data = Fun.by.sample.dat_cmeta)))$coefficients[2,1],2)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~nitrate, data = Fun.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\
+
+# herbivory_perc {.tabset .tabset-pills .unnumbered}
+
+## **Bacteria** {.unnumbered}
+```{r}
+ggplot(data=Bac.by.sample.dat_cmeta, aes(y=herbivory_perc, x=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point()+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.5)+
+  stat_smooth(inherit.aes = F, method = "lm", level=0.8, aes(y=herbivory_perc, x=abund_null_dev_stoch), col="black", linewidth=2)
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~herbivory_perc, data = Bac.by.sample.dat_cmeta)))$adj.r.squared,2)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~herbivory_perc, data = Bac.by.sample.dat_cmeta)))$coefficients[2,1],3)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~herbivory_perc, data = Bac.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\
+
+## **Fungi** {.unnumbered}
+```{r}
+ggplot(data=Fun.by.sample.dat_cmeta, aes(y=herbivory_perc, x=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point()+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.5)+
+  stat_smooth(inherit.aes = F, method = "lm", level=0.8, aes(y=herbivory_perc, x=abund_null_dev_stoch), col="black", linewidth=2)
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~herbivory_perc, data = Fun.by.sample.dat_cmeta)))$adj.r.squared,3)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~herbivory_perc, data = Fun.by.sample.dat_cmeta)))$coefficients[2,1],3)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~herbivory_perc, data = Fun.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\
+
+# avg_SLA {.tabset .tabset-pills .unnumbered}
+
+## **Bacteria** {.unnumbered}
+```{r}
+ggplot(data=Bac.by.sample.dat_cmeta, aes(y=avg_SLA, x=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point()+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.5)+
+  stat_smooth(inherit.aes = F, method = "lm", level=0.8, aes(y=avg_SLA, x=abund_null_dev_stoch), col="black", linewidth=2)
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~avg_SLA, data = Bac.by.sample.dat_cmeta)))$adj.r.squared,3)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~avg_SLA, data = Bac.by.sample.dat_cmeta)))$coefficients[2,1],4)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~avg_SLA, data = Bac.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\
+
+## **Fungi** {.unnumbered}
+```{r}
+ggplot(data=Fun.by.sample.dat_cmeta, aes(y=avg_SLA, x=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point()+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.5)+
+  stat_smooth(inherit.aes = F, method = "lm", level=0.8, aes(y=avg_SLA, x=abund_null_dev_stoch), col="black", linewidth=2)
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~avg_SLA, data = Fun.by.sample.dat_cmeta)))$adj.r.squared,3)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~avg_SLA, data = Fun.by.sample.dat_cmeta)))$coefficients[2,1],4)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~avg_SLA, data = Fun.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\
+
+# avg_SRL {.tabset .tabset-pills .unnumbered}
+
+## **Bacteria** {.unnumbered}
+```{r}
+ggplot(data=Bac.by.sample.dat_cmeta, aes(y=avg_SRL, x=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point()+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.5)+
+  stat_smooth(inherit.aes = F, method = "lm", level=0.8, aes(y=avg_SRL, x=abund_null_dev_stoch), col="black", linewidth=2)
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~avg_SRL, data = Bac.by.sample.dat_cmeta)))$adj.r.squared,3)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~avg_SRL, data = Bac.by.sample.dat_cmeta)))$coefficients[2,1],5)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~avg_SRL, data = Bac.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\
+
+## **Fungi** {.unnumbered}
+```{r}
+ggplot(data=Fun.by.sample.dat_cmeta, aes(y=avg_SRL, x=abund_null_dev_stoch, col=Grass.x)) +
+  geom_point()+
+  stat_smooth(method = "loess", level=0.8, se=F, alpha=0.5)+
+  stat_smooth(inherit.aes = F, method = "lm", level=0.8, aes(y=avg_SRL, x=abund_null_dev_stoch), col="black", linewidth=2)
+```
+
+adj.r.squared: `r round((summary(lm(abund_null_dev_stoch~avg_SRL, data = Fun.by.sample.dat_cmeta)))$adj.r.squared,2)` \
+slope: `r round((summary(lm(abund_null_dev_stoch~avg_SRL, data = Fun.by.sample.dat_cmeta)))$coefficients[2,1],2)` \
+p-value: `r (summary(lm(abund_null_dev_stoch~avg_SRL, data = Fun.by.sample.dat_cmeta)))$coefficients[2,4]` \
+\
+
+
+# {-}
+
+
+# exploring decoupled pred var
+
+```{r}
+Bac.AllG<-readRDS(file = "../processed_data/clean_rds_saves/BacArch_min2_rare9048_v1.rds")
+  # otu_table()   OTU Table:         [ 23156 taxa and 533 samples ]
+  # sample_data() Sample Data:       [ 533 samples by 39 sample variables ]
+Fun.AllG<-readRDS(file = "../processed_data/clean_rds_saves/Fun_min2_rare10116_v2.rds")
+  # otu_table()   OTU Table:         [ 6749 taxa and 509 samples ]
+  # sample_data() Sample Data:       [ 509 samples by 39 sample variables ]
+Bac.AllG.k5.ord <- readRDS(file="../processed_data/clean_rds_saves/Bac.AllG.k5.ord.rds")
+Fun.AllG.k5.ord <- readRDS(file="../processed_data/clean_rds_saves/Fun.AllG.k5.ord.rds")
+
+```
+
+
+## soil_moisture
+negative to Bac, positive to Fun
+```{r}
+ adonis2(phyloseq::distance(Bac.AllG, method="bray") ~ Bin, 
+          data = (as(sample_data(get(comm)), "data.frame")))
+```
+
+```{r plot nmds AllG col soil_moisture, include=F, eval=T}
+nmds.Bac.AllG.colsoil_moisture_wleg<-plot_ordination(Bac.AllG, Bac.AllG.k5.ord, color = rev("soil_moisture")) +
+  scale_color_gradient(high = "#132B43",low = "#56B1F7",name="Soil Moisture") +
+  geom_point(size = 3, alpha = 0.9)+
+  #stat_ellipse(type = "t", level = 0.9) +
+  ggtitle("NMDS by Soil Moisture", subtitle = "16S") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="bottom",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    legend.title  = element_text(color="black", size=14),
+    legend.text  = element_text(color="black", size=12),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+leg_nmds.colsoil_moisture<-get_legend(nmds.Bac.AllG.colsoil_moisture_wleg)
+nmds.Bac.AllG.colsoil_moisture<-nmds.Bac.AllG.colsoil_moisture_wleg+theme(legend.position="none")
+
+nmds.Fun.AllG.colsoil_moisture<-plot_ordination(Fun.AllG, Fun.AllG.k5.ord, color = rev("soil_moisture")) +
+  scale_color_gradient(high = "#132B43",low = "#56B1F7") +
+  geom_point(size = 3, alpha = 0.9) +
+  # stat_ellipse(type = "t", level = 0.9) +
+  labs(y="") +
+  ggtitle("", subtitle = "ITS") +
+  theme_bw() +
+  theme(
+    plot.background = element_blank()
+    ,panel.grid.major = element_blank()
+    ,panel.grid.minor = element_blank()
+    ,panel.background = element_blank()
+    ,axis.text.x = element_text(color="black", size=12),
+    axis.text.y = element_text(color="black", size=12),
+    legend.position="none",
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14),
+    panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+  )
+
+nmds.AllG.colsoil_moisture_upper<-plot_grid(nmds.Bac.AllG.colsoil_moisture,nmds.Fun.AllG.colsoil_moisture, ncol=2)
+plot_grid(nmds.AllG.colsoil_moisture_upper,leg_nmds.colsoil_moisture, nrow=2, rel_heights = c(0.85,0.15))
+
+# ggsave(filename = "../analyses/ordinations/NMDS_AllG_soil_moisture.png", plot = last_plot(), device = "png", height = 4, width = 7, units = "in")
+```
+
+
+## pH
+negative to Bac, no relationship to Fun
+
+## nitrate
+positive to Bac, negative to Fun
+
+```{r, include=F, eval=F}
+allM<-BOGR_dev_vals_dat_long
+
+allM$Grass<-factor(allM$Grass)
+levels(allM$Grass)
+allM$Grass<-factor(allM$Grass, levels=c("ANGE","SCSC", "BOER", "BOGR", "BUDA"))
+
+allM$Bin<-factor(allM$Bin)
+levels(allM$Bin)
+allM$Bin<-factor(allM$Bin, levels=c("North","North Central", "South Central", "South"))
+
+allM$Gradient<-factor(allM$Gradient)
+levels(allM$Gradient)
+allM$Gradient<-factor(allM$Gradient, levels=c("West","Middle", "East"))
+
+min(allM$abund_null_dev_stoch)
+max(allM$abund_null_dev_stoch)
+
+hist(allM$Bnull_dev)
+
+bin_comparisons <- list( c("North", "North Central"), c("North", "South Central"), c("North", "South"),
+                         c("North Central", "South Central"), c("North Central", "South"), 
+                         c("South Central", "South"))
+
+grass_comparisons <- list( c("ANGE", "SCSC"), c("ANGE", "BOER"), c("ANGE", "BOGR"), c("ANGE", "BUDA"), 
+                           c("SCSC", "BOER"), c("SCSC", "BOGR"), c("SCSC", "BUDA"),
+                           c("BOER", "BOGR"), c("BOER", "BUDA"),
+                           c("BOGR", "BUDA"))
+
+gradient_comparisons <- list( c("West", "Middle"), c("West", "East"), c("Middle", "East"))
+
+domain_comparisons <- list( c("Bacteria", "Fungi"))
+
+ggboxplot(subset(allM, Domain=="Bacteria"), x = "Bin", y = "abund_null_dev_stoch", 
+               facet.by = "Gradient",
+               color = "Bin", palette = bac_bin_cols_n5, ylab = "Beta null deviation value",
+               xlab = "\nLatitudinal Bin",
+               title = "Bacterial Communities: Stochastic", add = "jitter", ylim=c(-0.3, 0.4)) +
+    stat_compare_means(comparisons = bin_comparisons, label = "p.signif",
+                      #label.y = c(.2,.3, .4,.2)
+                       )+
+    theme(axis.text.x = element_text(color="black", angle = 90, hjust=1,vjust=.5),
+          legend.position = "bottom",
+          ) +
+  geom_hline(yintercept =0,  linetype = 2, color="grey30")
+
+# ggsave(file="Bnull_dev/BA_grass.bin.png", plot = last_plot(), width=8, height=6, units = "in", device="png")
+
+ggboxplot(subset(allM, Domain=="Fungi"), x = "Bin", y = "Bnull_dev", 
+               #facet.by = "Bin",
+               color = "Grass", palette = bac_cols_n5, ylab = "Beta null deviation value",
+               xlab = "\nLatitudinal Bin",
+               title = "Fungal Communities", add = "jitter"
+          #, ylim=c(-0.4, 1)
+          ) +
+    stat_compare_means(comparisons = bin_comparisons, label = "p.signif",
+                      #label.y = c(.2,.3, .4,.2)
+                       )+
+    theme(axis.text.x = element_text(color="black", angle = 90, hjust=1,vjust=.5),
+          legend.position = "bottom",
+          ) +
+  geom_hline(yintercept =0,  linetype = 2, color="grey30")
+# ggsave(file="Bnull_dev/F_grass.bin.png", plot = last_plot(), width=8, height=6, units = "in", device="png")
+
+
+# +
+#     geom_hline(yintercept =0,  linetype = 2, color="grey30")+
+#     geom_vline(xintercept =2.5,  linetype =1)
+# p <- p +    annotate("text", x = .65, y = 0.5, label = "Phase I")+
+#     annotate("text", x = 2.8, y = 0.5, label = "Phase II")
+
+ggboxplot(subset(allM, Domain=="Bacteria"), x = "Bin", y = "Bnull_dev", 
+               facet.by = "Grassland",
+               color = "Grass", palette = bac_cols_n5, ylab = "Beta null deviation value",
+               xlab = "\nLatitudinal Bin",
+               title = "Bacterial Communities", add = "jitter", ylim=c(-0.3, 0.4)) +
+    stat_compare_means(comparisons = bin_comparisons, label = "p.signif",
+                      #label.y = c(.2,.3, .4,.2)
+                       )+
+    theme(axis.text.x = element_text(color="black", angle = 90, hjust=1,vjust=.5),
+          legend.position = "bottom",
+          ) +
+  geom_hline(yintercept =0,  linetype = 2, color="grey30")
+
+# ggsave(file="Bnull_dev/BA_grass.grassland.png", plot = last_plot(), units = "in", device="png")
+
+ggboxplot(subset(allM, Domain=="Fungi"), x = "Bin", y = "Bnull_dev", 
+               facet.by = "Grassland",
+               color = "Grass", palette = bac_cols_n5, ylab = "Beta null deviation value",
+               xlab = "\nLatitudinal Bin",
+               title = "Fungal Communities", add = "jitter"
+          , ylim=c(0, 0.9)
+          ) +
+    stat_compare_means(comparisons = bin_comparisons, label = "p.signif",
+                      #label.y = c(.2,.3, .4,.2)
+                       )+
+    theme(axis.text.x = element_text(color="black", angle = 90, hjust=1,vjust=.5),
+          legend.position = "bottom",
+          ) +
+  geom_hline(yintercept =0,  linetype = 2, color="grey30")
+
+# ggsave(file="Bnull_dev/F_grass.grassland.png", plot = last_plot(), units = "in", device="png")
+
+```

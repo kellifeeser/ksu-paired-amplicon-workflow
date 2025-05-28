@@ -1,0 +1,59 @@
+---
+title: "Distance–Decay and Spatial Dependence Results"
+output:
+  bookdown::html_document2:
+    toc: true
+    number_sections: true
+bibliography: references.bib
+csl: apa.csl
+---
+
+# Results
+
+## Bacterial {.tabset}
+
+### Global
+
+```{r bac-global}
+Kingdom <- "Bacteria"
+Group <- "all"
+Global <- "yes"
+Beta <- "Sorensen"
+
+source("analysis_core.R", local = TRUE)
+ENDCHUNK
+
+### Bacteria Associated with Fungal F1 vs. non-F1
+
+```{r bac-f1-nf1}
+Kingdom <- "Bacteria"
+Group <- "F1"
+Global <- "no"
+Beta <- "Sorensen"
+
+source("analysis_core.R", local = TRUE)
+ENDCHUNK
+
+## Fungal {.tabset}
+
+### Global
+
+```{r fun-global}
+Kingdom <- "Fungi"
+Group <- "all"
+Global <- "yes"
+Beta <- "Sorensen"
+
+source("analysis_core.R", local = TRUE)
+ENDCHUNK
+
+### Fungal F1 vs. non-F1
+
+```{r fun-f1-nf1}
+Kingdom <- "Fungi"
+Group <- "F1"
+Global <- "no"
+Beta <- "Sorensen"
+
+source("analysis_core.R", local = TRUE)
+ENDCHUNK

@@ -1,0 +1,1375 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+Bac.AllG<-readRDS(file="../processed_data/clean_rds_saves/BacArch_min2_rare9048_v1.rds")
+
+Fun.AllG<-readRDS(file="../processed_data/clean_rds_saves/Fun_min2_rare10116_v2.rds")
+
+samplenames <- data.frame("Bac_samplenames" = sample_names(Bac.AllG),
+                          "Fun_samplenames" = c(sample_names(Fun.AllG), rep("null", (length(sample_names(Bac.AllG))-length(sample_names(Fun.AllG))))),
+                          check.rows = F)
+
+write.csv(samplenames,row.names = F,file="../metadata/samplenames.csv")
+```
+
+
+
+# adonis2 tables
+```{r, eval=F, cache=T}
+# create container array (dim = c(nrow, ncol, n_df))
+adonis.out_predGrass.list = vector("list", length = length(comm.names.by.grass[1:2]))
+
+for (comm in comm.names.by.grass[1:2]) {
+  adonis.temp_predGrass <- adonis2(phyloseq::distance(get(comm), method="bray") ~ Grass, 
+          data = (as(sample_data(get(comm)), "data.frame")))
+  
+  adonis.temp_predGrass$comm <- comm 
+  
+  adonis.out_predGrass.list[[comm]] <- (as.data.frame(adonis.temp_predGrass))
+
+  }
+
+adonis.out.array_predGrass = do.call(rbind, adonis.out_predGrass.list)
+```
+
+```{r, eval=F}
+
+# for (comm in comm.names.by.grass[1]) {
+#   
+#   adonis.out.tmp <- adonis2(phyloseq::distance(get(comm), method="bray") ~ Grass, 
+#           data = (as(sample_data(get(comm)), "data.frame")))
+#   
+#   adonis.out
+# }
+# 
+# # combine adonis.out by comm and store in container vector at indexed location
+# 
+# paste("adonis.out",comm, sep"_")
+
+
+knitr::kable(as.data.frame(adonis.out), "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+```
+
+```{r, include=F,eval=F}
+str(adonis.out)
+attr(class(adonis.out))[1]
+attributes(adonis.out)
+subset(adonis.out, class="anova")
+subset(adonis.out, class="data.frame")
+
+attr(adonis.out, class)
+adonis.out
+```
+
+
+```{r, eval=F}
+knitr::kable(as.data.frame(adonis.out), "simple", 
+             digits =c (0,1,3,2,3), 
+             align = 'c')
+```
+
+
+```{r, eval=F}
+results <- lapply(colnames(comm.names.by.grass), function(x)
+```
+
+
+
+```{r, eval=F}
+#code for running lots of metadata against comm
+comm.meta.long <- (as(sample_data(get(comm)), "data.frame"))
+# comm.meta.long[,c(8,19:20)] # 5-Site, 8-Grass, 19-Gradient, 20-Bin
+comm.meta <- subset(comm.meta.long, select=Grass) # 5-Site, 8-Grass, 19-Gradient, 20-Bin
+
+# lappy to 'loop' aov results by metadata col into df
+results <- lapply(colnames(comm.meta), function(x){
+  form <- as.formula(paste(comm, x, sep="~")) 
+  z <- adonis2(form, data = comm.meta, permutations=99)
+  return(as.data.frame(z$aov.tab)) #convert anova table to a data frame
+}
+)
+
+# see 1st element
+  # results[[1]]
+
+# name the list elements with the appropriate variable
+names(results) <- colnames(comm.meta)
+
+# convert to df
+results <- do.call(rbind, results)
+```
+
+
+
+
+# taxonomy
+
+# old {.hidden}
+
+Bacterial-Archaeal Phylum Relative Abundance 
+
+\
+*Note:* Bacterial and archaeal phyla with a global abundance of \< 2% relative abundance have been agglomerated into "\< 2% relative abundance"\
+
+```{r Bac-Phylum-Full-GrassRep-Site, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Bac.Phylum.r, aes(x = Grass_Rep, 
+                             y = as.numeric(Abundance*100), 
+                             fill = Phylum)) + 
+  # facet_grid(Reach~., labeller = labeller(Reach = reach_name2))+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Phylum")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = Bac_Phylum_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Phylum_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+```{r Bac-Phylum-Full-SiteRep-Grass, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Bac.Phylum.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Phylum)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Phylum")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = Bac_Phylum_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Phylum_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+## Fungal Phylum Relative Abundance
+
+\
+~~*Note:* Fungal phyla with a global abundance of \< 1% relative abundance have been agglomerated into "\< 1% relative abundance"~~\
+
+```{r Fun-Phylum-Full-GrassRep-Site, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Fun.Phylum.r, aes(x = Grass_Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Phylum)) + 
+  # facet_grid(Reach~., labeller = labeller(Reach = reach_name2))+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Phylum")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = c("≤ 0.0002% relative abundance" = '#28A48D', 
+            "Ascomycota"="#8569D5",
+           "Basidiomycota"="#D1A33D",
+           "Mucoromycota"="#5E738F")) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Phylum_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+```{r Fun-Phylum-Full-SiteRep-Grass, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Fun.Phylum.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Phylum)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Phylum")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = c("≤ 0.0002% relative abundance" = '#28A48D', 
+            "Ascomycota"="#8569D5",
+           "Basidiomycota"="#D1A33D",
+           "Mucoromycota"="#5E738F")) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Phylum_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+### **Across Different Sites by Grass Hosts** {.unnumbered .tabset}
+
+```{r, echo=F, results='asis'}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Phylum
+#price=Abundance
+#col=fill
+
+BA_tabs <- sort(unique(dat_Bac.Phylum.r2$Site))
+
+
+
+for(tab in BA_tabs) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Bac.Phylum.r2 %>% filter(Site == tab)
+
+  subtabs <- sort(unique(sub_values$Grass))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    plot_values <- sub_values %>% filter(Grass == subtab)
+
+
+    print(ggplot(plot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Phylum)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = c( "< 2% relative abundance"="#CBD588",
+                    "Acidobacteria"="#5F7FC7",
+                    "Actinobacteria"="orange",
+                    "Armatimonadetes"="#DA5724",
+                    "Bacteroidetes"="#508578",
+                    "Candidatus_Saccharibacteria"="#CD9BCD",
+                    "Chloroflexi"="#AD6F3B",
+                    "Firmicutes"="#673770",
+                    "Planctomycetes"="#D14285",
+                    "Proteobacteria"="#652926",
+                    "Verrucomicrobia"="#C84248")) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Phylum') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+### **Across Different Grass Hosts by Site** {.unnumbered .tabset}
+
+```{r, echo=F, results='asis'}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Phylum
+#price=Abundance
+#col=fill
+
+BA_tabsG <- sort(unique(dat_Bac.Phylum.r2$Grass))
+
+
+
+for(tab in BA_tabsG) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Bac.Phylum.r2 %>% filter(Grass == tab)
+
+  subtabs <- sort(unique(sub_values$Site))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    plot_values <- sub_values %>% filter(Site == subtab)
+
+
+    print(ggplot(plot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Phylum)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = c( "< 2% relative abundance"="#CBD588",
+                    "Acidobacteria"="#5F7FC7",
+                    "Actinobacteria"="orange",
+                    "Armatimonadetes"="#DA5724",
+                    "Bacteroidetes"="#508578",
+                    "Candidatus_Saccharibacteria"="#CD9BCD",
+                    "Chloroflexi"="#AD6F3B",
+                    "Firmicutes"="#673770",
+                    "Planctomycetes"="#D14285",
+                    "Proteobacteria"="#652926",
+                    "Verrucomicrobia"="#C84248")) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Phylum') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+
+### **Full Dataset** {.unnumbered .tabset}
+
+#### Grass x Rep, grouped by Site {.unnumbered}
+
+![](figures/taxa_plots/Fun_Phylum_Full_GrassRep_Site.png){width="99%"}
+
+#### Site x Rep, grouped by Grass {.unnumbered}
+
+![](figures/taxa_plots/Fun_Phylum_Full_SiteRep_Grass.png){width="99%"}
+
+### **Across Different Sites by Grass Hosts** {.unnumbered .tabset}
+
+```{r, echo=F, results='asis'}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Phylum
+#price=Abundance
+#col=fill
+
+Fun_tabs <- sort(unique(dat_Fun.Phylum.r2$Site))
+
+
+
+for(tab in Fun_tabs) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Fun.Phylum.r2 %>% filter(Site == tab)
+
+  subtabs <- sort(unique(sub_values$Grass))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    Fplot_values <- sub_values %>% filter(Grass == subtab)
+
+
+    print(ggplot(Fplot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Phylum)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = c("Ascomycota"="#8569D5",
+                                       "Basidiomycota"="#D1A33D",
+                                       "Calcarisporiellomycota"="#5E738F",
+                                       "Chytridiomycota"="#8A7C64",
+                                       "Cryptomycota"="#551118",
+                                       "Entorrhizomycota"="#28A48D",
+                                       "Mucoromycota"="#8789C0",
+                                       "Olpidiomycota"="#4B8153",
+                                       "Zoopagomycota"="#C46BAE")) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Phylum') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+### **Across Different Grass Hosts by Site** {.unnumbered .tabset}
+
+```{r, echo=F, results='asis'}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Phylum
+#price=Abundance
+#col=fill
+
+Fun_tabsG <- sort(unique(dat_Fun.Phylum.r2$Grass))
+
+
+
+for(tab in Fun_tabsG) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Fun.Phylum.r2 %>% filter(Grass == tab)
+
+  subtabs <- sort(unique(sub_values$Site))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    Fplot_values <- sub_values %>% filter(Site == subtab)
+
+
+    print(ggplot(Fplot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Phylum)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = c("Ascomycota"="#8569D5",
+                                       "Basidiomycota"="#D1A33D",
+                                       "Calcarisporiellomycota"="#5E738F",
+                                       "Chytridiomycota"="#8A7C64",
+                                       "Cryptomycota"="#551118",
+                                       "Entorrhizomycota"="#28A48D",
+                                       "Mucoromycota"="#8789C0",
+                                       "Olpidiomycota"="#4B8153",
+                                       "Zoopagomycota"="#C46BAE")) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Phylum') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+# Class-level taxonomy
+
+\
+
+## Bacterial-Archaeal Class Relative Abundance
+
+\
+*Note:* Bacterial and archaeal classes with a global abundance of \< 2% relative abundance have been agglomerated into "\< 2% relative abundance"\
+
+```{r, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Bac.Class.r, aes(x = Grass_Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Class)) + 
+  # facet_grid(Reach~., labeller = labeller(Reach = reach_name2))+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Class")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = c( "< 2% relative abundance"="#CBD588",
+                    "Acidobacteria"="#5F7FC7",
+                    "Actinobacteria"="orange",
+                    "Armatimonadetes"="#DA5724",
+                    "Bacteroidetes"="#508578",
+                    "Candidatus_Saccharibacteria"="#CD9BCD",
+                    "Chloroflexi"="#AD6F3B",
+                    "Firmicutes"="#673770",
+                    "Planctomycetes"="#D14285",
+                    "Proteobacteria"="#652926",
+                    "Verrucomicrobia"="#C84248")) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Class_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+```{r, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Bac.Class.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Class)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Class")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = c( "< 2% relative abundance"="#CBD588",
+                    "Acidobacteria"="#5F7FC7",
+                    "Actinobacteria"="orange",
+                    "Armatimonadetes"="#DA5724",
+                    "Bacteroidetes"="#508578",
+                    "Candidatus_Saccharibacteria"="#CD9BCD",
+                    "Chloroflexi"="#AD6F3B",
+                    "Firmicutes"="#673770",
+                    "Planctomycetes"="#D14285",
+                    "Proteobacteria"="#652926",
+                    "Verrucomicrobia"="#C84248")) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Class_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+### **Full Dataset** {.unnumbered .tabset}
+
+#### Grass x Rep, grouped by Site {.unnumbered}
+
+#### Site x Rep, grouped by Grass {.unnumbered}
+
+### **Across Different Sites by Grass Hosts** {.unnumbered .tabset}
+
+```{r, echo=F, results='asis'}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Class
+#price=Abundance
+#col=fill
+
+BA_tabs <- sort(unique(dat_Bac.Class.r2$Site))
+
+
+
+for(tab in BA_tabs) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Bac.Class.r2 %>% filter(Site == tab)
+
+  subtabs <- sort(unique(sub_values$Grass))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    plot_values <- sub_values %>% filter(Grass == subtab)
+
+
+    print(ggplot(plot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Class)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = c( "< 2% relative abundance"="#CBD588",
+                    "Acidobacteria"="#5F7FC7",
+                    "Actinobacteria"="orange",
+                    "Armatimonadetes"="#DA5724",
+                    "Bacteroidetes"="#508578",
+                    "Candidatus_Saccharibacteria"="#CD9BCD",
+                    "Chloroflexi"="#AD6F3B",
+                    "Firmicutes"="#673770",
+                    "Planctomycetes"="#D14285",
+                    "Proteobacteria"="#652926",
+                    "Verrucomicrobia"="#C84248")) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Class') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+### **Across Different Grass Hosts by Site** {.unnumbered .tabset}
+
+```{r, echo=F, results='asis'}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Class
+#price=Abundance
+#col=fill
+
+BA_tabsG <- sort(unique(dat_Bac.Class.r2$Grass))
+
+
+
+for(tab in BA_tabsG) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Bac.Class.r2 %>% filter(Grass == tab)
+
+  subtabs <- sort(unique(sub_values$Site))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    plot_values <- sub_values %>% filter(Site == subtab)
+
+
+    print(ggplot(plot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Class)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = c( "< 2% relative abundance"="#CBD588",
+                    "Acidobacteria"="#5F7FC7",
+                    "Actinobacteria"="orange",
+                    "Armatimonadetes"="#DA5724",
+                    "Bacteroidetes"="#508578",
+                    "Candidatus_Saccharibacteria"="#CD9BCD",
+                    "Chloroflexi"="#AD6F3B",
+                    "Firmicutes"="#673770",
+                    "Planctomycetes"="#D14285",
+                    "Proteobacteria"="#652926",
+                    "Verrucomicrobia"="#C84248")) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Class') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+## Fungal Class Relative Abundance
+
+\
+*Note:* Fungal classes with a global abundance of \< 1% relative abundance have been agglomerated into "\< 1% relative abundance"\
+
+```{r, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Fun.Class.r, aes(x = Grass_Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Class)) + 
+  # facet_grid(Reach~., labeller = labeller(Reach = reach_name2))+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Class")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = c("Ascomycota"="#8569D5",
+           "Basidiomycota"="#D1A33D",
+           "Calcarisporiellomycota"="#5E738F",
+           "Chytridiomycota"="#8A7C64",
+           "Cryptomycota"="#551118",
+           "Entorrhizomycota"="#28A48D",
+           "Mucoromycota"="#8789C0",
+           "Olpidiomycota"="#4B8153",
+           "Zoopagomycota"="#C46BAE")) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Class_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+```{r, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Fun.Class.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Class)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Class")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = c("Ascomycota"="#8569D5",
+           "Basidiomycota"="#D1A33D",
+           "Calcarisporiellomycota"="#5E738F",
+           "Chytridiomycota"="#8A7C64",
+           "Cryptomycota"="#551118",
+           "Entorrhizomycota"="#28A48D",
+           "Mucoromycota"="#8789C0",
+           "Olpidiomycota"="#4B8153",
+           "Zoopagomycota"="#C46BAE")) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Class_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+### **Full Dataset** {.unnumbered .tabset}
+
+#### Grass x Rep, grouped by Site {.unnumbered}
+
+![](figures/taxa_plots/Fun_Class_Full_GrassRep_Site.png){width="99%"}
+
+#### Site x Rep, grouped by Grass {.unnumbered}
+
+![](figures/taxa_plots/Fun_Class_Full_SiteRep_Grass.png){width="99%"}
+
+### **Across Different Sites by Grass Hosts** {.unnumbered .tabset}
+
+```{r, echo=F, results='asis'}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Class
+#price=Abundance
+#col=fill
+
+Fun_tabs <- sort(unique(dat_Fun.Class.r2$Site))
+
+
+
+for(tab in Fun_tabs) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Fun.Class.r2 %>% filter(Site == tab)
+
+  subtabs <- sort(unique(sub_values$Grass))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    Fplot_values <- sub_values %>% filter(Grass == subtab)
+
+
+    print(ggplot(Fplot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Class)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = c("Ascomycota"="#8569D5",
+                                       "Basidiomycota"="#D1A33D",
+                                       "Calcarisporiellomycota"="#5E738F",
+                                       "Chytridiomycota"="#8A7C64",
+                                       "Cryptomycota"="#551118",
+                                       "Entorrhizomycota"="#28A48D",
+                                       "Mucoromycota"="#8789C0",
+                                       "Olpidiomycota"="#4B8153",
+                                       "Zoopagomycota"="#C46BAE")) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Class') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+### **Across Different Grass Hosts by Site** {.unnumbered .tabset}
+
+```{r, echo=F, results='asis'}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Class
+#price=Abundance
+#col=fill
+
+Fun_tabsG <- sort(unique(dat_Fun.Class.r2$Grass))
+
+
+
+for(tab in Fun_tabsG) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Fun.Class.r2 %>% filter(Grass == tab)
+
+  subtabs <- sort(unique(sub_values$Site))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    Fplot_values <- sub_values %>% filter(Site == subtab)
+
+
+    print(ggplot(Fplot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Class)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = c("Ascomycota"="#8569D5",
+                                       "Basidiomycota"="#D1A33D",
+                                       "Calcarisporiellomycota"="#5E738F",
+                                       "Chytridiomycota"="#8A7C64",
+                                       "Cryptomycota"="#551118",
+                                       "Entorrhizomycota"="#28A48D",
+                                       "Mucoromycota"="#8789C0",
+                                       "Olpidiomycota"="#4B8153",
+                                       "Zoopagomycota"="#C46BAE")) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Class') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+# Order-level taxonomy
+
+# Family-level taxonomy
+
+# Genus-level taxonomy
+
+
+### Bac - Family
+
+```{r Bac-Family-Full-GrassRep-Site, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Bac.Family.r, aes(x = Grass_Rep, 
+                             y = as.numeric(Abundance*100), 
+                             fill = Family)) + 
+  # facet_grid(Reach~., labeller = labeller(Reach = reach_name2))+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Family")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = Bac_Family_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Family_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+### Fun - Family
+
+```{r Fun-Family-Full-GrassRep-Site, message=F, warning=F, error=F, fig.dim = c(12, 9), out.width = "100%", eval=F, echo=F}
+# facet site
+
+ggplot(dat_Fun.Family.r, aes(x = Grass_Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Family)) + 
+  # facet_grid(Reach~., labeller = labeller(Reach = reach_name2))+
+  facet_wrap("Site", nrow=4, ncol=6, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nGrass x Replicate', y="Relative Abundance", fill="Family")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Family_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Family_Full_GrassRep_Site.png", plot = last_plot(), width=12, height=9, units = "in", device="png")
+```
+
+
+
+
+
+
+### Bac - Order
+
+```{r Bac-Order-Full-SiteRep-Grass, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Bac.Order.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Order)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Order")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  # scale_fill_jco() + # max 10 colors
+  # scale_fill_igv() +
+  scale_fill_manual(values = Bac_Order_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/BA_Order_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+### Fun - Order
+
+```{r Fun-Order-Full-SiteRep-Grass, message=F, warning=F, error=F, fig.dim = c(10, 10), out.width = "100%", eval=F, echo=F}
+# facet grass
+
+ggplot(dat_Fun.Order.r, aes(x = Site.Rep, 
+                                                    y = as.numeric(Abundance*100), 
+                                                    fill = Order)) + 
+  facet_wrap("Grass", nrow=5, scales = "free_x")+
+  # geom_vline(xintercept = 2, color="black")+
+  labs(x= '\nSite x Replicate', y="Relative Abundance", fill="Order")+
+  geom_bar(stat = "identity", position="fill")+
+  guides(fill=guide_legend(ncol = 1))+
+  scale_fill_manual(values = Fun_Order_cols) +
+  theme_bw() + 
+  theme(
+    axis.text.x = element_text(color="black", size=7, angle = 90, hjust=1,vjust=.5),
+    axis.text.y = element_text(color="black", size=12),
+    strip.text = element_text(color="black", size=12),
+    strip.background = element_blank(),
+    legend.title = element_text(color="black", size=12),
+    legend.text = element_text(color="black", size=10),
+    legend.key.height = unit(0.5, 'cm'),
+    axis.title.x = element_text(color="black", size=14),
+    axis.title.y = element_text(color="black", size=14, angle=90),
+    plot.title = element_text(size=14),
+    panel.grid.major = element_blank(), # switch off major gridlines
+    panel.grid.minor = element_blank(), # switch off minor gridlines
+    panel.border = element_rect(colour = "black", fill=NA, size=.75)
+  )
+
+#tax fig naming: Dataset_Taxlevel_subset_xaxis_facet
+ggsave(file="../figures/taxa_plots/Fun_Order_Full_SiteRep_Grass.png", plot = last_plot(), width=10, height=10, units = "in", device="png")
+```
+
+
+```{r}
+# cut ksu color code
+
+
+# "#BBE6E4"
+# "#4C1036"
+# 
+#  "Glomeromycetes" = "#5E738F",    # Mucoromycota
+# "uncl_Basidiomycota" = "#60463B",  # Basidiomycota
+# "Atractiellomycetes" = "#4B8153"  # Basidiomycota
+# 
+#  
+# "#C6D8FF"
+# "#736F72"
+# "#8789C0"
+# "#551118"
+
+
+Fun_Class_cols_NO<-(values = c("≤ 0.5% relative abundance" = '#28A48D', 
+                               "Agaricomycetes" = "#D1A33D",   # Basidiomycota
+                               "Atractiellomycetes" = "#4B8153",  # Basidiomycota
+                               "Dothideomycetes" = "#C46BAE",   # Ascomycota
+                               "Eurotiomycetes" = "#551118",    # Ascomycota
+                               "Glomeromycetes" = "#5E738F",    # Mucoromycota
+                               "Lecanoromycetes" = ,   # Ascomycota
+                               "Sordariomycetes" = "#8569D5",   # Ascomycota
+                               "uncl_Ascomycota" = "#8789C0",   # Ascomycota
+                               "uncl_Basidiomycota" = "#8A7C64")) # Basidiomycota
+
+
+Fun_Class_cols3<-(values = c("≤ 0.5% relative abundance" = '#28A48D', 
+                             "Sordariomycetes" = "#8569D5",   # Ascomycota
+                             "uncl_Ascomycota" = ,   # Ascomycota
+                             "Dothideomycetes" = "#C46BAE",   # Ascomycota
+                             "Eurotiomycetes" = "#551118",    # Ascomycota
+                             "Lecanoromycetes" = "#8789C0",   # Ascomycota
+                             
+                             "Glomeromycetes" = "#5E738F",    # Mucoromycota
+                             
+                             "Agaricomycetes" = "#D1A33D",   # Basidiomycota
+                             "uncl_Basidiomycota" = "#8A7C64",  # Basidiomycota
+                             "Atractiellomycetes" = "#4B8153"  # Basidiomycota
+))
+
+
+
+##unused
+# "Chytridiomycota"="#8A7C64",
+# "Cryptomycota"="#551118",
+# "Entorrhizomycota"="#28A48D",
+# "Mucoromycota"="#8789C0",
+# 
+# values = c("Ascomycota"="#8569D5",
+#            "Basidiomycota"="#D1A33D",
+#            "Calcarisporiellomycota"="#5E738F",
+# values = c("Chytridiomycota"=,
+#            "Cryptomycota"=,
+#            "Entorrhizomycota"="#28A48D",
+#            "Mucoromycota"=,
+#            "Olpidiomycota"=,
+#           "Zoopagomycota"=)
+
+
+
+#old
+# values = c( "< 1% relative abundance"="#CBD588",
+#             "Ascomycota"="#8569D5",
+#             "Basidiomycota"="#D1A33D",
+#             "Chytridiomycota"="#5E738F",
+#             "Glomeromycota"="#8A7C64",
+#             "Monoblepharomycota"="#551118",
+#             "Mortierellomycota"="#28A48D",
+#             "Mucoromycota"="#8789C0",
+#             "Olpidiomycota"="#4B8153",
+#             "Rozellomycota"="#C46BAE")
+
+
+#old
+# values = c( "< 2% relative abundance"="#CBD588",
+#             "Acidobacteria"="#5F7FC7",
+#             "Actinobacteria"="orange",
+#             "Armatimonadetes"="#DA5724",
+#             "Bacteroidetes"="#508578",
+#             "Candidatus_Saccharibacteria"="#CD9BCD",
+#             "Chloroflexi"="#AD6F3B",
+#             "Firmicutes"="#673770",
+#             "Planctomycetes"="#D14285",
+#             "Proteobacteria"="#652926",
+#             "Verrucomicrobia"="#C84248")
+
+
+####################
+```

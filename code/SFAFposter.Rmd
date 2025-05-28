@@ -1,0 +1,1262 @@
+---
+title: '**RAM paired amplicons: SFAF Poster Figures**'
+author: "Kelli Feeser"
+date: "`r Sys.Date()`"
+output:
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+    keep_md: yes
+  html_notebook:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+  html_document:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+\
+
+::: homelink
+<a href="https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html" target="_blank" style="text-align:right">Back to Home</a>
+:::
+
+\
+
+------------------------------------------------------------------------
+
+Document last updated: `r Sys.Date()`
+
+------------------------------------------------------------------------
+
+\
+
+# Set-up {.unlisted .unnumbered .hidden}
+
+```{r global_options, include=FALSE}
+# packages
+library(knitr)
+# library(kableExtra)
+
+# set up global R options
+  # to list the current values of all options but better to F1
+    #options()
+    # easier way:
+      #?options
+  # to access the value of a single option
+    #getOption("width")
+
+# set up knitr global chunk options
+  # See str(knitr::opts_chunk$get()) for a list of default chunk options.
+#knitr::opts_chunk$set(fig.width = 8)
+# knitr::opts_chunk$set(fig.path = "../figures/darksidea_plots/")
+#knitr::opts_chunk$set(fig.path = "figures/taxa_plots/prefix-")
+
+# How to use an object before it is created
+  # see https://bookdown.org/yihui/rmarkdown-cookbook/load-cache.html
+
+# changing from cache.path="../docs/code/BacterialFungalClusterInteractions_cache/html/") to cache.path="../docs/github_BacterialFungal_Cluster_Interactions_files/figure-html/")
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
+                      cache.path="../docs/github_SFAFposter_files/figure-html/")
+opts_knit$set(eval.after = "fig.cap")
+knitr::opts_chunk$set(fig.pos = '!h')
+options(knitr.kable.NA = '')
+
+## preload your R variables here ##
+# variable_1 <- c("a", "b", "c")
+####
+```
+
+```{r LANL-proxies, eval=T, include=FALSE}
+# LANL proxies
+Sys.setenv('HTTP_PROXY'='http://proxyout.lanl.gov:8080')
+Sys.setenv('HTTPS_PROXY'='http://proxyout.lanl.gov:8080')
+```
+
+## load packages
+
+```{r load-packages, eval=T, include=F}
+library("ggplot2"); packageVersion("ggplot2") #‘3.4.4’
+library("vegan"); packageVersion("vegan") # # ‘2.6.4’
+library("phyloseq"); packageVersion("phyloseq") #‘1.44.0’
+library("scales"); packageVersion("scales") #‘1.2.1’
+library("swatches"); packageVersion("swatches") #‘0.5.0’
+library("ggsci"); packageVersion("ggsci") #‘3.0.0’
+library("ggpubr"); packageVersion("ggpubr") #‘0.6.0’
+library("viridis"); packageVersion("viridis") #‘0.6.4’
+library("RColorBrewer"); packageVersion("RColorBrewer") #‘1.1.3’
+library("cowplot"); packageVersion("cowplot") #‘1.1.1’
+library("dplyr"); packageVersion("dplyr") #‘1.1.3’
+library("plyr"); packageVersion("plyr") #‘1.8.9’
+library("knitr"); packageVersion("knitr") #‘1.44’
+#library("kableExtra"); packageVersion("kableExtra") #‘1.3.4’
+library("DT"); packageVersion("DT") #‘0.30’
+library("tidyverse"); packageVersion("tidyverse") #‘2.0.0’
+library("prettydoc"); packageVersion("prettydoc") #‘0.4.1’
+library("magrittr"); packageVersion("magrittr") #‘2.0.3’
+library("broom"); packageVersion("broom") #‘1.0.5’
+library("betapart"); packageVersion("betapart") #‘1.6’
+# patch see: https://stackoverflow.com/questions/76118194/error-when-loading-kableextra-in-markdown-file-after-updating-to-r-4-3-0
+# devtools::install_github("kupietz/kableExtra",force = TRUE)
+library("kableExtra")
+
+library("microbiome"); packageVersion("microbiome") #‘1.22.0’
+library("supernova"); packageVersion("supernova") #‘3.0.0’
+library("lme4"); packageVersion("lme4") #‘1.1.34’
+library("circlize"); packageVersion("circlize") #‘0.4.16’
+library("ggordiplots"); packageVersion("ggordiplots") #‘0.4.3’
+
+
+# source("ksu_colors.R")
+source("RAM_bulk_harvester.R")
+source("../../black-sheep-club/code/sheepish_scripts.R")
+```
+
+## load cache
+
+```{r load-cache, include=FALSE, eval=F}
+# OBJECT <- if (file.exists('OBJECT.rds')) {
+#   readRDS('OBJECT.rds')
+# } else {
+#   "The value of `OBJECT` is not available yet"
+# }
+
+# knitr::load_cache('CHUNK-NAME', 'OBJECT')
+
+
+
+# knitr::load_cache('adonis-predClus-Fun-calc', 'adonis_predClus_Fun')
+# knitr::load_cache('adonis-predClus-Bac-calc', 'adonis_predClus_Bac')
+# knitr::load_cache('calc-alpha', 'fwc_alpha')
+# knitr::load_cache('calc-alpha', 'bwc_alpha')
+# knitr::load_cache('gamma-fun-calc', 'Fun_gamma2')
+# knitr::load_cache('gamma-bac-calc', 'Bac_gamma2')
+
+# knitr::load_cache('mean-diss-bycluster-Fun', 'md_Fwc_self')
+# knitr::load_cache('mean-diss-bycluster-Fun', 'md_Fwc_clus_sor_k10.df.noself')
+# knitr::load_cache('mean-diss-bycluster-Bac', 'md_Bwc_self')
+# knitr::load_cache('mean-diss-bycluster-Bac', 'md_Bwc_clus_sor_k14.df.noself')
+
+# knitr::load_cache('subset-Fun-wc-byClus', 'sor.dist.list')
+# knitr::load_cache('subset-Bac-wc-byClus')
+
+# knitr::load_cache('calc-betadisp')
+# knitr::load_cache('betadisp-boxplot-Fun', 'betadisp_clus_Fun.df')
+# knitr::load_cache('', '')
+# knitr::load_cache('', '')
+# knitr::load_cache('', '')
+
+```
+
+## load rds
+
+```{r load-rds, include=FALSE,eval=TRUE}
+##########
+# phylo #
+Bac_wholecommunity<-readRDS(file = "../processed_data/clean_rds_saves/Bac_wholecommunity.rds")
+Fun_wholecommunity <- readRDS(file="../processed_data/clean_rds_saves/Fun_wholecommunity.rds")
+##########
+
+##########
+# nmds #
+Bac_wc_sor_k5.ord <- readRDS(file = "../processed_data/clean_rds_saves/Bac_wc_sor_k5.ord.rds")
+Fun_wc_sor_k4.ord <- readRDS(file = "../processed_data/clean_rds_saves/Fun_wc_sor_k4.ord.rds")
+##########
+
+
+##########
+# misc #
+Bac_wholecommunity.r<-readRDS(file = "../processed_data/clean_rds_saves/Bac_wholecommunity.r.rds")
+Fun_wholecommunity.r<-readRDS(file = "../processed_data/clean_rds_saves/Fun_wholecommunity.r.rds")
+sd<-as(sample_data(Fun_wholecommunity), "data.frame") # metadata for phyloseq
+##########
+
+
+
+
+##########
+# colors #
+col_n14 <- c("B1"="#730025","B2"="#AF0039","B3"="#E8004C","B4"="#FF65A3","B5"="#9E4D97",
+             "B6"="#4D42B3","B7"="#7678ed","B8"="#5B7898","B9"="#17A398","B10"="#74A57F",
+             "B11"="#B6AF40","B12"="#f7b801", "B13"="#f18701", "B14"="#f35b04")
+# creation: https://coolors.co/730025-AF0039-E8004C-FF65A3-9E4D97-4D42B3-7678ed-5B7898-17A398-74A57F-B6AF40-f7b801-f18701-f35b04
+
+
+col_n10 <- c("F1"="#8E0152","F2"="#C51B7D","F3"="#DE77AE","F4"="#F1B6DA","F5"="#C5C2EA",
+             "F6"="#8DC9BB","F7"="#86C37E","F8"="#7FBC41","F9"="#4D9221","F10"="#276419")
+             
+                 # "#DBBCE2","F6"="#E6F5D0","F7"="#B8E186","F8"="#7FBC41","F9"="#4D9221","F10"="#276419")
+
+             # "#B77EBE","#B0AFDF","#92CDC8","#7BB990","#EFBC9B","#DBA8AC"
+
+# creation: https://coolors.co/8e0152-c51b7d-de77ae-f1b6da-c5c2ea-a8e0ff-8dc9bb-7fbc41-4d9221-276419
+col_clusn10 <- c("F1"="#8E0152","F2"="#C51B7D","F3"="#DE77AE","F4"="#F1B6DA","F5"="#FDE0EF",
+                 "F6"="#E6F5D0","F7"="#B8E186","F8"="#7FBC41","F9"="#4D9221","F10"="#276419")
+
+# change "F5"="#FDE0EF" to "#C5C2EA",
+  # "F6"="#E6F5D0" to "#8DC9BB", 
+  # "F7"="#B8E186" to "#86C37E"
+
+latlong_cols<-readRDS(file = "../processed_data/clean_rds_saves/latlong_cols.rds")
+##########
+```
+
+## check metadata
+
+```{r sampledata-check, include=FALSE,eval=FALSE}
+# Bin should be north
+unique(subset(sample_data(Fun_wholecommunity), Site=="ONF")$Bin)
+unique(subset(sample_data(Bac_wholecommunity), Site=="ONF")$Bin)
+
+tail(colnames(sample_data(Fun_wholecommunity)))
+tail(colnames(sample_data(Bac_wholecommunity)))
+
+# colnames
+colnames(sample_data(Fun_wholecommunity))
+
+```
+
+\
+
+# nestedness
+
+
+```{r}
+MRM(betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F10_Fun"]]$beta.sor ~ env_dist_matrices[["Fun_sor_clusters"]][["F10_pH_m.std"]] + env_dist_matrices[["Fun_sor_clusters"]][["F10_soil_moisture_m.std"]] + env_dist_matrices[["Fun_sor_clusters"]][["F10_SOM_m.std"]] + env_dist_matrices[["Fun_sor_clusters"]][["F10_ammonium_m.std"]] + env_dist_matrices[["Fun_sor_clusters"]][["F10_phos_m.std"]] + env_dist_matrices[["Fun_sor_clusters"]][["F10_GDD3yr_m.std"]] + env_dist_matrices[["Fun_sor_clusters"]][["F10_ppt3yr_m.std"]], nperm=1001)
+
+decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F10"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F10_pH_m.std"]] + env_dist_matrices[["Fun_sor_clusters"]][["F10_soil_moisture_m.std"]] +
+              env_dist_matrices[["Fun_sor_clusters"]][["F10_SOM_m.std"]], y.type="dissim", model.type="exp")
+```
+
+
+## F1 vs non-F1
+
+
+### sor
+
+```{r}
+# F1
+decay.Fun_F1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["F1"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]], y.type="dissim", model.type="exp")
+# non-F1
+decay.Fun_nonF1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp")
+
+plot.decay.pretty(decay.Fun_F1.exp.sor, col=paste(col_n10[1],"cc",sep = ""), add=F, main="F1", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+plot.decay.pretty(decay.Fun_nonF1.exp.sor, col="#7FBC41", add=T, main="non-F1",
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line="#276419",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+```
+
+### sim
+
+```{r}
+# F1
+decay.Fun_F1.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["F1"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]], y.type="dissim", model.type="exp")
+# non-F1
+decay.Fun_nonF1.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp")
+
+plot.decay.pretty(decay.Fun_F1.exp.sim, col=paste(col_n10[1],"cc",sep = ""), add=F, main="Turnover-resultant dissimilarity", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+plot.decay.pretty(decay.Fun_nonF1.exp.sim, col="#7FBC41", add=T, main="non-F1",
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line="#276419",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext((paste("F1 - ",round(decay.Fun_F1.exp.sim$pseudo.r.squared,3)," (",round(decay.Fun_nonF1.exp.sim$p.value,3),")",sep = "")),side=1,line=-2,adj=0.05,outer = F,padj = 0,col=col_n10[1])
+mtext((paste("non-F1 - ",round(decay.Fun_nonF1.exp.sim$pseudo.r.squared,3)," (",round(decay.Fun_nonF1.exp.sim$p.value,3),")",sep = "")),side=1,line=-1,adj=0.05,outer = F,padj = 0, col="#7FBC41")
+mtext((paste("pseudo R2 (p-value)",sep = "")),side=1,line=-3,adj=0.05,outer = F,padj = 0, col="black")
+
+```
+
+### sne
+
+```{r}
+# F1
+decay.Fun_F1.exp.sne<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["F1"]]$beta.sne, x=env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]], y.type="dissim", model.type="exp")
+# non-F1
+decay.Fun_nonF1.exp.sne<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1"]]$beta.sne, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp")
+
+plot.decay.pretty(decay.Fun_F1.exp.sne, col=paste(col_n10[1],"cc",sep = ""), add=F, main="Nestedness-resultant dissimilarity", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+plot.decay.pretty(decay.Fun_nonF1.exp.sne, col="#7FBC41", add=T, main="non-F1",
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line="#276419",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext((paste("F1 - ",round(decay.Fun_F1.exp.sne$pseudo.r.squared,3)," (",round(decay.Fun_nonF1.exp.sne$p.value,3),")",sep = "")),side=3,line=-3,adj=0.05,outer = F,padj = 0,col=col_n10[1])
+mtext((paste("non-F1 - ",round(decay.Fun_nonF1.exp.sne$pseudo.r.squared,3)," (",round(decay.Fun_nonF1.exp.sne$p.value,3),")",sep = "")),side=3,line=-2,adj=0.05,outer = F,padj = 0, col="#7FBC41")
+mtext((paste("pseudo R2 (p-value)",sep = "")),side=3,line=-1,adj=0.05,outer = F,padj = 0, col="black")
+
+```
+
+## Fun_sor_clusters
+
+```{r}
+betapart_results <- readRDS(file = "../processed_data/clean_rds_saves/betapart_results.rds")
+
+env_dist_matrices <- readRDS(file = "../processed_data/clean_rds_saves/env_dist_matrices.rds")
+
+env_dist_matrices <- readRDS(file = "../processed_data/clean_rds_saves/env_dist_matrices2.rds")
+```
+
+
+
+```{r}
+# col_n10 <- c("F1"="#8E0152","F2"="#C51B7D","F3"="#DE77AE","F4"="#F1B6DA","F5"="#C5C2EA",
+#              "F6"="#8DC9BB","F7"="#86C37E","F8"="#7FBC41","F9"="#4D9221","F10"="#276419")
+
+col_n10[1]
+paste(col_n10[1],"cc",sep = "")
+
+
+F1sor_dist <- betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F1_Fun"]]$beta.sor
+F1geo_dist <- env_dist_matrices$Fun_sor_clusters$F1_geodist
+as.data.frame(F1geo_dist, rownames = names(F1sor_dist), rownames.force = T)
+
+Fun_all.geo<-as(subset(sd, select = c(Longitude,Latitude)), "data.frame")
+  Fun_all.geodist_mat <- as.dist(geodist(Fun_all.geo, measure = 'geodesic' )/1000)
+Fun_F1.geo<-as(subset(subset(sd, sd$Fun_sor_clusters=="F1"), select = c(Longitude,Latitude)), "data.frame")
+  Fun_F1.geodist_mat <- stats::as.dist(geodist(Fun_F1.geo, measure = 'geodesic' )/1000)
+
+
+
+
+MRM(dist(F1sor_dist)~dist(Fun_F1.geodist_mat))
+# F1
+decay.Fun_F1.exp.sor2<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]]$F1_geodist, y.type="dissim", model.type="exp")
+# F2 - singular gradient matrix at initial parameter estimates
+decay.Fun_F2.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F2"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F2_geodist"]], y.type="dissim", model.type="exp")
+# F3
+decay.Fun_F3.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F3"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F3_geodist"]], y.type="dissim", model.type="exp")
+# F4
+decay.Fun_F4.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F4"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F4_geodist"]], y.type="dissim", model.type="exp")
+# F5
+decay.Fun_F5.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F5"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F5_geodist"]], y.type="dissim", model.type="exp")
+# F6
+decay.Fun_F6.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F6"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F6_geodist"]], y.type="dissim", model.type="exp")
+# F7
+decay.Fun_F7.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F7"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F7_geodist"]], y.type="dissim", model.type="exp")
+# F8
+decay.Fun_F8.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F8"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F8_geodist"]], y.type="dissim", model.type="exp")
+# F9
+decay.Fun_F9.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F9"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F9_geodist"]], y.type="dissim", model.type="exp")
+# F10
+decay.Fun_F10.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F10"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F10_geodist"]], y.type="dissim", model.type="exp")
+
+# non-F1
+decay.Fun_nonF1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["non-F1"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["non-F1_geodist"]], y.type="dissim", model.type="exp")
+
+plot.decay.pretty(decay.Fun_F1.exp.sor2, col=paste(col_n10[1],"cc",sep = ""), add=F, main="F1", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F3.exp.sor, col=paste(col_n10[3],"cc",sep = ""), add=T, main="F3", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[3],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F4.exp.sor, col=paste(col_n10[4],"cc",sep = ""), add=T, main="F4", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[4],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F5.exp.sor, col=paste(col_n10[5],"cc",sep = ""), add=T, main="F5", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[5],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F6.exp.sor, col=paste(col_n10[6],"cc",sep = ""), add=T, main="F6", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[6],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F7.exp.sor, col=paste(col_n10[7],"cc",sep = ""), add=T, main="F7", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[7],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F8.exp.sor, col=paste(col_n10[8],"cc",sep = ""), add=T, main="F8", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[8],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F9.exp.sor, col=paste(col_n10[9],"cc",sep = ""), add=T, main="F9", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[9],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F10.exp.sor, col=paste(col_n10[10],"cc",sep = ""), add=T, main="F10", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[10],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+plot.decay.pretty(decay.Fun_nonF1.exp.sor, col="#7FBC41", add=T, main="non-F1",
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line="#276419",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+```
+
+
+## Bac_sor_clusters
+
+```{r}
+col_n10 <- c("B1"="#8E0152","B2"="#C51B7D","B3"="#DE77AE","B4"="#B1B6DA","B5"="#C5C2EA",
+             "B6"="#8DC9BB","B7"="#86C37E","B8"="#7BBC41","B9"="#4D9221","B10"="#276419")
+
+col_n10[1]
+paste(col_n10[1],"cc",sep = "")
+
+# B1
+decay.Bac_B1.exp.sor2<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B1"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B1_geodist"]], y.type="dissim", model.type="exp")
+# B2 
+decay.Bac_B2.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B2"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B2_geodist"]], y.type="dissim", model.type="exp")
+# B3
+decay.Bac_B3.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B3"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B3_geodist"]], y.type="dissim", model.type="exp")
+# B4
+decay.Bac_B4.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B4"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B4_geodist"]], y.type="dissim", model.type="exp")
+# B5
+decay.Bac_B5.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B5"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B5_geodist"]], y.type="dissim", model.type="exp")
+# B6 - singular gradient matrix at initial parameter estimates
+decay.Bac_B6.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B6"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B6_geodist"]], y.type="dissim", model.type="exp")
+# B7
+decay.Bac_B7.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B7"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B7_geodist"]], y.type="dissim", model.type="exp")
+# B8
+decay.Bac_B8.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B8"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B8_geodist"]], y.type="dissim", model.type="exp")
+# B9
+decay.Bac_B9.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B9"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B9_geodist"]], y.type="dissim", model.type="exp")
+# B10
+decay.Bac_B10.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B10"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B10_geodist"]], y.type="dissim", model.type="exp")
+# B11
+decay.Bac_B11.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B11"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B11_geodist"]], y.type="dissim", model.type="exp")
+# B12
+decay.Bac_B12.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B12"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B12_geodist"]], y.type="dissim", model.type="exp")
+# B13
+decay.Bac_B13.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B13"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B13_geodist"]], y.type="dissim", model.type="exp")
+# B14 - singular gradient matrix at initial parameter estimates
+decay.Bac_B14.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B14"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B14_geodist"]], y.type="dissim", model.type="exp")
+
+
+plot.decay.pretty(decay.Bac_B1.exp.sor2, col=paste(col_n14[1],"cc",sep = ""), main="B1", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B2.exp.sor, col=paste(col_n14[2],"cc",sep = ""), add=T, main="B2", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[2],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B3.exp.sor, col=paste(col_n14[3],"cc",sep = ""), add=T, main="B3", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[3],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B4.exp.sor, col=paste(col_n14[4],"cc",sep = ""), add=T, main="B4", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[4],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B5.exp.sor, col=paste(col_n14[5],"cc",sep = ""), add=T, main="B5", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[5],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B7.exp.sor, col=paste(col_n14[7],"cc",sep = ""), add=T, main="B7", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[7],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B8.exp.sor, col=paste(col_n14[8],"cc",sep = ""), add=T, main="B8", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[8],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B9.exp.sor, col=paste(col_n14[9],"cc",sep = ""), add=T, main="B9", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[9],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B10.exp.sor, col=paste(col_n14[10],"cc",sep = ""), add=T, main="B10", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[10],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B11.exp.sor, col=paste(col_n14[11],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[11],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B12.exp.sor, col=paste(col_n14[12],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[12],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B13.exp.sor, col=paste(col_n14[13],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[13],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+# plot.decay.pretty(decay.Bac_B14.exp.sor, col=paste(col_n10[14],"cc",sep = ""), add=T,
+#            xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+#            col.line=col_n10[14],xaxp = c(0,1500,3),
+#            ylab="",xlab="")
+
+
+```
+
+
+
+# nmds
+
+(ref:combined-NMDSspider-Sor-PAM-all-fig-caption) NMDS plots showing variation in the presence/absence-based composition of root-associated A) bacteria and B) fungi in relation to PAM cluster designations (labeled) with ellipses showing 90% CI for the standard errors about each cluster centroid. Fungal NMDS plot based on Sørensen dissimilarities: k = 4, 2-dimensional stress = 0.122, non-metric fit R^2^ = 0.985, linear fit R^2^ = 0.908. Bacterial NMDS plot based on Sørensen dissimilarities: k = 5, 2-dimensional stress = 0.055, non-metric fit R^2^ = 0.997, linear fit R^2^ = 0.981.
+
+
+
+```{r, echo=FALSE,eval=F, out.height="90%",fig.cap='(ref:combined-NMDSspider-Sor-PAM-all-fig-caption)', fig.show='hold', dpi=300}
+library("ggordiplots")
+
+# mean-diss-bycluster-Fun
+library("betapart")
+Fun_wc_sorensen_dist<-as.dist(as.matrix(beta.pair(decostand(phylo2vegan_OTU(Fun_wholecommunity), method = "pa"), index.family = "sorensen")$beta.sor))
+
+md_Fwc_clus_sor_k10<-meandist(Fun_wc_sorensen_dist, phylo2vegan_sd(Fun_wholecommunity)$Fun_sor_clusters)
+
+md_Fwc_clus_sor_k10.r <- round(md_Fwc_clus_sor_k10,digits = 3)
+
+# Diagonal elements = mean within-group dissimilarity
+  # extract the diagonals directly from matrix, preserving names in 
+  # vectorized output
+  md_Fwc_clus_sor_k10.df.self <- diag(md_Fwc_clus_sor_k10.r)
+
+# vector reflects inverted beta dispersion scaled to max of 1
+  (1/md_Fwc_clus_sor_k10.df.self)/max(1/md_Fwc_clus_sor_k10.df.self)
+  
+  alpha_scale <- 1
+  
+  Fun_alpha_vec <- data.frame("Group" = names(md_Fwc_clus_sor_k10.df.self),
+                             "alpha_val" = as.numeric((1/md_Fwc_clus_sor_k10.df.self)*alpha_scale/max(1/md_Fwc_clus_sor_k10.df.self)))
+  
+library("forcats")
+# forcats::fct_rev()
+Fun_ordiplot_spiders1$df_mean.ord2 <- Fun_ordiplot_spiders1$df_mean.ord
+
+Fun_ordiplot_spiders1$df_mean.ord2$Group
+Fun_ordiplot_spiders1$df_mean.ord2$Group <- forcats::fct_rev(Fun_ordiplot_spiders1$df_mean.ord2$Group)
+Fun_ordiplot_spiders1$df_mean.ord2$x <- rev(Fun_ordiplot_spiders1$df_mean.ord2$x)
+Fun_ordiplot_spiders1$df_mean.ord2$y <- rev(Fun_ordiplot_spiders1$df_mean.ord2$y)
+
+  # Fungal ----
+
+Fun_ordiplot_spiders1<-gg_ordiplot(Fun_wc_sor_k4.ord, groups = sd$Fun_sor_clusters, 
+            pt.size = 1,kind = "se",conf = 0.90,ellipse = TRUE,
+            label = T, spiders = T, hull = F, plot = F)
+Fun_ordiplot_spiders <- Fun_ordiplot_spiders1$plot
+
+# Join density alpha values to hull data
+Fun_hull_df <- Fun_ordiplot_spiders1$df_hull %>%
+  left_join(Fun_alpha_vec, by = "Group")
+
+
+Fun_ordiplot_spiders2<-Fun_ordiplot_spiders+
+  scale_color_manual(values = col_n10, name = "Sørensen clusters", 
+                     guide = guide_legend(ncol = 1)) +
+  scale_fill_manual(values = col_n10, name = "Sørensen clusters", 
+                    guide = guide_legend(ncol = 1)) +
+  geom_polygon(
+    data = Fun_hull_df,
+    aes(x = x, y = y, group = Group, fill = Group, alpha = alpha_val*1.2),
+    color = NA
+  ) +
+  guides(alpha = "none") + # hides the alpha legend
+  geom_label(data = Fun_ordiplot_spiders1$df_mean.ord, 
+             aes(x = x, y = y, label = Group, color = Group), 
+             show.legend = FALSE, size=4.72, label.size = 1.4, 
+               label.padding = unit(0.12, "lines"), label.r = unit(0.1, "lines"),
+             fontface="bold")+
+  ggtitle("Fungal Sub-Assemblages") +
+  theme_bw(base_family = "Arial") +
+  theme(legend.position="none",
+        aspect.ratio = 0.7488341,
+        plot.title = element_text(color="#E58908", size=28, face="bold"),
+        axis.text = element_text(color="black", size=18),
+        axis.title = element_text(color="black", size=20),
+        plot.background = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, linewidth=1.5), #fill="#E5A60C1a"
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank()) 
+
+# aspect.ratio = (ggplot_build(Fun_ordiplot_spiders2)$layout$panel_scales_y[[1]]$range$range[1]-ggplot_build(Fun_ordiplot_spiders2)$layout$panel_scales_y[[1]]$range$range[2])/(ggplot_build(Fun_ordiplot_spiders2)$layout$panel_scales_x[[1]]$range$range[1]-ggplot_build(Fun_ordiplot_spiders2)$layout$panel_scales_x[[1]]$range$range[2]), # 0.7488341
+
+Fun_ordiplot_spiders2
+# 6x8"
+# 4.5x6"
+ggsave(filename="../figures/sfaf/sfaf2025/nmds_Fun_all.png", plot = Fun_ordiplot_spiders2,height = 6, width=8,units = "in", dpi = 300, device = "png")
+```
+
+
+```{r, echo=FALSE,eval=F, out.height="90%",fig.cap='(ref:combined-NMDSspider-Sor-PAM-all-fig-caption)', fig.show='hold', dpi=300}
+# Bacterial ----
+Bac_ordiplot_spiders1<-gg_ordiplot(Bac_wc_sor_k5.ord, groups = sd$Bac_sor_clusters, 
+            pt.size = 1,kind = "se",conf = 0.90,ellipse = TRUE,
+            label = T, spiders = T, hull = F, plot = F)
+Bac_ordiplot_spiders <- Bac_ordiplot_spiders1$plot
+
+Bac_ordiplot_spiders2<-Bac_ordiplot_spiders+
+  scale_color_manual(values = col_n14, name = "Sørensen clusters",guide = guide_legend(ncol = 2))+
+  scale_fill_manual(values = col_n14, name = "Sørensen clusters",guide = guide_legend(ncol = 2))+
+  geom_label(data = Bac_ordiplot_spiders1$df_mean.ord, aes(x = x, y = y, label = Group, color = Group), show.legend = FALSE, size=5, label.size = 2, fontface="bold")+
+  # geom_point(size = 0.8, alpha = 0.2) +
+  ggtitle("Bacterial Sub-Assemblages") +
+          # , subtitle = "ellipses showing 90% CI for the standard errors about each cluster centroid") +
+  theme_bw() +
+  theme(legend.position="none",
+        aspect.ratio = 0.8382428,
+        plot.title = element_text(color="#006e90", size=28, face="bold"),
+        plot.subtitle = element_text(color="black", size=16),
+        axis.text = element_text(color="black", size=20),
+        axis.title = element_text(color="black", size=24),
+        legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
+        plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=1.5), #fill="#006e901a"
+        panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
+
+ggplot_build(Fun_ordiplot_spiders2)$layout$panel_scales_x[[1]]$range$range
+
+
+#  
+ggsave(filename="../figures/sfaf/nmds_Bac_all.png", plot = last_plot(),height = 8, width=9.543774, units = "in", dpi = 300, device = "png")
+```
+
+
+```{r}
+
+Fun_ordiplot_spidersF1a<-gg_ordiplot(Fun_wc_sor_k4.ord, groups = sd$Fun_sor_clus2, 
+            pt.size = 1,kind = "se",conf = 0.90,ellipse = TRUE,show.groups = "all",
+            label = T, spiders = T, hull = T, plot = F)
+Fun_ordiplot_spidersF1 <- Fun_ordiplot_spidersF1a$plot 
+
+Fun_ordiplot_spidersF1+
+  scale_color_manual(values = c("#C51B7D","#7FBC41e6"), name = "Sørensen clusters",guide = guide_legend(ncol = 2))+
+  scale_fill_manual(values = c("#C51B7D","#7FBC41e6"), name = "Sørensen clusters",guide = guide_legend(ncol = 2))+
+  geom_label(data = Fun_ordiplot_spidersF1a$df_mean.ord, aes(x = x, y = y, label = Group, color = Group), show.legend = FALSE, size=3.5, label.size = 1.25, fontface="bold",
+             label.padding = unit(0.2, "lines"), label.r = unit(0.3, "lines"))+
+  # geom_point(size = 0.8, alpha = 0.2) +
+  ggtitle("Fungal Sub-Assemblages") +
+  theme_bw(base_family = "Arial") +
+  theme(legend.position="none",
+        aspect.ratio = 0.7488341,
+        plot.title = element_text(color="#E58908", size=14, face="bold"),
+        axis.text = element_text(color="black", size=9),
+        axis.title = element_text(color="black", size=10),
+        plot.background = element_blank(),
+        panel.border = element_rect(colour = "black", fill=NA, linewidth=1.5), #fill="#E5A60C1a"
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank()) 
+
+ggsave(filename="../figures/sfaf/sfaf2025/nmds_Fun_F1vnonF1.png", plot = last_plot(),height = 3, width=4,units = "in", dpi = 300, device = "png")
+
+```
+
+# alpha div
+
+```{r calc-alpha, include=FALSE,eval=TRUE}
+fwc_alpha <- data.frame(sample_data(Fun_wholecommunity),
+                        estimate_richness(Fun_wholecommunity))
+
+
+# renaming for consistency
+  # simpson_inv 
+  # fwc_alpha <- subset(fwc_alpha, select = -c(InvSimpson))
+  # names(fwc_alpha)[names(fwc_alpha) == "Simpson"] <- "simpson_inv"
+  
+  # inv_simpson
+  names(fwc_alpha)[names(fwc_alpha) == "InvSimpson"] <- "simpson_inv"
+  
+  # simpson
+  names(fwc_alpha)[names(fwc_alpha) == "Simpson"] <- "simpson"
+  
+  # shannon
+  names(fwc_alpha)[names(fwc_alpha) == "Shannon"] <- "shannonH"
+
+
+# calculations needed
+  # simpsonD
+  fwc_alpha$simpsonD <- 1-fwc_alpha$simpson
+  
+  # simpsoneven
+  fwc_alpha$simpsoneven <- 1/(fwc_alpha$simpsonD*fwc_alpha$Observed)
+  
+  # shannoneven
+  fwc_alpha$shannoneven <- fwc_alpha$shannonH/log(fwc_alpha$Observed)
+
+  # fwc_alpha$simpson<- 1-(fwc_alpha$simpsonD)
+
+  
+  bwc_alpha <- data.frame(sample_data(Bac_wholecommunity),
+                        estimate_richness(Bac_wholecommunity))
+  # inv_simpson
+  names(bwc_alpha)[names(bwc_alpha) == "InvSimpson"] <- "simpson_inv"
+  # simpson
+  names(bwc_alpha)[names(bwc_alpha) == "Simpson"] <- "simpson"
+  # shannon
+  names(bwc_alpha)[names(bwc_alpha) == "Shannon"] <- "shannonH"
+  # simpsonD
+  bwc_alpha$simpsonD <- 1-bwc_alpha$simpson
+  # simpsoneven
+  bwc_alpha$simpsoneven <- 1/(bwc_alpha$simpsonD*bwc_alpha$Observed)
+  # shannoneven
+  bwc_alpha$shannoneven <- bwc_alpha$shannonH/log(bwc_alpha$Observed)
+
+```
+
+```{r}
+# test ----
+f <- data.frame(
+  category = factor(rep(c("A", "B", "C"), each = 5)),
+  value = runif(15)
+)
+
+# Create a dummy variable to expand category "A"
+df$expand_width <- ifelse(df$category == "A", 2, 1) # Expand "A" by a factor of 2
+
+# Create the plot
+ggplot(df, aes(x = category, y = value, fill = category)) +
+  geom_bar(stat = "identity", position = "dodge", width = df$expand_width) +
+  scale_fill_manual(values = c("A" = "red", "B" = "blue", "C" = "green")) +
+  labs(title = "Expanded Bar for Category A") +
+  theme_minimal()
+# ENDtest ----
+
+```
+
+
+```{r plot-Fun-alpha, echo=FALSE, fig.height=3.5, fig.width=5, dpi=300, out.height="70%",out.width="70%", eval=FALSE}
+fwc_alpha2 <- fwc_alpha
+levels(fwc_alpha2$Fun_sor_clusters) <- c('',levels(fwc_alpha2$Fun_sor_clusters),'')
+
+
+ggviolin(fwc_alpha, x = "Fun_sor_clusters", y = "Observed",
+          fill = "Fun_sor_clusters", palette = col_n10,
+         alpha = 0.85, trim = FALSE, add = c("dotplot",
+                                             "boxplot"
+                                           ,"mean_sd","mean"
+                                           ),#size=1,
+         add.params = list(alpha = 0.6, binwidth = 9.25, size=0.8),
+         error.plot = "errorbar" ) +
+  # stat_compare_means(aes(label = after_stat(p.signif)),
+  #                    method = "wilcox.test", ref.group = "F1", # Add pairwise p-value
+  #                    label = "p.signif",hide.ns=T, paired = F, size=3
+  #                    ,label.y = 300)+ 
+  # stat_compare_means(label.y = 7,label.x = 1.15)+     # Add global p-value
+  geom_hline(yintercept = mean(fwc_alpha$Observed), linetype = 2)+ # add mean hline
+  scale_y_continuous(limits = c(0,350))+
+  theme(legend.position = "none",
+        axis.text.y = element_text(size=18, color = "black"),
+        axis.text.x = element_text(size=20, color = col_n10, face = "bold"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size=20, color = "black"),
+        plot.subtitle = element_text(size=22, color = "black"),
+        plot.title = element_text(color="#E58908", size=28, face="bold"))+
+  labs(x = "Fungal Sub-Assemblage",title = "Fungal Species Richness",
+       y = "Observed OTUs",
+       caption = "pairwise wilcox.test, ref.group = Sub-Assemblage F1",
+       subtitle = paste("F1 (mean = ",
+round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F1"]),0),
+                        ") vs. all (global mean = ", 
+                        round(mean(fwc_alpha$Observed),0),
+                        ")",sep = ""))
+  # scale_x_discrete(breaks = c(1:10))
+  # expand_limits(x= c(-1, 0))+
+  # scale_x_discrete(drop=FALSE)
+# scale_x_discrete(limits = "F1")
+# scale_x_discrete(limits = c("F2","F2","F3","F4","F5",
+#                             "F6","F7","F8","F9","F10"))
+
+# ggsave(filename="../figures/sfaf/sfaf2025/obs_Fun_clusters.png", plot = last_plot(),height = 4.8, width=7.5,units = "in", dpi = 400, device = "png")
+
+# ggsave(filename="../figures/sfaf/sfaf2025/obs_Fun_clustersF1.png", plot = last_plot(),height = 4.8, 
+#        width=7.95*(183/484)*1.05,
+#        units = "in", dpi = 400, device = "png")
+
+ggsave(filename="../figures/sfaf/sfaf2025/obs_Fun_clusters_binwidth925_all.png", plot = last_plot(),height = 4.8, 
+       width=((7.5*1.05)+3.156183),
+       units = "in", dpi = 400, device = "png")
+length((fwc_alpha$SampleID[fwc_alpha$Fun_sor_clusters=="F1"]))
+```
+
+
+```{r plot-Fun-alpha-F1, echo=FALSE, fig.height=3.5, fig.width=5, dpi=300, out.height="70%",out.width="70%", eval=FALSE}
+ggviolin(subset(fwc_alpha, fwc_alpha$Fun_sor_clus2=="F1"), x = "Fun_sor_clusters", y = "Observed",
+          fill = "Fun_sor_clusters", palette = col_n10[1],
+         alpha = 0.85, trim = FALSE, add = c("dotplot",
+                                             "boxplot"
+                                           ,"mean_sd","mean"
+                                           ),#size=1,
+         add.params = list(alpha = 0.6, binwidth = 9.25, size=0.8),
+         error.plot = "errorbar" ) +
+  geom_hline(yintercept = mean(fwc_alpha$Observed), linetype = 2)+ # add mean hline
+  scale_y_continuous(limits = c(0,350))+
+  theme(legend.position = "none",
+        axis.text.y = element_text(size=18, color = "black"),
+        axis.text.x = element_text(size=20, color = col_n10[1], face = "bold"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size=20, color = "black"),
+        plot.subtitle = element_text(size=22, color = "black"),
+        plot.title = element_text(color="#E58908", size=28, face="bold"))+
+  labs(x = "Fungal Sub-Assemblage",title = "Fungal Species Richness",
+       y = "Observed OTUs",
+       caption = "pairwise wilcox.test, ref.group = Sub-Assemblage F1",
+       subtitle = paste("F1 (mean = ",
+round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F1"]),0),
+                        ") vs. all (global mean = ", 
+                        round(mean(fwc_alpha$Observed),0),
+                        ")",sep = ""))
+  # scale_x_discrete(breaks = c(1:10))
+  # expand_limits(x= c(-1, 0))+
+  # scale_x_discrete(drop=FALSE)
+# scale_x_discrete(limits = "F1")
+# scale_x_discrete(limits = c("F2","F2","F3","F4","F5",
+#                             "F6","F7","F8","F9","F10"))
+
+# ggsave(filename="../figures/sfaf/sfaf2025/obs_Fun_clusters.png", plot = last_plot(),height = 4.8, width=7.5,units = "in", dpi = 400, device = "png")
+
+# ggsave(filename="../figures/sfaf/sfaf2025/obs_Fun_clustersF1.png", plot = last_plot(),height = 4.8, 
+#        width=7.95*(183/484)*1.05,
+#        units = "in", dpi = 400, device = "png")
+
+ggsave(filename="../figures/sfaf/sfaf2025/obs_Fun_clusters_binwidth925_F1.png", plot = last_plot(),height = 4.8, 
+       width=7.95*(183/484)*1.05, # 3.156183
+       units = "in", dpi = 400, device = "png")
+```
+
+
+
+
+```{r plot-Fun-alpha-nonF1, echo=FALSE, fig.height=3.5, fig.width=5, dpi=300, out.height="70%",out.width="70%", eval=FALSE}
+ggviolin(subset(fwc_alpha, fwc_alpha$Fun_sor_clus2=="non-F1"), x = "Fun_sor_clusters", y = "Observed",
+          fill = "Fun_sor_clusters", palette = col_n10[2:10],
+         alpha = 0.85, trim = FALSE, add = c("dotplot",
+                                             "boxplot"
+                                           ,"mean_sd","mean"
+                                           ),#size=1,
+         add.params = list(alpha = 0.6, binwidth = 9.25, size=0.8),
+         error.plot = "errorbar" ) +
+  geom_hline(yintercept = mean(fwc_alpha$Observed), linetype = 2)+ # add mean hline
+  scale_y_continuous(limits = c(0,350))+
+  theme(legend.position = "none",
+        axis.text.y = element_text(size=18, color = "black"),
+        axis.text.x = element_text(size=20, color = col_n10[2:10], face = "bold"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size=20, color = "black"),
+        plot.subtitle = element_text(size=22, color = "black"),
+        plot.title = element_text(color="#E58908", size=28, face="bold"))+
+  labs(x = "Fungal Sub-Assemblage",title = "Fungal Species Richness",
+       y = "Observed OTUs",
+       caption = "pairwise wilcox.test, ref.group = Sub-Assemblage F1",
+       subtitle = paste("F1 (mean = ",
+round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F1"]),0),
+                        ") vs. all (global mean = ", 
+                        round(mean(fwc_alpha$Observed),0),
+                        ")",sep = ""))
+  # scale_x_discrete(breaks = c(1:10))
+  # expand_limits(x= c(-1, 0))+
+  # scale_x_discrete(drop=FALSE)
+# scale_x_discrete(limits = "F1")
+# scale_x_discrete(limits = c("F2","F2","F3","F4","F5",
+#                             "F6","F7","F8","F9","F10"))
+
+# ggsave(filename="../figures/sfaf/sfaf2025/obs_Fun_clusters.png", plot = last_plot(),height = 4.8, width=7.5,units = "in", dpi = 400, device = "png")
+
+# ggsave(filename="../figures/sfaf/sfaf2025/obs_Fun_clustersF1.png", plot = last_plot(),height = 4.8, 
+#        width=7.95*(183/484)*1.05,
+#        units = "in", dpi = 400, device = "png")
+
+ggsave(filename="../figures/sfaf/sfaf2025/obs_Fun_clusters_binwidth925_nonF1.png", plot = last_plot(),height = 4.8, 
+       width=7.5*1.05,
+       units = "in", dpi = 400, device = "png")
+```
+
+
+# beta disp
+
+```{r beta-disp}
+# Fun_wc_sorensen_dist<-as.dist(as.matrix(beta.pair(decostand(phylo2vegan_OTU(Fun_wholecommunity), method = "pa"), index.family = "sorensen")$beta.sor))
+
+betadisp_clus_Fun_addC <- betadisper(Fun_wc_sorensen_dist,
+                            group = phylo2vegan_sd(Fun_wholecommunity)$Fun_sor_clusters,
+                            type = "median", # type = "median" (distance from each sample unit to the spatial median of its group)
+                            bias.adjust = T, # adjust for small sample bias in beta div estimates?
+                            sqrt.dist = FALSE,
+                            add = "lingoes")
+
+betadisp_clus_Fun_addC$distances
+
+```
+
+
+
+```{r plot-Fun-betadisp-all, echo=FALSE, eval=FALSE}
+betadisp_clus_Fun_addC$distances
+betadisp_clus_Fun_addC$group
+
+betadisp_clus_Fun_df <- data.frame("group"=betadisp_clus_Fun_addC$group,
+                                   "distances"=betadisp_clus_Fun_addC$distances)
+
+
+ggviolin(betadisp_clus_Fun_df, x = "group", y = "distances",
+          fill = "group", palette = col_n10,
+         alpha = 0.85, trim = FALSE, add = c("dotplot",
+                                             "boxplot"
+                                           ,"mean_sd","mean"
+                                           ),#size=1,
+         add.params = list(alpha = 0.6, binwidth = .01, size=0.8),
+         error.plot = "errorbar" ) +
+  # stat_compare_means(aes(label = after_stat(p.signif)),
+  #                    method = "wilcox.test", ref.group = "F1", # Add pairwise p-value
+  #                    label = "p.signif",hide.ns=T, 
+  #                    paired = F, size=3,label.y = 0.9)+
+  stat_compare_means(label.y = 0.95,label.x = 1.15)+     # Add global p-value
+  geom_hline(yintercept = mean(betadisp_clus_Fun_df$distances), linetype = 2)+ # add mean hline
+  scale_y_continuous(limits = c(0.5,0.9))+
+  theme(legend.position = "none",
+        axis.text.y = element_text(size=18, color = "black"),
+        axis.text.x = element_text(size=20, color = col_n10, face = "bold"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size=20, color = "black"),
+        plot.caption = element_text(size=18, color = "black"),
+        plot.subtitle = element_text(size=22, color = "black"),
+        plot.title = element_text(color="#E58908", size=28, face="bold"))+
+  labs(x = "Fungal Sub-Assemblage",title = "Fungal \u03b2-dispersion (within-group variability)",
+       y = "\u03b2-dispersion (within-group\ndistance to spatial median)",
+       caption = "pairwise wilcox.test, ref.group = Sub-Assemblage F1",
+       subtitle = paste("F1 (mean = ",
+round(mean(betadisp_clus_Fun_df$distances[betadisp_clus_Fun_df$group=="F1"]),3),
+                        ") vs. all (global mean = ", 
+                        round(mean(betadisp_clus_Fun_df$distances),3),
+                        ")",sep = ""))
+
+ggsave(filename="../figures/sfaf/sfaf2025/betadisp_Fun_clusters_all.png", plot = last_plot(),height = 4.85, 
+       width=((7.5*1.05)+3.156183)+0.1,
+       units = "in", dpi = 400, device = "png")
+```
+
+```{r plot-Fun-betadisp-F1, echo=FALSE, eval=FALSE}
+betadisp_clus_Fun_addC$distances
+betadisp_clus_Fun_addC$group
+
+betadisp_clus_Fun_df <- data.frame("group"=betadisp_clus_Fun_addC$group,
+                                   "distances"=betadisp_clus_Fun_addC$distances)
+
+
+ggviolin(subset(betadisp_clus_Fun_df, betadisp_clus_Fun_df$group=="F1"), x = "group", y = "distances",
+          fill = "group", palette = col_n10,
+         alpha = 0.85, trim = FALSE, add = c("dotplot",
+                                             "boxplot"
+                                           ,"mean_sd","mean"
+                                           ),#size=1,
+         add.params = list(alpha = 0.6, binwidth = .01, size=0.8),
+         error.plot = "errorbar" ) +
+  # stat_compare_means(aes(label = after_stat(p.signif)),
+  #                    method = "wilcox.test", ref.group = "F1", # Add pairwise p-value
+  #                    label = "p.signif",hide.ns=T, 
+  #                    paired = F, size=3,label.y = 0.9)+
+  # stat_compare_means(label.y = 0.95,label.x = 1.15)+     # Add global p-value
+  geom_hline(yintercept = mean(betadisp_clus_Fun_df$distances), linetype = 2)+ # add mean hline
+  scale_y_continuous(limits = c(0.5,0.9))+
+  theme(legend.position = "none",
+        axis.text.y = element_text(size=18, color = "black"),
+        axis.text.x = element_text(size=20, color = col_n10, face = "bold"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size=20, color = "black"),
+        # plot.caption = element_text(size=18, color = "black"),
+        plot.subtitle = element_text(size=22, color = "black"),
+        plot.title = element_text(color="#E58908", size=28, face="bold"))+
+  labs(x = "Fungal Sub-Assemblage",title = "Fungal \u03b2-dispersion (within-group variability)",
+       y = "\u03b2-dispersion (within-group\ndistance to spatial median)",
+       caption = "pairwise wilcox.test, ref.group = Sub-Assemblage F1",
+       subtitle = paste("F1 (mean = ",
+round(mean(betadisp_clus_Fun_df$distances[betadisp_clus_Fun_df$group=="F1"]),3),
+                        ") vs. all (global mean = ", 
+                        round(mean(betadisp_clus_Fun_df$distances),3),
+                        ")",sep = ""))
+
+ggsave(filename="../figures/sfaf/sfaf2025/betadisp_Fun_clusters_F1.png", plot = last_plot(),height = 4.8, 
+       width=(3.156183)+0.4,
+       units = "in", dpi = 400, device = "png")
+```
+
+```{r plot-Fun-betadisp-nonF1, echo=FALSE, eval=FALSE}
+betadisp_clus_Fun_addC$distances
+betadisp_clus_Fun_addC$group
+
+betadisp_clus_Fun_df <- data.frame("group"=betadisp_clus_Fun_addC$group,
+                                   "distances"=betadisp_clus_Fun_addC$distances)
+
+
+ggviolin(subset(betadisp_clus_Fun_df, betadisp_clus_Fun_df$group!="F1"), x = "group", y = "distances",
+          fill = "group", palette = col_n10[2:10],
+         alpha = 0.85, trim = FALSE, add = c("dotplot",
+                                             "boxplot"
+                                           ,"mean_sd","mean"
+                                           ),#size=1,
+         add.params = list(alpha = 0.6, binwidth = .01, size=0.8),
+         error.plot = "errorbar" ) +
+  # stat_compare_means(aes(label = after_stat(p.signif)),
+  #                    method = "wilcox.test", ref.group = "F1", # Add pairwise p-value
+  #                    label = "p.signif",hide.ns=T, 
+  #                    paired = F, size=3,label.y = 0.9)+
+  # stat_compare_means(label.y = 0.95,label.x = 1.15)+     # Add global p-value
+  geom_hline(yintercept = mean(betadisp_clus_Fun_df$distances), linetype = 2)+ # add mean hline
+  scale_y_continuous(limits = c(0.5,0.9))+
+  theme(legend.position = "none",
+        axis.text.y = element_text(size=18, color = "black"),
+        axis.text.x = element_text(size=20, color = col_n10[2:10], face = "bold"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size=20, color = "black"),
+        # plot.caption = element_text(size=18, color = "black"),
+        plot.subtitle = element_text(size=22, color = "black"),
+        plot.title = element_text(color="#E58908", size=28, face="bold"))+
+  labs(x = "Fungal Sub-Assemblage",title = "Fungal \u03b2-dispersion (within-group variability)",
+       y = "\u03b2-dispersion (within-group\ndistance to spatial median)",
+       caption = "pairwise wilcox.test, ref.group = Sub-Assemblage F1",
+       subtitle = paste("F1 (mean = ",
+round(mean(betadisp_clus_Fun_df$distances[betadisp_clus_Fun_df$group=="F1"]),3),
+                        ") vs. all (global mean = ", 
+                        round(mean(betadisp_clus_Fun_df$distances),3),
+                        ")",sep = ""))
+
+ggsave(filename="../figures/sfaf/sfaf2025/betadisp_Fun_clusters_nonF1.png", plot = last_plot(),height = 4.8, 
+       width=(7.5*1.1),
+       units = "in", dpi = 400, device = "png")
+```
+
+
+
+```{r beta-disp-anova}
+perform_anova_betadisper <- function(betadisper_object, grouping) {
+
+  # Perform ANOVA 
+  anova_result <- anova(betadisper_object)
+  
+  tidy_aov <- tidy(anova_result)
+  tidy_df <- as.data.frame(tidy_aov)
+  
+  tidy_df$term[1] <- paste0(grouping)
+
+  sum_squares_regression <- tidy_df$sumsq[1]
+  sum_squares_residuals <- tidy_df$sumsq[2]
+
+  R_squared <- sum_squares_regression /
+            (sum_squares_regression + sum_squares_residuals)*100
+
+  tidier_df <- data.frame(Term = character(),df = numeric(),
+                          SumSq = numeric(),MeanSq = numeric(),
+                          F.statistic = numeric(),
+                          R_squared = numeric(),p.value = character(),
+                          stringsAsFactors = FALSE)
+  
+  tidier_df[1,"Term"] <- tidy_df$term[1]
+  tidier_df[2,"Term"] <- tidy_df$term[2]
+  tidier_df[1:2,2] <- (tidy_df$df)[1:2]
+  tidier_df$SumSq <- round(tidy_df$sumsq[1:2],2)
+  tidier_df$MeanSq <- round(tidy_df$meansq[1:2],3)
+  tidier_df$F.statistic <- round(tidy_df$statistic,2)
+  tidier_df[1,"R_squared"] <- round(R_squared,2)
+  tidier_df[2,"R_squared"] <- 100-(round(R_squared,2))
+  tidier_df[1,"P.value"] <- prettyNum(tidy_df$p.value[1],digits=2)
+
+  # Return ANOVA results for the specified taxa_of_interest
+  return(tidier_df)
+}
+library("broom"); packageVersion("broom") #‘1.0.5’
+betadisp_clus_Fun.aov<-perform_anova_betadisper(betadisp_clus_Fun_addC, "Fun_sor_clusters")
+```
+
+
+```{r beta-disp}
+```
+
+
+
+
+
+
+
+
+# Sample Map + Convex Hulls
+
+```{r fig-map-hulls, echo=F,fig.width=7, fig.height=5}
+
+# Convex hulls by group
+hull_df <- sd %>%
+  group_by(Fun_sor_clus2) %>%
+  dplyr::slice(chull(Longitude, Latitude))
+
+# Ensure Site is a factor
+sd$Site <- as.factor(sd$Site)
+
+# Get centroid positions for labeling
+centroids <- sd %>%
+  group_by(Site) %>%
+  dplyr::summarise(
+    Longitude = mean(Longitude),
+    Latitude = mean(Latitude)
+  )
+
+centroids$Site <- as.factor(centroids$Site)
+centroids_HPGCPR <- subset(centroids, Site %in% c("HPG", "CPR"))
+centroids_BLMHPGCPR <- subset(centroids, Site %in% c("BLM","HPG", "CPR"))
+
+# centroids[5,] #CPR
+# centroids[12,] #HPG
+centroids_not_BLMHPGCPR <- as.data.frame(rbind(centroids[2:4,],centroids[6:11,]
+                                            ,centroids[13:22,]))
+
+spatial_extent_plot <- ggplot(sd, aes(x = Longitude, y = Latitude, 
+                                      color = Fun_sor_clus2, fill = Fun_sor_clus2)) +
+  geom_polygon(data = hull_df, aes(group = Fun_sor_clus2), alpha = 0.4, color = NA) +
+  geom_point(size = 5, alpha = 0.95) +
+  geom_point(data = centroids, aes(x = Longitude, y = Latitude,group = Site), 
+             alpha = 0.8, color = "black", size = 7.5, shape = 1,
+             show.legend = F, stroke = 1.25, inherit.aes = F) +
+
+  geom_text(data = centroids_not_BLMHPGCPR, aes(x = Longitude, y = Latitude, label = Site), 
+            alpha = 1, color = "black", size = 4.5, 
+             show.legend = F, nudge_y = 0.6, #nudge_x = 0.15, 
+            check_overlap = F, inherit.aes = F) +
+
+  geom_text(data = centroids_BLMHPGCPR, aes(x = Longitude, y = Latitude, label = Site), 
+            alpha = 1, color = "black", size = 4.5, 
+             show.legend = F, nudge_y = c(0.1,0.5,0.6), nudge_x = c(0.88,-0.6, 0.4), 
+            check_overlap = F, inherit.aes = F) +
+  
+  scale_color_manual(values = c("F1" = "#8E0152", "non-F1" = "#7FBC41")) +
+  scale_fill_manual(values = c("F1" = "#8E0152", "non-F1" = "#7FBC41")) +
+  theme_minimal(base_size = 15, base_family = "Arial") +
+  coord_fixed() +
+  labs(
+    title = "Site Locations with Convex Hulls",
+    subtitle = "Group-specific spatial extent",
+    x = "Longitude", y = "Latitude",
+     color = "Fungal Subassemblage", fill = "Fungal Subassemblage"
+  ) +
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 17),
+        plot.title = element_blank(),
+        plot.subtitle = element_blank(),
+        axis.title = element_blank(),
+        plot.background = element_rect(fill = NA, colour = NA))
+spatial_extent_plot
+
+# saveRDS(spatial_extent_plot,file = "../figures/sfaf/sfaf2025/spatial_extent_plot_OG.rds")
+
+spatial_extent_plot <- spatial_extent_plot_OG +
+  theme(legend.position = "inside",
+    legend.position.inside = c(0.9,0.95),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 17),
+        plot.title = element_blank(),
+        plot.subtitle = element_blank(),
+        axis.title = element_blank(),
+        plot.background = element_rect(fill = NA, colour = NA))
+spatial_extent_plot
+
+ggsave("../figures/sfaf/sfaf2025/spatial_extent_plot_F1nonF1.png", 
+       plot = last_plot(),
+       # width = 5, 
+       height = 6, units = "in", device = "png", dpi = 400)
+```
+
+\
+\
+\
+
+
+
+
+
+# explan var
+
+```{r, include=FALSE, eval=FALSE}
+
+# Fun ----
+Fun_ev_tab1<-data.frame("Explanatory Variable"=adonis.out.array_Fun_wc.r2$expl_var,
+"Sub-assemblage"=adonis.out.array_Fun_wc.r2$comm,"R^2"=adonis.out.array_Fun_wc.r2$R2,"P-value"=adonis.out.array_Fun_wc.r2$`Pr(>F)`, check.names = F)
+
+Fun_ev_tab1$`R^2`[Fun_ev_tab1$`P-value` > 0.05] <- 0
+  
+Fun_ev_tab2<-subset(Fun_ev_tab1,select = -c(4))
+Fun_ev_tab3<-reshape(Fun_ev_tab2, idvar = "Explanatory Variable", timevar = "Sub-assemblage", direction = "wide")
+
+colnames(Fun_ev_tab3) <-c("Explanatory Variable","Whole Community","F1","F3","F4","F5","F6","F7","F8","F9","F10")
+rownames(Fun_ev_tab3) <- NULL
+max(Fun_ev_tab3[,2:11])
+Fun.xc <- seq(min(Fun_ev_tab3[,2:11]), max(Fun_ev_tab3[,2:11]), length.out = 10)
+Fun.pal <- seq_gradient_pal("#E5A60C1a", "#E5A60C")(Fun.xc)
+
+# setSpecFun <- function(y){
+#   kableExtra::cell_spec(y, "html", background = Fun.pal[cut(y, breaks=Fun.pal, include.lowest = TRUE)])
+# }
+# apply(Fun_ev_tab3[,2:11], 2, setSpecFun) %>% knitr::kable("html", escape = FALSE,caption = "adonis2 outputs for single-term models",align='rcccccccccc') %>%
+
+Fun_ev_tab3 %>%
+  # mutate_if(is.numeric, ~ +(setSpecFun(.))) %>%
+  kbl("html", escape = F,caption = "adonis2 outputs for single-term models",align='rcccccccccc') %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
+  kable_styling() %>%
+  scroll_box(width = "90%", height = "600px")
+# Fun ----
+
+
+# Bac ----
+Bac_ev_tab1a<-data.frame("Explanatory Variable"=adonis.out.array_Bac_wc.r2$expl_var,
+"Sub-assemblage"=adonis.out.array_Bac_wc.r2$comm,"R^2"=adonis.out.array_Bac_wc.r2$R2,"P-value"=adonis.out.array_Bac_wc.r2$`Pr(>F)`, check.names = F)
+
+Bac_ev_tab1<-subset(Bac_ev_tab1a,`Sub-assemblage` != "Bac_wc_B6")
+Bac_ev_tab1$`Sub-assemblage`<-factor(Bac_ev_tab1$`Sub-assemblage`)
+Bac_ev_tab1$`R^2`[Bac_ev_tab1$`P-value` > 0.05] <- 0
+  
+Bac_ev_tab2<-subset(Bac_ev_tab1,select = -c(4))
+Bac_ev_tab3<-reshape(Bac_ev_tab2, idvar = "Explanatory Variable", timevar = "Sub-assemblage", direction = "wide")
+
+colnames(Bac_ev_tab3) <-c("Explanatory Variable","Whole Community","B1","B2","B3","B4","B5","B7",
+                          "B8","B9","B10","B11","B12","B13","B14")
+rownames(Bac_ev_tab3) <- NULL
+max(Bac_ev_tab3[,2:15])
+Bac.xc <- seq(min(Bac_ev_tab3[,2:11]), max(Bac_ev_tab3[,2:11]), length.out = 10)
+Bac.pal <- seq_gradient_pal("#006e901a", "#006e90")(Bac.xc)
+
+# setSpecBac <- function(y){
+#   kableExtra::cell_spec(y, "html", background = Bac.pal[cut(y, breaks=Bac.pal, include.lowest = TRUE)])
+# }
+# apply(Bac_ev_tab3[,2:11], 2, setSpecBac) %>% knitr::kable("html", escape = FALSE,caption = "adonis2 outputs for single-term models",align='rcccccccccc') %>%
+
+Bac_ev_tab1 %>%
+  kbl("html", escape = F,caption = "adonis2 outputs for single-term models",align='rcccccccccc') %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
+  kable_styling() %>%
+  scroll_box(width = "90%", height = "600px")
+
+Bac_ev_tab3 %>%
+  # mutate_if(is.numeric, ~ +(setSpecBac(.))) %>%
+  kbl("html", escape = F,caption = "adonis2 outputs for single-term models",align='rcccccccccc') %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
+  kable_styling() %>%
+  scroll_box(width = "90%", height = "600px")
+# Bac ----
+```

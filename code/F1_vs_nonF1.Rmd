@@ -1,0 +1,173 @@
+---
+title: "Fungal F1 vs. non-F1"
+author: "Kelli Feeser"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+    keep_md: yes
+  html_notebook:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+\
+
+# Set-up {.unlisted .unnumbered .hidden}
+
+```{r global-options, include=FALSE,eval=T}
+
+FIG_PATH = "../docs/github_F1vnonF1/"
+CACHE_PATH = "../docs/github_F1vnonF1_cache/"
+
+## ~~create directories~~ ##
+###########################################
+dir.create(FIG_PATH, showWarnings = T,recursive=T)
+dir.create(CACHE_PATH, showWarnings = T,recursive=T)
+###########################################
+
+knitr::opts_chunk$set(fig.path=FIG_PATH,
+                      cache.path = CACHE_PATH)
+opts_knit$set(eval.after = "fig.cap")
+knitr::opts_chunk$set(fig.pos = '!h')
+options(knitr.kable.NA = '')
+```
+
+## load packages
+
+```{r load-packages, eval=T, message=F,results='hide',warning=F}
+library("vegan"); packageVersion("vegan") # ‘2.6.10’
+library("phyloseq"); packageVersion("phyloseq") # ‘1.50.0’
+library("betapart"); packageVersion("betapart") # ‘1.6’
+library("ecodist"); packageVersion("ecodist") # ‘2.1.3’
+library("measurements"); packageVersion("measurements") # ‘1.5.1’
+library("geosphere"); packageVersion("geosphere") # ‘1.5.20’
+  # The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,
+  # which was just loaded, were retired in October 2023.
+  # Please refer to R-spatial evolution reports for details, especially
+  # https://r-spatial.org/r/2023/05/15/evolution4.html.
+  # It may be desirable to make the sf package available;
+  # package maintainers should consider adding sf to Suggests:.
+library("gdata"); packageVersion("gdata") # ‘3.0.1’
+# library("spam"); packageVersion("spam") # ‘2.9.1’
+library("ggplot2"); packageVersion("ggplot2") # ‘3.5.1’
+library("ggpubr"); packageVersion("ggpubr") # ‘0.6.0’
+library("cowplot"); packageVersion("cowplot") # ‘1.1.3’
+library("geodist"); packageVersion("geodist") # ‘0.1.0’
+library("knitr"); packageVersion("knitr") # ‘1.49’
+library("kableExtra"); packageVersion("kableExtra") # ‘1.4.0’
+
+source("RAM_bulk_harvester.R")
+```
+
+## load cache & rds
+
+```{r load-cache, include=FALSE, eval=T}
+# OBJECT <- if (file.exists('OBJECT.rds')) {
+#   readRDS('OBJECT.rds')
+# } else {
+#   "The value of `OBJECT` is not available yet"
+# }
+
+env_dist_matrices <- readRDS(file = "../processed_data/clean_rds_saves/env_dist_matrices.rds")
+betapart_results <- readRDS(file = "../processed_data/clean_rds_saves/betapart_results.rds")
+
+
+# knitr::load_cache('CHUNK-NAME', 'OBJECT')
+# knitr::load_cache('calc-DD-BF-all')
+getwd()
+```
+
+#### Fungal F1 vs. non-F1
+
+```{r calc-Fun-clus2-sor-sim-sne-geo, warning=T,eval=TRUE,cache=T}
+#sor
+# F1
+decay.Fun_sor_clus2F1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]], y.type="dissim", model.type="exp")
+
+# non-F1
+decay.Fun_sor_clus2nonF1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp")
+
+#sor
+# F1
+decay.Fun_sor_clus2F1.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["F1_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]], y.type="dissim", model.type="exp")
+
+# non-F1
+decay.Fun_sor_clus2nonF1.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp")
+
+#sne
+# F1
+decay.Fun_sor_clus2F1.exp.sne<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["F1_Fun"]]$beta.sne, x=env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]], y.type="dissim", model.type="exp")
+
+# non-F1
+decay.Fun_sor_clus2nonF1.exp.sne<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1_Fun"]]$beta.sne, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp")
+
+```
+
+
+```{r plot-Fun-clus-sor-sim-geo, warning=T,eval=TRUE,cache=F, fig.dim=c(7,4),fig.dpi=250}
+par(mfrow = c(1, 2),#c(nr, nc) 
+    mar = c(2, 2, 2.5, 2),# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+    oma = (c(3, 0, 2, 0) + 0.1))
+
+plot.decay.pretty(decay.Fun_sor_clus2F1.exp.sor, col=paste(col_n10[1],"66",sep = ""), add=F, main="Total Dissimilarity (βsor)\nFungi",cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
+
+plot.decay.pretty(decay.Fun_sor_clus2nonF1.exp.sor, col="#7FBC41", add=T, main="Total Dissimilarity (βsor)\nFungi: non-F1", cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line="#276419",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext((paste("F1 - ",round(decay.Fun_sor_clus2F1.exp.sor$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2F1.exp.sor$p.value,3),")",sep = "")),side=1,line=-2,adj=0.05,outer = F,padj = 0,col=col_n10[1])
+mtext((paste("non-F1 - ",round(decay.Fun_sor_clus2nonF1.exp.sor$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2nonF1.exp.sor$p.value,3),")",sep = "")),side=1,line=-1,adj=0.05,outer = F,padj = 0, col="#7FBC41")
+mtext((paste("pseudo R2 (p-value)",sep = "")),side=1,line=-3,adj=0.05,outer = F,padj = 0, col="black")
+
+
+# sim
+plot.decay.pretty(decay.Fun_sor_clus2F1.exp.sim, col=paste(col_n10[1],"66",sep = ""), add=F, main="Total Dissimilarity (βsim)\nFungi",cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
+
+plot.decay.pretty(decay.Fun_sor_clus2nonF1.exp.sim, col="#7FBC41", add=T, main="Total Dissimilarity (βsim)\nFungi: non-F1", cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line="#276419",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext((paste("F1 - ",round(decay.Fun_sor_clus2F1.exp.sim$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2F1.exp.sim$p.value,3),")",sep = "")),side=1,line=-2,adj=0.05,outer = F,padj = 0,col=col_n10[1])
+mtext((paste("non-F1 - ",round(decay.Fun_sor_clus2nonF1.exp.sim$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2nonF1.exp.sim$p.value,3),")",sep = "")),side=1,line=-1,adj=0.05,outer = F,padj = 0, col="#7FBC41")
+mtext((paste("pseudo R2 (p-value)",sep = "")),side=1,line=-3,adj=0.05,outer = F,padj = 0, col="black")
+
+
+# plot.decay.pretty(decay.Fun_sor_clus2nonF1.exp.sor, col="#7FBC41", add=T, main="non-F1",
+#            xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+#            col.line="#276419",xaxp = c(0,1500,3),
+#            ylab="",xlab="")
+
+```
+
+
+

@@ -1,0 +1,75 @@
+
+CCTACGGGNGGCWGCAG
+GACTACHVGGGTATCTAATCC
+GATGAAGAACGYAGYRAA
+TCCTCCGCTTATTGATATGC
+### Predictor: Fungi - whole community, p/a of OTUs (Sørensen) {.tabset}
+
+\
+
+#### Response: Bacteria - abundance-weighted {.tabset .tabset-pills .unnumbered}
+
+##### Whole community (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_wholecommunity ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Generalists (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_generalists ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Whole community (Genus-level) {.unnumbered}
+
+OTU table agglomerated to genus-level\
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_wholecommunity_genus ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+#### Response: Bacteria - p/a (Sørensen) {.tabset .tabset-pills .unnumbered}
+
+##### Whole community (OTUs) {.unnumbered}
+
+-   A: Slightly more
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_sor_wholecommunity$beta.sor ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Generalists (OTUs) {.unnumbered}
+
+-   A: Slightly more
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_sor_generalists$beta.sor ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Whole community (Genus-level) {.unnumbered}
+
+OTU table agglomerated to genus-level\
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_sor_wholecommunity_genus$beta.sor ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+\

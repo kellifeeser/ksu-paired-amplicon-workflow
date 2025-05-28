@@ -1,0 +1,80 @@
+/* Set font family to sans-serif (adjust if needed) */
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #fff; /* White background */
+  color: #333; /* Default text color */
+}
+
+/* Gradient background for title area */
+header {
+  background-image: linear-gradient(to right, #0366d6, #34d058); /* Gradient from Cayman blue to green */
+  color: #fff; /* Text color in the title area */
+}
+
+/* Style headers in the main content */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
+  color: #228b22; /* Green color for headers in the main content */
+}
+
+/* Reset bold style for headers in the table of contents */
+#table-of-contents a {
+  font-weight: normal;
+  color: #0366d6; /* Blue color for headers in the table of contents */
+}
+
+/* Table of contents styles */
+#table-of-contents {
+  border: 1px solid #e1e4e8; /* TOC border color */
+  background-color: #fff; /* TOC background color */
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+/* TOC links and hover effect */
+#table-of-contents a {
+  text-decoration: none;
+}
+
+#table-of-contents a:hover {
+  text-decoration: underline;
+}
+
+/* Styles for code blocks */
+pre,
+code {
+  font-family: "Courier New", monospace; /* Adjust code font if needed */
+  background-color: #f6f8fa; /* Code block background color */
+  padding: 5px;
+  border-radius: 3px;
+}
+
+/* Styling for blockquotes */
+blockquote {
+  border-left: 4px solid #dfe2e5; /* Blockquote border color */
+  margin: 0;
+  padding-left: 15px;
+}
+
+/* Styling for lists */
+ul, ol {
+  margin-left: 20px; /* Adjust indentation */
+}
+
+/* Styling for links */
+.homelink, a:link[href*="index"] {
+  color: #0366d6;
+  font-size: 25px;
+  text-align: center;
+  background-color: #f6f8fa;
+  text-decoration: underline;
+}
+
+.homelink, a:visited {
+  color: #34d058;
+  font-size: 25px;
+  text-align: center;
+  background-color: underline;
+  background-color: #f6f8fa;
+  text-decoration: none;
+}

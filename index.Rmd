@@ -89,6 +89,9 @@ rmarkdown::render("code/F1_vs_nonF1_v2.Rmd", output_file="/Users/L347123/Desktop
 
 #render MRM_SEM_Landspace_Bacteria
 rmarkdown::render("code/MRM_SEM_Landspace_Bacteria.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_MRM_SEM_Landspace_Bacteria")
+
+#render MRM_SEM_Landspace_Fungi
+rmarkdown::render("code/MRM_SEM_Landspace_Fungi.Rmd", output_file="/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/github_MRM_SEM_Landspace_Fungi")
 ```
 
 On this GitHub Pages site, you can find:

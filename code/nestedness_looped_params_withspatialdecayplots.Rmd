@@ -1,0 +1,1348 @@
+---
+title: "nestedness_looped_params"
+author: "Kelli Feeser"
+date: "`r Sys.Date()`"
+output:
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+    keep_md: yes
+  html_document:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+  html_notebook:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+---
+
+\
+
+# Set-up {.unlisted .unnumbered .hidden}
+
+```{r global-options, include=FALSE,eval=T}
+library(knitr)
+
+FIG_PATH="../docs/github_looped-params_figures/"
+CACHE_PATH="../docs/github_nestedness_looped-params_cache/"
+
+## ~~create directories~~ ##
+###########################################
+dir.create(FIG_PATH, showWarnings = T,recursive=T)
+dir.create(CACHE_PATH, showWarnings = T,recursive=T)
+###########################################
+
+knitr::opts_chunk$set(fig.path=FIG_PATH,
+                      cache.path = CACHE_PATH)
+opts_knit$set(eval.after = "fig.cap")
+knitr::opts_chunk$set(fig.pos = '!h')
+options(knitr.kable.NA = '')
+```
+
+## load packages
+
+```{r load-packages, eval=T, message=F,results='hide',warning=F}
+library("vegan"); packageVersion("vegan") # ‘2.6.4’
+library("phyloseq"); packageVersion("phyloseq") # ‘1.41.1’
+library("betapart"); packageVersion("betapart") # ‘1.6’
+library("ecodist"); packageVersion("ecodist") # ‘2.0.9’
+library("measurements"); packageVersion("measurements") # ‘1.5.1’
+library("geosphere"); packageVersion("geosphere") # ‘1.5.18’
+  # The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,
+  # which was just loaded, were retired in October 2023.
+  # Please refer to R-spatial evolution reports for details, especially
+  # https://r-spatial.org/r/2023/05/15/evolution4.html.
+  # It may be desirable to make the sf package available;
+  # package maintainers should consider adding sf to Suggests:.
+library("gdata"); packageVersion("gdata") # ‘2.19.0’
+# library("spam"); packageVersion("spam") # ‘2.9.1’
+library("ggplot2"); packageVersion("ggplot2") # ‘3.4.4’
+library("ggpubr"); packageVersion("ggpubr") # ‘0.6.0’
+library("cowplot"); packageVersion("cowplot") # ‘1.1.1’
+library("geodist"); packageVersion("geodist") # ‘0.0.8’
+library(kableExtra)
+# detach("package:spam", unload = TRUE)
+source("RAM_bulk_harvester.R")
+```
+
+## load cache & rds
+
+```{r load-cache, include=FALSE, eval=T}
+# OBJECT <- if (file.exists('OBJECT.rds')) {
+#   readRDS('OBJECT.rds')
+# } else {
+#   "The value of `OBJECT` is not available yet"
+# }
+
+env_dist_matrices <- readRDS(file = "../processed_data/clean_rds_saves/env_dist_matrices.rds")
+betapart_results <- readRDS(file = "../processed_data/clean_rds_saves/betapart_results.rds")
+
+
+# knitr::load_cache('CHUNK-NAME', 'OBJECT')
+# knitr::load_cache('calc-DD-BF-all')
+```
+
+### Edaphic/environmental variables: generate distance matrices
+
+### list of env var
+
+```{r var-list, echo=T,eval=TRUE,cache=F}
+vard_sample <- c("Site","Grass","Site_Grass","Grassland","Latitude","Longitude","Elevation_m")
+
+vard_intpred <- c("Site","Grass","Site_Grass",
+                  "Bac_sor_clusters","Fun_sor_clusters",
+                  "nsamples_per_Site",
+                  "nsamples_perBac_sor_clusters","nsamples_perFun_sor_clusters",
+                  "ngrass_persite","ngrass_perBac_sor_clusters","ngrass_perFun_sor_clusters",
+                  "Bac_gamma_Site","Fun_gamma_Site")
+
+vard_climate <- c("GDD3yr_m.std","ppt3yr_m.std")
+
+vard_edaphic <- c("soil_water_content_m.std","pH_m.std","phos_m.std","ammonium_m.std","SOM_m.std")
+
+vard_plant <- c("avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std")
+
+vard_all <- c("Site","Grass","Site_Grass","Grassland","Latitude","Longitude","Elevation_m",
+              "GDD3yr_m.std","ppt3yr_m.std",
+              "soil_water_content_m.std","pH_m.std","phos_m.std","ammonium_m.std","SOM_m.std",
+              "avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std",
+              "Bac_sor_clusters","Fun_sor_clusters",
+              "nsamples_per_Site",
+              "nsamples_perBac_sor_clusters","nsamples_perFun_sor_clusters",
+              "ngrass_persite","ngrass_perBac_sor_clusters","ngrass_perFun_sor_clusters",
+              "Bac_gamma_Site","Fun_gamma_Site")
+
+vard_all_numeric <- c("Latitude","Longitude","Elevation_m",
+              "GDD3yr_m.std","ppt3yr_m.std",
+              "soil_water_content_m.std","pH_m.std","phos_m.std","ammonium_m.std","SOM_m.std",
+              "avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std",
+              "nsamples_per_Site",
+              "nsamples_perBac_sor_clusters","nsamples_perFun_sor_clusters",
+              "ngrass_persite","ngrass_perBac_sor_clusters","ngrass_perFun_sor_clusters",
+              "Bac_gamma_Site","Fun_gamma_Site")
+
+vard_all_numeric_env <- c("GDD3yr_m.std","ppt3yr_m.std","soil_water_content_m.std","pH_m.std","phos_m.std","ammonium_m.std","SOM_m.std","avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std",
+                          "nsamples_per_Site",
+              "nsamples_perBac_sor_clusters","nsamples_perFun_sor_clusters",
+              "ngrass_persite","ngrass_perBac_sor_clusters","ngrass_perFun_sor_clusters",
+              "Bac_gamma_Site","Fun_gamma_Site")
+
+vard_all_numeric_intpred <- c("nsamples_per_Site",
+                              "nsamples_perBac_sor_clusters","nsamples_perFun_sor_clusters",
+              "ngrass_persite","ngrass_perBac_sor_clusters","ngrass_perFun_sor_clusters",
+              "Bac_gamma_Site","Fun_gamma_Site")
+vard_all_numeric_env_intpred <-union(vard_all_numeric_env,vard_all_numeric_intpred)
+```
+
+#### generate distance matrices of env var and Lat/long distance matrix calc
+
+```{r env-var-dist-calc, echo=T,eval=F, cache=F}
+var_Fun_sor_clus2 <- levels(sd$Fun_sor_clus2)
+var_Fun_sor_clusters <- levels(sd$Fun_sor_clusters)
+var_Bac_sor_clusters <- levels(sd$Bac_sor_clusters)
+var_Site <- levels(sd$Site)
+var_Grass <- levels(sd$Grass)
+
+# Create an empty list to store the distance matrices
+env_dist_matrices <- list("all"=list(),"Site"=list(),"Grass"=list(),"Bac_sor_clusters"=list(),
+                          "Fun_sor_clusters"=list(),"Fun_sor_clus2"=list())
+
+  
+# all
+for (var in vard_all_numeric_env_intpred) {
+  # Calculate geodistance matrices 
+  Bac_all.geo<-as(subset(sd, select = c(Longitude,Latitude)), "data.frame")
+  Bac_all.geodist_mat <- as.dist(geodist(Bac_all.geo, measure = 'geodesic' )/1000) #converting it to km
+  
+  Fun_all.geo<-as(subset(sd, select = c(Longitude,Latitude)), "data.frame")
+  Fun_all.geodist_mat <- as.dist(geodist(Fun_all.geo, measure = 'geodesic' )/1000) #converting it to km
+  
+  # Store the geodist matrices in the list using variable name as key
+  env_dist_matrices$all[["geodist_Bac"]] <- Bac_all.geodist_mat
+  env_dist_matrices$all[["geodist_Fun"]] <- Fun_all.geodist_mat
+
+  # Subset the data for the current variable
+  Bac_subset <- subset(as.data.frame(sample_data(Bac_wholecommunity)), select = var)
+  Fun_subset <- subset(as.data.frame(sample_data(Fun_wholecommunity)), select = var)
+  
+  # Calculate distance matrices and store them in the list
+  Bac_dist_matrix <- dist(Bac_subset, method = "euclidean", diag = TRUE, upper = FALSE)
+  Fun_dist_matrix <- dist(Fun_subset, method = "euclidean", diag = TRUE, upper = FALSE)
+  
+  # Store the matrices in the list using variable name as key
+  env_dist_matrices$all[[paste0(var,"_Bac")]] <- Bac_dist_matrix
+  env_dist_matrices$all[[paste0(var,"_Fun")]] <- Fun_dist_matrix
+
+}
+
+# var_Site
+for (var in var_Site) {
+  # Subset the data for the current variable
+  sd_subset <- subset(sd, Site == var)
+  
+  subset.geo<-as(subset(sd_subset, select = c(Longitude,Latitude)), "data.frame")
+  subset.geodist_mat <- as.dist(geodist(subset.geo, measure = 'geodesic' )/1000) #convert to km
+
+  # Store the matrices in the list using variable name as key
+  env_dist_matrices$Site[[paste0(var,"_geodist")]] <- subset.geodist_mat
+  
+  for (var2 in vard_all_numeric_env_intpred) {
+    sd_subsubset <- subset(sd_subset, select = var2)
+  
+    # Calculate distance matrices and store them in the list
+    subset_dist_matrix <- dist(sd_subsubset, method = "euclidean", diag = T, upper = F)
+  
+    # Store the matrices in the list using variable name as key
+    env_dist_matrices$Site[[paste0(var,"_",var2)]] <- subset_dist_matrix
+  }
+}
+
+# var_Grass
+for (var in var_Grass) {
+  # Subset the data for the current variable
+  sd_subset <- subset(sd, Grass == var)
+  
+  subset.geo<-as(subset(sd_subset, select = c(Longitude,Latitude)), "data.frame")
+  subset.geodist_mat <- as.dist(geodist(subset.geo, measure = 'geodesic' )/1000) #convert to km
+
+  # Store the matrices in the list using variable name as key
+  env_dist_matrices$Grass[[paste0(var,"_geodist")]] <- subset.geodist_mat
+  
+  for (var2 in vard_all_numeric_env_intpred) {
+    sd_subsubset <- subset(sd_subset, select = var2)
+  
+    # Calculate distance matrices and store them in the list
+    subset_dist_matrix <- dist(sd_subsubset, method = "euclidean", diag = T, upper = F)
+  
+    # Store the matrices in the list using variable name as key
+    env_dist_matrices$Grass[[paste0(var,"_",var2)]] <- subset_dist_matrix
+  }
+}
+
+# var_Bac_sor_clusters
+for (var in var_Bac_sor_clusters) {
+  # Subset the data for the current variable
+  sd_subset <- subset(sd, Bac_sor_clusters == var)
+  
+  subset.geo<-as(subset(sd_subset, select = c(Longitude,Latitude)), "data.frame")
+  subset.geodist_mat <- as.dist(geodist(subset.geo, measure = 'geodesic' )/1000) #convert to km
+
+  # Store the matrices in the list using variable name as key
+  env_dist_matrices$Bac_sor_clusters[[paste0(var,"_geodist")]] <- subset.geodist_mat
+  
+  for (var2 in vard_all_numeric_env_intpred) {
+    sd_subsubset <- subset(sd_subset, select = var2)
+  
+    # Calculate distance matrices and store them in the list
+    subset_dist_matrix <- dist(sd_subsubset, method = "euclidean", diag = T, upper = F)
+  
+    # Store the matrices in the list using variable name as key
+    env_dist_matrices$Bac_sor_clusters[[paste0(var,"_",var2)]] <- subset_dist_matrix
+  }
+}
+
+# var_Fun_sor_clusters
+for (var in var_Fun_sor_clusters) {
+  # Subset the data for the current variable
+  sd_subset <- subset(sd, Fun_sor_clusters == var)
+  
+  subset.geo<-as(subset(sd_subset, select = c(Longitude,Latitude)), "data.frame")
+  subset.geodist_mat <- as.dist(geodist(subset.geo, measure = 'geodesic' )/1000) #convert to km
+
+  # Store the matrices in the list using variable name as key
+  env_dist_matrices$Fun_sor_clusters[[paste0(var,"_geodist")]] <- subset.geodist_mat
+  
+  for (var2 in vard_all_numeric_env_intpred) {
+    sd_subsubset <- subset(sd_subset, select = var2)
+  
+    # Calculate distance matrices and store them in the list
+    subset_dist_matrix <- dist(sd_subsubset, method = "euclidean", diag = T, upper = F)
+  
+    # Store the matrices in the list using variable name as key
+    env_dist_matrices$Fun_sor_clusters[[paste0(var,"_",var2)]] <- subset_dist_matrix
+  }
+}
+
+# var_Fun_sor_clus2
+for (var in var_Fun_sor_clus2) {
+  # Subset the data for the current variable
+  sd_subset <- subset(sd, Fun_sor_clus2 == var)
+  
+  subset.geo<-as(subset(sd_subset, select = c(Longitude,Latitude)), "data.frame")
+  subset.geodist_mat <- as.dist(geodist(subset.geo, measure = 'geodesic' )/1000) #convert to km
+
+  # Store the matrices in the list using variable name as key
+  env_dist_matrices$Fun_sor_clus2[[paste0(var,"_geodist")]] <- subset.geodist_mat
+  
+  for (var2 in vard_all_numeric_env_intpred) {
+    sd_subsubset <- subset(sd_subset, select = var2)
+  
+    # Calculate distance matrices and store them in the list
+    subset_dist_matrix <- dist(sd_subsubset, method = "euclidean", diag = T, upper = F)
+  
+    # Store the matrices in the list using variable name as key
+    env_dist_matrices$Fun_sor_clus2[[paste0(var,"_",var2)]] <- subset_dist_matrix
+  }
+}
+
+# var_Grass
+
+
+# saveRDS(env_dist_matrices, file = "../processed_data/clean_rds_saves/env_dist_matrices2.rds")
+```
+
+\
+\
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+\
+\
+
+# Results - Bacteria
+
+\
+
+## Landscape-scale: All samples (agnostic to site) {.tabset}
+
+### Pure spatial effects (S)
+
+Distance-decay relationships between geographic distance (in km) between communities and i) total community pairwise dissimilarity (β~sor~), ii) spatial turnover-resultant dissimilarity (β~sim~), and iii) nestedness-resultant dissimilarity (β~sne~) using 1,000 permutations. Differences between bacterial and fungal model parameters were assessed via block-site bootstrap whether the parameters of both models are equal (n = 1,000 bootstrap resamples). Both tests were conducted independently, one for the equality of the first parameters of both models, another for the equality of the second parameters (slopes) of both models.
+
+```{r plot.decay.pretty-function, include=FALSE,eval=TRUE}
+plot.decay.pretty = function (x, xlim = c(0, max(x$data.x)), ylim = c(0, 1), add = FALSE, 
+  remove.dots = FALSE, col = "black", pch = 1, lty = 1, lwd = 5, las=1,
+  # xaxp = c(0,max(x$data.x),4), 
+  yaxp = c(0,1,5),col.line = "black", ylab,xlab,
+  cex = 1, ...) 
+{
+  if (!inherits(x, "decay")) {
+    stop("The input is not a distance-decay model fitted with decay.model().", 
+      call. = TRUE)
+  }
+  data <- data.frame(as.vector(x$data.x), as.vector(x$data.y))
+  if (!remove.dots) {
+    pch = pch
+  }
+  else {
+    pch = ""
+  }
+  if (!add) {
+    plot(x$data.x, x$data.y, xlim = xlim, ylim = ylim, xlab = xlab, 
+      ylab = ylab, col = col, pch = pch, cex = cex, 
+      ...)
+  }
+  if (add) {
+    points(x$data.x, x$data.y, xlim = xlim, ylim = ylim, 
+      xlab = xlab, ylab = ylab, col = col, pch = pch, 
+      cex = cex, ...)
+  }
+  switch(x$y.type, similarities = {
+    lines(fitted(x$model)[order(x$data.x)] ~ sort(x$data.x), 
+      col = col.line, lty = lty, lwd = lwd, ...)
+  }, dissimilarities = {
+    lines(1 - fitted(x$model)[order(x$data.x)] ~ sort(x$data.x), 
+      col = col.line, lty = lty, lwd = lwd, ...)
+  })
+}
+
+```
+
+```{r calc-DD-BF-all-MRM, echo=TRUE,message=T, results='show',cache=T, eval=TRUE}
+# (MRM(betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~ env_dist_matrices[["all"]][["geodist_Bac"]],nperm=1000))
+#$r.squared R2 0.1529891     pval 0.0010000
+
+# vard_all_numeric_env_intpred
+#  [1] "GDD3yr_m.std"                 "ppt3yr_m.std"                 "soil_water_content_m.std"     "pH_m.std"                    
+#  [5] "phos_m.std"                   "ammonium_m.std"               "SOM_m.std"                    "avg_SRL_m.std"               
+#  [9] "avg_SLA_m.std"                "herbivory_perc_m.std"         "nsamples_per_Site"            "nsamples_perBac_sor_clusters"
+# [13] "nsamples_perFun_sor_clusters" "ngrass_persite"               "ngrass_perBac_sor_clusters"   "ngrass_perFun_sor_clusters"  
+# [17] "Bac_gamma_Site"               "Fun_gamma_Site"      
+
+# Spatial ----
+MRM.all_Bac.linear.sor_Spatial<-MRM(betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+      env_dist_matrices[["all"]][["geodist_Bac"]],
+    method = "linear", nperm = 1000)
+# endSpatial ----
+
+# Environmental:Climate ----
+MRM.all_Bac.linear.sor_E_Climate<-MRM(betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+     env_dist_matrices[["all"]][["GDD3yr_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["ppt3yr_m.std_Bac"]],
+    method = "linear", nperm = 1000)
+# endEnvironmental:Climate ----
+
+
+# Environmental:Edaphic ----
+MRM.all_Bac.linear.sor_E_Edaphic<-MRM(betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+      env_dist_matrices[["all"]][["soil_water_content_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["pH_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["phos_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["ammonium_m.std_Bac"]],
+    method = "linear", nperm = 1000)
+MRM.all_Bac.linear.sor_E_Edaphic
+# endEnvironmental:Edaphic ----
+
+
+# Environmental:Plant ----
+MRM.all_Bac.linear.sor_E_Plant <- MRM(betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+      env_dist_matrices[["all"]][["avg_SRL_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["avg_SLA_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["herbivory_perc_m.std_Bac"]],
+    method = "linear", nperm = 1000)
+MRM.all_Bac.linear.sor_E_Plant
+# endEnvironmental:Plant ----
+
+
+# Environmental:All ----
+MRM.all_Bac.linear.sor_E_All<-MRM(betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+     env_dist_matrices[["all"]][["GDD3yr_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["ppt3yr_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["soil_water_content_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["pH_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["phos_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["ammonium_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["avg_SRL_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["avg_SLA_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["herbivory_perc_m.std_Bac"]],
+    method = "linear", nperm = 1000)
+# endEnvironmental:All ----
+
+
+# Mixed (E*S):All ----
+MRM.all_Bac.linear.sor_ES_All <- MRM(betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+     env_dist_matrices[["all"]][["geodist_Bac"]] +
+      env_dist_matrices[["all"]][["GDD3yr_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["ppt3yr_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["soil_water_content_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["pH_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["phos_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["ammonium_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["avg_SRL_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["avg_SLA_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["herbivory_perc_m.std_Bac"]],
+    method = "linear", nperm = 1000)
+# endMixed (E*S):All ----
+
+# Var:Intpred ----
+MRM.all_Bac.linear.sor_Var_Intpred <- MRM(betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+      env_dist_matrices[["all"]][["nsamples_per_Site_Bac"]] + 
+      env_dist_matrices[["all"]][["nsamples_perBac_sor_clusters_Bac"]] + 
+      env_dist_matrices[["all"]][["nsamples_perFun_sor_clusters_Bac"]] + 
+      env_dist_matrices[["all"]][["ngrass_persite_Bac"]] + 
+      env_dist_matrices[["all"]][["ngrass_perBac_sor_clusters_Bac"]] + 
+      env_dist_matrices[["all"]][["ngrass_perFun_sor_clusters_Bac"]] + 
+      env_dist_matrices[["all"]][["Bac_gamma_Site_Bac"]] + 
+      env_dist_matrices[["all"]][["Fun_gamma_Site_Bac"]],
+    method = "linear", nperm = 1000)
+# endVar:Intpred ----
+
+
+# Var:All ----
+MRM.all_Bac.linear.sor_Var_All <- MRM(betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+     env_dist_matrices[["all"]][["geodist_Bac"]] +
+      env_dist_matrices[["all"]][["GDD3yr_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["ppt3yr_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["soil_water_content_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["pH_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["phos_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["ammonium_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["avg_SRL_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["avg_SLA_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["herbivory_perc_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["nsamples_per_Site_Bac"]] + 
+      env_dist_matrices[["all"]][["nsamples_perBac_sor_clusters_Bac"]] + 
+      env_dist_matrices[["all"]][["nsamples_perFun_sor_clusters_Bac"]] + 
+      env_dist_matrices[["all"]][["ngrass_persite_Bac"]] + 
+      env_dist_matrices[["all"]][["ngrass_perBac_sor_clusters_Bac"]] + 
+      env_dist_matrices[["all"]][["ngrass_perFun_sor_clusters_Bac"]] + 
+      env_dist_matrices[["all"]][["Bac_gamma_Site_Bac"]] + 
+      env_dist_matrices[["all"]][["Fun_gamma_Site_Bac"]],
+    method = "linear", nperm = 1000)
+# endVar:All ----
+```
+
+```{r active-test, echo=FALSE,eval=FALSE}
+# convert list of lists into dataframe  
+# by row 
+print(as.data.frame(do.call(rbind, env_dist_matrices))) 
+
+newtest2_env_dist_matrices <- rapply(env_dist_matrices, function(x) `[`(x, c(2, 3)), classes="dist", how="list")
+str(newtest2_env_dist_matrices, max.level = 2, vec.len = 1)
+
+# takes from first level list (whole), elements names distA and distB
+lapply(listoflists, `[`, c('distA', 'distB'))
+
+# Working with data frames
+# Use map_lgl(), map_dbl(), etc to return a vector instead of a list:
+mtcars |> map_dbl(sum)
+
+
+library("purrr")
+
+# A more realistic example: split a data frame into pieces, fit a
+# model to each piece, summarise and extract R^2
+mtcars |>
+  split(mtcars$cyl) |>
+  map(\(df) lm(mpg ~ wt, data = df)) |>
+  map(summary) |>
+  map_dbl("r.squared")
+
+Spatial relationships should be modelled with care: Euclidean, polynomial, or other models are required in different circumstances. For spatial analysis, consider also principal coordinates of neighbour matrices (PCNM).
+https://sites.google.com/site/mb3gustame/spatial-analysis/principal-coordinates-of-neighbour-matrices 
+```
+
+The main current hypotheses about the origin of beta diversity are as follows:
+
+1) Species composition is uniform over large areas. This hypothesis, which plays the role of a null model, emphasizes the role of biological interactions. It suggests that communities are dominated by a limited suite of competitively superior species (Pitman et al. 1999, 2001); beta diversity is small.
+
+2) Species composition fluctuates in a random, autocorrelated way. This hypothesis emphasizes spatially limited dispersal history. Models derived from neutral theory state that all species are demographically and competitively equal. Differences are created through spatially limited dispersal of species drawn at random from a metacommunity, plus possibly the appearance of newly evolved species in different areas. Neutral models differ in the details of the mechanisms that they invoke (Bell 2001, Hubbell 2001, He 2005).
+
+3) Species distributions are related to environmental conditions. This hypothesis emphasizes environmental control. Landscapes are mosaics where species composition is controlled by environmental site characteristics (Whittaker 1956, Bray and Curtis 1957, Hutchinson 1957, Gentry 1988, Tuomisto et al. 1995).
+
+Testing these hypotheses is important for understanding the functioning of ecosystems, for the conservation of biodiversity, and for ecosystem management. Regarding the establishment of natural reserves, e.g., hypothesis 1 implies that all parts of the ecosystem are equivalent. Reserves can be located anywhere. Hypothesis 2 implies that different parts of the ecosystem may, for historical reasons, sustain different species compositions, although these parts are environmentally equivalent. Portions of space supporting the different species compositions should be preserved. Reserves must be large, allowing the dynamics to go on without many species going extinct. Hypothesis 3 implies that all parts of the ecosystem are not equivalent. Reserves must represent the different types of habitat and each portion must be of sufficient size to be sustainable. The parts representing favorable dispersion routes must be especially preserved.
+(https://esajournals.onlinelibrary.wiley.com/doi/10.1890/05-0549)
+
+
+When studying the origin of beta diversity, one must consider different hypotheses and answer the following questions. (1) Is the variation in species composition among sites random, i.e., devoid of significant spatial pattern? A positive answer will support hypothesis 1. (2) Is there significant spatial patchiness (different from random) in the distributions of species? A positive answer will support hypothesis 2, and possibly hypothesis 3 if the environmental variables influencing species distributions are spatially structured. (3) Can the environmental variables explain a significant proportion of the community composition variation? A positive answer will support hypothesis 3, which is compatible with hypothesis 2.
+
+Empirical data must be used to determine the likelihood of each hypothesis in different systems and at different spatial scales. To test these hypotheses, the variation of community composition at many sites must be analyzed to determine if significant spatial patterns (different from random) are present in the data and if the environmental variables explain a significant proportion of the community composition variation. In this contribution, we explain how hypotheses about the origin of beta diversity can be tested by partitioning the spatial variation of community composition (presence– absence or abundance data) with respect to environmental variables and spatial base functions. Next we set out to assess the appropriateness and robustness of two partitioning approaches used by researchers to assess the likelihood of different mechanisms structuring beta diversity.
+
+```{r display-MRM-Spatial-rawresults-Bac, echo=FALSE,eval=TRUE}
+MRM.all_Bac.linear.sor_Spatial
+```
+
+\
+
+### Pure environmental effects (E) {.tabset .tabset-pills}
+
+#### Climate
+
+```{r display-MRM-E-Climate-rawresults-Bac, echo=FALSE,eval=TRUE}
+MRM.all_Bac.linear.sor_E_Climate
+```
+
+\
+
+#### Edaphic
+
+```{r display-MRM-E-Edaphic-rawresults-Bac, echo=FALSE,eval=TRUE}
+MRM.all_Bac.linear.sor_E_Edaphic
+```
+
+\
+
+#### Plant-Associated
+
+```{r display-MRM-E-Plant-rawresults-Bac, echo=FALSE,eval=TRUE}
+MRM.all_Bac.linear.sor_E_Plant
+```
+
+\
+
+#### All Environmental {.tabset .tabset-pills}
+
+#### All variables
+
+```{r display-MRM-E-All-rawresults-Bac, echo=FALSE,eval=TRUE}
+MRM.all_Bac.linear.sor_E_All
+```
+
+\
+
+#### Down-selected model
+
+All predictor variables included in down-selected MRM model if $p$-value ≤ 0.01.\
+
+*Not significant:* phos, ammonium, avg_SRL, avg_SLA \
+
+```{r display-MRM-E-All-rawresults-DS-Bac, echo=FALSE,eval=TRUE}
+MRM.all_Bac.linear.sor_E_All_DS<-MRM(betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+     env_dist_matrices[["all"]][["GDD3yr_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["ppt3yr_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["soil_water_content_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["pH_m.std_Bac"]] + 
+      # env_dist_matrices[["all"]][["phos_m.std_Bac"]] + 
+      # env_dist_matrices[["all"]][["ammonium_m.std_Bac"]] + 
+      # env_dist_matrices[["all"]][["avg_SRL_m.std_Bac"]] + 
+      # env_dist_matrices[["all"]][["avg_SLA_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["herbivory_perc_m.std_Bac"]],
+    method = "linear", nperm = 1000)
+
+MRM.all_Bac.linear.sor_E_All_DS
+```
+
+
+### Mixed effects (E \* S) {.tabset .tabset-pills}
+
+#### All variables
+
+```{r display-MRM-ES-All-rawresults-Bac, echo=FALSE,eval=TRUE}
+MRM.all_Bac.linear.sor_ES_All
+```
+
+\
+
+#### Down-selected model
+
+All predictor variables included in down-selected MRM model if $p$-value ≤ 0.01.\
+
+*Not significant:* GDD3yr, phos, ammonium, avg_SLA \
+
+```{r display-MRM-ES-All-rawresults-DS-Bac, echo=FALSE,eval=TRUE}
+MRM.all_Bac.linear.sor_ES_All_DS<-MRM(betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+      env_dist_matrices[["all"]][["geodist_Bac"]] +
+    # env_dist_matrices[["all"]][["GDD3yr_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["ppt3yr_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["soil_water_content_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["pH_m.std_Bac"]] + 
+      # env_dist_matrices[["all"]][["phos_m.std_Bac"]] + 
+      # env_dist_matrices[["all"]][["ammonium_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["avg_SRL_m.std_Bac"]] + 
+      # env_dist_matrices[["all"]][["avg_SLA_m.std_Bac"]] + 
+      env_dist_matrices[["all"]][["herbivory_perc_m.std_Bac"]],
+    method = "linear", nperm = 1000)
+
+MRM.all_Bac.linear.sor_ES_All_DS
+```
+
+\
+
+### Derived measures {.tabset .tabset-pills}
+
+#### All variables
+
+```{r display-MRM-Intpred-All-rawresults-Bac, echo=FALSE,eval=TRUE}
+MRM.all_Bac.linear.sor_Var_Intpred
+```
+
+\
+
+#### Down-selected model
+
+All predictor variables included in down-selected MRM model if $p$-value ≤ 0.01.\
+
+*Not significant:* ngrass_persite_Bac\
+
+```{r display-MRM-Intpred-All-rawresults-DS-Bac, echo=FALSE,eval=TRUE}
+MRM.all_Bac.linear.sor_Var_Intpred_DS <- MRM(
+  betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~  
+      env_dist_matrices[["all"]][["nsamples_per_Site_Bac"]] + 
+      env_dist_matrices[["all"]][["nsamples_perBac_sor_clusters_Bac"]] + 
+      env_dist_matrices[["all"]][["nsamples_perFun_sor_clusters_Bac"]] + 
+      # env_dist_matrices[["all"]][["ngrass_persite_Bac"]] + 
+      env_dist_matrices[["all"]][["ngrass_perBac_sor_clusters_Bac"]] + 
+      env_dist_matrices[["all"]][["ngrass_perFun_sor_clusters_Bac"]] + 
+      env_dist_matrices[["all"]][["Bac_gamma_Site_Bac"]] + 
+      env_dist_matrices[["all"]][["Fun_gamma_Site_Bac"]],
+    method = "linear", nperm = 1000)
+
+MRM.all_Bac.linear.sor_Var_Intpred_DS
+```
+
+\
+
+### All PredVar {.tabset .tabset-pills}
+
+#### All variables
+
+```{r extract_env_dist_pred_names-function, include=FALSE, eval=TRUE}
+extract_env_dist_pred_names <- function(mrm_result) {
+  raw_names <- rownames(mrm_result[[1]])[-1]  # drop intercept
+  # Filter only env_dist_matrices[["all"]] entries
+  env_preds <- grep('^env_dist_matrices\\[\\["all"\\]\\]\\[\\[', raw_names, value = TRUE)
+  # Clean up names: remove prefix and suffix
+  cleaned_names <- gsub('^env_dist_matrices\\[\\["all"\\]\\]\\[\\["|_m\\.std_(Bac|Fun)\\"]\\]|_(Bac|Fun)\\"]\\]|\\"]$', "", env_preds)
+  paste(cleaned_names, collapse = ", ")
+}
+
+# Example usage:
+cat(extract_env_dist_pred_names(MRM.all_Bac.linear.sor_Var_All))
+
+extract_sorted_env_dist_pred_names <- function(mrm_result) {
+  # Get coefficient names and values
+  coefs <- mrm_result$coef[, 1]
+  sorted_names <- names(sort(abs(coefs), decreasing = TRUE))
+  
+  # Clean names: special case for intercept
+  cleaned_names <- ifelse(
+    sorted_names == "Int",
+    "Intercept",
+    gsub(
+      '^env_dist_matrices\\[\\["all"\\]\\]\\[\\["|_m\\.std_(Bac|Fun)\\"]\\]|_(Bac|Fun)\\"]\\]|\\"]$',
+      "",
+      sorted_names
+    )
+  )
+  
+  # Return as single comma-separated string
+  paste(cleaned_names, collapse = ", ")
+}
+
+# Example usage:
+cat(extract_sorted_env_dist_pred_names(MRM.all_Bac.linear.sor_Var_All))
+
+
+# extract_sorted_env_dist_pred_names_filtered by pval
+extract_sorted_env_dist_pred_names_filtered <- function(mrm_result, pval_threshold = 0.05) {
+  # Extract p-values and coefficients
+  pvals <- mrm_result[[1]][, 2]
+  coefs <- mrm_result$coef[, 1]
+  
+  # Always include intercept
+  keep_terms <- names(pvals[pvals <= pval_threshold])
+  if (!"Int" %in% keep_terms) {
+    keep_terms <- c("Int", keep_terms)
+  }
+  
+  # Subset coefficients to those with significant p-values
+  coefs_filtered <- coefs[keep_terms]
+  
+  # Sort by absolute value
+  sorted_names <- names(sort(abs(coefs_filtered), decreasing = TRUE))
+  
+  # Clean names
+  cleaned_names <- ifelse(
+    sorted_names == "Int",
+    "Intercept",
+    gsub(
+      '^env_dist_matrices\\[\\["all"\\]\\]\\[\\["|_m\\.std_(Bac|Fun)\\"]\\]|_(Bac|Fun)\\"]\\]|\\"]$',
+      "",
+      sorted_names
+    )
+  )
+  
+  # Return as a comma-separated string
+  paste(cleaned_names, collapse = ", ")
+}
+
+# Example usage:
+cat(extract_sorted_env_dist_pred_names_filtered(MRM.all_Bac.linear.sor_Var_All))               # uses default 0.05
+cat(extract_sorted_env_dist_pred_names_filtered(MRM.all_Bac.linear.sor_Var_All, 0.01))         # stricter filter
+
+
+# extract_nonsignif_env_dist_pred_names
+extract_nonsignif_env_dist_pred_names <- function(mrm_result, alpha = 0.05) {
+  # Extract p-values and exclude intercept
+  pvals <- mrm_result[[1]][, 2]
+  # pvals <- pvals[names(pvals) != "Int"]
+  
+  # Filter for non-significant predictors
+  nonsig <- pvals[pvals > alpha]
+  
+  # Clean names
+  cleaned_names <- gsub(
+    '^env_dist_matrices\\[\\["all"\\]\\]\\[\\["|_m\\.std_(Bac|Fun)\\"]\\]|_(Bac|Fun)\\"]\\]|\\"]$',
+    "",
+    names(nonsig)
+  )
+  
+  # Return as comma-separated string
+  paste(cleaned_names, collapse = ", ")
+}
+
+# Example usage:
+cat(extract_nonsignif_env_dist_pred_names(MRM.all_Bac.linear.sor_Var_All))
+```
+
+```{r display-MRM-Var-All-rawresults-Bac-testing, echo=FALSE,eval=F}
+MRM.all_Bac.linear.sor_Var_All
+
+# index order by coef?
+# sort(abs(MRM.all_Bac.linear.sor_Var_All$coef[,1]),decreasing=T,index.return=T)
+sort(abs(MRM.all_Bac.linear.sor_Var_All$coef[,1]),decreasing=T) # sort by decreasing coef
+
+# df[sort(abs(df$value),decreasing=T,index.return=T)[[2]],]
+
+df[sort()[[2]],]
+
+MRM.all_Bac.linear.sor_Var_All[[1]][,1] #coefs
+MRM.all_Bac.linear.sor_Var_All[[1]][,2] #pvals
+rownames(MRM.all_Bac.linear.sor_Var_All[[1]])[2:length(rownames(MRM.all_Bac.linear.sor_Var_All[[1]]))] # factors minus intercept
+
+MRM.all_Bac.linear.sor_Var_All[sort(abs(MRM.all_Bac.linear.sor_Var_All$coef[,1]),decreasing=T)]MRM.all_Bac.linear.sor_Var_All[,1]
+
+MRM.all_Bac.linear.sor_Var_All 
+
+MRM.all_Bac.linear.sor_Var_All[sort(abs(MRM.all_Bac.linear.sor_Var_All$coef[,1]),decreasing=T,index.return=T)]
+
+MRM.all_Bac.linear.sor_Var_All$coef[,1] #coef
+MRM.all_Bac.linear.sor_Var_All$coef[,2] #p-value
+
+library("dplyr")
+
+
+  
+```
+
+
+\
+
+Full Model Summary:\
+
+  - $R^2$-value = `r round(MRM.all_Bac.linear.sor_Var_All[[2]][1],4)`, $P$-value = `r round(MRM.all_Bac.linear.sor_Var_All[[2]][2],5)`, $F_{test}$ = `r round(MRM.all_Bac.linear.sor_Var_All$F.test[1],2)`, $F_{test}-Pvalue$ = `r round(MRM.all_Bac.linear.sor_Var_All$F.test[2],4)`
+  
+  - These terms were significant ($P$-value < 0.05): `r cat(extract_sorted_env_dist_pred_names_filtered(MRM.all_Bac.linear.sor_Var_All, 0.05))` (sorted by decreasing coefficient)
+
+\
+\
+
+
+```{r display-MRM-Var-All-rawresults-Bac, echo=FALSE,eval=T}
+MRM.all_Bac.linear.sor_Var_All
+```
+
+
+\
+
+#### Down-selected model
+
+```{r calc-MRM-Var-All-rawresults-DS-Bac, echo=FALSE,eval=TRUE}
+# ordered significant factors
+# as.data.frame(MRM.all_Bac.linear.sor_Var_All$coef)[order(abs(as.data.frame(MRM.all_Bac.linear.sor_Var_All$coef)[,1]), decreasing = TRUE),] %>% # colnames(.)
+  # filter(pval < 0.01) %>% rownames(.)
+
+MRM.all_Bac.linear.sor_Var_All_DS <- MRM(
+  betapart_results[["Bac"]][["all"]][["pairwise"]][["beta.sor"]] ~ 
+    env_dist_matrices[["all"]][["pH_m.std_Bac"]] + 
+    env_dist_matrices[["all"]][["ppt3yr_m.std_Bac"]] + 
+    env_dist_matrices[["all"]][["ngrass_persite_Bac"]] + 
+    env_dist_matrices[["all"]][["herbivory_perc_m.std_Bac"]] + 
+    env_dist_matrices[["all"]][["ngrass_perFun_sor_clusters_Bac"]] +
+    env_dist_matrices[["all"]][["ngrass_perBac_sor_clusters_Bac"]] + 
+    env_dist_matrices[["all"]][["soil_water_content_m.std_Bac"]] +
+    env_dist_matrices[["all"]][["nsamples_per_Site_Bac"]] + 
+    env_dist_matrices[["all"]][["nsamples_perBac_sor_clusters_Bac"]] + 
+    env_dist_matrices[["all"]][["nsamples_perFun_sor_clusters_Bac"]] + 
+    env_dist_matrices[["all"]][["Fun_gamma_Site_Bac"]] + 
+    env_dist_matrices[["all"]][["geodist_Bac"]] +
+    env_dist_matrices[["all"]][["Bac_gamma_Site_Bac"]],
+  method = "linear", nperm = 1000)
+
+MRM.all_Bac.linear.sor_Var_All_DS
+```
+
+All predictor variables included in down-selected MRM model if $P$-value ≤ 0.05 and the order of model terms was determined by ranking the absolute value of the regression coefficients for the significant model terms.\
+
+*Not significant:* `r cat(extract_nonsignif_env_dist_pred_names(MRM.all_Bac.linear.sor_Var_All))`\
+
+
+**Down-selected model summary:**\
+
+$R^2$-value = `r round(MRM.all_Bac.linear.sor_Var_All_DS[[2]][1],4)`, $P$-value = `r round(MRM.all_Bac.linear.sor_Var_All_DS[[2]][2],5)`, $F_{test}$ = `r round(MRM.all_Bac.linear.sor_Var_All_DS$F.test[1],2)`, $F_{test}-Pvalue$ = `r round(MRM.all_Bac.linear.sor_Var_All_DS$F.test[2],4)`
+
+   -These terms were significant ($P$-value < 0.05): `r cat(extract_sorted_env_dist_pred_names_filtered(MRM.all_Bac.linear.sor_Var_All_DS, 0.05))` (sorted by decreasing coefficient)
+   \
+
+```{r display-MRM-Var-All-rawresults-DS-Bac-raw, echo=FALSE,eval=TRUE}
+MRM.all_Bac.linear.sor_Var_All_DS
+```
+
+\
+
+
+
+# Plotting spatial distance decay
+
+## fungal spatial distance decay
+
+```{r}
+# F1
+decay.Fun_F1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F1_geodist"]], y.type="dissim", model.type="exp")
+
+# # F1
+# decay.Fun_F1.exp.sor2<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]]$F1_geodist, y.type="dissim", model.type="exp")
+# # F2 - singular gradient matrix at initial parameter estimates
+# decay.Fun_F2.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F2"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F2_geodist"]], y.type="dissim", model.type="exp")
+# F3
+decay.Fun_F3.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F3_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F3_geodist"]], y.type="dissim", model.type="exp")
+# F4
+decay.Fun_F4.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F4_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F4_geodist"]], y.type="dissim", model.type="exp")
+# F5
+decay.Fun_F5.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F5_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F5_geodist"]], y.type="dissim", model.type="exp")
+# F6
+decay.Fun_F6.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F6_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F6_geodist"]], y.type="dissim", model.type="exp")
+# F7
+decay.Fun_F7.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F7_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F7_geodist"]], y.type="dissim", model.type="exp")
+# F8
+decay.Fun_F8.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F8_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F8_geodist"]], y.type="dissim", model.type="exp")
+# F9
+decay.Fun_F9.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F9_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F9_geodist"]], y.type="dissim", model.type="exp")
+# F10
+decay.Fun_F10.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clusters"]][["pairwise"]][["F10_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clusters"]][["F10_geodist"]], y.type="dissim", model.type="exp")
+
+# non-F1 betapart_results[["Fun"]]$Fun_sor_clus2$pairwise$`non-F1_Fun`
+decay.Fun_nonF1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp")
+
+
+png(file="../figures/sfaf/sfaf2025/spatial_decay_Fun_sor_clusters.png", 
+       width = 7, height = 5, units = "in", res = 400)
+
+plot.decay.pretty(decay.Fun_F1.exp.sor, col=paste(col_n10[1],"cc",sep = ""), add=F, main="F1", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F3.exp.sor, col=paste(col_n10[3],"cc",sep = ""), add=T, main="F3", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[3],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F4.exp.sor, col=paste(col_n10[4],"cc",sep = ""), add=T, main="F4", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[4],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F5.exp.sor, col=paste(col_n10[5],"cc",sep = ""), add=T, main="F5", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[5],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F6.exp.sor, col=paste(col_n10[6],"cc",sep = ""), add=T, main="F6", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[6],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F7.exp.sor, col=paste(col_n10[7],"cc",sep = ""), add=T, main="F7", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[7],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F8.exp.sor, col=paste(col_n10[8],"cc",sep = ""), add=T, main="F8", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[8],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F9.exp.sor, col=paste(col_n10[9],"cc",sep = ""), add=T, main="F9", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[9],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F10.exp.sor, col=paste(col_n10[10],"cc",sep = ""), add=T, main="F10", 
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[10],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+dev.off()
+
+# plot.decay.pretty(decay.Fun_nonF1.exp.sor, col="#7FBC41", add=T, main="non-F1",
+#            xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+#            col.line="#276419",xaxp = c(0,1500,3),
+#            ylab="",xlab="")
+
+ggsave("../figures/sfaf/sfaf2025/spatial_decay_Fun_sor_clusters.png", plot = last_plot(),
+       width = 6, height = 5, units = "in", device = "png", dpi = 400)
+```
+
+
+
+```{r plot-fungal-spatial-distance-decay, echo=FALSE}
+png(file="../figures/sfaf/sfaf2025/spatial_decay_Fun_sor_clusters_zoom.png", 
+       width = 7, height = 5, units = "in", res = 400)
+
+FUN_YLIM <- c(0.2,1)
+plot.decay.pretty(decay.Fun_F1.exp.sor, col=paste(col_n10[1],"cc",sep = ""), add=F, main="F1", 
+           xlim = c(0,1600),ylim = FUN_YLIM,las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F3.exp.sor, col=paste(col_n10[3],"cc",sep = ""), add=T, main="F3", 
+           xlim = c(0,1600),ylim = FUN_YLIM,las=1, lty=1,lwd=5,
+           col.line=col_n10[3],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F4.exp.sor, col=paste(col_n10[4],"cc",sep = ""), add=T, main="F4", 
+           xlim = c(0,1600),ylim = FUN_YLIM,las=1, lty=1,lwd=5,
+           col.line=col_n10[4],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F5.exp.sor, col=paste(col_n10[5],"cc",sep = ""), add=T, main="F5", 
+           xlim = c(0,1600),ylim = FUN_YLIM,las=1, lty=1,lwd=5,
+           col.line=col_n10[5],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F6.exp.sor, col=paste(col_n10[6],"cc",sep = ""), add=T, main="F6", 
+           xlim = c(0,1600),ylim = FUN_YLIM,las=1, lty=1,lwd=5,
+           col.line=col_n10[6],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F7.exp.sor, col=paste(col_n10[7],"cc",sep = ""), add=T, main="F7", 
+           xlim = c(0,1600),ylim = FUN_YLIM,las=1, lty=1,lwd=5,
+           col.line=col_n10[7],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F8.exp.sor, col=paste(col_n10[8],"cc",sep = ""), add=T, main="F8", 
+           xlim = c(0,1600),ylim = FUN_YLIM,las=1, lty=1,lwd=5,
+           col.line=col_n10[8],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F9.exp.sor, col=paste(col_n10[9],"cc",sep = ""), add=T, main="F9", 
+           xlim = c(0,1600),ylim = FUN_YLIM,las=1, lty=1,lwd=5,
+           col.line=col_n10[9],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Fun_F10.exp.sor, col=paste(col_n10[10],"cc",sep = ""), add=T, main="F10", 
+           xlim = c(0,1600),ylim = FUN_YLIM,las=1, lty=1,lwd=5,
+           col.line=col_n10[10],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+dev.off()
+```
+
+
+# bacterial spatial distance decay
+
+```{r calc-Bac-clus-sor-geo, warning=T,eval=TRUE,cache=F}
+# B1
+decay.Bac_B1.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B1_Bac"]][["beta.sor"]], x=env_dist_matrices[["Bac_sor_clusters"]][["B1_geodist"]], y.type="dissim", model.type="exp")
+# B2 
+decay.Bac_B2.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B2_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B2_geodist"]], y.type="dissim", model.type="exp")
+# B3
+decay.Bac_B3.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B3_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B3_geodist"]], y.type="dissim", model.type="exp")
+# B4
+decay.Bac_B4.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B4_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B4_geodist"]], y.type="dissim", model.type="exp")
+# B5
+decay.Bac_B5.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B5_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B5_geodist"]], y.type="dissim", model.type="exp")
+# B6 - singular gradient matrix at initial parameter estimates
+# decay.Bac_B6.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B6_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B6_geodist"]], y.type="dissim", model.type="exp")
+# B7
+decay.Bac_B7.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B7_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B7_geodist"]], y.type="dissim", model.type="exp")
+# B8
+decay.Bac_B8.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B8_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B8_geodist"]], y.type="dissim", model.type="exp")
+# B9
+decay.Bac_B9.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B9_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B9_geodist"]], y.type="dissim", model.type="exp")
+# B10
+decay.Bac_B10.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B10_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B10_geodist"]], y.type="dissim", model.type="exp")
+# B11
+decay.Bac_B11.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B11_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B11_geodist"]], y.type="dissim", model.type="exp")
+# B12
+decay.Bac_B12.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B12_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B12_geodist"]], y.type="dissim", model.type="exp")
+# B13
+decay.Bac_B13.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B13_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B13_geodist"]], y.type="dissim", model.type="exp")
+# B14 - singular gradient matrix at initial parameter estimates
+# decay.Bac_B14.exp.sor<-decay.model(y=betapart_results[["Bac"]][["Bac_sor_clusters"]][["pairwise"]][["B14_Bac"]]$beta.sor, x=env_dist_matrices[["Bac_sor_clusters"]][["B14_geodist"]], y.type="dissim", model.type="exp")
+```
+
+```{r print-calc-Bac-clus-sor-geo, eval=FALSE}
+paste0("B1: ","b=",prettyNum(decay.Bac_B1.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B1.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B1.exp.sor$p.value, cat("\n"))
+paste0("B2: ","b=",prettyNum(decay.Bac_B2.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B2.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B2.exp.sor$p.value)
+paste0("B3: ","b=",prettyNum(decay.Bac_B3.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B3.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B3.exp.sor$p.value)
+paste0("B4: ","b=",prettyNum(decay.Bac_B4.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B4.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B4.exp.sor$p.value)
+paste0("B5: ","b=",prettyNum(decay.Bac_B5.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B5.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B5.exp.sor$p.value)
+paste0("B7: ","b=",prettyNum(decay.Bac_B7.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B7.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B7.exp.sor$p.value)
+paste0("B8: ","b=",prettyNum(decay.Bac_B8.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B8.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B8.exp.sor$p.value)
+paste0("B9: ","b=",prettyNum(decay.Bac_B9.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B9.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B9.exp.sor$p.value)
+paste0("B10: ","b=",prettyNum(decay.Bac_B10.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B10.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B10.exp.sor$p.value)
+paste0("B11: ","b=",prettyNum(decay.Bac_B11.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B11.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B11.exp.sor$p.value)
+paste0("B12: ","b=",prettyNum(decay.Bac_B12.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B12.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B12.exp.sor$p.value)
+paste0("B13: ","b=",prettyNum(decay.Bac_B13.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B13.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B13.exp.sor$p.value)
+
+```
+
+```{r echo=FALSE}
+# Your input vector of strings
+lines <- c(
+  "B1: b=0.000372, R2.adj=0.398, pval=0.01",
+  "B2: b=0.000225, R2.adj=0.358, pval=0.01",
+  "B3: b=0.000155, R2.adj=0.312, pval=0.01",
+  "B4: b=0.000205, R2.adj=0.243, pval=0.01",
+  "B5: b=0.000136, R2.adj=0.286, pval=0.01",
+  "B7: b=0.00025, R2.adj=0.641, pval=0.01",
+  "B8: b=0.000203, R2.adj=0.149, pval=0.01",
+  "B9: b=0.000136, R2.adj=0.297, pval=0.01",
+  "B10: b=0.00017, R2.adj=0.447, pval=0.01",
+  "B11: b=0.000624, R2.adj=0.12, pval=0.08",
+  "B12: b=0.000229, R2.adj=0.044, pval=0.08",
+  "B13: b=0.00051, R2.adj=0.266, pval=0.01"
+)
+
+lines <- c(paste0("B1: ","b=",prettyNum(decay.Bac_B1.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B1.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B1.exp.sor$p.value),
+paste0("B2: ","b=",prettyNum(decay.Bac_B2.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B2.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B2.exp.sor$p.value),
+paste0("B3: ","b=",prettyNum(decay.Bac_B3.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B3.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B3.exp.sor$p.value),
+paste0("B4: ","b=",prettyNum(decay.Bac_B4.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B4.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B4.exp.sor$p.value),
+paste0("B5: ","b=",prettyNum(decay.Bac_B5.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B5.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B5.exp.sor$p.value),
+paste0("B7: ","b=",prettyNum(decay.Bac_B7.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B7.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B7.exp.sor$p.value),
+paste0("B8: ","b=",prettyNum(decay.Bac_B8.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B8.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B8.exp.sor$p.value),
+paste0("B9: ","b=",prettyNum(decay.Bac_B9.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B9.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B9.exp.sor$p.value),
+paste0("B10: ","b=",prettyNum(decay.Bac_B10.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B10.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B10.exp.sor$p.value),
+paste0("B11: ","b=",prettyNum(decay.Bac_B11.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B11.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B11.exp.sor$p.value),
+paste0("B12: ","b=",prettyNum(decay.Bac_B12.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B12.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B12.exp.sor$p.value),
+paste0("B13: ","b=",prettyNum(decay.Bac_B13.exp.sor$second.parameter,digits=3),
+       ", R2.adj=",round(decay.Bac_B13.exp.sor$pseudo.r.squared,3),
+       ", pval=",decay.Bac_B13.exp.sor$p.value))
+
+# Extract values using regular expressions
+parsed_df <- do.call(rbind, lapply(lines, function(line) {
+  b <- as.numeric(sub(".*b=([0-9\\.e-]+),.*", "\\1", line))
+  r2 <- as.numeric(sub(".*R2\\.adj=([0-9\\.]+),.*", "\\1", line))
+  pval <- as.numeric(sub(".*pval=([0-9\\.]+)", "\\1", line))
+  data.frame(b = b, R2.adj = r2, pval = pval)
+}))
+
+# Compute min and max
+summary_df <- data.frame(
+  Variable = c("b", "R2.adj", "pval"),
+  Min = sapply(parsed_df, min),
+  Max = sapply(parsed_df, max)
+)
+
+# Display result
+summary_df
+```
+
+
+
+```{r plot-Bac-clus-sor-geo, warning=T,eval=TRUE,cache=F,echo=FALSE}
+png(file="../figures/sfaf/sfaf2025/spatial_decay_Bac_sor_clusters.png", 
+       width = 7, height = 4, units = "in", res = 400)
+
+
+# par(mfrow = c(1, 2),#c(nr, nc) 
+#     mar = c(2, 2, 2.5, 2),# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+#     oma = (c(3, 0, 2, 0) + 0.1))
+
+# old ylim = c(0.3,1)
+# new ylim = c(0.55,0.95)
+
+#sor
+# plot.decay.pretty(decay.Bac_B1.exp.sor, col=paste(col_n14[1],"cc",sep = ""), main="Total Dissimilarity (βsor)\n Bacteria",cex.main=1,
+#            xlim = c(0,1600),ylim = c(0.39,0.835),las=1, lty=1,lwd=5,
+#            col.line=col_n14[1],xaxp = c(0,1500,3),
+#            ylab="",xlab="")
+# mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
+plot.decay.pretty(decay.Bac_B1.exp.sor, col=paste(col_n14[1],"cc",sep = ""), main="Total Dissimilarity (βsor)  Bacteria",cex.main=1,
+           xlim = c(0,1600),ylim = c(0.39,0.835),las=1, lty=1,lwd=5,
+           col.line=col_n14[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+plot.decay.pretty(decay.Bac_B2.exp.sor, col=paste(col_n14[2],"cc",sep = ""), add=T, main="B2", 
+           xlim = c(0,1600),ylim = c(0.39,0.835),las=1, lty=1,lwd=5,
+           col.line=col_n14[2],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B3.exp.sor, col=paste(col_n14[3],"cc",sep = ""), add=T, main="B3", 
+           xlim = c(0,1600),ylim = c(0.39,0.835),las=1, lty=1,lwd=5,
+           col.line=col_n14[3],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B4.exp.sor, col=paste(col_n14[4],"cc",sep = ""), add=T, main="B4", 
+           xlim = c(0,1600),ylim = c(0.39,0.835),las=1, lty=1,lwd=5,
+           col.line=col_n14[4],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B5.exp.sor, col=paste(col_n14[5],"cc",sep = ""), add=T, main="B5", 
+           xlim = c(0,1600),ylim = c(0.39,0.835),las=1, lty=1,lwd=5,
+           col.line=col_n14[5],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B7.exp.sor, col=paste(col_n14[7],"cc",sep = ""), add=T, main="B7", 
+           xlim = c(0,1600),ylim = c(0.39,0.835),las=1, lty=1,lwd=5,
+           col.line=col_n14[7],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B8.exp.sor, col=paste(col_n14[8],"cc",sep = ""), add=T, main="B8", 
+           xlim = c(0,1600),ylim = c(0.39,0.835),las=1, lty=1,lwd=5,
+           col.line=col_n14[8],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B9.exp.sor, col=paste(col_n14[9],"cc",sep = ""), add=T, main="B9", 
+           xlim = c(0,1600),ylim = c(0.39,0.835),las=1, lty=1,lwd=5,
+           col.line=col_n14[9],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B10.exp.sor, col=paste(col_n14[10],"cc",sep = ""), add=T, main="B10", 
+           xlim = c(0,1600),ylim = c(0.39,0.835),las=1, lty=1,lwd=5,
+           col.line=col_n14[10],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B11.exp.sor, col=paste(col_n14[11],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0.39,0.835),las=1, lty=1,lwd=5,
+           col.line=col_n14[11],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B12.exp.sor, col=paste(col_n14[12],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0.39,0.835),las=1, lty=1,lwd=5,
+           col.line=col_n14[12],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B13.exp.sor, col=paste(col_n14[13],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0.39,0.835),las=1, lty=1,lwd=5,
+           col.line=col_n14[13],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+dev.off()
+```
+
+
+
+```{r plot-Bac-clus-sor-sim-geo, warning=T,eval=TRUE,cache=F,echo=FALSE,fig.dim=c(7,4),fig.dpi=250}
+par(mfrow = c(1, 2),#c(nr, nc) 
+    mar = c(2, 2, 2.5, 2),# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+    oma = (c(3, 0, 2, 0) + 0.1))
+
+#sor
+plot.decay.pretty(decay.Bac_B1.exp.sor, col=paste(col_n14[1],"cc",sep = ""), main="Total Dissimilarity (βsor)\n Bacteria",cex.main=1,
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
+
+plot.decay.pretty(decay.Bac_B2.exp.sor, col=paste(col_n14[2],"cc",sep = ""), add=T, main="B2", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[2],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B3.exp.sor, col=paste(col_n14[3],"cc",sep = ""), add=T, main="B3", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[3],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B4.exp.sor, col=paste(col_n14[4],"cc",sep = ""), add=T, main="B4", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[4],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B5.exp.sor, col=paste(col_n14[5],"cc",sep = ""), add=T, main="B5", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[5],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B7.exp.sor, col=paste(col_n14[7],"cc",sep = ""), add=T, main="B7", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[7],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B8.exp.sor, col=paste(col_n14[8],"cc",sep = ""), add=T, main="B8", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[8],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B9.exp.sor, col=paste(col_n14[9],"cc",sep = ""), add=T, main="B9", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[9],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B10.exp.sor, col=paste(col_n14[10],"cc",sep = ""), add=T, main="B10", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[10],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B11.exp.sor, col=paste(col_n14[11],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[11],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B12.exp.sor, col=paste(col_n14[12],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[12],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B13.exp.sor, col=paste(col_n14[13],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[13],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+#sim
+plot.decay.pretty(decay.Bac_B1.exp.sim, col=paste(col_n14[1],"cc",sep = ""), main="Turnover-Resultant Dissimilarity\n(βsim) Bacteria",cex.main=1,
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+plot.decay.pretty(decay.Bac_B2.exp.sim, col=paste(col_n14[2],"cc",sep = ""), add=T, main="B2", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[2],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B3.exp.sim, col=paste(col_n14[3],"cc",sep = ""), add=T, main="B3", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[3],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B4.exp.sim, col=paste(col_n14[4],"cc",sep = ""), add=T, main="B4", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[4],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B5.exp.sim, col=paste(col_n14[5],"cc",sep = ""), add=T, main="B5", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[5],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B7.exp.sim, col=paste(col_n14[7],"cc",sep = ""), add=T, main="B7", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[7],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B8.exp.sim, col=paste(col_n14[8],"cc",sep = ""), add=T, main="B8", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[8],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B9.exp.sim, col=paste(col_n14[9],"cc",sep = ""), add=T, main="B9", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[9],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B10.exp.sim, col=paste(col_n14[10],"cc",sep = ""), add=T, main="B10", 
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[10],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B11.exp.sim, col=paste(col_n14[11],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[11],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B12.exp.sim, col=paste(col_n14[12],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[12],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+plot.decay.pretty(decay.Bac_B13.exp.sim, col=paste(col_n14[13],"cc",sep = ""), add=T,
+           xlim = c(0,1600),ylim = c(0.3,1),las=1, lty=1,lwd=5,
+           col.line=col_n14[13],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+
+```
+
+
+
+# spatial extent
+
+```{r echo=FALSE}
+spatial_extent_plot_OG<-readRDS(file = "../figures/sfaf/sfaf2025/spatial_extent_plot_OG.rds")
+
+spatial_extent_plot <- spatial_extent_plot_OG +
+  theme(legend.position = "inside",
+    legend.position.inside = c(0.9,0.95),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 17),
+        plot.title = element_blank(),
+        plot.subtitle = element_blank(),
+        axis.title = element_blank(),
+        plot.background = element_rect(fill = NA, colour = NA))
+spatial_extent_plot
+
+# ggsave("../figures/sfaf/sfaf2025/spatial_extent_plot_F1nonF1.png", 
+#        plot = last_plot(),
+#        # width = 6, 
+#        height = 5, units = "in", device = "png", dpi = 400)
+
+```
+

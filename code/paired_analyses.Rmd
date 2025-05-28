@@ -1,0 +1,44 @@
+---
+title: "**Paired Bacterial-Fungi Community Analyses**"
+subtitle: "Alpha diversity, beta diversity"
+author: "Kelli Feeser"
+date: '2024-01-17'
+output:
+  bookdown::html_document2:
+    code_folding: hide
+    df_print: kable
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    fig.caption: yes
+    keep_md: yes
+  html_notebook:
+    code_folding: hide
+    df_print: kable
+    css: test.css
+    number_sections: yes
+    theme: cosmo
+    toc: yes
+    toc_depth: 4
+editor_options:
+  chunk_output_type: inline
+---
+
+
+
+
+
+
+
+
+# Indicator Species Analysis
+library(indicspecies)
+
+# Assuming Fun and Bac are merged phyloseq objects
+indicators_fun <- multipatt(as.matrix(otu_table(Fun)), metadata_df$climate)
+indicators_bac <- multipatt(as.matrix(otu_table(Bac)), metadata_df$climate)
+
+# Visualization of indicator species
+plot(indicators_fun)
+plot(indicators_bac)

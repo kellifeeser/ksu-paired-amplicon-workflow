@@ -1,0 +1,1826 @@
+---
+title: "**KSU paired amplicon Taxonomy**"
+subtitle: "Taxa plots of clean 16S and ITS OTU tables (EDGE samples excluded)"
+author: "Kelli Feeser"
+date: "`r Sys.Date()`"
+output:
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+    keep_md: yes
+  html_notebook:
+    code_folding: hide
+    df_print: paged
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    css: styles.css
+    fig.caption: yes
+  html_document:
+    code_folding: hide
+    df_print: paged
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    css: styles.css
+    fig.caption: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+\
+<div class="homelink">
+<a href="https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html" target="_blank" style="text-align:right">Back to Home</a>
+</div>
+
+```{r setup, include = FALSE}
+# set up global R options
+  # to list the current values of all options but better to F1
+    #options()
+    # easier way:
+      #?options
+  # to access the value of a single option
+    #getOption("width")
+
+
+# set up knitr global chunk options
+  # See str(knitr::opts_chunk$get()) for a list of default chunk options.
+knitr::opts_chunk$set(fig.width = 8)
+knitr::opts_chunk$set(fig.path = "../docs/figures/taxa_plots/")
+#knitr::opts_chunk$set(fig.path = "figures/taxa_plots/prefix-")
+```
+
+```{r LANL proxies, eval=T, include=FALSE}
+# LANL proxies
+Sys.setenv('HTTP_PROXY'='http://proxyout.lanl.gov:8080')
+Sys.setenv('HTTPS_PROXY'='http://proxyout.lanl.gov:8080')
+```
+
+```{r github-stuff, eval=FALSE,include=FALSE}
+rmarkdown:::site_skeleton("/Users/L347123/Desktop/ksu-paired-amplicon-workflow/docs/")
+```
+
+
+# Set-up project naming from reproducible code {.unlisted .unnumbered .hidden}
+
+```{r project-naming, include=F, eval=F}
+PROJECT <- 'KSU paired amplicons'
+PROJABBV <- 'ksu'
+
+DATASET1 <- 'Bac'
+DATASET2 <- 'Fun'
+
+RDS1 <- 'BacArch_min2_rare9048_v1'
+RDS2 <- 'Fun_min2_rare10116_v2'
+
+```
+
+
+# Set-up {.unlisted .unnumbered .hidden}
+
+```{r load packages, eval=T, include=F}
+library("ggplot2"); packageVersion("ggplot2") #‘3.4.4’
+library("vegan"); packageVersion("vegan") # # ‘2.6.4’
+library("phyloseq"); packageVersion("phyloseq") #‘1.44.0’
+library("scales"); packageVersion("scales") #‘1.2.1’
+library("swatches"); packageVersion("swatches") #‘0.5.0’
+library("ggsci"); packageVersion("ggsci") #‘3.0.0’
+library("ggpubr"); packageVersion("ggpubr") #‘0.6.0’
+library("viridis"); packageVersion("viridis") #‘0.6.4’
+library("RColorBrewer"); packageVersion("RColorBrewer") #‘1.1.3’
+library("cowplot"); packageVersion("cowplot") #‘1.1.1’
+library("dplyr"); packageVersion("dplyr") #‘1.1.3’
+library("plyr"); packageVersion("plyr") #‘1.8.9’
+
+  # if (!require("BiocManager", quietly = TRUE))
+  #     install.packages("BiocManager")
+  # BiocManager::install(version = "3.11")
+  # 
+  # BiocManager::install("microbiome")
+library("microbiome"); packageVersion("microbiome") #‘1.22.0’
+
+source("ksu_colors.R")
+```
+
+
+
+# Import clean OTU tables
+
+```{r readin-clean-rds, echo=F, eval=F}
+Bac<-readRDS(file = "../processed_data/clean_rds_saves/Bac_wholecommunity.rds")
+#old
+  # otu_table()   OTU Table:         [ 23156 taxa and 533 samples ]
+  # sample_data() Sample Data:       [ 533 samples by 39 sample variables ]
+#new
+  # otu_table()   OTU Table:         [ 22661 taxa and 484 samples ]
+  # sample_data() Sample Data:       [ 484 samples by 64 sample variables ]
+  # tax_table()   Taxonomy Table:    [ 22661 taxa by 6 taxonomic ranks ]
+Fun<-readRDS(file = "../processed_data/clean_rds_saves/Fun_wholecommunity.rds")
+#old
+  # otu_table()   OTU Table:         [ 6749 taxa and 509 samples ]
+  # sample_data() Sample Data:       [ 509 samples by 39 sample variables ]
+#new
+  # otu_table()   OTU Table:         [ 6626 taxa and 484 samples ]
+  # sample_data() Sample Data:       [ 484 samples by 66 sample variables ]
+  # tax_table()   Taxonomy Table:    [ 6626 taxa by 7 taxonomic ranks ]
+
+
+#to view
+as.data.frame.matrix(tax_table(Fun_wholecommunity))$Sign
+
+#fun
+Fun_wholecommunity_wGvS <- Fun_wholecommunity
+cft<-as.data.frame.matrix(tax_table(Fun_wholecommunity))
+cft$OTU_Sign <- cft$Sign
+cft$OTU_Sign <- as.factor(cft$OTU_Sign)
+cft$OTU_Sign <- revalue(cft$OTU_Sign, c("Singleton" = "Singletons"))
+cft$OTU_Sign <- factor(cft$OTU_Sign, levels = c("Generalists","Specialists","NS","Singletons"))
+cft$Sign <- NULL
+tax_table(Fun_wholecommunity_wGvS) <- tax_table(as.matrix(cft))
+head(tax_table(Fun_wholecommunity_wGvS))
+
+cft2<-subset(cft, select = -OTU_Sign)
+tax_table(Fun_wholecommunity) <- tax_table(as.matrix(cft2))
+head(tax_table(Fun_wholecommunity))
+
+#bac
+Bac_wholecommunity_wGvS <- Bac_wholecommunity
+
+cbt<-as.data.frame.matrix(tax_table(Bac_wholecommunity))
+cbt$OTU_Sign <- cbt$Sign
+cbt$Sign <- NULL
+cbt<-cbt %>% dplyr::mutate(OTU_Sign = replace_na(OTU_Sign, "Singletons"))
+cbt$OTU_Sign <- factor(cbt$OTU_Sign, levels = c("Generalists","Specialists","NS","Singletons"))
+
+tax_table(Bac_wholecommunity_wGvS) <- tax_table(as.matrix(cbt))
+head(tax_table(Bac_wholecommunity_wGvS))
+
+cbt2<-subset(cbt, select = -OTU_Sign)
+tax_table(Bac_wholecommunity) <- tax_table(as.matrix(cbt2))
+head(tax_table(Bac_wholecommunity))
+
+
+# removing GvS taxonomy col (and saving for export)
+Fun_wholecommunity.r  = transform_sample_counts(Fun_wholecommunity, function(x) x / sum(x) )
+saveRDS(Fun_wholecommunity.r, file = "../processed_data/clean_rds_saves/Fun_wholecommunity.r.rds") 
+saveRDS(Fun_wholecommunity, file = "../processed_data/clean_rds_saves/Fun_wholecommunity.rds") 
+saveRDS(Fun_wholecommunity_wGvS, file = "../processed_data/clean_rds_saves/Fun_wholecommunity_wGvS.rds") 
+
+Bac_wholecommunity.r  = transform_sample_counts(Bac_wholecommunity, function(x) x / sum(x) )
+saveRDS(Bac_wholecommunity.r, file = "../processed_data/clean_rds_saves/Bac_wholecommunity.r.rds") 
+saveRDS(Bac_wholecommunity, file = "../processed_data/clean_rds_saves/Bac_wholecommunity.rds") 
+saveRDS(Bac_wholecommunity_wGvS, file = "../processed_data/clean_rds_saves/Bac_wholecommunity_wGvS.rds") 
+
+Bac<-Bac_wholecommunity
+Fun<-Fun_wholecommunity
+```
+
+```{r fix-cyano-naming-phylo-object, include=FALSE, eval=FALSE}
+# rename
+tax_table(DATASET1)[,colnames(tax_table(DATASET1))] <- gsub(tax_table(DATASET1)[,colnames(tax_table(DATASET1))],pattern="Cyanobacteria/Chloroplast",replacement="Cyanobacteria")
+
+    # get_taxa_unique(DATASET1, taxonomic.rank = "Phylum")
+
+tax_table(DATASET2)[,colnames(tax_table(DATASET2))] <- gsub(tax_table(DATASET2)[,colnames(tax_table(DATASET2))],pattern="Cyanobacteria/Chloroplast",replacement="Cyanobacteria")
+
+    # get_taxa_unique(DATASET2, taxonomic.rank = "Phylum")
+
+# save
+saveRDS(DATASET1, file = "../processed_data/clean_rds_saves/RDS1.rds")
+saveRDS(DATASET2, file = "../processed_data/clean_rds_saves/RDS2.rds")
+
+```
+
+All EDGE samples excluded \
+OTU tables rarefied to the following sequencing depths:
+
+-   16S: `r prettyNum(max(sample_sums(Bac)),big.mark = ",")` 
+-   ITS: `r prettyNum(max(sample_sums(Fun)),big.mark = ",")`
+
+
+**Bacterial & Archaeal Dataset:**
+
+- `r prettyNum(ntaxa(Bac),big.mark = ",")` OTUs
+- `r prettyNum(nsamples(Bac),big.mark = ",")` samples
+\
+
+**Fungal Dataset:**
+
+- `r prettyNum(ntaxa(Fun),big.mark = ",")` OTUs
+- `r prettyNum(nsamples(Fun),big.mark = ",")` samples
+\
+
+# Set-up metadata strata {.unlisted .unnumbered .hidden}
+
+# Available metadata {.unlisted .unnumbered}
+
+
+Available metadata:
+
+```{r, echo=F, eval=T}
+sd_Bac<-sample_data(Bac)
+colnames(sd_Bac)
+```
+
+\
+
+# Set-up taxonomy for plotting {.unlisted .unnumbered .hidden}
+
+\
+
+## Global: Calculate  mean relative abundance by tax rank and export csv of relative abundance 
+
+### merge samples within dataset 
+
+```{r merge-all-samples-by-dataset, include=F, eval=F, cache=TRUE}
+# merge all samples to calculate mean relative abundance by tax rank
+Bac_merged <- merge_samples(Bac, "Edge",fun=mean)
+Fun_merged <- merge_samples(Fun, "Edge",fun=mean)
+```
+
+### tax glom and export 
+(no generating code just copy and replace)
+
+```{r glom-merged-obs-by-rank-and-export-relabund-csv, include=F, eval=F, cache=TRUE}
+
+##
+#################
+# Bac Phylum #
+#################
+Bac_merged.Phylum.A <- tax_glom(Bac_merged, taxrank="Phylum")
+Bac_merged.Phylum <- prune_taxa(taxa_sums(Bac_merged.Phylum.A) > 0, Bac_merged.Phylum.A)
+Bac_merged.Phylum.r  = transform_sample_counts(Bac_merged.Phylum, function(x) x / sum(x) )
+length(get_taxa_unique(Bac_merged.Phylum.r, taxonomic.rank = "Phylum"))
+  #35
+
+sample_names(Bac_merged.Phylum.r)<-"Bac_Phylum_Mean"
+Bac_Phylum_Mean_Abund <- merge(tax_table(Bac_merged.Phylum.r)[,c("Domain","Phylum")], t(otu_table(Bac_merged.Phylum.r)), by=0, all=TRUE)
+colnames(Bac_Phylum_Mean_Abund)[1]<-"Bac_OTU"
+Bac_Phylum_Mean_Abund$Bac_Phylum_Mean<-as.numeric(Bac_Phylum_Mean_Abund$Bac_Phylum_Mean*100)
+Bac_Phylum_Mean_Abund <-Bac_Phylum_Mean_Abund[order(Bac_Phylum_Mean_Abund$Bac_Phylum_Mean, decreasing = T),]
+write.csv(Bac_Phylum_Mean_Abund, file="../analyses/taxonomy/RelAbundance_Bac_Global_mean_Phylum.csv")
+##
+
+##
+##############
+# Fun Phylum #
+##############
+Fun_merged.Phylum.A <- tax_glom(Fun_merged, taxrank="Phylum")
+Fun_merged.Phylum <- prune_taxa(taxa_sums(Fun_merged.Phylum.A) > 0, Fun_merged.Phylum.A)
+Fun_merged.Phylum.r  = transform_sample_counts(Fun_merged.Phylum, function(x) x / sum(x) )
+length(get_taxa_unique(Fun_merged.Phylum.r, taxonomic.rank = "Phylum"))
+  #9
+
+sample_names(Fun_merged.Phylum.r)<-"Fun_Phylum_Mean"
+Fun_Phylum_Mean_Abund <- merge(tax_table(Fun_merged.Phylum.r)[,c("Domain","Phylum")], t(otu_table(Fun_merged.Phylum.r)), by=0, all=TRUE)
+colnames(Fun_Phylum_Mean_Abund)[1]<-"Fun_OTU"
+Fun_Phylum_Mean_Abund$Fun_Phylum_Mean<-as.numeric(Fun_Phylum_Mean_Abund$Fun_Phylum_Mean*100)
+Fun_Phylum_Mean_Abund <-Fun_Phylum_Mean_Abund[order(Fun_Phylum_Mean_Abund$Fun_Phylum_Mean, decreasing = T),]
+write.csv(Fun_Phylum_Mean_Abund, file="../analyses/taxonomy/RelAbundance_Fun_Global_mean_Phylum.csv")
+##
+
+#######################################################################
+#######################################################################
+
+##
+################
+# Bac Class #
+################
+Bac_merged.Class.A <- tax_glom(Bac_merged, taxrank="Class")
+Bac_merged.Class <- prune_taxa(taxa_sums(Bac_merged.Class.A) > 0, Bac_merged.Class.A)
+Bac_merged.Class.r  = transform_sample_counts(Bac_merged.Class, function(x) x / sum(x) )
+  #107
+
+sample_names(Bac_merged.Class.r)<-"Bac_Class_Mean"
+Bac_Class_Mean_Abund <- merge(tax_table(Bac_merged.Class.r)[,c("Domain","Phylum","Class")], t(otu_table(Bac_merged.Class.r)), by=0, all=TRUE)
+colnames(Bac_Class_Mean_Abund)[1]<-"Bac_OTU"
+Bac_Class_Mean_Abund$Bac_Class_Mean<-as.numeric(Bac_Class_Mean_Abund$Bac_Class_Mean*100)
+Bac_Class_Mean_Abund <-Bac_Class_Mean_Abund[order(Bac_Class_Mean_Abund$Bac_Class_Mean, decreasing = T),]
+write.csv(Bac_Class_Mean_Abund, file="../analyses/taxonomy/RelAbundance_Bac_Global_mean_Class.csv")
+##
+
+##
+#############
+# Fun Class #
+#############
+Fun_merged.Class.A <- tax_glom(Fun_merged, taxrank="Class")
+Fun_merged.Class <- prune_taxa(taxa_sums(Fun_merged.Class.A) > 0, Fun_merged.Class.A)
+Fun_merged.Class.r  = transform_sample_counts(Fun_merged.Class, function(x) x / sum(x) )
+  #58
+
+sample_names(Fun_merged.Class.r)<-"Fun_Class_Mean"
+Fun_Class_Mean_Abund <- merge(tax_table(Fun_merged.Class.r)[,c("Domain","Phylum","Class")], t(otu_table(Fun_merged.Class.r)), by=0, all=TRUE)
+colnames(Fun_Class_Mean_Abund)[1]<-"Fun_OTU"
+Fun_Class_Mean_Abund$Fun_Class_Mean<-as.numeric(Fun_Class_Mean_Abund$Fun_Class_Mean*100)
+Fun_Class_Mean_Abund <-Fun_Class_Mean_Abund[order(Fun_Class_Mean_Abund$Fun_Class_Mean, decreasing = T),]
+write.csv(Fun_Class_Mean_Abund, file="../analyses/taxonomy/RelAbundance_Fun_Global_mean_Class.csv")
+##
+
+#######################################################################
+#######################################################################
+
+##
+################
+# Bac Order #
+################
+Bac_merged.Order.A <- tax_glom(Bac_merged, taxrank="Order")
+Bac_merged.Order <- prune_taxa(taxa_sums(Bac_merged.Order.A) > 0, Bac_merged.Order.A)
+Bac_merged.Order.r  = transform_sample_counts(Bac_merged.Order, function(x) x / sum(x) )
+  #217
+
+sample_names(Bac_merged.Order.r)<-"Bac_Order_Mean"
+Bac_Order_Mean_Abund <- merge(tax_table(Bac_merged.Order.r)[,c("Domain","Phylum","Class","Order")], t(otu_table(Bac_merged.Order.r)), by=0, all=TRUE)
+colnames(Bac_Order_Mean_Abund)[1]<-"Bac_OTU"
+Bac_Order_Mean_Abund$Bac_Order_Mean<-as.numeric(Bac_Order_Mean_Abund$Bac_Order_Mean*100)
+Bac_Order_Mean_Abund <-Bac_Order_Mean_Abund[order(Bac_Order_Mean_Abund$Bac_Order_Mean, decreasing = T),]
+write.csv(Bac_Order_Mean_Abund, file="../analyses/taxonomy/RelAbundance_Bac_Global_mean_Order.csv")
+##
+
+##
+##############
+# Fun Order #
+##############
+Fun_merged.Order.A <- tax_glom(Fun_merged, taxrank="Order")
+Fun_merged.Order <- prune_taxa(taxa_sums(Fun_merged.Order.A) > 0, Fun_merged.Order.A)
+Fun_merged.Order.r  = transform_sample_counts(Fun_merged.Order, function(x) x / sum(x) )
+  #164
+
+sample_names(Fun_merged.Order.r)<-"Fun_Order_Mean"
+Fun_Order_Mean_Abund <- merge(tax_table(Fun_merged.Order.r)[,c("Domain","Phylum","Class","Order")], t(otu_table(Fun_merged.Order.r)), by=0, all=TRUE)
+colnames(Fun_Order_Mean_Abund)[1]<-"Fun_OTU"
+Fun_Order_Mean_Abund$Fun_Order_Mean<-as.numeric(Fun_Order_Mean_Abund$Fun_Order_Mean*100)
+Fun_Order_Mean_Abund <-Fun_Order_Mean_Abund[order(Fun_Order_Mean_Abund$Fun_Order_Mean, decreasing = T),]
+#Fun_Order_Mean_Abund$Fun_Order_Mean<-round(as.numeric(Fun_Order_Mean_Abund$Fun_Order_Mean),digFun=2)
+write.csv(Fun_Order_Mean_Abund, file="../analyses/taxonomy/RelAbundance_Fun_Global_mean_Order.csv")
+##
+
+#######################################################################
+#######################################################################
+
+##
+#################
+# Bac Family #
+#################
+Bac_merged.Family.A <- tax_glom(Bac_merged, taxrank="Family")
+Bac_merged.Family <- prune_taxa(taxa_sums(Bac_merged.Family.A) > 0, Bac_merged.Family.A)
+Bac_merged.Family.r  = transform_sample_counts(Bac_merged.Family, function(x) x / sum(x) )
+  #458
+
+sample_names(Bac_merged.Family.r)<-"Bac_Family_Mean"
+Bac_Family_Mean_Abund <- merge(tax_table(Bac_merged.Family.r)[,c("Domain","Phylum","Class","Order","Family")], t(otu_table(Bac_merged.Family.r)), by=0, all=TRUE)
+colnames(Bac_Family_Mean_Abund)[1]<-"Bac_OTU"
+Bac_Family_Mean_Abund$Bac_Family_Mean<-as.numeric(Bac_Family_Mean_Abund$Bac_Family_Mean*100)
+Bac_Family_Mean_Abund <-Bac_Family_Mean_Abund[order(Bac_Family_Mean_Abund$Bac_Family_Mean, decreasing = T),]
+#Bac_Family_Mean_Abund$Bac_Family_Mean<-round(as.numeric(Bac_Family_Mean_Abund$Bac_Family_Mean),digFun=2)
+write.csv(Bac_Family_Mean_Abund, file="../analyses/taxonomy/RelAbundance_Bac_Global_mean_Family.csv")
+##
+
+##
+###############
+# Fun Family #
+###############
+Fun_merged.Family.A <- tax_glom(Fun_merged, taxrank="Family")
+Fun_merged.Family <- prune_taxa(taxa_sums(Fun_merged.Family.A) > 0, Fun_merged.Family.A)
+Fun_merged.Family.r  = transform_sample_counts(Fun_merged.Family, function(x) x / sum(x) )
+  #401
+
+sample_names(Fun_merged.Family.r)<-"Fun_Family_Mean"
+Fun_Family_Mean_Abund <- merge(tax_table(Fun_merged.Family.r)[,c("Domain","Phylum","Class","Order","Family")], t(otu_table(Fun_merged.Family.r)), by=0, all=TRUE)
+colnames(Fun_Family_Mean_Abund)[1]<-"Fun_OTU"
+Fun_Family_Mean_Abund$Fun_Family_Mean<-as.numeric(Fun_Family_Mean_Abund$Fun_Family_Mean*100)
+Fun_Family_Mean_Abund <-Fun_Family_Mean_Abund[order(Fun_Family_Mean_Abund$Fun_Family_Mean, decreasing = T),]
+write.csv(Fun_Family_Mean_Abund, file="../analyses/taxonomy/RelAbundance_Fun_Global_mean_Family.csv")
+##
+
+#######################################################################
+#######################################################################
+
+##
+#################
+# Bac Genus #
+#################
+Bac_merged.Genus.A <- tax_glom(Bac_merged, taxrank="Genus")
+Bac_merged.Genus <- prune_taxa(taxa_sums(Bac_merged.Genus.A) > 0, Bac_merged.Genus.A)
+Bac_merged.Genus.r  = transform_sample_counts(Bac_merged.Genus, function(x) x / sum(x) )
+  #973
+
+sample_names(Bac_merged.Genus.r)<-"Bac_Genus_Mean"
+Bac_Genus_Mean_Abund <- merge(tax_table(Bac_merged.Genus.r)[,c("Domain","Phylum","Class","Order","Family","Genus")], t(otu_table(Bac_merged.Genus.r)), by=0, all=TRUE)
+colnames(Bac_Genus_Mean_Abund)[1]<-"Bac_OTU"
+Bac_Genus_Mean_Abund$Bac_Genus_Mean<-as.numeric(Bac_Genus_Mean_Abund$Bac_Genus_Mean*100)
+Bac_Genus_Mean_Abund <-Bac_Genus_Mean_Abund[order(Bac_Genus_Mean_Abund$Bac_Genus_Mean, decreasing = T),]
+write.csv(Bac_Genus_Mean_Abund, file="../analyses/taxonomy/RelAbundance_Bac_Global_mean_Genus.csv")
+##
+
+##
+##############
+# Fun Genus #
+##############
+Fun_merged.Genus.A <- tax_glom(Fun_merged, taxrank="Genus")
+Fun_merged.Genus <- prune_taxa(taxa_sums(Fun_merged.Genus.A) > 0, Fun_merged.Genus.A)
+Fun_merged.Genus.r  = transform_sample_counts(Fun_merged.Genus, function(x) x / sum(x) )
+  #731
+
+sample_names(Fun_merged.Genus.r)<-"Fun_Genus_Mean"
+Fun_Genus_Mean_Abund <- merge(tax_table(Fun_merged.Genus.r)[,c("Domain","Phylum","Class","Order","Family","Genus")], t(otu_table(Fun_merged.Genus.r)), by=0, all=TRUE)
+colnames(Fun_Genus_Mean_Abund)[1]<-"Fun_OTU"
+Fun_Genus_Mean_Abund$Fun_Genus_Mean<-as.numeric(Fun_Genus_Mean_Abund$Fun_Genus_Mean*100)
+Fun_Genus_Mean_Abund <-Fun_Genus_Mean_Abund[order(Fun_Genus_Mean_Abund$Fun_Genus_Mean, decreasing = T),]
+write.csv(Fun_Genus_Mean_Abund, file="../analyses/taxonomy/RelAbundance_Fun_Global_mean_Genus.csv")
+##
+
+
+##
+##############
+# Fun Species #
+##############
+Fun_merged.Species.r  = transform_sample_counts(Fun_merged, function(x) x / sum(x) )
+  #6749
+
+sample_names(Fun_merged.Species.r)<-"Fun_Species_Mean"
+Fun_Species_Mean_Abund <- merge(tax_table(Fun_merged.Species.r)[,c("Domain","Phylum","Class","Order","Family","Genus","Species")], t(otu_table(Fun_merged.Species.r)), by=0, all=TRUE)
+colnames(Fun_Species_Mean_Abund)[1]<-"Fun_OTU"
+Fun_Species_Mean_Abund$Fun_Species_Mean<-as.numeric(Fun_Species_Mean_Abund$Fun_Species_Mean*100)
+Fun_Species_Mean_Abund <-Fun_Species_Mean_Abund[order(Fun_Species_Mean_Abund$Fun_Species_Mean, decreasing = T),]
+write.csv(Fun_Species_Mean_Abund, file="../analyses/taxonomy/RelAbundance_Fun_Global_mean_Species.csv")
+##
+```
+
+## Samples: Calculate relative abundance by tax rank and export csv of relative abundance {.unlisted .unnumbered .hidden} 
+
+
+1. create vectors of top 10 taxa names to plot for all ranks
+  - auto-generated code found: 
+  a. set minimum threshold of 0.5% all-sample (a.k.a global) mean relative abundance
+    - (so that taxa below this threshold won't get plotted)
+2. tax glom by each rank
+3. transform to relative abundance
+3. psmelt
+4. add column "[rank]_all" to preserve names not in top 10 
+5. recode all taxa not in top 10 to by "LowAbundance" & revalue with specifics later (in dat_Bac.[rank].r and in dat_Fun.[rank].r)
+
+
+### generating code: 
+
+```{r auto-populate-rank-names-to-plot-Bac, results='asis', eval=F}
+Bac.rank.names<-rank_names(Bac)[2:6]
+# add this line to beginning
+  #  cat('\n # Set min plotting threshold to 0.5% relative abundance (all-sample a.k.a global mean) \n')
+
+#also adding psmelt step
+
+for(rank in Bac.rank.names) {
+
+  cat('\n## \n')
+
+  cat('################## \n')
+
+  cat('# Bac:', rank, '# \n')
+
+  cat('################## \n')
+
+  cat('\n')
+  
+   cat('min_nname_Bac_', rank, '<-length(unique(Bac_', rank, '_Mean_Abund$', 
+       rank, '[Bac_', rank, '_Mean_Abund$Bac_', rank, '_Mean > 0.5]))',
+       sep = '')
+  
+  cat('\n \n ')
+
+    cat('if (min_nname_Bac_', rank, ' < 10){
+  Bac.', rank, '.names.to.plot<-top_n(Bac_', rank, '_Mean_Abund, min_nname_Bac_', rank, ', Bac_', rank, '_Mean)$',rank, ' 
+} else {
+  Bac.', rank, '.names.to.plot<-top_n(Bac_', rank, '_Mean_Abund, 10, Bac_', rank, '_Mean)$', rank, '
+}', sep = '')
+
+  cat('\n# \n')
+  
+  cat('\nBac.',rank,'.A <- tax_glom(Bac, taxrank="',rank,'")\n',sep = '')
+  
+  cat('Bac.',rank,' <- prune_taxa(taxa_sums(Bac.',rank,'.A) > 0, Bac.',rank,'.A)\n',sep = '')
+
+  cat('Bac.',rank,'.r  = transform_sample_counts(Bac.',rank,', function(x) x / sum(x) )\n',sep = '')
+
+  cat('dat_Bac.',rank,'.r <- psmelt(Bac.',rank,'.r)\n',sep = '')
+
+  cat('dat_Bac.',rank,'.r$',rank,' <- as.character(dat_Bac.',rank,'.r$',rank,') \n',sep = '')
+
+  cat('dat_Bac.',rank,'.r$',rank,'_all <- dat_Bac.',rank,'.r$',rank,' \n',sep = '')
+  
+  cat('dat_Bac.',rank,'.r$',rank,' <- if_else(dat_Bac.',rank,'.r$',rank,' %in% Bac.',rank,'.names.to.plot, dat_Bac.',rank,'.r$',rank,', "LowAbundance") \n',sep = '')
+
+  cat('\n## \n')
+
+  cat('\n \n')
+
+}
+
+```
+
+```{r auto-populate-rank-names-to-plot-Fun, results='asis', eval=F}
+Fun.rank.names<-rank_names(Fun)[2:7] #change 6 to 7 if fungal
+
+# add this line to beginning
+  #  cat('\n # Set min plotting threshold to 0.5% relative abundance (all-sample a.k.a global mean) \n')
+
+#also adding psmelt step
+
+for(rank in Fun.rank.names) {
+
+  cat('\n## \n')
+
+  cat('################## \n')
+
+  cat('# Fun:', rank, '# \n')
+
+  cat('################## \n')
+
+  cat('\n')
+  
+   cat('min_nname_Fun_', rank, '<-length(unique(Fun_', rank, '_Mean_Abund$', 
+       rank, '[Fun_', rank, '_Mean_Abund$Fun_', rank, '_Mean > 0.5]))',
+       sep = '')
+  
+  cat('\n \n ')
+
+    cat('if (min_nname_Fun_', rank, ' < 10){
+  Fun.', rank, '.names.to.plot<-top_n(Fun_', rank, '_Mean_Abund, min_nname_Fun_', rank, ', Fun_', rank, '_Mean)$',rank, ' 
+} else {
+  Fun.', rank, '.names.to.plot<-top_n(Fun_', rank, '_Mean_Abund, 10, Fun_', rank, '_Mean)$', rank, '
+}', sep = '')
+
+  cat('\n# \n')
+  
+  cat('\nFun.',rank,'.A <- tax_glom(Fun, taxrank="',rank,'")\n',sep = '')
+  
+  cat('Fun.',rank,' <- prune_taxa(taxa_sums(Fun.',rank,'.A) > 0, Fun.',rank,'.A)\n',sep = '')
+
+  cat('Fun.',rank,'.r  = transform_sample_counts(Fun.',rank,', function(x) x / sum(x) )\n',sep = '')
+
+  cat('dat_Fun.',rank,'.r <- psmelt(Fun.',rank,'.r)\n',sep = '')
+
+  cat('dat_Fun.',rank,'.r$',rank,' <- as.character(dat_Fun.',rank,'.r$',rank,') \n',sep = '')
+
+  cat('dat_Fun.',rank,'.r$',rank,'_all <- dat_Fun.',rank,'.r$',rank,' \n',sep = '')
+  
+  cat('dat_Fun.',rank,'.r$',rank,' <- if_else(dat_Fun.',rank,'.r$',rank,' %in% Fun.',rank,'.names.to.plot, dat_Fun.',rank,'.r$',rank,', "LowAbundance") \n',sep = '')
+
+  cat('\n## \n')
+
+  cat('\n \n')
+
+}
+
+```
+
+### create vectors of top 10 taxa names
+
+#### Bac
+
+(paste in previous generated code)
+
+```{r rank-names-plotting-Bac-plus-psmelt, include=F, eval=F, cache=TRUE}
+
+## 
+################## 
+# Bac: Phylum # 
+################## 
+
+min_nname_Bac_Phylum<-length(unique(Bac_Phylum_Mean_Abund$Phylum[Bac_Phylum_Mean_Abund$Bac_Phylum_Mean > 0.5]))
+ 
+ if (min_nname_Bac_Phylum < 10){
+  Bac.Phylum.names.to.plot<-top_n(Bac_Phylum_Mean_Abund, min_nname_Bac_Phylum, Bac_Phylum_Mean)$Phylum 
+} else {
+  Bac.Phylum.names.to.plot<-top_n(Bac_Phylum_Mean_Abund, 10, Bac_Phylum_Mean)$Phylum
+}
+# 
+
+Bac.Phylum.A <- tax_glom(Bac, taxrank="Phylum")
+Bac.Phylum <- prune_taxa(taxa_sums(Bac.Phylum.A) > 0, Bac.Phylum.A)
+Bac.Phylum.r  = transform_sample_counts(Bac.Phylum, function(x) x / sum(x) )
+dat_Bac.Phylum.r <- psmelt(Bac.Phylum.r)
+dat_Bac.Phylum.r$Phylum <- as.character(dat_Bac.Phylum.r$Phylum) 
+dat_Bac.Phylum.r$Phylum_all <- dat_Bac.Phylum.r$Phylum 
+dat_Bac.Phylum.r$Phylum <- if_else(dat_Bac.Phylum.r$Phylum %in% Bac.Phylum.names.to.plot, dat_Bac.Phylum.r$Phylum, "LowAbundance") 
+
+## 
+
+ 
+
+## 
+################## 
+# Bac: Class # 
+################## 
+
+min_nname_Bac_Class<-length(unique(Bac_Class_Mean_Abund$Class[Bac_Class_Mean_Abund$Bac_Class_Mean > 0.5]))
+ 
+ if (min_nname_Bac_Class < 10){
+  Bac.Class.names.to.plot<-top_n(Bac_Class_Mean_Abund, min_nname_Bac_Class, Bac_Class_Mean)$Class 
+} else {
+  Bac.Class.names.to.plot<-top_n(Bac_Class_Mean_Abund, 10, Bac_Class_Mean)$Class
+}
+# 
+
+Bac.Class.A <- tax_glom(Bac, taxrank="Class")
+Bac.Class <- prune_taxa(taxa_sums(Bac.Class.A) > 0, Bac.Class.A)
+Bac.Class.r  = transform_sample_counts(Bac.Class, function(x) x / sum(x) )
+dat_Bac.Class.r <- psmelt(Bac.Class.r)
+dat_Bac.Class.r$Class <- as.character(dat_Bac.Class.r$Class) 
+dat_Bac.Class.r$Class_all <- dat_Bac.Class.r$Class 
+dat_Bac.Class.r$Class <- if_else(dat_Bac.Class.r$Class %in% Bac.Class.names.to.plot, dat_Bac.Class.r$Class, "LowAbundance") 
+
+## 
+
+ 
+
+## 
+################## 
+# Bac: Order # 
+################## 
+
+min_nname_Bac_Order<-length(unique(Bac_Order_Mean_Abund$Order[Bac_Order_Mean_Abund$Bac_Order_Mean > 0.5]))
+ 
+ if (min_nname_Bac_Order < 10){
+  Bac.Order.names.to.plot<-top_n(Bac_Order_Mean_Abund, min_nname_Bac_Order, Bac_Order_Mean)$Order 
+} else {
+  Bac.Order.names.to.plot<-top_n(Bac_Order_Mean_Abund, 10, Bac_Order_Mean)$Order
+}
+# 
+
+Bac.Order.A <- tax_glom(Bac, taxrank="Order")
+Bac.Order <- prune_taxa(taxa_sums(Bac.Order.A) > 0, Bac.Order.A)
+Bac.Order.r  = transform_sample_counts(Bac.Order, function(x) x / sum(x) )
+dat_Bac.Order.r <- psmelt(Bac.Order.r)
+dat_Bac.Order.r$Order <- as.character(dat_Bac.Order.r$Order) 
+dat_Bac.Order.r$Order_all <- dat_Bac.Order.r$Order 
+dat_Bac.Order.r$Order <- if_else(dat_Bac.Order.r$Order %in% Bac.Order.names.to.plot, dat_Bac.Order.r$Order, "LowAbundance") 
+
+## 
+
+ 
+
+## 
+################## 
+# Bac: Family # 
+################## 
+
+min_nname_Bac_Family<-length(unique(Bac_Family_Mean_Abund$Family[Bac_Family_Mean_Abund$Bac_Family_Mean > 0.5]))
+ 
+ if (min_nname_Bac_Family < 10){
+  Bac.Family.names.to.plot<-top_n(Bac_Family_Mean_Abund, min_nname_Bac_Family, Bac_Family_Mean)$Family 
+} else {
+  Bac.Family.names.to.plot<-top_n(Bac_Family_Mean_Abund, 10, Bac_Family_Mean)$Family
+}
+# 
+
+Bac.Family.A <- tax_glom(Bac, taxrank="Family")
+Bac.Family <- prune_taxa(taxa_sums(Bac.Family.A) > 0, Bac.Family.A)
+Bac.Family.r  = transform_sample_counts(Bac.Family, function(x) x / sum(x) )
+dat_Bac.Family.r <- psmelt(Bac.Family.r)
+dat_Bac.Family.r$Family <- as.character(dat_Bac.Family.r$Family) 
+dat_Bac.Family.r$Family_all <- dat_Bac.Family.r$Family 
+dat_Bac.Family.r$Family <- if_else(dat_Bac.Family.r$Family %in% Bac.Family.names.to.plot, dat_Bac.Family.r$Family, "LowAbundance") 
+
+## 
+
+ 
+
+## 
+################## 
+# Bac: Genus # 
+################## 
+
+min_nname_Bac_Genus<-length(unique(Bac_Genus_Mean_Abund$Genus[Bac_Genus_Mean_Abund$Bac_Genus_Mean > 0.5]))
+ 
+ if (min_nname_Bac_Genus < 10){
+  Bac.Genus.names.to.plot<-top_n(Bac_Genus_Mean_Abund, min_nname_Bac_Genus, Bac_Genus_Mean)$Genus 
+} else {
+  Bac.Genus.names.to.plot<-top_n(Bac_Genus_Mean_Abund, 10, Bac_Genus_Mean)$Genus
+}
+# 
+
+Bac.Genus.A <- tax_glom(Bac, taxrank="Genus")
+Bac.Genus <- prune_taxa(taxa_sums(Bac.Genus.A) > 0, Bac.Genus.A)
+Bac.Genus.r  = transform_sample_counts(Bac.Genus, function(x) x / sum(x) )
+dat_Bac.Genus.r <- psmelt(Bac.Genus.r)
+dat_Bac.Genus.r$Genus <- as.character(dat_Bac.Genus.r$Genus) 
+dat_Bac.Genus.r$Genus_all <- dat_Bac.Genus.r$Genus 
+dat_Bac.Genus.r$Genus <- if_else(dat_Bac.Genus.r$Genus %in% Bac.Genus.names.to.plot, dat_Bac.Genus.r$Genus, "LowAbundance") 
+
+# merge(tax_table(dat_Bac.Genus.r)[,c("Domain","Phylum","Class","Order","Family","Genus")], t(otu_table(Fun_merged.Genus.r)), by=0, all=TRUE)
+# colnames(Fun_Genus_Mean_Abund)[1]<-"Fun_OTU"
+# Fun_Genus_Mean_Abund$Fun_Genus_Mean<-as.numeric(Fun_Genus_Mean_Abund$Fun_Genus_Mean*100)
+# Fun_Genus_Mean_Abund <-Fun_Genus_Mean_Abund[order(Fun_Genus_Mean_Abund$Fun_Genus_Mean, decreasing = T),]
+# write.csv(Fun_Genus_Mean_Abund, file="../analyses/taxonomy/RelAbundance_Fun_Global_mean_Genus.csv")
+## 
+
+ 
+```
+
+#### Fun
+
+```{r rank-names-plotting-Fun-plus-psmelt, include=F, eval=F, cache=TRUE}
+
+## 
+################## 
+# Fun: Phylum # 
+################## 
+
+min_nname_Fun_Phylum<-length(unique(Fun_Phylum_Mean_Abund$Phylum[Fun_Phylum_Mean_Abund$Fun_Phylum_Mean > 0.5]))
+ 
+ if (min_nname_Fun_Phylum < 10){
+  Fun.Phylum.names.to.plot<-top_n(Fun_Phylum_Mean_Abund, min_nname_Fun_Phylum, Fun_Phylum_Mean)$Phylum 
+} else {
+  Fun.Phylum.names.to.plot<-top_n(Fun_Phylum_Mean_Abund, 10, Fun_Phylum_Mean)$Phylum
+}
+# 
+
+Fun.Phylum.A <- tax_glom(Fun_wholecommunity, taxrank="Phylum")
+Fun.Phylum <- prune_taxa(taxa_sums(Fun.Phylum.A) > 0, Fun.Phylum.A)
+Fun.Phylum.r  = transform_sample_counts(Fun.Phylum, function(x) x / sum(x) )
+dat_Fun.Phylum.r <- psmelt(Fun.Phylum.r)
+dat_Fun.Phylum.r$Phylum <- as.character(dat_Fun.Phylum.r$Phylum) 
+dat_Fun.Phylum.r$Phylum_all <- dat_Fun.Phylum.r$Phylum 
+dat_Fun.Phylum.r$Phylum <- if_else(dat_Fun.Phylum.r$Phylum %in% Fun.Phylum.names.to.plot, dat_Fun.Phylum.r$Phylum, "LowAbundance") 
+
+## 
+
+ 
+
+## 
+################## 
+# Fun: Class # 
+################## 
+
+min_nname_Fun_Class<-length(unique(Fun_Class_Mean_Abund$Class[Fun_Class_Mean_Abund$Fun_Class_Mean > 0.5]))
+ 
+ if (min_nname_Fun_Class < 10){
+  Fun.Class.names.to.plot<-top_n(Fun_Class_Mean_Abund, min_nname_Fun_Class, Fun_Class_Mean)$Class 
+} else {
+  Fun.Class.names.to.plot<-top_n(Fun_Class_Mean_Abund, 10, Fun_Class_Mean)$Class
+}
+# 
+
+Fun.Class.A <- tax_glom(Fun_wholecommunity, taxrank="Class")
+Fun.Class <- prune_taxa(taxa_sums(Fun.Class.A) > 0, Fun.Class.A)
+Fun.Class.r  = transform_sample_counts(Fun.Class, function(x) x / sum(x) )
+dat_Fun.Class.r <- psmelt(Fun.Class.r)
+dat_Fun.Class.r$Class <- as.character(dat_Fun.Class.r$Class) 
+dat_Fun.Class.r$Class_all <- dat_Fun.Class.r$Class 
+dat_Fun.Class.r$Class <- if_else(dat_Fun.Class.r$Class %in% Fun.Class.names.to.plot, dat_Fun.Class.r$Class, "LowAbundance") 
+
+## 
+
+ 
+
+## 
+################## 
+# Fun: Order # 
+################## 
+
+min_nname_Fun_Order<-length(unique(Fun_Order_Mean_Abund$Order[Fun_Order_Mean_Abund$Fun_Order_Mean > 0.5]))
+ 
+ if (min_nname_Fun_Order < 10){
+  Fun.Order.names.to.plot<-top_n(Fun_Order_Mean_Abund, min_nname_Fun_Order, Fun_Order_Mean)$Order 
+} else {
+  Fun.Order.names.to.plot<-top_n(Fun_Order_Mean_Abund, 10, Fun_Order_Mean)$Order
+}
+# 
+
+Fun.Order.A <- tax_glom(Fun_wholecommunity, taxrank="Order")
+Fun.Order <- prune_taxa(taxa_sums(Fun.Order.A) > 0, Fun.Order.A)
+Fun.Order.r  = transform_sample_counts(Fun.Order, function(x) x / sum(x) )
+dat_Fun.Order.r <- psmelt(Fun.Order.r)
+dat_Fun.Order.r$Order <- as.character(dat_Fun.Order.r$Order) 
+dat_Fun.Order.r$Order_all <- dat_Fun.Order.r$Order 
+dat_Fun.Order.r$Order <- if_else(dat_Fun.Order.r$Order %in% Fun.Order.names.to.plot, dat_Fun.Order.r$Order, "LowAbundance") 
+
+## 
+
+ 
+
+## 
+################## 
+# Fun: Family # 
+################## 
+
+min_nname_Fun_Family<-length(unique(Fun_Family_Mean_Abund$Family[Fun_Family_Mean_Abund$Fun_Family_Mean > 0.5]))
+ 
+ if (min_nname_Fun_Family < 10){
+  Fun.Family.names.to.plot<-top_n(Fun_Family_Mean_Abund, min_nname_Fun_Family, Fun_Family_Mean)$Family 
+} else {
+  Fun.Family.names.to.plot<-top_n(Fun_Family_Mean_Abund, 10, Fun_Family_Mean)$Family
+}
+# 
+
+Fun.Family.A <- tax_glom(Fun_wholecommunity, taxrank="Family")
+Fun.Family <- prune_taxa(taxa_sums(Fun.Family.A) > 0, Fun.Family.A)
+Fun.Family.r  = transform_sample_counts(Fun.Family, function(x) x / sum(x) )
+dat_Fun.Family.r <- psmelt(Fun.Family.r)
+dat_Fun.Family.r$Family <- as.character(dat_Fun.Family.r$Family) 
+dat_Fun.Family.r$Family_all <- dat_Fun.Family.r$Family 
+dat_Fun.Family.r$Family <- if_else(dat_Fun.Family.r$Family %in% Fun.Family.names.to.plot, dat_Fun.Family.r$Family, "LowAbundance") 
+
+## 
+
+ 
+
+## 
+################## 
+# Fun: Genus # 
+################## 
+
+min_nname_Fun_Genus<-length(unique(Fun_Genus_Mean_Abund$Genus[Fun_Genus_Mean_Abund$Fun_Genus_Mean > 0.5]))
+ 
+ if (min_nname_Fun_Genus < 10){
+  Fun.Genus.names.to.plot<-top_n(Fun_Genus_Mean_Abund, min_nname_Fun_Genus, Fun_Genus_Mean)$Genus 
+} else {
+  Fun.Genus.names.to.plot<-top_n(Fun_Genus_Mean_Abund, 10, Fun_Genus_Mean)$Genus
+}
+# 
+
+Fun.Genus.A <- tax_glom(Fun_wholecommunity, taxrank="Genus")
+Fun.Genus <- prune_taxa(taxa_sums(Fun.Genus.A) > 0, Fun.Genus.A)
+Fun.Genus.r  = transform_sample_counts(Fun.Genus, function(x) x / sum(x) )
+dat_Fun.Genus.r <- psmelt(Fun.Genus.r)
+dat_Fun.Genus.r$Genus <- as.character(dat_Fun.Genus.r$Genus) 
+dat_Fun.Genus.r$Genus_all <- dat_Fun.Genus.r$Genus 
+dat_Fun.Genus.r$Genus <- if_else(dat_Fun.Genus.r$Genus %in% Fun.Genus.names.to.plot, dat_Fun.Genus.r$Genus, "LowAbundance") 
+
+## 
+
+ 
+
+## 
+################## 
+# Fun: Species # 
+################## 
+
+# min_nname_Fun_Species<-length(unique(Fun_Species_Mean_Abund$Species[Fun_Species_Mean_Abund$Fun_Species_Mean > 0.5]))
+#  
+#  if (min_nname_Fun_Species < 10){
+#   Fun.Species.names.to.plot<-top_n(Fun_Species_Mean_Abund, min_nname_Fun_Species, Fun_Species_Mean)$Species 
+# } else {
+#   Fun.Species.names.to.plot<-top_n(Fun_Species_Mean_Abund, 10, Fun_Species_Mean)$Species
+# }
+# # 
+# 
+# Fun.Species.r  = transform_sample_counts(Fun, function(x) x / sum(x) )
+# dat_Fun.Species.r <- psmelt(Fun.Species.r)
+# dat_Fun.Species.r$Species <- as.character(dat_Fun.Species.r$Species) 
+# dat_Fun.Species.r$Species_all <- dat_Fun.Species.r$Species 
+# dat_Fun.Species.r$Species <- if_else(dat_Fun.Species.r$Species %in% Fun.Species.names.to.plot, dat_Fun.Species.r$Species, "LowAbundance") 
+
+## 
+
+ 
+```
+
+
+## Group low abundance (!%inc% top 10 taxa)
+
+(no generating code just copy paste)
+
+### Bac
+```{r Bac group low abundance, include=F, eval=F, cache=TRUE}
+## 
+################## 
+# Bac: Phylum #  
+################## 
+
+#rename phyla with low abundance
+dat_Bac.Phylum.r$Phylum[dat_Bac.Phylum.r$Phylum == "LowAbundance"] <- paste("\u2264 ",round(Bac_Phylum_Mean_Abund[10,4],1),"% relative abundance", sep = "") 
+dat_Bac.Phylum.r$Phylum<-factor(dat_Bac.Phylum.r$Phylum)
+levels(dat_Bac.Phylum.r$Phylum)
+
+# save dat files
+saveRDS(dat_Bac.Phylum.r, file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Phylum.r.rds")
+
+##
+
+
+## 
+################## 
+# Bac: Class #  
+################## 
+
+#rename phyla with low abundance
+dat_Bac.Class.r$Class[dat_Bac.Class.r$Class == "LowAbundance"] <- paste("\u2264 ",round(Bac_Class_Mean_Abund[10,5],0),"% relative abundance", sep = "") 
+dat_Bac.Class.r$Class<-factor(dat_Bac.Class.r$Class)
+levels(dat_Bac.Class.r$Class)
+
+# save dat files
+saveRDS(dat_Bac.Class.r, file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Class.r.rds")
+
+##
+
+
+## 
+################## 
+# Bac: Order #  
+################## 
+
+#rename phyla with low abundance
+dat_Bac.Order.r$Order[dat_Bac.Order.r$Order == "LowAbundance"] <- paste("\u2264 ",round(Bac_Order_Mean_Abund[10,6],1),"% relative abundance", sep = "") 
+dat_Bac.Order.r$Order<-factor(dat_Bac.Order.r$Order)
+levels(dat_Bac.Order.r$Order)
+
+# save dat files
+saveRDS(dat_Bac.Order.r, file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Order.r.rds")
+
+##
+
+
+## 
+################## 
+# Bac: Family #  
+################## 
+
+#rename phyla with low abundance
+dat_Bac.Family.r$Family[dat_Bac.Family.r$Family == "LowAbundance"] <- paste("\u2264 ",round(Bac_Family_Mean_Abund[10,7],1),"% relative abundance", sep = "") 
+dat_Bac.Family.r$Family<-factor(dat_Bac.Family.r$Family)
+levels(dat_Bac.Family.r$Family)
+
+# save dat files
+saveRDS(dat_Bac.Family.r, file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Family.r.rds")
+
+##
+
+
+## 
+################## 
+# Bac: Genus #  
+################## 
+
+#rename phyla with low abundance
+dat_Bac.Genus.r$Genus[dat_Bac.Genus.r$Genus == "LowAbundance"] <- paste("\u2264 ",round(Bac_Genus_Mean_Abund[10,8],1),"% relative abundance", sep = "") 
+dat_Bac.Genus.r$Genus<-factor(dat_Bac.Genus.r$Genus)
+levels(dat_Bac.Genus.r$Genus)
+
+# save dat files
+saveRDS(dat_Bac.Genus.r, file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Genus.r.rds")
+
+##
+
+```
+
+### Fun
+```{r Fun group low abundance, include=F, eval=F}
+## 
+################## 
+# Fun: Phylum #  
+################## 
+Fun.Phylum_thresh <- formatC(round(Fun_Phylum_Mean_Abund[9,4],4),format="g",digits=1)
+
+#rename phyla with low abundance
+dat_Fun.Phylum.r$Phylum[dat_Fun.Phylum.r$Phylum == "LowAbundance"] <- paste("\u2264 ",Fun.Phylum_thresh,"% relative abundance", sep = "") 
+dat_Fun.Phylum.r$Phylum<-factor(dat_Fun.Phylum.r$Phylum)
+levels(dat_Fun.Phylum.r$Phylum)
+
+# save dat files
+saveRDS(dat_Fun.Phylum.r, file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Phylum.r.rds")
+
+##
+
+
+## 
+################## 
+# Fun: Class #  
+################## 
+
+#rename phyla with low abundance
+dat_Fun.Class.r$Class[dat_Fun.Class.r$Class == "LowAbundance"] <- paste("\u2264 ",round(Fun_Class_Mean_Abund[10,5],1),"% relative abundance", sep = "") 
+dat_Fun.Class.r$Class<-factor(dat_Fun.Class.r$Class)
+levels(dat_Fun.Class.r$Class)
+
+# save dat files
+saveRDS(dat_Fun.Class.r, file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Class.r.rds")
+
+##
+
+
+## 
+################## 
+# Fun: Order #  
+################## 
+
+#rename phyla with low abundance
+dat_Fun.Order.r$Order[dat_Fun.Order.r$Order == "LowAbundance"] <- paste("\u2264 ",round(Fun_Order_Mean_Abund[10,6],1),"% relative abundance", sep = "") 
+dat_Fun.Order.r$Order<-factor(dat_Fun.Order.r$Order)
+levels(dat_Fun.Order.r$Order)
+
+# save dat files
+saveRDS(dat_Fun.Order.r, file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Order.r.rds")
+
+##
+
+
+## 
+################## 
+# Fun: Family #  
+################## 
+
+#rename phyla with low abundance
+dat_Fun.Family.r$Family[dat_Fun.Family.r$Family == "LowAbundance"] <- paste("\u2264 ",round(Fun_Family_Mean_Abund[10,7],1),"% relative abundance", sep = "") 
+dat_Fun.Family.r$Family<-factor(dat_Fun.Family.r$Family)
+levels(dat_Fun.Family.r$Family)
+
+# save dat files
+saveRDS(dat_Fun.Family.r, file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Family.r.rds")
+
+##
+
+
+## 
+################## 
+# Fun: Genus #  
+################## 
+
+#rename phyla with low abundance
+dat_Fun.Genus.r$Genus[dat_Fun.Genus.r$Genus == "LowAbundance"] <- paste("\u2264 ",round(Fun_Genus_Mean_Abund[10,8],1),"% relative abundance", sep = "") 
+dat_Fun.Genus.r$Genus<-factor(dat_Fun.Genus.r$Genus)
+levels(dat_Fun.Genus.r$Genus)
+
+# save dat files
+saveRDS(dat_Fun.Genus.r, file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Genus.r.rds")
+
+##
+
+
+## 
+################## 
+# Fun: Species #  
+################## 
+
+#rename phyla with low abundance
+dat_Fun.Species.r$Species[dat_Fun.Species.r$Species == "LowAbundance"] <- paste("\u2264 ",round(Fun_Species_Mean_Abund[10,9],1),"% relative abundance", sep = "") 
+dat_Fun.Species.r$Species<-factor(dat_Fun.Species.r$Species)
+levels(dat_Fun.Species.r$Species)
+
+# save dat files
+saveRDS(dat_Fun.Species.r, file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Species.r.rds")
+
+##
+
+
+## 
+################## 
+# Fun: Sign #  
+################## 
+Fun.Sign.A <- prune_taxa(Fun_wholecommunity_wGvS, taxrank="OTU_Sign")
+Fun.Sign <- prune_taxa(taxa_sums(Fun.Sign.A) > 0, Fun.Sign.A)
+Fun.Sign.r  = transform_sample_counts(Fun.Sign, function(x) x / sum(x) )
+
+dat_Fun.Sign.r <- psmelt(Fun.Sign.r)
+dat_Fun.Sign.r$Sign <- as.character(dat_Fun.Sign.r$Sign) 
+dat_Fun.Sign.r$Sign_all <- dat_Fun.Sign.r$Sign 
+# dat_Fun.Sign.r$Sign <- if_else(dat_Fun.Sign.r$Sign %in% Fun.Sign.names.to.plot, dat_Fun.Sign.r$Sign, "LowAbundance") 
+
+#rename phyla with low abundance
+# dat_Fun.Sign.r$Sign[dat_Fun.Sign.r$Sign == "LowAbundance"] <- paste("\u2264 ",round(Fun_Sign_Mean_Abund[10,9],1),"% relative abundance", sep = "") 
+dat_Fun.Sign.r$Sign<-factor(dat_Fun.Sign.r$Sign)
+levels(dat_Fun.Sign.r$Sign)
+# dat_Fun.Sign.r$Sign[dat_Fun.Sign.r$Sign == "Singleton"] <- "Singletons"
+dat_Fun.Sign.r$Sign<-factor(dat_Fun.Sign.r$Sign, levels = c("Generalists","Specialists","Singleton","NS"))
+
+# save dat files
+saveRDS(dat_Fun.Sign.r, file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Sign.r.rds")
+
+##
+
+
+
+
+```
+
+#select metadata of interest (do later)
+```{r, eval=F}
+dat_Bac.Phylum.r2<-subset(dat_Bac.Phylum.r, select=c(OTU, Sample, Abundance, Basin, Site, BasinSite, Depth, Depth2, Pit, Phylum))
+
+# save dat files
+saveRDS(dat_Bac.Phylum.r2, file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Phylum.r2.rds")
+
+```
+
+
+##
+
+
+
+## restore dat files
+
+```{r restore dat files, include=F, eval=T, cache=T}
+####
+# Bac
+dat_Bac.Phylum.r<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Phylum.r.rds")
+# dat_Bac.Phylum.r2<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Phylum.r2.rds")
+
+dat_Bac.Class.r<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Class.r.rds")
+# dat_Bac.Class.r2<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Class.r2.rds")
+
+dat_Bac.Order.r<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Order.r.rds")
+# dat_Bac.Order.r2<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Order.r2.rds")
+
+dat_Bac.Family.r<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Family.r.rds")
+# dat_Bac.Family.r2<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Family.r2.rds")
+
+dat_Bac.Genus.r<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Genus.r.rds")
+# dat_Bac.Genus.r2<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Bac.Genus.r2.rds")
+####
+
+####
+# Fun
+dat_Fun.Phylum.r<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Phylum.r.rds")
+# dat_Fun.Phylum.r2<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Phylum.r2.rds")
+
+dat_Fun.Class.r<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Class.r.rds")
+# dat_Fun.Class.r2<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Class.r2.rds")
+
+dat_Fun.Order.r<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Order.r.rds")
+# dat_Fun.Order.r2<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Order.r2.rds")
+
+dat_Fun.Family.r<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Family.r.rds")
+# dat_Fun.Family.r2<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Family.r2.rds")
+
+dat_Fun.Genus.r<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Genus.r.rds")
+# dat_Fun.Genus.r2<-readRDS(file = "../processed_data/clean_rds_saves/tax_dat/dat_Fun.Genus.r2.rds")
+####
+```
+
+
+# **Full Dataset** {.unnumbered .tabset .tabset-pills}
+
+## Grass replicates, grouped by Site {.unnumbered .tabset}
+
+### Phylum {.unnumbered .tabset .tabset-pills}
+
+#### Bacteria-Archaea {.unnumbered}
+
+![](../figures/taxa_plots/BA_Phylum_Full_GrassRep_Site.png){width="103%"}
+
+#### Fungi {.unnumbered}
+
+![](../figures/taxa_plots/Fun_Phylum_Full_GrassRep_Site.png){width="99%"}
+
+### Class {.unnumbered .tabset .tabset-pills}
+
+#### Bacteria-Archaea {.unnumbered}
+
+![](../figures/taxa_plots/BA_Class_Full_GrassRep_Site.png){width="115%"}
+
+#### Fungi {.unnumbered}
+
+![](../figures/taxa_plots/Fun_Class_Full_GrassRep_Site.png){width="99%"}
+
+### Order {.unnumbered .tabset .tabset-pills}
+
+#### Bacteria-Archaea {.unnumbered}
+
+![](../figures/taxa_plots/BA_Order_Full_GrassRep_Site.png){width="99%"}
+
+#### Fungi {.unnumbered}
+
+![](../figures/taxa_plots/Fun_Order_Full_GrassRep_Site.png){width="99%"}
+
+### Family {.unnumbered .tabset .tabset-pills}
+
+#### Bacteria-Archaea {.unnumbered}
+
+![](../figures/taxa_plots/BA_Family_Full_GrassRep_Site.png){width="99%"}
+
+#### Fungi {.unnumbered}
+
+![](../figures/taxa_plots/Fun_Family_Full_GrassRep_Site.png){width="99%"}
+
+
+## Site replicates, grouped by Grass {.unnumbered .tabset}
+
+### Phylum {.unnumbered .tabset .tabset-pills}
+
+#### Bacteria-Archaea {.unnumbered}
+
+![](../figures/taxa_plots/BA_Phylum_Full_SiteRep_Grass.png){width="99%"}
+
+#### Fungi {.unnumbered}
+
+![](../figures/taxa_plots/Fun_Phylum_Full_SiteRep_Grass.png){width="99%"}
+
+### Class {.unnumbered .tabset .tabset-pills}
+
+#### Bacteria-Archaea {.unnumbered}
+
+![](../figures/taxa_plots/BA_Class_Full_SiteRep_Grass.png){width="99%"}
+
+#### Fungi {.unnumbered}
+
+![](../figures/taxa_plots/Fun_Class_Full_SiteRep_Grass.png){width="99%"}
+
+### Order {.unnumbered .tabset .tabset-pills}
+
+#### Bacteria-Archaea {.unnumbered}
+
+![](../figures/taxa_plots/BA_Order_Full_SiteRep_Grass.png){width="99%"}
+
+#### Fungi {.unnumbered}
+
+![](../figures/taxa_plots/Fun_Order_Full_SiteRep_Grass.png){width="99%"}
+
+### Family {.unnumbered .tabset .tabset-pills}
+
+#### Bacteria-Archaea {.unnumbered}
+
+![](../figures/taxa_plots/BA_Family_Full_SiteRep_Grass.png){width="99%"}
+
+#### Fungi {.unnumbered}
+
+![](../figures/taxa_plots/Fun_Family_Full_SiteRep_Grass.png){width="99%"}
+
+
+
+\
+
+# **Across Different Sites by Grass Hosts** {.unnumbered .tabset}
+
+## Phylum {.unnumbered .tabset .tabset-pills}
+
+### Bacteria-Archaea {.unnumbered .tabset}
+
+```{r autogen-SitebyGrass-Bac-Phylum, echo=F, results='asis', cache=TRUE}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Phylum
+#price=Abundance
+#col=fill
+
+BA_tabs <- sort(unique(dat_Bac.Phylum.r$Site))
+
+
+
+for(tab in BA_tabs) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Bac.Phylum.r %>% filter(Site == tab)
+
+  subtabs <- sort(unique(sub_values$Grass))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    plot_values <- sub_values %>% filter(Grass == subtab)
+
+
+    print(ggplot(plot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Phylum)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = Bac_Phylum_cols) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Phylum') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+### Fungi {.unnumbered .tabset}
+
+```{r autogen-SitebyGrass-Fun-Phylum, echo=F, results='asis', cache=TRUE}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Phylum
+#price=Abundance
+#col=fill
+
+Fun_tabs <- sort(unique(dat_Fun.Phylum.r$Site))
+
+
+
+for(tab in Fun_tabs) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Fun.Phylum.r %>% filter(Site == tab)
+
+  subtabs <- sort(unique(sub_values$Grass))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    plot_values <- sub_values %>% filter(Grass == subtab)
+
+
+    print(ggplot(plot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Phylum)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = Fun_Phylum_cols) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Phylum') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+## Class {.unnumbered .tabset .tabset-pills}
+
+### Bacteria-Archaea {.unnumbered .tabset}
+
+```{r autogen-SitebyGrass-Bac-Class, echo=F, results='asis', cache=TRUE}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Class
+#price=Abundance
+#col=fill
+
+BA_tabs <- sort(unique(dat_Bac.Class.r$Site))
+
+
+
+for(tab in BA_tabs) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Bac.Class.r %>% filter(Site == tab)
+
+  subtabs <- sort(unique(sub_values$Grass))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    plot_values <- sub_values %>% filter(Grass == subtab)
+
+
+    print(ggplot(plot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Class)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = Bac_Class_cols) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Class') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+### Fungi {.unnumbered .tabset}
+
+```{r autogen-SitebyGrass-Fun-Class, echo=F, results='asis', cache=TRUE}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Class
+#price=Abundance
+#col=fill
+
+Fun_tabs <- sort(unique(dat_Fun.Class.r$Site))
+
+
+
+for(tab in Fun_tabs) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Fun.Class.r %>% filter(Site == tab)
+
+  subtabs <- sort(unique(sub_values$Grass))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    plot_values <- sub_values %>% filter(Grass == subtab)
+
+
+    print(ggplot(plot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Class)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = Fun_Class_cols) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Class') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+## Order {.unnumbered .tabset .tabset-pills}
+
+### Bacteria-Archaea {.unnumbered .tabset}
+
+```{r autogen-SitebyGrass-Bac-Order, echo=F, results='asis', cache=TRUE}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Order
+#price=Abundance
+#col=fill
+
+BA_tabs <- sort(unique(dat_Bac.Order.r$Site))
+
+
+
+for(tab in BA_tabs) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Bac.Order.r %>% filter(Site == tab)
+
+  subtabs <- sort(unique(sub_values$Grass))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    plot_values <- sub_values %>% filter(Grass == subtab)
+
+
+    print(ggplot(plot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Order)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = Bac_Order_cols) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Order') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+### Fungi {.unnumbered .tabset}
+
+```{r autogen-SitebyGrass-Fun-Order, echo=F, results='asis', cache=TRUE}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Order
+#price=Abundance
+#col=fill
+
+Fun_tabs <- sort(unique(dat_Fun.Order.r$Site))
+
+
+
+for(tab in Fun_tabs) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Fun.Order.r %>% filter(Site == tab)
+
+  subtabs <- sort(unique(sub_values$Grass))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    plot_values <- sub_values %>% filter(Grass == subtab)
+
+
+    print(ggplot(plot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Order)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = Fun_Order_cols) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Order') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+## Family {.unnumbered .tabset .tabset-pills}
+
+### Bacteria-Archaea {.unnumbered .tabset}
+
+```{r autogen-SitebyGrass-Bac-Family, echo=F, results='asis', cache=TRUE}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Family
+#price=Abundance
+#col=fill
+
+BA_tabs <- sort(unique(dat_Bac.Family.r$Site))
+
+
+
+for(tab in BA_tabs) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Bac.Family.r %>% filter(Site == tab)
+
+  subtabs <- sort(unique(sub_values$Grass))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    plot_values <- sub_values %>% filter(Grass == subtab)
+
+
+    print(ggplot(plot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Family)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = Bac_Family_cols) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Family') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+### Fungi {.unnumbered .tabset}
+
+```{r autogen-SitebyGrass-Fun-Family, echo=F, results='asis', cache=TRUE}
+#cut=Site
+#color=Grass
+#carat=sample_name
+#clarity=Family
+#price=Abundance
+#col=fill
+
+Fun_tabs <- sort(unique(dat_Fun.Family.r$Site))
+
+
+
+for(tab in Fun_tabs) {
+
+  cat('\n')
+
+  cat('#### ', tab, '{.unnumbered .tabset .tabset-pills}   \n')
+
+  cat('\n')
+
+
+  sub_values <- dat_Fun.Family.r %>% filter(Site == tab)
+
+  subtabs <- sort(unique(sub_values$Grass))
+
+
+  for(subtab in subtabs) {
+
+    cat('\n')
+
+    cat('##### ', subtab, '{.unnumbered}   \n')
+
+    cat('\n')
+
+    plot_values <- sub_values %>% filter(Grass == subtab)
+
+
+    print(ggplot(plot_values, aes(x = sample_name,y = as.numeric(Abundance*100), fill = Family)) +
+          geom_bar(stat = "identity", position = "fill") +
+          scale_fill_manual(values = Fun_Family_cols) +
+          labs(x = '\n Site x Grass x Replicate',
+               y = 'Relative Abundance \n',
+               fill = 'Family') +
+          theme_bw()+
+          theme(
+            axis.text.x = element_text(color="black", size=9, angle = 90, hjust=1,vjust=.5),
+            axis.text.y = element_text(color="black", size=12),
+            strip.text = element_text(color="black", size=12),
+            strip.background = element_blank(),
+            legend.title = element_text(color="black", size=12),
+            legend.text = element_text(color="black", size=10),
+            legend.key.height = unit(0.5, 'cm'),
+            axis.title.x = element_text(color="black", size=14),
+            axis.title.y = element_text(color="black", size=14, angle=90),
+            plot.title = element_text(size=14),
+            panel.grid.major = element_blank(), # switch off major gridlines
+            panel.grid.minor = element_blank(), # switch off minor gridlines
+            panel.border = element_rect(colour = "black", fill=NA, linewidth=.75)
+            )
+          )
+
+
+    cat('\n')
+
+  }
+
+}
+```
+
+\
+

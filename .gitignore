@@ -50,12 +50,21 @@ rsconnect/
 
 #ignore these folders
 analyses/
-code/
+
 figures/
 #figures/taxa_plots/
 metadata/
-raw_data/knb-lter-sev.332.2/
 meeting_notes/
+
+# code
+code/*nb.html
+code/*.html
+code/*/figure-html/load packages*png
+code/*/figure-html/load-packages*.png
+code/*/figure-docx/load-packages*.png
+code/*.tar.gz
+code/site_libs
+#code/map_bin_mislabel_files/jquery-3.6.0/*
 
 # docs
 docs/presentations/
@@ -67,12 +76,20 @@ docs/github_ordinations_files/
 docs/github_*_files/
 docs/raw_data/
 docs/processed_data/
+docs/*/load-packages*.png
+docs/*/.DS_Store
+docs/code/
 
 
 processed_data/Rudgers2021/
 #processed_data/OTU_occurrencefrequency/
 processed_data/clean_rds_saves/
 processed_data/adonis2/
+processed_data/*.xlsx
+
+# raw_data/
+raw_data/knb-lter-sev.332.2/
+raw_data/raw_otu_tables/*.txt
 
 unorganized_data/
 ksu-paired-amplicon-workflow.Rproj
@@ -81,3 +98,4 @@ darksidea_mono_30Jan24.RData
 
 *.pptx
 
+*.png

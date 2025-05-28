@@ -1,0 +1,968 @@
+---
+title: "**KSU: Inter-kingdom Regressions**"
+subtitle: "Running multiple regressions on distance matrices (MRM) comprised of 16S and ITS OTU tables - Does the composition of bacterial members of a community impact the presence or abundance of fungal members? Or vice versa"
+author: "Kelli Feeser"
+date: '2024-03-05'
+output:
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    fig.caption: yes
+    keep_md: yes
+  html_notebook:
+    code_folding: hide
+    df_print: paged
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    fig.caption: yes
+  html_document: 
+    code_folding: hide
+    css: ../test.css
+    fig_height: 4.5
+    fig_width: 6
+    number_sections: yes
+    theme: cosmo
+    toc: yes
+    toc_depth: 2
+editor_options:
+  chunk_output_type: inline
+---
+
+
+\
+\
+\
+
+### Background {.unlisted .unnumbered}
+
+\
+
+[Analyses on distance matrices]{.underline}
+
+-   2 distance matrices: simple Mantel
+    -   a test for association between two $n × n$ matrices whose entries are distances or similarities between all pair-wise combinations of $n$ objects.
+    -   The objects may be plots, species, or any other type of sampling unit, and the pair-wise measures may reflect distance or similarity in terms of species abundance(s), environmental conditions, or geographic location (when the objects are plots); physiology, behavior, morphology, or phylogeny (when the objects are species); or any other uni- or multivariate space.\
+-   3 matrices: partial Mantel
+    -   Partial Mantel analysis is partial correlation analysis performed on distance matrices, each unfolded into a vector. The partial correlation between two distance matrices is computed while controlling for the effect of a third matrix. It is commonly used to obtain the variance partitioning in which variation in species data is partitioned into environmental and spatial components.
+    -   However, distance and raw data matrices have very different properties, and distance matrix analysis should not be used for making inferences about raw data (applies to all).\
+-   ≥ 2 matrices: **MRM**
+    -   multiple regression on distance matrices (MRM)
+    -   MRM entails a multiple regression of a response distance matrix, $D_Y$, on two or more environmental, spatial, or other explanatory distance matrices, each unfolded into a distance vector. The significance of an MRM model and its regression coefficients are tested by permuting $D_Y$ while holding the explanatory matrices constant. When $D_Y$ is an ordinary distance or similarity matrix, its rows and columns are permuted and the model $R^2$ and regression coefficients are calculated for each permutation to generate null distributions.
+    -   MRM offers two advantages over traditional partial Mantel analysis:
+        -   Polynomial, nonlinear, or nonparametric regression methods, such as generalized additive models (Yee and Mitchell 1991), can be used with MRM: Once the distance matrices have been unfolded into vectors, the calculations for fitting an MRM model are no different than those for multiple regression with raw data. The only computational difference lies in significance testing, which is performed by permuting the objects of the response distance matrix.
+        -   Expanding the number of explanatory matrices allows each environmental variable to be represented by its own distance matrix. This provides an improved species--environment correlation (because the effects of important variables are not diluted by unimportant ones), and a convenient way to determine the statistical significance and relative importance of each environmental factor.
+
+# Prep data {.unlisted .unnumbered .hidden}
+
+```{r load packages, eval=T, include=F}
+library("vegan"); packageVersion("vegan") # ‘2.6.4’
+library("phyloseq"); packageVersion("phyloseq") # ‘1.44.0’
+library("betapart"); packageVersion("betapart") # ‘1.6’
+library("ecodist"); packageVersion("ecodist") # ‘2.0.9’
+library("measurements"); packageVersion("measurements") # ‘1.5.1’
+library("geosphere"); packageVersion("geosphere") # ‘1.5.18’
+  # The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,
+  # which was just loaded, were retired in October 2023.
+  # Please refer to R-spatial evolution reports for details, especially
+  # https://r-spatial.org/r/2023/05/15/evolution4.html.
+  # It may be desirable to make the sf package available;
+  # package maintainers should consider adding sf to Suggests:.
+library("gdata"); packageVersion("gdata") # ‘2.19.0’
+library("spam"); packageVersion("spam") # ‘2.9.1’
+library("ggplot2"); packageVersion("ggplot2") # ‘3.4.4’
+library("ggpubr"); packageVersion("ggpubr") # ‘0.6.0’
+library("cowplot"); packageVersion("cowplot") # ‘1.1.1’
+library("geodist"); packageVersion("geodist") # ‘0.0.8’
+```
+
+```{r readin-phylo, include=FALSE, eval=T}
+# Bac #
+#######
+Bac_m.std <- readRDS(file="../processed_data/clean_rds_saves/Bac_m.std.rds")
+
+#######
+# Fun #
+#######
+Fun_m.std <- readRDS(file="../processed_data/clean_rds_saves/Fun_m.std.rds")
+
+Bac_wholecommunity <- readRDS(file="../processed_data/clean_rds_saves/Bac_wholecommunity_shared.rds")
+Fun_wholecommunity <- readRDS(file="../processed_data/clean_rds_saves/Fun_wholecommunity_shared.rds")
+
+Bac_generalists <- readRDS(file="../processed_data/clean_rds_saves/Bac_generalists_allgrasses_shared.rds")
+Fun_generalists <- readRDS(file="../processed_data/clean_rds_saves/Fun_generalists_allgrasses_shared.rds")
+
+```
+
+```{r add-generalists-bac, include=FALSE, eval=FALSE}
+# bac
+# saveRDS(bac_AllGrasses_OA_sign, file = "../processed_data/clean_rds_saves/bac_AllGrasses_OA_sign.rds")
+bac_AllGrasses_OA_sign <- read.csv(file = "../processed_data/2_generalist_vs_specialist/GvS_AllGrasses/GvS_Res_16S_AllGrasses_nperm100.csv")
+
+bac_AllGrasses_OA_sign2 <- bac_AllGrasses_OA_sign
+bac_AllGrasses_OA_sign2$Sign <- ifelse(is.na(bac_AllGrasses_OA_sign2$Sign), "Singleton", bac_AllGrasses_OA_sign2$Sign)
+
+Bac_wGvS<-Bac_m.std
+
+# Ensure row names of taxonomy table match OTU column in Bac_AllGrasses_OA_sign2
+row.names(tax_table(Bac_wGvS)) <- taxa_names(Bac_wGvS)
+
+# Merge sign column with taxonomy table
+bac_merged_tax_table <- merge(tax_table(Bac_wGvS), subset(bac_AllGrasses_OA_sign2, select = c("OTU", "Sign")), by.x = 0, by.y = "OTU", all.x = TRUE)
+
+# Reorder columns to place Sign column as the second column
+bac_merged_tax_table1 <- cbind(bac_merged_tax_table[,1:2],bac_merged_tax_table[,8],bac_merged_tax_table[,3:7])
+colnames(bac_merged_tax_table1)[3] <- "Sign"
+row.names(bac_merged_tax_table1) <- bac_merged_tax_table1[,1]
+bac_merged_tax_table1[,1] <- NULL
+
+# Update taxonomy table in Bac_wGvS with the merged and reordered table
+bac_merged_tax_table_fixed <- tax_table(as.matrix(bac_merged_tax_table1))
+tax_table(Bac_wGvS) <- bac_merged_tax_table_fixed
+
+saveRDS(Bac_wGvS, file = "../processed_data/clean_rds_saves/bac_AllGrasses_wGvS.rds")
+```
+
+```{r add-generalists-fun, include=FALSE, eval=FALSE}
+# fun
+# saveRDS(fun_AllGrasses_OA_sign, file = "../processed_data/clean_rds_saves/fun_AllGrasses_OA_sign.rds")
+fun_AllGrasses_OA_sign <- readRDS(file = "../processed_data/clean_rds_saves/fun_AllGrasses_OA_sign.rds")
+
+fun_AllGrasses_OA_sign2 <- fun_AllGrasses_OA_sign
+fun_AllGrasses_OA_sign2$Sign <- ifelse(is.na(fun_AllGrasses_OA_sign2$Sign), "Singleton", fun_AllGrasses_OA_sign2$Sign)
+
+Fun_wGvS<-Fun_m.std
+
+# Ensure row names of taxonomy table match OTU column in fun_AllGrasses_OA_sign2
+row.names(tax_table(Fun_wGvS)) <- taxa_names(Fun_wGvS)
+
+# Merge sign column with taxonomy table
+fun_merged_tax_table <- merge(tax_table(Fun_wGvS), subset(fun_AllGrasses_OA_sign2, select = c("OTU", "Sign")), by.x = 0, by.y = "OTU", all.x = TRUE)
+
+# Reorder columns to place Sign column as the second column
+fun_merged_tax_table1 <- cbind(fun_merged_tax_table[,1:2],fun_merged_tax_table[,9],fun_merged_tax_table[,3:8])
+colnames(fun_merged_tax_table1)[3] <- "Sign"
+row.names(fun_merged_tax_table1) <- fun_merged_tax_table1[,1]
+fun_merged_tax_table1[,1] <- NULL
+# Update taxonomy table in Fun_wGvS with the merged and reordered table
+fun_merged_tax_table_fixed <- tax_table(as.matrix(fun_merged_tax_table1))
+tax_table(Fun_wGvS) <- fun_merged_tax_table_fixed
+
+saveRDS(Fun_wGvS, file = "../processed_data/clean_rds_saves/fun_AllGrasses_wGvS.rds")
+
+```
+
+```{r subset-to-shared-samples, include=FALSE, eval=FALSE}
+# Subsetting to samples present in both datasets
+common_samples <- intersect(sample_data(Bac_wGvS)$sample_name, sample_data(Fun_wGvS)$sample_name)
+
+# Subset Bac_wGvS and Fun_wGvS to include only common samples
+Bac_common1 <- subset_samples(Bac_wGvS, sample_name %in% common_samples)
+Fun_common1 <- subset_samples(Fun_wGvS, sample_name %in% common_samples)
+
+Bac_common <- prune_taxa(taxa_sums(Bac_common1) > 0, Bac_common1)
+Fun_common <- prune_taxa(taxa_sums(Fun_common1) > 0, Fun_common1)
+
+Bac_wholecommunity <- Bac_common
+Fun_wholecommunity <- Fun_common
+
+saveRDS(Bac_wholecommunity,file="../processed_data/clean_rds_saves/Bac_wholecommunity_shared.rds")
+saveRDS(Fun_wholecommunity,file="../processed_data/clean_rds_saves/Fun_wholecommunity_shared.rds")
+```
+
+```{r subset-to-generalists, include=FALSE,eval=FALSE}
+
+Bac_generalists <- subset_taxa(Bac_wholecommunity, Sign=="Generalists")
+Bac_generalists <- prune_taxa(taxa_sums(Bac_generalists) > 0, Bac_generalists)
+  # otu_table()   OTU Table:         [ 2145 taxa and 484 samples ]
+  # sample_data() Sample Data:       [ 484 samples by 57 sample variables ]
+  # tax_table()   Taxonomy Table:    [ 2145 taxa by 7 taxonomic ranks ]
+
+Fun_generalists <- subset_taxa(Fun_wholecommunity, Sign=="Generalists")
+Fun_generalists <- prune_taxa(taxa_sums(Fun_generalists) > 0, Fun_generalists)
+  # otu_table()   OTU Table:         [ 896 taxa and 484 samples ]
+  # sample_data() Sample Data:       [ 484 samples by 57 sample variables ]
+  # tax_table()   Taxonomy Table:    [ 896 taxa by 8 taxonomic ranks ]
+
+saveRDS(Bac_generalists,file="../processed_data/clean_rds_saves/Bac_generalists_allgrasses_shared.rds")
+saveRDS(Fun_generalists,file="../processed_data/clean_rds_saves/Fun_generalists_allgrasses_shared.rds")
+
+```
+
+```{r subset-to-generalists, include=FALSE,eval=FALSE}
+
+Bac_specialists <- subset_taxa(Bac_wholecommunity, Sign=="Specialists")
+Bac_specialists <- prune_taxa(taxa_sums(Bac_specialists) > 0, Bac_specialists)
+  # otu_table()   OTU Table:         [ 5140 taxa and 484 samples ]
+  # sample_data() Sample Data:       [ 484 samples by 57 sample variables ]
+  # tax_table()   Taxonomy Table:    [ 5140 taxa by 7 taxonomic ranks ]
+
+Fun_specialists <- subset_taxa(Fun_wholecommunity, Sign=="Specialists")
+Fun_specialists <- prune_taxa(taxa_sums(Fun_specialists) > 0, Fun_specialists)
+  # otu_table()   OTU Table:         [ 1803 taxa and 484 samples ]
+  # sample_data() Sample Data:       [ 484 samples by 57 sample variables ]
+  # tax_table()   Taxonomy Table:    [ 1803 taxa by 8 taxonomic ranks ]
+
+saveRDS(Bac_specialists,file="../processed_data/clean_rds_saves/Bac_specialists_allgrasses_shared.rds")
+saveRDS(Fun_specialists,file="../processed_data/clean_rds_saves/Fun_specialists_allgrasses_shared.rds")
+
+```
+
+\
+\
+
+------------------------------------------------------------------------
+
+\
+\
+
+
+# Methods
+
+## Input data
+
+\
+Bacterial and fungal OTU tables subset to only those with samples present from both kingdoms. I have added the generalist vs. specialist results from all grasses to the taxa slots in the objects.
+
+-   n = 484 samples
+
+-   22,661 bacterial OTUs (2,145 are 'Generalists')
+
+-   6,626 fungal OTUs (896 are 'Generalists')
+
+## Create distance matrices
+
+➞ We are assessing the impact of fungal OTU abundance on bacterial composition, therefore using Bray-Curtis as a distance metric... also trying presence/absence via Sørensen.
+
+-   Bacteria
+    -   whole community
+    -   generalists (from all grasses)
+    -   whole community agglomerated to genus-level
+-   Fungi
+    -   whole community
+    -   generalists (from all grasses)
+    -   whole community agglomerated to genus-level
+
+\
+
+```{r OLD-bray, include=F, eval=FALSE}
+Bac_bray_wholecommunity <- vegan::vegdist(phylo2vegan_OTU(Bac_wholecommunity), method="bray", binary=FALSE, diag=FALSE, upper=FALSE)
+
+Fun_bray_wholecommunity <- vegan::vegdist(phylo2vegan_OTU(Fun_wholecommunity), method="bray", binary=FALSE, diag=FALSE, upper=FALSE)
+
+Bac_bray_generalists <- vegan::vegdist(phylo2vegan_OTU(Bac_generalists), method="bray", binary=FALSE, diag=FALSE, upper=FALSE)
+
+Fun_bray_generalists <- vegan::vegdist(phylo2vegan_OTU(Fun_generalists), method="bray", binary=FALSE, diag=FALSE, upper=FALSE)
+```
+
+```{r genus-glom, include=FALSE, eval=TRUE,cache=TRUE}
+# tax_glom(tax.rank = "Genus") for both kingdoms
+Bac_wholecommunity_genus <- tax_glom(Bac_wholecommunity, taxrank = "Genus")
+# otu_table()   OTU Table:         [ 1935 taxa and 484 samples ]
+# sample_data() Sample Data:       [ 484 samples by 57 sample variables ]
+# tax_table()   Taxonomy Table:    [ 1935 taxa by 7 taxonomic ranks ]
+Fun_wholecommunity_genus <- tax_glom(Fun_wholecommunity, taxrank = "Genus")
+# otu_table()   OTU Table:         [ 1340 taxa and 484 samples ]
+# sample_data() Sample Data:       [ 484 samples by 57 sample variables ]
+# tax_table()   Taxonomy Table:    [ 1340 taxa by 8 taxonomic ranks ]
+```
+
+```{r bray-all, include=FALSE, eval=TRUE,cache=TRUE}
+##############################################################
+### Subset ###
+##############
+# OTUs and genera of interest
+# bac_OTUs_of_interest <- c("OTU1", "OTU2", "OTU3")
+# fungi_OTUs_of_interest <- c("OTU4", "OTU5", "OTU6")
+# bac_genus_of_interest <- c("Genus1", "Genus2", "Genus3")
+fungi_genus_of_interest <- c("Fusarium", "Monosporascus")
+
+# Subset the bacterial and fungal communities of interest
+# Bac_OTUsubset <- subset_taxa(Bac_wholecommunity, OTU %in% bac_OTUs_of_interest)
+# Fun_OTUsubset <- subset_taxa(Fun_wholecommunity, OTU %in% fungi_OTUs_of_interest)
+
+# Bac_OTUsubset <- prune_taxa(taxa_sums(Bac_OTUsubset) > 0, Bac_OTUsubset)
+# Fun_OTUsubset <- prune_taxa(taxa_sums(Fun_OTUsubset) > 0, Fun_OTUsubset)
+
+
+# Bac_genus_GENUSsubset <- subset_taxa(Bac_wholecommunity_genus, Genus %in% bac_genus_of_interest)
+Fun_genus_GENUSsubset <- subset_taxa(Fun_wholecommunity_genus, Genus %in% fungi_genus_of_interest)
+
+# Bac_genus_GENUSsubset <- prune_taxa(taxa_sums(Bac_genus_GENUSsubset) > 0, Bac_genus_GENUSsubset)
+Fun_genus_GENUSsubset <- prune_taxa(taxa_sums(Fun_genus_GENUSsubset) > 0, Fun_genus_GENUSsubset)
+
+##############################################################
+
+##############################################################
+### Create distance matrices - Bray-Curtis ###
+##############################################
+# for whole communities
+Bac_bray_wholecommunity <- vegan::vegdist(phylo2vegan_OTU(Bac_wholecommunity), method = "bray", binary = FALSE, diag = FALSE, upper = FALSE)
+Fun_bray_wholecommunity <- vegan::vegdist(phylo2vegan_OTU(Fun_wholecommunity), method = "bray", binary = FALSE, diag = FALSE, upper = FALSE)
+
+# for OTU subsets
+# Bac_bray_OTUsubset <- vegan::vegdist(phylo2vegan_OTU(Bac_OTUsubset), method = "bray", binary = FALSE, diag = FALSE, upper = FALSE)
+# Fun_bray_OTUsubset <- vegan::vegdist(phylo2vegan_OTU(Fun_OTUsubset), method = "bray", binary = FALSE, diag = FALSE, upper = FALSE)
+
+# for generalists
+Bac_bray_generalists <- vegan::vegdist(phylo2vegan_OTU(Bac_generalists), method = "bray", binary = FALSE, diag = FALSE, upper = FALSE)
+Fun_bray_generalists <- vegan::vegdist(phylo2vegan_OTU(Fun_generalists), method = "bray", binary = FALSE, diag = FALSE, upper = FALSE)
+
+# Genus-level - whole communities
+# Create distance matrices for whole communities (Genus)
+Bac_bray_wholecommunity_genus <- vegan::vegdist(phylo2vegan_OTU(Bac_wholecommunity_genus), method = "bray", binary = FALSE, diag = FALSE, upper = FALSE)
+Fun_bray_wholecommunity_genus <- vegan::vegdist(phylo2vegan_OTU(Fun_wholecommunity_genus), method = "bray", binary = FALSE, diag = FALSE, upper = FALSE)
+
+# Genus-level - genera subsets
+# Bac_bray_genus_GENUSsubset <- vegan::vegdist(phylo2vegan_OTU(Bac_genus_GENUSsubset), method = "bray", binary = FALSE, diag = FALSE, upper = FALSE)
+# Fun_bray_genus_GENUSsubset <- vegan::vegdist(phylo2vegan_OTU(Fun_genus_GENUSsubset), method = "bray", binary = FALSE, diag = FALSE, upper = FALSE)
+
+
+# Genus-level - generalists??
+
+##############################################################
+### Create distance matrices - Sørensen ###
+###########################################
+# Bac
+Bac_sor_wholecommunity <- beta.pair(decostand(x = as.data.frame(t(otu_table(Bac_wholecommunity))), method = "pa"), index.family = "sorensen")
+
+Bac_sor_generalists <- beta.pair(decostand(x = as.data.frame(t(otu_table(Bac_generalists))), method = "pa"), index.family = "sorensen")
+
+Bac_sor_wholecommunity_genus <- beta.pair(decostand(x = as.data.frame(t(otu_table(Bac_wholecommunity_genus))), method = "pa"), index.family = "sorensen")
+
+# Fun
+Fun_sor_wholecommunity <- beta.pair(decostand(x = as.data.frame(t(otu_table(Fun_wholecommunity))), method = "pa"), index.family = "sorensen")
+
+Fun_sor_generalists <- beta.pair(decostand(x = as.data.frame(t(otu_table(Fun_generalists))), method = "pa"), index.family = "sorensen")
+
+Fun_sor_wholecommunity_genus <- beta.pair(decostand(x = as.data.frame(t(otu_table(Fun_wholecommunity_genus))), method = "pa"), index.family = "sorensen")
+
+
+##############################################################
+
+iteration_names <- c("Bac_wholecommunity", "Fun_wholecommunity", 
+                     # "Bac_OTUsubset", "Fun_OTUsubset", 
+                     "Bac_generalists", "Fun_generalists", 
+                     "Bac_wholecommunity_genus", "Fun_wholecommunity_genus" 
+                     # ,"Bac_genus_GENUSsubset", "Fun_genus_GENUSsubset" 
+                     )
+
+iteration_names_bray <- c(
+  "Bac_bray_wholecommunity","Fun_bray_wholecommunity",
+  # "Bac_bray_OTUsubset","Fun_bray_OTUsubset",
+  "Bac_bray_generalists","Fun_bray_generalists",
+  "Bac_bray_wholecommunity_genus", "Fun_bray_wholecommunity_genus" 
+  # ,"Bac_bray_genus_GENUSsubset","Fun_bray_genus_GENUSsubset"
+)
+
+
+```
+
+## Multiple regression models for distance matrices (MRM)
+
+Main reference: [Lichstein 2007](https://people.clas.ufl.edu/jlichstein/files/Lichstein_2007_Plant_Ecol.pdf "Multiple regression on distance matrices: a multivariate spatial analysis tool")
+
+Compared to multiple regressions, all variables in MRM are distance matrices and P-values are estimated by permutation test (9999 runs) to remove the effect of non-independence between cases on P-values (Legendre, Lapointe & Casgrain 1994).
+
+MRM is an explicitly distance-based method somewhat similar to the (partial) Mantel test, except that MRM preserves the individual-nature of input distance matrices instead of a compound distance, i.e., each dependent variables is converted to a distance matrix separately ➞ be careful to state hypotheses and conclusions in terms of distances rather than raw data
+
+| Test                                           | Formula    | Hypothesis                                     | Components                                                                                    |
+|:------------------|:-----------------|:-----------------|------------------|
+| Multiple regression on distance matrices (MRM) | $y$ \~ $X$ | Explanatory power of each member of $X$ on $y$ | $y$ is an individual distance matrix; $X$ represents one or more individual distance matrices |
+
+**R package**
+
+`ecodist 2.0.9`
+
+**Description**
+
+Multiple regression on distance matrices (MRM) using permutation tests of significance for regression coefficients and R-squared.
+
+**Usage**
+
+```         
+MRM(formula = formula(data), data, nperm = 1000,
+    method = "linear", mrank = FALSE)
+```
+
+**Arguments**
+
+|           |                                                                                                                                                                                            |
+|------------------------|------------------------------------------------|
+| `formula` | formula describing the test to be conducted.                                                                                                                                               |
+| `data`    | an optional dataframe containing the variables in the model as columns of dissimilarities. By default the variables are taken from the current environment.                                |
+| `nperm`   | number of permutations to use. If set to 0, the permutation test will be omitted.                                                                                                          |
+| `mrank`   | if this is set to FALSE (the default option), Pearson correlations will be used. If set to TRUE, the Spearman correlation (correlation ranked distances) will be used.                     |
+| `method`  | if "linear", the default, uses multiple regression analysis. If "logistic", performs logistic regression with appropriate permutation testing. Note that this may be substantially slower. |
+
+**Details**
+
+Performs multiple regression on distance matrices following the methods outlined in Legendre et al. 1994. Specifically, the permutation test uses a pseudo-t test to assess significance, rather than using the regression coefficients directly.
+
+**Value**
+
+|             |                                                                                                                                       |
+|------------------------|------------------------------------------------|
+| `coef`      | A matrix with regression coefficients and associated p-values from the permutation test (using the pseudo-t of Legendre et al. 1994). |
+| `r.squared` | Regression R-squared and associated p-value from the permutation test (linear only).                                                  |
+| `F.test`    | F-statistic and p-value for overall F-test for lack of fit (linear only).                                                             |
+| ~~`dev`~~   | ~~Residual deviance, degrees of freedom, and associated p-value (logistic only).~~                                                    |
+\
+\
+
+## MRM model specifications and fitting
+
+1.  **Model Specification**:
+
+    -   Define our MRM model. In this case, it would involve specifying the bacterial distance matrix as the response variable and the fungal distance matrix as the predictor variable(s).
+
+    -   We may include other covariates in the model if necessary, such as environmental variables or sample metadata.
+
+2.  **Model Fitting**:
+
+    -   Fit the MRM models using the `ecodist` package.
+
+    -   Ensure that the model assumptions are met, such as linearity, independence, and normality of residuals.
+
+3.  **Model Assessment**:
+
+    -   Evaluate the significance of the fungal predictors on bacterial community composition using appropriate statistical tests, such as F-tests or permutation tests.
+
+    -   Assess the goodness-of-fit of the model and check for any violations of assumptions.
+
+4.  **Interpretation**:
+
+    -   Interpret the coefficients associated with the fungal predictors to understand their impact on bacterial community composition.
+
+    -   Consider the direction and magnitude of the coefficients to determine the strength and direction of the relationship between fungal abundance and bacterial composition.
+
+5.  **Validation and Sensitivity Analysis**:
+
+    -   Validate the results using cross-validation or other validation techniques to ensure the robustness of the findings.
+
+    -   Conduct sensitivity analysis to assess the robustness of the results to potential outliers or influential data points.
+
+```{r mrm-loop-NOTWORKING, include=FALSE, eval=FALSE}
+# Define the combinations of iterations for MRM
+combinations <- expand.grid(Bac = grep("^Bac_bray", iteration_names_bray, value = TRUE),
+                             Fun = grep("^Fun_bray", iteration_names_bray, value = TRUE))
+
+sample_combinations <- combn(common_samples, 2, FUN = NULL, simplify = F)
+# length(sample_combinations) #116886
+
+# View the resulting matrix
+head(sample_combinations)
+
+
+# Initialize an empty list to store the results
+mrm_results <- list()
+
+# Loop through each combination of Bac and Fun iterations
+for (i in 1:nrow(combinations)) {
+  # Extract Bac and Fun iteration names
+  bac_iteration <- as.character(combinations$Bac[i])
+  fun_iteration <- as.character(combinations$Fun[i])
+  
+  print(bac_iteration)
+  print(fun_iteration)
+
+  # Prepare the data for paired samples
+  paired_data <- data.frame(
+    SampleID = common_samples,
+    Bacterial_Distance = as.dist(get(bac_iteration)),
+    Fungal_Distance = as.dist(get(fun_iteration))
+  )
+  
+  print(head(paired_data))
+}
+  # Extract Bac and Fun distances
+  bac_distance <- paired_data[[paste0("Bacterial_Distance_", substring(bac_iteration, 10))]]
+
+  fun_distance <- paired_data[[paste0("Fungal_Distance_", substring(fun_iteration, 10))]]
+  
+  # Calculate lower triangle of Bac and Fun distances
+  bac_lower_triangle <- bac_distance[lower.tri(bac_distance)]
+  fun_lower_triangle <- fun_distance[lower.tri(fun_distance)]
+  
+  # Perform MRM
+  formula <- as.formula(paste0("bac_lower_triangle ~ fun_lower_triangle"))
+  mrm_model <- lm(formula, data = paired_data)
+  
+  # Store the results
+  mrm_results[[i]] <- mrm_model
+}
+
+# Access the results for each combination
+# For example, to access the results for the first combination:
+# summary(mrm_results[[1]])
+
+```
+
+```{r round_mrm-function, include=FALSE,eval=TRUE,cache=TRUE}
+# Define a function to round numeric elements of a list
+round_mrm <- function(lst, digits = 3) {
+  if (is.list(lst)) {
+    for (i in seq_along(lst)) {
+      if (is.numeric(lst[[i]])) {
+        lst[[i]] <- round(lst[[i]], digits = digits)
+      } else if (is.list(lst[[i]])) {
+        lst[[i]] <- round_list(lst[[i]], digits = digits)
+      }
+    }
+  }
+  return(lst)
+}
+```
+
+\
+\
+
+------------------------------------------------------------------------
+
+\
+\
+
+
+# Results
+
+\
+\
+
+## Do fungal community dissimilarities influence bacterial community dissimilarities?
+
+\
+
+### Predictor: Fungi - whole community, abundance-weighted OTUs {.tabset}
+
+\
+
+#### Response: Bacteria - abundance-weighted {.tabset .tabset-pills .unnumbered}
+
+##### Whole community (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_wholecommunity ~ Fun_bray_wholecommunity, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Generalists (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_generalists ~ Fun_bray_wholecommunity, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Whole community (Genus-level) {.unnumbered}
+
+OTU table agglomerated to genus-level\
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_wholecommunity_genus ~ Fun_bray_wholecommunity, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+#### Response: Bacteria - p/a (Sørensen) {.tabset .tabset-pills .unnumbered}
+
+##### Whole community (OTUs) {.unnumbered}
+
+-   A: Slightly more
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_sor_wholecommunity$beta.sor ~ Fun_bray_wholecommunity, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Generalists (OTUs) {.unnumbered}
+
+-   A: Slightly more
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_sor_generalists$beta.sor ~ Fun_bray_wholecommunity, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Whole community (Genus-level) {.unnumbered}
+
+OTU table agglomerated to genus-level\
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_sor_wholecommunity_genus$beta.sor ~ Fun_bray_wholecommunity, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+\
+
+### Predictor: Fungi - whole community, p/a of OTUs (Sørensen) {.tabset}
+
+\
+
+#### Response: Bacteria - abundance-weighted {.tabset .tabset-pills .unnumbered}
+
+##### Whole community (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_wholecommunity ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Generalists (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_generalists ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Whole community (Genus-level) {.unnumbered}
+
+OTU table agglomerated to genus-level\
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_wholecommunity_genus ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+#### Response: Bacteria - p/a (Sørensen) {.tabset .tabset-pills .unnumbered}
+
+##### Whole community (OTUs) {.unnumbered}
+
+-   A: Yes, barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_sor_wholecommunity$beta.sor ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Generalists (OTUs) {.unnumbered}
+
+-   A: Slightly more
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_sor_generalists$beta.sor ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Whole community (Genus-level) {.unnumbered}
+
+OTU table agglomerated to genus-level\
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_sor_wholecommunity_genus$beta.sor ~ Fun_sor_wholecommunity$beta.sor, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+\
+
+------------------------------------------------------------------------
+
+\
+
+### Predictor: Fungi - Generalists, abundance-weighted OTUs {.tabset}
+
+\
+
+#### Response: Bacteria - abundance-weighted {.tabset .tabset-pills .unnumbered}
+
+##### Whole community (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_wholecommunity ~ Fun_bray_generalists, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Generalists (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_generalists ~ Fun_bray_generalists, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Whole community (Genus-level) {.unnumbered}
+
+OTU table agglomerated to genus-level\
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_wholecommunity_genus ~ Fun_bray_generalists, nperm = 1000, method = "linear"), digits = 3)
+```
+
+
+\
+\
+
+------------------------------------------------------------------------
+
+\
+
+### Predictor: Fungi - whole community, abundance-weighted genera {.tabset}
+\
+Fungal OTU table agglomerated to genus-level
+\
+
+#### Response: Bacteria - abundance-weighted {.tabset .tabset-pills .unnumbered}
+
+##### Whole community (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_wholecommunity ~ Fun_bray_wholecommunity_genus, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Generalists (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_generalists ~ Fun_bray_wholecommunity_genus, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Whole community (Genus-level) {.unnumbered}
+
+OTU table agglomerated to genus-level\
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Bac_bray_wholecommunity_genus ~ Fun_bray_wholecommunity_genus, nperm = 1000, method = "linear"), digits = 3)
+```
+
+
+\
+\
+
+
+\
+\
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+\
+\
+
+
+
+## Do bacterial community dissimilarities influence fungal community dissimilarities? 
+
+\
+
+### Predictor: Bacteria - whole community, abundance-weighted OTUs {.tabset}
+
+\
+
+#### Response: Fungi - abundance-weighted {.tabset .tabset-pills .unnumbered}
+
+##### Whole community (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Fun_bray_wholecommunity ~ Bac_bray_wholecommunity, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Generalists (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Fun_bray_generalists ~ Bac_bray_wholecommunity, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Whole community (Genus-level) {.unnumbered}
+
+OTU table agglomerated to genus-level\
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Fun_bray_wholecommunity_genus ~ Bac_bray_wholecommunity, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+\
+
+------------------------------------------------------------------------
+
+\
+
+### Predictor: Bacteria - Generalists, abundance-weighted OTUs {.tabset}
+
+\
+
+#### Response: Fungi - abundance-weighted {.tabset .tabset-pills .unnumbered}
+
+##### Whole community (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Fun_bray_wholecommunity ~ Bac_bray_generalists, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Generalists (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Fun_bray_generalists ~ Bac_bray_generalists, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Whole community (Genus-level) {.unnumbered}
+
+OTU table agglomerated to genus-level\
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Fun_bray_wholecommunity_genus ~ Bac_bray_generalists, nperm = 1000, method = "linear"), digits = 3)
+```
+
+
+\
+\
+
+------------------------------------------------------------------------
+
+\
+
+### Predictor: Bacteria - whole community, abundance-weighted genera {.tabset}
+\
+Bacterial OTU table agglomerated to genus-level
+\
+
+#### Response: Fungi - abundance-weighted {.tabset .tabset-pills .unnumbered}
+
+##### Whole community (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Fun_bray_wholecommunity ~ Bac_bray_wholecommunity_genus, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Generalists (OTUs) {.unnumbered}
+
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Fun_bray_generalists ~ Bac_bray_wholecommunity_genus, nperm = 1000, method = "linear"), digits = 3)
+```
+
+\
+
+##### Whole community (Genus-level) {.unnumbered}
+
+OTU table agglomerated to genus-level\
+-   A: Yes, but barely
+
+```{r, include=T,eval=T}
+round_mrm(MRM(Fun_bray_wholecommunity_genus ~ Bac_bray_wholecommunity_genus, nperm = 1000, method = "linear"), digits = 3)
+```
+
+
+\
+\
+
+
+\
+\
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+\
+\
+
+
+
+
+
+
+# Cut code {.unnumbered .unlisted .hidden}
+
+##### Logistic {.unnumbered .unlisted .hidden}
+
+-   A: Yes, but barely
+
+```{r, include=F,eval=F, warning=FALSE}
+#Logistic regression is a statistical method used to model the relationship between a binary dependent variable and one or more independent variables. Here's how you can interpret logistic regression results:
+
+#Coefficients: The coefficients represent the log odds of the dependent variable being "1" (success) compared to being "0" (failure) for each unit change in the independent variable.
+  # Positive coefficient: As the independent variable increases, the log odds of success increase.
+  # Negative coefficient: As the independent variable increases, the log odds of success decrease.
+  # Magnitude of coefficient: Indicates the strength of the relationship between the independent variable and the log odds of success.
+
+# Odds Ratio: Exponentiating the coefficients gives the odds ratio, which represents the multiplicative change in odds of success for each one-unit increase in the independent variable.
+  # An odds ratio greater than 1 indicates that the odds of success increase with an increase in the independent     variable.
+  # An odds ratio less than 1 indicates that the odds of success decrease with an increase in the independent        variable.
+
+# Significance: The p-value associated with each coefficient indicates whether the relationship between the independent variable and the dependent variable is statistically significant.
+  # A small p-value (usually < 0.05) suggests that the coefficient is significantly different from zero, meaning     that there is evidence to suggest a relationship between the independent variable and the dependent variable.
+
+# Model Fit: Various measures such as the deviance, AIC (Akaike Information Criterion), and BIC (Bayesian Information Criterion) can be used to assess the overall fit of the logistic regression model.
+  # Lower values of deviance, AIC, and BIC indicate better model fit.
+
+# Prediction: Logistic regression models can be used to predict the probability of success for a given set of values of the independent variables. Predicted probabilities closer to 0 or 1 indicate greater certainty about the outcome.
+MRM(Bac_bray_wholecommunity ~ Fun_bray_wholecommunity, nperm=100, method = "logistic")
+```
+
+For ease of interpretation:
+
+-   `$F.test`
+
+    -   `F`: The F-statistic measures the ratio of the variance explained by the model to the unexplained variance. In the context of the lack of fit test:
+
+        -   A larger F-statistic indicates that the variance explained by the model is significantly greater than the unexplained variance, suggesting that the model fits the data well.
+
+        -   Conversely, a smaller F-statistic indicates that the model does not explain much of the variance in the data relative to the unexplained variance, suggesting potential lack of fit.
+
+    -   `F.pval`: The p-value associated with the F-statistic indicates the probability of observing an F-statistic as extreme as the one computed from the data, assuming that the null hypothesis is true (i.e., assuming that there is no lack of fit).
+
+        -   A small p-value (usually less than a chosen significance level, e.g., 0.05) suggests that the observed lack of fit is unlikely to occur by chance alone. In this case, you would reject the null hypothesis and conclude that there is evidence of lack of fit in the model.
+
+        -   A large p-value suggests that the observed lack of fit could plausibly occur by chance even if the null hypothesis is true. In this case, you would fail to reject the null hypothesis, indicating that there is no significant evidence of lack of fit in the model.\
