@@ -57,13 +57,16 @@ metadata/
 meeting_notes/
 
 # code
+code/.DS_Store
 code/*nb.html
+code/*.nb.html
 code/*.html
 code/*/figure-html/load packages*png
 code/*/figure-html/load-packages*.png
 code/*/figure-docx/load-packages*.png
 code/*.tar.gz
 code/site_libs
+code/PAM_Clusters_files/
 #code/map_bin_mislabel_files/jquery-3.6.0/*
 
 # docs
