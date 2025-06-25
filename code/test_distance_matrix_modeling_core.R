@@ -14,6 +14,8 @@ library(cowplot)
 library(dplyr)
 library(tibble)
 
+# why isnt extract_matrices function used in Compare Pairwise Geographic Distances function?
+# write a loop to paste all sd colnames with ", " inbw so that it looks likes c("Site","Grass", ... )
 # ---- Function: Extract Distance Matrices ----
 extract_matrices <- function(KINGDOM, METAGROUPING, METASUBGROUP, GLOBAL, BETA) {
   beta_map <- c("Sorensen" = "beta.sor", "Turnover" = "beta.sim", "Nestedness" = "beta.sne")

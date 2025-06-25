@@ -33,7 +33,7 @@ if (tolower(GLOBAL) == "yes") {
 }
 
 # -----------------------
-# Summary of Pairwise Spatial Distances (F1 vs. non-F1)
+# Summary of Pairwise Spatial Distances by METAGROUPING (e.g., F1 vs. non-F1)
 if (tolower(GLOBAL) != "yes") {
   dist1 <- env_dist_matrices[[METAGROUPING]][[glue::glue("{METASUBGROUP}_geodist")]]
   other_subgroup <- setdiff(names(env_dist_matrices[[METAGROUPING]]), glue::glue("{METASUBGROUP}_geodist"))[1]

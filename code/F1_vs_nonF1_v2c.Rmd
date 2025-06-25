@@ -157,27 +157,19 @@ Because fungi and bacteria co-dominate root and soil microbiomes in virtually al
 
 -   
 
--   
-
-    Panel A: NMDS or PCoA of fungal β\<sub\>sor\</sub\>, color-coded by cluster (F1–F10)
+-   Panel A: NMDS or PCoA of fungal β\<sub\>sor\</sub\>, color-coded by cluster (F1–F10)
 
 -   
 
--   
-
-    Panel B: Relative abundance of each fungal cluster across sites and hosts
+-   Panel B: Relative abundance of each fungal cluster across sites and hosts
 
 -   
 
--   
-
-    Panel C: Alpha diversity (richness, Shannon) by fungal cluster
+-   Panel C: Alpha diversity (richness, Shannon) by fungal cluster
 
 -   
 
--   
-
-    Panel D: β-dispersion by cluster (showing F1’s low dispersion)
+-   Panel D: β-dispersion by cluster (showing F1’s low dispersion)
 
 -   
 
@@ -195,45 +187,31 @@ Shows that fungal subassemblages are real, stable, and variable in structure —
 
 -   
 
--   
-
-    Panel A: Fungal β\<sub\>sor\</sub\> vs bacterial β\<sub\>sor\</sub\>, with R² (full model)
+-   Panel A: Fungal β\<sub\>sor\</sub\> vs bacterial β\<sub\>sor\</sub\>, with R² (full model)
 
 -   
 
--   
-
-    Panel B: Residual bacterial β\<sub\>sor\</sub\> vs fungal subassemblage pairings
+-   Panel B: Residual bacterial β\<sub\>sor\</sub\> vs fungal subassemblage pairings
 
 -   
 
--   
-
-    Panel C: Bar plot of variance explained by:
+-   Panel C: Bar plot of variance explained by:
 
     -   
 
-    -   
-
-        Fungal β\<sub\>sor\</sub\>
+    -   Fungal β\<sub\>sor\</sub\>
 
     -   
 
-    -   
-
-        Pool dissimilarity
+    -   Pool dissimilarity
 
     -   
 
-    -   
-
-        Grass
+    -   Grass
 
     -   
 
-    -   
-
-        Fungal cluster pair
+    -   Fungal cluster pair
 
     -   
 
@@ -253,15 +231,11 @@ This is your **core finding** — fungal cluster identity explains bacterial str
 
 -   
 
--   
-
-    Heatmap of mean bacterial β\<sub\>sor\</sub\> residuals by fungal cluster pair (F1_F2, F1_F3…)
+-   Heatmap of mean bacterial β\<sub\>sor\</sub\> residuals by fungal cluster pair (F1_F2, F1_F3…)
 
 -   
 
--   
-
-    Line plot of bacterial dissimilarity vs fungal β\<sub\>sor\</sub\> by cluster pair (showing non-equivalent slopes)
+-   Line plot of bacterial dissimilarity vs fungal β\<sub\>sor\</sub\> by cluster pair (showing non-equivalent slopes)
 
 -   
 
@@ -279,21 +253,15 @@ Shows that **direction in community space matters** — not just distance — va
 
 -   
 
--   
-
-    Panel A: Effect sizes (e.g., marginal R²) of fungal cluster effect per site
+-   Panel A: Effect sizes (e.g., marginal R²) of fungal cluster effect per site
 
 -   
 
--   
-
-    Panel B: Distribution of fungal clusters per site and per host
+-   Panel B: Distribution of fungal clusters per site and per host
 
 -   
 
--   
-
-    Panel C (optional): Interaction model (Grass × Fungal cluster)
+-   Panel C (optional): Interaction model (Grass × Fungal cluster)
 
 -   
 
@@ -309,27 +277,19 @@ ISME wants to see **generality** — not local effects only
 
 -   
 
--   
-
-    R² values and p-values from models:
+-   R² values and p-values from models:
 
     -   
 
-    -   
-
-        Bac β\<sub\>sor\</sub\> \~ Fun β\<sub\>sor\</sub\>
+    -   Bac β\<sub\>sor\</sub\> \~ Fun β\<sub\>sor\</sub\>
 
     -   
 
-    -   
-
-        Bac β\<sub\>sor\</sub\> \~ Fun β\<sub\>sor\</sub\> + Pool + Grass
+    -   Bac β\<sub\>sor\</sub\> \~ Fun β\<sub\>sor\</sub\> + Pool + Grass
 
     -   
 
-    -   
-
-        Residual model: Bac \~ Fungal cluster pair
+    -   Residual model: Bac \~ Fungal cluster pair
 
     -   
 
@@ -347,39 +307,27 @@ ISME expects a concise summary table with **key stats** from the main models —
 
 -   
 
--   
-
-    For each F1–F10:
+-   For each F1–F10:
 
     -   
 
-    -   
-
-        Number of samples
+    -   Number of samples
 
     -   
 
-    -   
-
-        Mean α-diversity (richness, Shannon)
+    -   Mean α-diversity (richness, Shannon)
 
     -   
 
-    -   
-
-        Mean β-dispersion
+    -   Mean β-dispersion
 
     -   
 
-    -   
-
-        Mean fungal β\<sub\>sor\</sub\> vs Bac β\<sub\>sor\</sub\> congruence
+    -   Mean fungal β\<sub\>sor\</sub\> vs Bac β\<sub\>sor\</sub\> congruence
 
     -   
 
-    -   
-
-        Site distribution entropy or spread
+    -   Site distribution entropy or spread
 
     -   
 
@@ -1413,8 +1361,6 @@ addLabelOnlyMarkers(data = centroids_BLMHPG,
 \
 \
 \
-
-
 
 # Distributions of numeric metadata in F1 vs. non-F1
 
@@ -6136,45 +6082,6 @@ ggplot(combined_df, aes(x = Fun_beta_sor, y = Bac_beta_sor, color = Group)) +
     color = "Fungal Group"
   )
 ```
-
-
-```{r scatterplot-BF-Fun-sor-clus2-sor-bySite, fig.height=9,fig.width=8, include=FALSE,eval=FALSE}
-sort(unique(combined_df$Site_pair))
-# BLM   BNP   CAD    CNF CPR DMT FCP FMT GMT GNF HAR HPG KAE KNZ LAR LBJ NWP ONF RNF SEV SFA UHC
-#                                             
-
-subset_df <- subset(combined_df, Site_pair=="UHC")
-ggplot(subset_df, aes(x = Fun_beta_sor, y = Bac_beta_sor, color = Group)) +
-  geom_point(alpha = 0.9, size = 1.2) +
-  geom_smooth(method = "lm", se = TRUE, linetype = "dashed") +
-  stat_cor(
-    method = "spearman",
-    aes(group = Group, color = Group),
-    label.x.npc = "left", label.y.npc = "top",
-    size = 3,
-    show.legend = FALSE
-  ) +
-  # facet_wrap(~ Site_pair, scales = "free",ncol=4) +
-  scale_color_manual(
-    values = c("F1" = "#8E0152", "non-F1" = "#7FBC41"),
-    breaks = c("F1", "non-F1")
-  ) +
-  theme_bw(base_size = 13) +
-  theme(
-    strip.text = element_text(face = "bold"),
-    strip.background = element_blank(),
-    legend.position = "non"
-  ) +
-  labs(
-    x = "Fungal Dissimilarity (βsor)",
-    y = "Bacterial Dissimilarity (βsor)",
-    color = "Fungal Group"
-  )
-
-ggsave(file="../figures/sfaf/sfaf2025/FdissBdiss/UHC.png",
-       width = 3, height = 3, units = "in", dpi = 300)
-```
-
 
 ## Source or sink (F1 - fungal only)
 

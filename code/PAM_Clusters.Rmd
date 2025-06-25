@@ -111,12 +111,8 @@ knitr::load_cache('calc-alpha', 'bwc_alpha')
 knitr::load_cache('gamma-fun-calc', 'Fun_gamma2')
 knitr::load_cache('gamma-bac-calc', 'Bac_gamma2')
 
-
-
-# knitr::load_cache('mean-diss-bycluster-Fun', 'md_Fwc_self')
-knitr::load_cache('mean-diss-bycluster-Fun')
-# knitr::load_cache('mean-diss-bycluster-Fun', 'md_Fwc_clus_sor_k10.df.self')
-# knitr::load_cache('mean-diss-bycluster-Fun', 'md_Fwc_clus_sor_k10.df.noself')
+knitr::load_cache('mean-diss-bycluster-Fun', 'md_Fwc_self')
+knitr::load_cache('mean-diss-bycluster-Fun', 'md_Fwc_clus_sor_k10.df.noself')
 # knitr::load_cache('mean-diss-bycluster-Bac', 'md_Bwc_self')
 # knitr::load_cache('mean-diss-bycluster-Bac', 'md_Bwc_clus_sor_k14.df.noself')
 
@@ -128,7 +124,6 @@ knitr::load_cache('betadisp-boxplot-Fun', 'betadisp_clus_Fun.df')
 # knitr::load_cache('adonis_Fun_clus_bray')
 knitr::load_cache('betadisp-aov-Fun')
 # knitr::load_cache('', '')
-
 
 
 # readin boxplots of fun taxa sig diffs
@@ -157,6 +152,7 @@ library("cowplot"); packageVersion("cowplot") #‘1.1.3’
 library("dplyr"); packageVersion("dplyr") #‘1.1.4’
 library("plyr"); packageVersion("plyr") #‘1.8.9’
 library("knitr"); packageVersion("knitr") #‘1.49’
+#library("kableExtra"); packageVersion("kableExtra") #‘1.3.4’
 library("DT"); packageVersion("DT") #‘0.33’
 library("tidyverse"); packageVersion("tidyverse") #‘2.0.0’
 library("prettydoc"); packageVersion("prettydoc") #‘0.4.1’
@@ -166,12 +162,6 @@ library("betapart"); packageVersion("betapart") #‘1.6’
 # patch see: https://stackoverflow.com/questions/76118194/error-when-loading-kableextra-in-markdown-file-after-updating-to-r-4-3-0
 # devtools::install_github("kupietz/kableExtra",force = TRUE)
 library("kableExtra"); packageVersion("kableExtra") #‘1.4.0’
-library("circlize"); packageVersion("circlize") #‘0.4.16’
-library("sf"); packageVersion("sf") #‘1.0.19’
-  # Linking to GEOS 3.13.0, GDAL 3.8.5, PROJ 9.5.1;
-  # sf_use_s2() is TRUE
-
-
 
 # library("microbiome"); packageVersion("microbiome") #‘1.22.0’
 
@@ -195,7 +185,7 @@ source("RAM_bulk_harvester.R")
 # 
 # Fun_wc_sor_k4.ord <- readRDS(file = "../processed_data/clean_rds_saves/Fun_wc_sor_k4.ord.rds")
 # 
-# col_n10 <- c("F1"="#8E0152","F2"="#C51B7D","F3"="#DE77AE","F4"="#F1B6DA",
+# col_clusn10 <- c("F1"="#8E0152","F2"="#C51B7D","F3"="#DE77AE","F4"="#F1B6DA",
 #                  "F5"="#C5C2EA","F6"="#8DC9BB","F7"="#86C37E","F8"="#7FBC41","F9"="#4D9221","F10"="#276419")
 # 
 # 
@@ -227,6 +217,10 @@ Fwc_rel.clus_sor_k10<-readRDS(file = "../processed_data/Clustering/Fwc_rel.clus_
 
 
 ```
+
+
+
+
 
 ```{r readin-phylo, include=FALSE, eval=F}
 ## HAS ONF BEEN FIXED TO BIN=NORTH? CHECK
@@ -376,8 +370,8 @@ tail(colnames(sample_data(Bac_wholecommunity)))
 
 -   Unsupervised clustering of the fungal community data revealed 14 sub-assemblages of communities. These resultant sub-assemblages are a good representation of the data:
 
-    -   Across the whole dataset, the fungal PAM clustering explained `r round(adonis_predClus_Fun$R2[1]*100,2)`% of the community composition, in terms of the presence/absence of OTUs (adonis2/permANOVA; $P$-value \< `r adonis_predClus_Fun[1,5]`) and `r round(adonis_Fun_clus_bray$R2[1]*100,2)`% of the abundance-weighted community composition ($P$-value \< `r adonis_Fun_clus_bray[1,5]`)\*
-
+    -   Across the whole dataset, the fungal PAM clustering explained `r round(adonis_predClus_Fun$R2[1]*100,2)`% of the community composition, in terms of the presence/absence of OTUs (adonis2/permANOVA; $P$-value \< `r adonis_predClus_Fun[1,5]`) and `r round(adonis_Fun_clus_bray$R2[1]*100,2)`% of the abundance-weighted community composition  ($P$-value \< `r adonis_Fun_clus_bray[1,5]`)\*
+    
     -   However, these sub-assemblages are a better representation of fungal community [*dispersal*]{.underline}, indicating that variability in the dispersal patterns of fungi is the primary driver in sub-assemblage differentiation. Variation in the dispersion of communities (distance to spatial median) accounted for `r round(betadisp_clus_Fun.aov$R_squared[1],2)`% of the differences observed among fungal sub-assemblages (Permutation test for homogeneity of multivariate dispersions; $P$-value \< `r betadisp_clus_Fun.aov[1,8]`).
 
 -   Hierarchical clustering of fungal communities using Sørensen dissimilarities closely aligned with PAM clustering results, evidenced by concordance between PAM clusters and the dendrograms created using five different agglomeration methods ("average", "single", "complete", "median", and "centroid").
@@ -700,39 +694,39 @@ plot_ordination(Fun_wholecommunity, Fun_wc_sor_k4.ord, color = "Fun_sor_clusters
 
 We do see clusters with only 1 site and others with multiple sites.\
 
-```         
-- F2 has only Site = SFA, and all SFA site samples are exclusive to F3\
+    - F2 has only Site = SFA, and all SFA site samples are exclusive to F3\
 
-- F3 has only Site = KAE, however 3 KAE site samples belong to other clusters (F4, F7, F9 - all 3 were BUDA grass samples, but the other 9 BUDA samples clustered with F3) \
+    - F3 has only Site = KAE, however 3 KAE site samples belong to other clusters (F4, F7, F9 - all 3 were BUDA grass samples, but the other 9 BUDA samples clustered with F3) \
+    
+    - F4 is mostly site LAR (and all LAR site samples are exclusive to F4) and 2 samples from 2 other sites: 1 from KAE and 1 from FCP. Those 2 samples were both BUDA, however no BUDA grasses were present at LAR.
+    
+    - F5 has samples from 5 sites, (BNP - all BOGR, n=2; CPR - all BOER, n=11; DMT - SCSC, n=1; FCP & HPG - all BOGR, n=1 & 2, respectively). \
+    
+    - F6 was mostly KNZ samples (25/32 samples in cluster)
+        - KNZ was exclusive to F6 and F7. In F6, KNZ had 10 ANGE grass samples (of 11, the other is in F7), 3 BOGR (of 9, the others are in F7), 1 BUDA (of 11, the others are in F7), and all of the 11 SCSC samples (of 11). \
+      
+    - F7 was mostly KNZ (n=17), HAR (n=13), and FCP (n=7). 1 KAE BUDA sample also clustered with F7.
+        - By Grass
+            - 13 (of 38) samples were from BOGR grasses at sites FCP, HAR, and KNZ.\
+            - 21 (of 38) samples were from BUDA grasses at sites FCP, HAR, and KNZ.\
+            - 3 (of 38) samples were from SCSC grasses, all at site FCP.\
+            - 1 (of 38) sample was from ANGE grasses at site KNZ\
+        - Site-by-grass exclusivity
+            - 9 of 10 BUDA samlpes from site HAR were in F7 (1 other was in F9)
+            - 4 of 6 BOGR samlpes from site HAR were in F7 (1 other was in F8 and F9)\
+            - 10 of 11 BUDA samlpes from site KNZ were in F7 (1 other was in F6)
+            - 6 of 9 BOGR samlpes from site KNZ were in F7 (3 others were in F6)
+            - 1 of 11 ANGE samlpes from site KNZ were in F7 (all 10 others were in F6)\
+            - 1 of 12 BUDA samlpes from site FCP were in F7 (1 other was in F4 and F8, 9 were in F9)
+            - 3 of 4 BOGR samlpes from site FCP were in F7 (1 other was in F5)
+            - 3 of 11 SCSC samlpes from site FCP were in F7 (all 8 others were in F9)
+            
+    - F8 was mostly ANGE and SCSC grasses (18 and 32 of 53 samples, respectively). 2 BOGR (from HAR and HPG) and 1 BUDA (FCP) samples were also in this cluster. This cluster was comprised primarily of sites HAR (n=22), CAD (n=15), DMT (n=7), DMT (n=7), and 1 sample each from FCP and HPG.
+        - KNZ was exclusive to F6 and F7. In F6, KNZ had 10 ANGE grass samples (of 11, the other is in F7), 3 BOGR (of 9, the others are in F7), 1 BUDA (of 11, the others are in F7), and all of the 11 SCSC samples (of 11). \
 
-- F4 is mostly site LAR (and all LAR site samples are exclusive to F4) and 2 samples from 2 other sites: 1 from KAE and 1 from FCP. Those 2 samples were both BUDA, however no BUDA grasses were present at LAR.
-
-- F5 has samples from 5 sites, (BNP - all BOGR, n=2; CPR - all BOER, n=11; DMT - SCSC, n=1; FCP & HPG - all BOGR, n=1 & 2, respectively). \
-
-- F6 was mostly KNZ samples (25/32 samples in cluster)
-    - KNZ was exclusive to F6 and F7. In F6, KNZ had 10 ANGE grass samples (of 11, the other is in F7), 3 BOGR (of 9, the others are in F7), 1 BUDA (of 11, the others are in F7), and all of the 11 SCSC samples (of 11). \
-  
-- F7 was mostly KNZ (n=17), HAR (n=13), and FCP (n=7). 1 KAE BUDA sample also clustered with F7.
-    - By Grass
-        - 13 (of 38) samples were from BOGR grasses at sites FCP, HAR, and KNZ.\
-        - 21 (of 38) samples were from BUDA grasses at sites FCP, HAR, and KNZ.\
-        - 3 (of 38) samples were from SCSC grasses, all at site FCP.\
-        - 1 (of 38) sample was from ANGE grasses at site KNZ\
-    - Site-by-grass exclusivity
-        - 9 of 10 BUDA samlpes from site HAR were in F7 (1 other was in F9)
-        - 4 of 6 BOGR samlpes from site HAR were in F7 (1 other was in F8 and F9)\
-        - 10 of 11 BUDA samlpes from site KNZ were in F7 (1 other was in F6)
-        - 6 of 9 BOGR samlpes from site KNZ were in F7 (3 others were in F6)
-        - 1 of 11 ANGE samlpes from site KNZ were in F7 (all 10 others were in F6)\
-        - 1 of 12 BUDA samlpes from site FCP were in F7 (1 other was in F4 and F8, 9 were in F9)
-        - 3 of 4 BOGR samlpes from site FCP were in F7 (1 other was in F5)
-        - 3 of 11 SCSC samlpes from site FCP were in F7 (all 8 others were in F9)
-        
-- F8 was mostly ANGE and SCSC grasses (18 and 32 of 53 samples, respectively). 2 BOGR (from HAR and HPG) and 1 BUDA (FCP) samples were also in this cluster. This cluster was comprised primarily of sites HAR (n=22), CAD (n=15), DMT (n=7), DMT (n=7), and 1 sample each from FCP and HPG.
-    - KNZ was exclusive to F6 and F7. In F6, KNZ had 10 ANGE grass samples (of 11, the other is in F7), 3 BOGR (of 9, the others are in F7), 1 BUDA (of 11, the others are in F7), and all of the 11 SCSC samples (of 11). \
-```
-
-All ANGE and SCSC grasses at site HAR were exclusive to F8 8 of 11 CAD ANGE were in F8 (all 3 others were in F6) 7 of 10 CAD SCSC were in F8 (all 3 others were in F6)
+All ANGE and SCSC grasses at site HAR were exclusive to F8
+8 of 11 CAD ANGE were in F8 (all 3 others were in F6)
+7 of 10 CAD SCSC were in F8 (all 3 others were in F6)
 
 ```{r, echo=FALSE,eval=T, fig.height=8,out.width="75%"}
 plot_ordination(Fun_wholecommunity, Fun_wc_sor_k4.ord, color = "Site") +
@@ -916,15 +910,13 @@ plot_ordination(Bac_wholecommunity, Bac_wc_sor_k5.ord, color = "Bac_sor_clusters
 
 We do see some clusters with only 1 site and others with multiple sites.\
 
-```         
-- B6: only site CNF (n=12, all SCSC). The remainng samples from CNF clustered in B2 (4 BOER and 11 BOER)
+    - B6: only site CNF (n=12, all SCSC). The remainng samples from CNF clustered in B2 (4 BOER and 11 BOER)
 
-- B7: Site CPR samples clustered only in B7 (n=11, all BOER). B7 was also comprised of an additional sample from site DMT (SCSC). \
+    - B7: Site CPR samples clustered only in B7 (n=11, all BOER). B7 was also comprised of an additional sample from site DMT (SCSC). \
 
-- B13: Site NWP samples clustered only in B13 (n=20, 10 ANGE and 10 SCSC). B13 was also comprised of an additional sample from site KAE (SCSC). \
+    - B13: Site NWP samples clustered only in B13 (n=20, 10 ANGE and 10 SCSC). B13 was also comprised of an additional sample from site KAE (SCSC). \
 
-- B14: B14 was comprised of only site ONF samples (n=20, 9 ANGE and 11 SCSC). Site ONF samples clustered mainly in B14 (20 of 22 samples), however 2 of the 12 SCSC clustered with other groups (1 each in B9 and B10). \
-```
+    - B14: B14 was comprised of only site ONF samples (n=20, 9 ANGE and 11 SCSC). Site ONF samples clustered mainly in B14 (20 of 22 samples), however 2 of the 12 SCSC clustered with other groups (1 each in B9 and B10). \
 
 ```{r, echo=FALSE,eval=T, fig.height=10,out.width="75%"}
 plot_ordination(Bac_wholecommunity, Bac_wc_sor_k5.ord, color = "Site") +
@@ -951,7 +943,7 @@ plot_ordination(Bac_wholecommunity, Bac_wc_sor_k5.ord, color = "Site") +
 
 #### TO_DO: FACET BY FUN_SOR_CLUS2 - Bac clus on Fun ord {.unnumbered .tabset}
 
-B12 \<-\> F3
+B12 <-> F3
 
 ```{r}
 plot_ordination(Fun_wholecommunity, Fun_wc_sor_k4.ord, color = "Bac_sor_clusters") +
@@ -973,9 +965,9 @@ plot_ordination(Fun_wholecommunity, Fun_wc_sor_k4.ord, color = "Bac_sor_clusters
 
 #### Fun clus on Bac ord {.unnumbered .tabset}
 
-F5 \<-\> B7
+F5 <-> B7
 
-```{r, echo=FALSE, eval=TRUE}
+```{r}
 plot_ordination(Bac_wholecommunity, Bac_wc_sor_k5.ord, color = "Fun_sor_clusters") +
   scale_color_manual(values = col_n10, name = "Fun Sørensen clusters",guide = guide_legend(ncol = 2, override.aes = list(size=4)))+
   geom_point(size = 0.4, alpha = 0.7) +
@@ -994,34 +986,6 @@ plot_ordination(Bac_wholecommunity, Bac_wc_sor_k5.ord, color = "Fun_sor_clus2") 
   geom_point(size = 0.4, alpha = 0.7) +
   geom_text(mapping = aes(label = Bac_sor_clusters), size = 4, vjust = 1.1, show.legend = F) +
   ggtitle("16S - Sørensen dissim. clusters based on PAM (k = 14)", subtitle = "Bacterial communities (labeled) colored by corresponding fungal cluster") +
-  theme_bw() +
-  theme(legend.position="right",
-    axis.text = element_text(color="black", size=10),
-    axis.title = element_text(color="black", size=12),
-    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
-    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
-    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
-
-plot_ordination(Bac_wholecommunity, Bac_wc_sor_k5.ord, color = "Fun_sor_clusters") +
-  scale_color_manual(values = col_n10, name = "Fun Sørensen clusters",guide = guide_legend(ncol = 2, override.aes = list(size=4)))+
-  geom_point(size = 0.4, alpha = 0.7) +
-  facet_grid(.~Fun_sor_clus2, scales = "free", space = "free")+
-  geom_text(mapping = aes(label = Bac_sor_clusters), size = 4, vjust = 1.1, show.legend = F) +
-  ggtitle("16S - Sørensen dissim. clusters based on PAM (k = 14)", subtitle = "Bacterial communities (labeled) colored by corresponding fungal cluster (facet by F1 vs. non-F1") +
-  theme_bw() +
-  theme(legend.position="right",
-    axis.text = element_text(color="black", size=10),
-    axis.title = element_text(color="black", size=12),
-    legend.text = element_text(color="black", size=8),legend.title = element_text(color="black", size=10),
-    plot.background = element_blank(),panel.border = element_rect(colour = "black", fill=NA, linewidth=.75),
-    panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.background = element_blank())
-
-plot_ordination(Bac_wholecommunity, Bac_wc_sor_k5.ord, color = "Bac_sor_clusters") +
-  scale_color_manual(values = col_n14, name = "Bac Sørensen clusters",guide = guide_legend(ncol = 2, override.aes = list(size=4)))+
-  geom_point(size = 0.4, alpha = 0.7) +
-  facet_wrap("Fun_sor_clusters", nrow=2,scales = "free")+
-  geom_text(mapping = aes(label = Bac_sor_clusters), size = 4, vjust = 1.1, show.legend = F) +
-  ggtitle("16S - Sørensen dissim. clusters based on PAM (k = 14)", subtitle = "Bacterial communities (labeled and colored), split by corresponding fungal cluster") +
   theme_bw() +
   theme(legend.position="right",
     axis.text = element_text(color="black", size=10),
@@ -1262,21 +1226,19 @@ sor.dist.list$Bac_wc_B14<-beta.pair(decostand(phylo2vegan_OTU(Bac_wc_B14), metho
 # comm.names.by.domain<-c("Fun_wholecommunity","Fun_wc_F1","Fun_wc_F2",
                         # "Fun_wc_F3","Fun_wc_F4","Fun_wc_F5")
 
-comm.names.by.domain <- c("Fun_wholecommunity","Fun_wc_F1",
+comm.names.by.domain<-c("Fun_wholecommunity","Fun_wc_F1",
                         "Fun_wc_F3","Fun_wc_F4","Fun_wc_F5","Fun_wc_F6",
                         "Fun_wc_F7","Fun_wc_F8","Fun_wc_F9","Fun_wc_F10"
                         # ,"Bac_wholecommunity"
                         )
 
-edaphic_var <- c("pH_m.std","soil_moisture_m.std",
-                 "perc_moisture_m.std","SOM_m.std",
-                 "ammonium_m.std","nitrate_m.std","phos_m.std")
-climate_var <- c("ppt3yr_m.std","ppt30yr_m.std","GDD3yr_m.std",
-                 "GDD30yr_m.std","coll_GDD_m.std")
+edaphic_var <- c("pH_m.std","soil_moisture_m.std","SOM_m.std",
+                 "ammonium_m.std","phos_m.std")
+climate_var <- c("ppt3yr_m.std","GDD3yr_m.std")
 plant_var <- c("avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std")
 expl_var <- c(edaphic_var,climate_var,plant_var)
 
-# pH ----
+# pH
 adonis.out_predpH.list = vector("list", length = length(comm.names.by.domain))
 
 for (comm in comm.names.by.domain) {
@@ -1296,9 +1258,9 @@ for (comm in comm.names.by.domain) {
   }
 
 adonis.out.array_predpH = do.call(rbind, adonis.out_predpH.list)
-### ----
+###
 
-# soil_moisture ----
+# soil_moisture
 adonis.out_predsoil_moisture.list = vector("list", length = length(comm.names.by.domain))
 
 for (comm in comm.names.by.domain) {
@@ -1318,31 +1280,9 @@ for (comm in comm.names.by.domain) {
   }
 
 adonis.out.array_predsoil_moisture = do.call(rbind, adonis.out_predsoil_moisture.list)
-### ----
+###
 
-# perc_moisture ----
-adonis.out_predperc_moisture.list = vector("list", length = length(comm.names.by.domain))
-
-for (comm in comm.names.by.domain) {
-  
-  comm.name<-comm
-  
-  adonis.temp_predperc_moisture <- adonis2(sor.dist.list[[paste(comm.name,sep = "''")]] ~ 
-                                    perc_moisture_m.std,
-          data = (as(sample_data(get(comm)), "data.frame")))
-  
-  adonis.temp_predperc_moisture$comm <- comm 
-  
-  adonis.temp_predperc_moisture$expl_var <- "perc_moisture" 
-  
-  adonis.out_predperc_moisture.list[[comm]] <- (as.data.frame(adonis.temp_predperc_moisture))
-
-  }
-
-adonis.out.array_predperc_moisture = do.call(rbind, adonis.out_predperc_moisture.list)
-### ----
-
-# SOM ----
+# SOM
 adonis.out_predSOM.list = vector("list", length = length(comm.names.by.domain))
 
 for (comm in comm.names.by.domain) {
@@ -1362,9 +1302,9 @@ for (comm in comm.names.by.domain) {
   }
 
 adonis.out.array_predSOM = do.call(rbind, adonis.out_predSOM.list)
-### ----
+###
 
-# ammonium ----
+# ammonium
 adonis.out_predammonium.list = vector("list", length = length(comm.names.by.domain))
 
 for (comm in comm.names.by.domain) {
@@ -1384,31 +1324,9 @@ for (comm in comm.names.by.domain) {
   }
 
 adonis.out.array_predammonium = do.call(rbind, adonis.out_predammonium.list)
-### ----
+###
 
-# nitrate ----
-adonis.out_prednitrate.list = vector("list", length = length(comm.names.by.domain))
-
-for (comm in comm.names.by.domain) {
-  
-  comm.name<-comm
-  
-  adonis.temp_prednitrate <- adonis2(sor.dist.list[[paste(comm.name,sep = "''")]] ~ 
-                                    nitrate_m.std,
-          data = (as(sample_data(get(comm)), "data.frame")))
-  
-  adonis.temp_prednitrate$comm <- comm 
-  
-  adonis.temp_prednitrate$expl_var <- "nitrate" 
-  
-  adonis.out_prednitrate.list[[comm]] <- (as.data.frame(adonis.temp_prednitrate))
-
-  }
-
-adonis.out.array_prednitrate = do.call(rbind, adonis.out_prednitrate.list)
-### ----
-
-# phos ----
+# phos
 adonis.out_predphos.list = vector("list", length = length(comm.names.by.domain))
 
 for (comm in comm.names.by.domain) {
@@ -1428,9 +1346,9 @@ for (comm in comm.names.by.domain) {
   }
 
 adonis.out.array_predphos = do.call(rbind, adonis.out_predphos.list)
-### ----
+###
 
-# ppt3yr ----
+# ppt3yr
 adonis.out_predppt3yr.list = vector("list", length = length(comm.names.by.domain))
 
 for (comm in comm.names.by.domain) {
@@ -1450,31 +1368,9 @@ for (comm in comm.names.by.domain) {
   }
 
 adonis.out.array_predppt3yr = do.call(rbind, adonis.out_predppt3yr.list)
-### ----
+###
 
-# ppt30yr ----
-adonis.out_predppt30yr.list = vector("list", length = length(comm.names.by.domain))
-
-for (comm in comm.names.by.domain) {
-  
-  comm.name<-comm
-  
-  adonis.temp_predppt30yr <- adonis2(sor.dist.list[[paste(comm.name,sep = "''")]] ~ 
-                                    ppt30yr_m.std,
-          data = (as(sample_data(get(comm)), "data.frame")))
-  
-  adonis.temp_predppt30yr$comm <- comm 
-  
-  adonis.temp_predppt30yr$expl_var <- "ppt30yr" 
-  
-  adonis.out_predppt30yr.list[[comm]] <- (as.data.frame(adonis.temp_predppt30yr))
-
-  }
-
-adonis.out.array_predppt30yr = do.call(rbind, adonis.out_predppt30yr.list)
-### ----
-
-# GDD3yr ----
+# GDD3yr
 adonis.out_predGDD3yr.list = vector("list", length = length(comm.names.by.domain))
 
 for (comm in comm.names.by.domain) {
@@ -1494,53 +1390,9 @@ for (comm in comm.names.by.domain) {
   }
 
 adonis.out.array_predGDD3yr = do.call(rbind, adonis.out_predGDD3yr.list)
-### ----
+###
 
-# GDD30yr ----
-adonis.out_predGDD30yr.list = vector("list", length = length(comm.names.by.domain))
-
-for (comm in comm.names.by.domain) {
-  
-  comm.name <- comm
-  
-  adonis.temp_predGDD30yr <- adonis2(sor.dist.list[[paste(comm.name,sep = "''")]] ~ 
-                                    GDD30yr_m.std,
-          data = (as(sample_data(get(comm)), "data.frame")))
-  
-  adonis.temp_predGDD30yr$comm <- comm 
-  
-  adonis.temp_predGDD30yr$expl_var <- "GDD30yr" 
-  
-  adonis.out_predGDD30yr.list[[comm]] <- (as.data.frame(adonis.temp_predGDD30yr))
-
-  }
-
-adonis.out.array_predGDD30yr = do.call(rbind, adonis.out_predGDD30yr.list)
-### ----
-
-# coll_GDD ----
-adonis.out_predcoll_GDD.list = vector("list", length = length(comm.names.by.domain))
-
-for (comm in comm.names.by.domain) {
-  
-  comm.name<-comm
-  
-  adonis.temp_predcoll_GDD <- adonis2(sor.dist.list[[paste(comm.name,sep = "''")]] ~ 
-                                    coll_GDD_m.std,
-          data = (as(sample_data(get(comm)), "data.frame")))
-  
-  adonis.temp_predcoll_GDD$comm <- comm 
-  
-  adonis.temp_predcoll_GDD$expl_var <- "coll_GDD" 
-  
-  adonis.out_predcoll_GDD.list[[comm]] <- (as.data.frame(adonis.temp_predcoll_GDD))
-
-  }
-
-adonis.out.array_predcoll_GDD = do.call(rbind, adonis.out_predcoll_GDD.list)
-### ----
-
-# avg_SRL ----
+# avg_SRL
 adonis.out_predavg_SRL.list = vector("list", length = length(comm.names.by.domain))
 
 for (comm in comm.names.by.domain) {
@@ -1560,9 +1412,9 @@ for (comm in comm.names.by.domain) {
   }
 
 adonis.out.array_predavg_SRL = do.call(rbind, adonis.out_predavg_SRL.list)
-### ----
+###
 
-# avg_SLA ----
+# avg_SLA
 adonis.out_predavg_SLA.list = vector("list", length = length(comm.names.by.domain))
 
 for (comm in comm.names.by.domain) {
@@ -1582,9 +1434,9 @@ for (comm in comm.names.by.domain) {
   }
 
 adonis.out.array_predavg_SLA = do.call(rbind, adonis.out_predavg_SLA.list)
-### ----
+###
 
-# herbivory_perc ----
+# herbivory_perc
 adonis.out_predherbivory_perc.list = vector("list", length = length(comm.names.by.domain))
 
 for (comm in comm.names.by.domain) {
@@ -1604,29 +1456,15 @@ for (comm in comm.names.by.domain) {
   }
 
 adonis.out.array_predherbivory_perc = do.call(rbind, adonis.out_predherbivory_perc.list)
-### ----
+###
 
 
-# adonis.out.array_Fun_wc ----
-adonis.out.array_Fun_wc <- rbind(
-  adonis.out.array_predpH,
-  adonis.out.array_predsoil_moisture,
-  adonis.out.array_predperc_moisture,
-  adonis.out.array_predSOM,
-  adonis.out.array_predammonium,
-  adonis.out.array_prednitrate,
-  adonis.out.array_predphos,
-  # climate
-  adonis.out.array_predppt3yr,
-  adonis.out.array_predppt30yr,
-  adonis.out.array_predGDD3yr,
-  adonis.out.array_predGDD30yr,
-  adonis.out.array_predcoll_GDD,
-  # plant
-  adonis.out.array_predavg_SRL,
-  adonis.out.array_predavg_SLA,
-  adonis.out.array_predherbivory_perc
-  )
+adonis.out.array_Fun_wc<-rbind(adonis.out.array_predpH,adonis.out.array_predsoil_moisture,
+                               adonis.out.array_predSOM,adonis.out.array_predammonium,
+                               adonis.out.array_predphos,
+                               adonis.out.array_predppt3yr,adonis.out.array_predGDD3yr,
+                               adonis.out.array_predavg_SRL,
+                               adonis.out.array_predavg_SLA,adonis.out.array_predherbivory_perc)
 
 
 # library(kableExtra)
@@ -1641,7 +1479,6 @@ adonis.out.array_Fun_wc.r2 = adonis.out.array_Fun_wc[seq(1, nrow(adonis.out.arra
 
 # saveRDS(adonis.out.array_Fun_wc,file = "../processed_data/clean_rds_saves/adonis.out.array_Fun_wc.rds")
 # saveRDS(adonis.out.array_Fun_wc.r2,file = "../processed_data/clean_rds_saves/adonis.out.array_Fun_wc.r2.rds")
-# ENDadonis.out.array_Fun_wc ----
 ```
 
 \
@@ -1651,9 +1488,9 @@ adonis.out.array_Fun_wc.r2 = adonis.out.array_Fun_wc[seq(1, nrow(adonis.out.arra
 ```{r, echo=FALSE}
 subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wholecommunity") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -1665,9 +1502,9 @@ subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wholecommunity") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F1") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -1679,9 +1516,9 @@ subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F1") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F3") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -1693,9 +1530,9 @@ subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F3") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F4") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -1707,9 +1544,9 @@ subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F4") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F5") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -1721,9 +1558,9 @@ subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F5") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F6") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -1735,9 +1572,9 @@ subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F6") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F7") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -1749,9 +1586,9 @@ subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F7") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F8") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -1763,9 +1600,9 @@ subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F8") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F9") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -1777,9 +1614,9 @@ subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F9") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Fun_wc.r2,comm=="Fun_wc_F10") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -1801,15 +1638,13 @@ comm.names.by.domainB<-c("Bac_wholecommunity","Bac_wc_B1","Bac_wc_B2",
                         # ,"Bac_wholecommunity"
                         )
 
-edaphic_var <- c("pH_m.std","soil_moisture_m.std",
-                 "perc_moisture_m.std","SOM_m.std",
-                 "ammonium_m.std","nitrate_m.std","phos_m.std")
-climate_var <- c("ppt3yr_m.std","ppt30yr_m.std","GDD3yr_m.std",
-                 "GDD30yr_m.std","coll_GDD_m.std")
+edaphic_var <- c("pH_m.std","soil_moisture_m.std","SOM_m.std",
+                 "ammonium_m.std","phos_m.std")
+climate_var <- c("ppt3yr_m.std","GDD3yr_m.std")
 plant_var <- c("avg_SRL_m.std","avg_SLA_m.std","herbivory_perc_m.std")
 expl_var <- c(edaphic_var,climate_var,plant_var)
 
-# pH ----
+# pH
 adonisB.out_predpH.list = vector("list", length = length(comm.names.by.domainB))
 
 for (comm in comm.names.by.domainB) {
@@ -1829,9 +1664,9 @@ for (comm in comm.names.by.domainB) {
   }
 
 adonisB.out.array_predpH = do.call(rbind, adonisB.out_predpH.list)
-### ----
+###
 
-# soil_moisture ----
+# soil_moisture
 adonisB.out_predsoil_moisture.list = vector("list", length = length(comm.names.by.domainB))
 
 for (comm in comm.names.by.domainB) {
@@ -1851,31 +1686,9 @@ for (comm in comm.names.by.domainB) {
   }
 
 adonisB.out.array_predsoil_moisture = do.call(rbind, adonisB.out_predsoil_moisture.list)
-### ----
+###
 
-# perc_moisture ----
-adonisB.out_predperc_moisture.list = vector("list", length = length(comm.names.by.domainB))
-
-for (comm in comm.names.by.domainB) {
-  
-  comm.name<-comm
-  
-  adonisB.temp_predperc_moisture <- adonis2(sor.dist.list[[paste(comm.name,sep = "''")]] ~ 
-                                    perc_moisture_m.std,
-          data = (as(sample_data(get(comm)), "data.frame")))
-  
-  adonisB.temp_predperc_moisture$comm <- comm 
-  
-  adonisB.temp_predperc_moisture$expl_var <- "perc_moisture" 
-  
-  adonisB.out_predperc_moisture.list[[comm]] <- (as.data.frame(adonisB.temp_predperc_moisture))
-
-  }
-
-adonisB.out.array_predperc_moisture = do.call(rbind, adonisB.out_predperc_moisture.list)
-### ----
-
-# SOM ----
+# SOM
 adonisB.out_predSOM.list = vector("list", length = length(comm.names.by.domainB))
 
 for (comm in comm.names.by.domainB) {
@@ -1895,9 +1708,9 @@ for (comm in comm.names.by.domainB) {
   }
 
 adonisB.out.array_predSOM = do.call(rbind, adonisB.out_predSOM.list)
-### ----
+###
 
-# ammonium ----
+# ammonium
 adonisB.out_predammonium.list = vector("list", length = length(comm.names.by.domainB))
 
 for (comm in comm.names.by.domainB) {
@@ -1917,31 +1730,9 @@ for (comm in comm.names.by.domainB) {
   }
 
 adonisB.out.array_predammonium = do.call(rbind, adonisB.out_predammonium.list)
-### ----
+###
 
-# nitrate ----
-adonisB.out_prednitrate.list = vector("list", length = length(comm.names.by.domainB))
-
-for (comm in comm.names.by.domainB) {
-  
-  comm.name<-comm
-  
-  adonisB.temp_prednitrate <- adonis2(sor.dist.list[[paste(comm.name,sep = "''")]] ~ 
-                                    nitrate_m.std,
-          data = (as(sample_data(get(comm)), "data.frame")))
-  
-  adonisB.temp_prednitrate$comm <- comm 
-  
-  adonisB.temp_prednitrate$expl_var <- "nitrate" 
-  
-  adonisB.out_prednitrate.list[[comm]] <- (as.data.frame(adonisB.temp_prednitrate))
-
-  }
-
-adonisB.out.array_prednitrate = do.call(rbind, adonisB.out_prednitrate.list)
-### ----
-
-# phos ----
+# phos
 adonisB.out_predphos.list = vector("list", length = length(comm.names.by.domainB))
 
 for (comm in comm.names.by.domainB) {
@@ -1961,9 +1752,9 @@ for (comm in comm.names.by.domainB) {
   }
 
 adonisB.out.array_predphos = do.call(rbind, adonisB.out_predphos.list)
-### ----
+###
 
-# ppt3yr ----
+# ppt3yr
 adonisB.out_predppt3yr.list = vector("list", length = length(comm.names.by.domainB))
 
 for (comm in comm.names.by.domainB) {
@@ -1983,31 +1774,9 @@ for (comm in comm.names.by.domainB) {
   }
 
 adonisB.out.array_predppt3yr = do.call(rbind, adonisB.out_predppt3yr.list)
-### ----
+###
 
-# ppt30yr ----
-adonisB.out_predppt30yr.list = vector("list", length = length(comm.names.by.domainB))
-
-for (comm in comm.names.by.domainB) {
-  
-  comm.name<-comm
-  
-  adonisB.temp_predppt30yr <- adonis2(sor.dist.list[[paste(comm.name,sep = "''")]] ~ 
-                                    ppt30yr_m.std,
-          data = (as(sample_data(get(comm)), "data.frame")))
-  
-  adonisB.temp_predppt30yr$comm <- comm 
-  
-  adonisB.temp_predppt30yr$expl_var <- "ppt30yr" 
-  
-  adonisB.out_predppt30yr.list[[comm]] <- (as.data.frame(adonisB.temp_predppt30yr))
-
-  }
-
-adonisB.out.array_predppt30yr = do.call(rbind, adonisB.out_predppt30yr.list)
-### ----
-
-# GDD3yr ----
+# GDD3yr
 adonisB.out_predGDD3yr.list = vector("list", length = length(comm.names.by.domainB))
 
 for (comm in comm.names.by.domainB) {
@@ -2027,53 +1796,9 @@ for (comm in comm.names.by.domainB) {
   }
 
 adonisB.out.array_predGDD3yr = do.call(rbind, adonisB.out_predGDD3yr.list)
-### ----
+###
 
-# GDD30yr ----
-adonisB.out_predGDD30yr.list = vector("list", length = length(comm.names.by.domainB))
-
-for (comm in comm.names.by.domainB) {
-  
-  comm.name<-comm
-  
-  adonisB.temp_predGDD30yr <- adonis2(sor.dist.list[[paste(comm.name,sep = "''")]] ~ 
-                                    GDD30yr_m.std,
-          data = (as(sample_data(get(comm)), "data.frame")))
-  
-  adonisB.temp_predGDD30yr$comm <- comm 
-  
-  adonisB.temp_predGDD30yr$expl_var <- "GDD30yr" 
-  
-  adonisB.out_predGDD30yr.list[[comm]] <- (as.data.frame(adonisB.temp_predGDD30yr))
-
-  }
-
-adonisB.out.array_predGDD30yr = do.call(rbind, adonisB.out_predGDD30yr.list)
-### ----
-
-# coll_GDD ----
-adonisB.out_predcoll_GDD.list = vector("list", length = length(comm.names.by.domainB))
-
-for (comm in comm.names.by.domainB) {
-  
-  comm.name<-comm
-  
-  adonisB.temp_predcoll_GDD <- adonis2(sor.dist.list[[paste(comm.name,sep = "''")]] ~ 
-                                    coll_GDD_m.std,
-          data = (as(sample_data(get(comm)), "data.frame")))
-  
-  adonisB.temp_predcoll_GDD$comm <- comm 
-  
-  adonisB.temp_predcoll_GDD$expl_var <- "coll_GDD" 
-  
-  adonisB.out_predcoll_GDD.list[[comm]] <- (as.data.frame(adonisB.temp_predcoll_GDD))
-
-  }
-
-adonisB.out.array_predcoll_GDD = do.call(rbind, adonisB.out_predcoll_GDD.list)
-### ----
-
-# avg_SRL ----
+# avg_SRL
 adonisB.out_predavg_SRL.list = vector("list", length = length(comm.names.by.domainB))
 
 for (comm in comm.names.by.domainB) {
@@ -2093,9 +1818,9 @@ for (comm in comm.names.by.domainB) {
   }
 
 adonisB.out.array_predavg_SRL = do.call(rbind, adonisB.out_predavg_SRL.list)
-### ----
+###
 
-# avg_SLA ----
+# avg_SLA
 adonisB.out_predavg_SLA.list = vector("list", length = length(comm.names.by.domainB))
 
 for (comm in comm.names.by.domainB) {
@@ -2115,9 +1840,9 @@ for (comm in comm.names.by.domainB) {
   }
 
 adonisB.out.array_predavg_SLA = do.call(rbind, adonisB.out_predavg_SLA.list)
-### ----
+###
 
-# herbivory_perc ----
+# herbivory_perc
 adonisB.out_predherbivory_perc.list = vector("list", length = length(comm.names.by.domainB))
 
 for (comm in comm.names.by.domainB) {
@@ -2137,28 +1862,15 @@ for (comm in comm.names.by.domainB) {
   }
 
 adonisB.out.array_predherbivory_perc = do.call(rbind, adonisB.out_predherbivory_perc.list)
-### ----
+###
 
 
-adonis.out.array_Bac_wc <- rbind(
-  adonisB.out.array_predpH,
-  adonisB.out.array_predsoil_moisture,
-  adonisB.out.array_predperc_moisture,
-  adonisB.out.array_predSOM,
-  adonisB.out.array_predammonium,
-  adonisB.out.array_prednitrate,
-  adonisB.out.array_predphos,
-  # climate
-  adonisB.out.array_predppt3yr,
-  adonisB.out.array_predppt30yr,
-  adonisB.out.array_predGDD3yr,
-  adonisB.out.array_predGDD30yr,
-  adonisB.out.array_predcoll_GDD,
-  # plant
-  adonisB.out.array_predavg_SRL,
-  adonisB.out.array_predavg_SLA,
-  adonisB.out.array_predherbivory_perc
-  )
+adonis.out.array_Bac_wc<-rbind(adonisB.out.array_predpH,adonisB.out.array_predsoil_moisture,
+                               adonisB.out.array_predSOM,adonisB.out.array_predammonium,
+                               adonisB.out.array_predphos,
+                               adonisB.out.array_predppt3yr,adonisB.out.array_predGDD3yr,
+                               adonisB.out.array_predavg_SRL,
+                               adonisB.out.array_predavg_SLA,adonisB.out.array_predherbivory_perc)
 
 
 # library(kableExtra)
@@ -2182,9 +1894,9 @@ adonis.out.array_Bac_wc.r2 = adonis.out.array_Bac_wc[seq(1, nrow(adonis.out.arra
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wholecommunity") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2196,9 +1908,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wholecommunity") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B1") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2210,9 +1922,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B1") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B2") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2224,9 +1936,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B2") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B3") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2238,9 +1950,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B3") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B4") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2252,9 +1964,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B4") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B5") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2266,9 +1978,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B5") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B6") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2280,9 +1992,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B6") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B7") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2294,9 +2006,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B7") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B8") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2308,9 +2020,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B8") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B9") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2322,9 +2034,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B9") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B10") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2336,9 +2048,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B10") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B11") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2350,9 +2062,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B11") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B12") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2364,9 +2076,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B12") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B13") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2378,9 +2090,9 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B13") %>%
 ```{r, echo=FALSE}
 subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B14") %>%
   kbl(caption = "adonis2 outputs for single-term models") %>%
-  pack_rows("Edaphic", 1, 7) %>%
-  pack_rows("Climate", 8, 12) %>%
-  pack_rows("Plant", 13, 15) %>%
+  pack_rows("Edaphic", 1, 5) %>%
+  pack_rows("Climate", 6, 7) %>%
+  pack_rows("Plant", 8, 10) %>%
   kable_styling() %>%
   scroll_box(width = "80%", height = "600px") 
 ```
@@ -2397,7 +2109,6 @@ subset(adonis.out.array_Bac_wc.r2,comm=="Bac_wc_B14") %>%
 # Hierarchical clustering of Sørensen dissimilarities (Approach 2)
 
 \
-
 
 ## Dendrograms of Sørensen-based clusters {.tabset .tabset-pills}
 
@@ -2431,7 +2142,7 @@ md_Fwc_clus_sor_k10.r <- round(md_Fwc_clus_sor_k10,digits = 3)
   md_Fwc_clus_sor_k10.noself_vec <- as.vector(md_Fwc_clus_sor_k10.df.noself)
   
 
-md_Fwc_clus_sor_k10.df<-as.data.frame(unclass(md_Fwc_clus_sor_k10.r))
+# md_Fwc_clus_sor_k10.df<-as.data.frame(unclass(md_Fwc_clus_sor_k10.r))
 # 
 # md_Fwc_clus_sor_k10.df.noself <- as.matrix(md_Fwc_clus_sor_k10.df)
 # md_Fwc_clus_sor_k10.df.self <- diag(md_Fwc_clus_sor_k10.df.noself)
@@ -2483,8 +2194,6 @@ md_Bwc_clus_sor_k14.r <- round(md_Bwc_clus_sor_k14,digits = 3)
   diag(md_Bwc_clus_sor_k14.df.noself) <- NA
   md_Bwc_clus_sor_k14.noself_vec <- as.vector(md_Bwc_clus_sor_k14.df.noself)
 
-  
-md_Bwc_clus_sor_k14.df<-as.data.frame(unclass(md_Bwc_clus_sor_k14.r))
 ```
 
 ![Dendrograms of Sørensen-based clusters of bacterial whole communities. The terminal segments hang to within-cluster dissimilarity.](../processed_data/Dendrograms/Dendrogram_Bac_wc_clus_sor_k14.png){out.width="500px"}
@@ -2509,9 +2218,9 @@ md_Bwc_clus_sor_k14.df<-as.data.frame(unclass(md_Bwc_clus_sor_k14.r))
 
 Rationale for comparing dissimilarities within and among groups (clusters) - If two groups of sampling units are really different (e.g. in their species composition), then average of the within-group compositional dissimilarities ought to be less than the average of the dissimilarities between two random collection of sampling units drawn from the entire population.
 
--   Within-cluster average pairwise Sørensen dissimilarities ranged from `r min(md_Fwc_clus_sor_k10.df.self)` (`r names(md_Fwc_clus_sor_k10.df.self[which.min(md_Fwc_clus_sor_k10.df.self)])`) to `r max(md_Fwc_clus_sor_k10.df.self)` (`r names(md_Fwc_clus_sor_k10.df.self[which.max(md_Fwc_clus_sor_k10.df.self)])`).
+-   Within-cluster average pairwise Sørensen dissimilarities ranged from `r min(md_Fwc_self)` (F1-F2) to `r max(md_Fwc_self)` (F6-F10).
 
--   Between-cluster average dissimilarities ranged from a minimum of `r min(md_Fwc_clus_sor_k10.df.noself, na.rm=T)` (`r rownames(which(md_Fwc_clus_sor_k10.df.noself == min(md_Fwc_clus_sor_k10.df.noself, na.rm=T), arr.ind = T))[2]` - `r rownames(which(md_Fwc_clus_sor_k10.df.noself == min(md_Fwc_clus_sor_k10.df.noself, na.rm=T), arr.ind = T))[1]`) to a maximum of `r max(md_Fwc_clus_sor_k10.df.noself, na.rm=T)` (`r rownames(which(md_Fwc_clus_sor_k10.df.noself == max(md_Fwc_clus_sor_k10.df.noself, na.rm=T), arr.ind = T))[2]` - `r rownames(which(md_Fwc_clus_sor_k10.df.noself == max(md_Fwc_clus_sor_k10.df.noself, na.rm=T), arr.ind = T))[1]`).\
+-   Between-cluster average dissimilarities ranged from `r min(md_Fwc_clus_sor_k10.df.noself, na.rm=T)` (F1-F2) to `r max(md_Fwc_clus_sor_k10.df.noself, na.rm=T)` (F6-F10).\
     \
 
 #### Within-cluster variation {.unnumbered}
@@ -2653,13 +2362,11 @@ permutest(betadisp_clus_Fun_addC, pairwise = TRUE, permutations = 999)
 PCoA represents dispersion (distance of group members to the spatial median in multivariate space, reduced to principal coordinates).
 
 ```{r, eval=TRUE}
-par(mfrow = c(1, 3)) #c(nr, nc)
-plot(betadisp_clus_Fun_addC, axes = c(1,2), seg.col = col_n10, seg.lty = "dashed",main="PCoA of beta dispersion",sub="axes 1 & 2",
-     col=col_n10,hull = T,ellipse = TRUE, conf = 0.90)
-plot(betadisp_clus_Fun_addC, axes = c(1,3), seg.col = col_n10, seg.lty = "dashed",main=NULL,sub="axes 1 & 3",
-     col=col_n10,hull = T,ellipse = TRUE, conf = 0.90)
-plot(betadisp_clus_Fun_addC, axes = c(2,3), seg.col = col_n10, seg.lty = "dashed",main=NULL,sub="axes 2 & 3",
-     col=col_n10,hull = T,ellipse = TRUE, conf = 0.90)
+par(mfrow = c(1, 2)) #c(nr, nc)
+plot(betadisp_clus_Fun_addC, axes = c(1,2), seg.col = col_clusn10, seg.lty = "dashed",
+     col=col_clusn10,hull = T,ellipse = TRUE, conf = 0.90)
+plot(betadisp_clus_Fun_addC, axes = c(1,3), seg.col = col_clusn10, seg.lty = "dashed",
+     col=col_clusn10,hull = T,ellipse = TRUE, conf = 0.90)
 ```
 
 \
@@ -2667,12 +2374,12 @@ plot(betadisp_clus_Fun_addC, axes = c(2,3), seg.col = col_n10, seg.lty = "dashed
 
 #### Boxplots {.unnumbered .unlisted}
 
-```{r betadisp-boxplot-Fun, eval=TRUE,cache=TRUE,cache.path="../docs/github_PAM_clustering_files/"}
+```{r betadisp-boxplot-Fun, eval=TRUE,cache=TRUE}
 betadisp_clus_Fun.df<-data.frame("Fun_sor_clusters"=betadisp_clus_Fun_addC$group,
 "distances"=betadisp_clus_Fun_addC$distances)
 
 ggboxplot(betadisp_clus_Fun.df, x = "Fun_sor_clusters", y = "distances",
-          fill = "Fun_sor_clusters", palette = col_n10)+ 
+          fill = "Fun_sor_clusters", palette = col_clusn10)+ 
   stat_compare_means(aes(label = after_stat(p.signif)),
                      method = "wilcox.test", ref.group = "F1", # Add pairwise comparisons p-value
                      label = "p.signif",hide.ns=T, paired = F
@@ -2721,62 +2428,14 @@ TukeyHSD(betadisp_clus_Fun_addC)
 \
 [I still need to update the cluster numbering here]\
 
-**Mean Sørensen dissimilarity between Clusters F1 & F10:** 0.920 (unweighted) / 0.903 (weighted by sample size)\
+**Mean Sørensen dissimilarity between Clusters F1 & 2:** 0.920 (unweighted) / 0.903 (weighted by sample size)\
 
 *Mean within-cluster similarities*\
-- Cluster F1: `r md_Fwc_clus_sor_k10.df.self[1]`\
-- Cluster F2: `r md_Fwc_clus_sor_k10.df.self[2]`\
-- Cluster F10: `r md_Fwc_clus_sor_k10.df.self[10]`\
+- Cluster F1: `r md_Fwc_self[1]`\
+- Cluster 2: `r md_Fwc_self[2]`\
 \
 
-```{r load-simper-NEW, include=FALSE,eval=TRUE, cache=F}
-# colnames(Fwc_rel.clus_sor_k10)[1]<-""
-# colnames(Fwc_rel.clus_sor_k10)[6628]<-""
-# sum(Fwc_rel.clus_sor_k10[1,2:6627])
-library(dplyr)
-
-#mean abundance by cluster
-fwc.clus.12_OTUsum<-Fwc_rel.clus_sor_k10 %>% 
-  # as_tibble %>%
-  group_by(clus_sor_k10) %>%
-  dplyr::summarise(across(2:6627, mean)) #%>%
-  # mutate(across(2:6627, ~ .x *100 ))
-
-colnames(fwc.clus.12_OTUsum)[1] <- "Sørensen Cluster"
-fwc.clus.12_OTUsum[,2:6627] <- (fwc.clus.12_OTUsum[,2:6627]*100)
-fwc.clus.12_OTUsumT<-as.data.frame(t(fwc.clus.12_OTUsum), check.names=F)
-colnames(fwc.clus.12_OTUsumT)<-c("RA_Cluster1","RA_Cluster2","RA_Cluster3",
-                                 "RA_Cluster4","RA_Cluster5","RA_Cluster6",
-                                 "RA_Cluster7","RA_Cluster8","RA_Cluster9",
-                                 "RA_Cluster10")
-
-fwc.clus.12_OTUsumT<-fwc.clus.12_OTUsumT %>%  filter(!row_number() %in% c(1))
-
-
-simp.fwc.clus.12_df<-(as.data.frame(SIMPER_Fun_wholecommunity_out$clus_sor_k10$`1_2`))
-simp.fwc.clus.12_df[1:3,1:3]
-# sum(Fwc_rel.clus_sor_k10[1,2:6627])
-# 1
-
-# sum(simp.fwc.clus.12_df[,2])
-# 0.9198551
-
-# library(data.table)
-# fcdt<-DT(cbind("OTU"=simp.fwc.clus.12_df[,1],
-#       "OTU contrib. to dissim"=simp.fwc.clus.12_df[,2],
-#       "ordered cumulative\ncontribution"=simp.fwc.clus.12_df[,9],
-#       "p-value"=simp.fwc.clus.12_df[,10],
-#       fwc.clus.12_OTUsumT[,1:2],
-#       phylo2vegan_tax(Fun_wholecommunity.r),
-#       "order"=simp.fwc.clus.12_df[,8]))
-
-# see Introduction to data.table
-
-
-```
-
-
-```{r load-simper-OLD, include=FALSE,eval=TRUE, cache=F}
+```{r load-simper, include=FALSE,eval=TRUE, cache=F}
 # colnames(Fwc_rel.clus_sor_k10)[1]<-""
 # colnames(Fwc_rel.clus_sor_k10)[6628]<-""
 # sum(Fwc_rel.clus_sor_k10[1,2:6627])
@@ -2849,7 +2508,132 @@ kbl(as.data.frame(cbind("OTU contrib. to dissim"=simp.fwc.clus.12_df[,2],
 
 \
 
-```{r, include=FALSE, eval=FALSE}
+```{r}
+library(sf) # ‘1.0.19’   #For working with spatial data
+library(tidyverse) # ‘2.0.0’   #For data wrangling and ggplot2
+library(ggspatial) # ‘1.1.9’   #For spatial data with ggplot2
+library("s2"); packageVersion("s2") # ‘1.1.7’ 
+
+# CRS - coordinate reference system
+  ## EPSG:4326
+  ## https://epsg.io/4326 
+  ## WGS 84 -- WGS84 - World Geodetic System 1984, used in GPS
+    ## Attributes
+      ### Unit: degree (supplier to define representation)
+      ### Geodetic CRS: WGS 84
+      ### Datum: World Geodetic System 1984 ensemble
+      ### Data source: EPSG
+      ### Information source: EPSG. See 3D CRS for original information source.
+      ### Revision date: 2022-11-29
+      ### Scope: Horizontal component of 3D system.
+      ### Area of use: World
+      ### Coordinate system: Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east. UoM: degree
+
+
+lonlat_BFclusters_df <- as(sample_data(Bac_wholecommunity),"data.frame")[,c("Site_Grass","Bac_sor_clusters","Fun_sor_clusters","Fun_sor_clus2","Longitude","Latitude")]
+
+# subset by cluster
+# subset(lonlat_BFclusters_df, Fun_sor_clusters=="F1")[,c("Fun_sor_clusters","Longitude","Latitude")] 
+
+lonlat_Fun_sor_clusters_df <- subset(lonlat_BFclusters_df, select = c(Fun_sor_clusters,Longitude,Latitude))
+
+lonlat_Site_Grass_df_unique <- lonlat_BFclusters_df %>% subset(., select = c(Site_Grass,Longitude,Latitude)) %>% distinct(Site_Grass,Longitude,Latitude, .keep_all = TRUE) %>% group_by(Site_Grass,Longitude,Latitude) %>% filter(row_number() == 1) %>% group_by(Site_Grass,Longitude,Latitude) %>%
+  as.data.frame()
+
+
+lonlat_Fun_sor_clusters_df_unique <- lonlat_Fun_sor_clusters_df %>% distinct(Fun_sor_clusters,Longitude,Latitude, .keep_all = TRUE) %>% group_by(Fun_sor_clusters,Longitude,Latitude) %>% filter(row_number() == 1) %>% group_by(Fun_sor_clusters,Longitude,Latitude) %>%
+  as.data.frame()
+
+# find unique rows/dedup
+# lonlat_BFclusters_df %>% distinct(Fun_sor_clusters,Longitude,Latitude, .keep_all = TRUE) %>% group_by(Fun_sor_clusters,Longitude,Latitude) %>% filter(row_number() == 1) %>% group_by(Fun_sor_clusters,Longitude,Latitude) %>%
+#   as.data.frame() # %>% slice((.),1)
+
+
+
+
+Fun_sor_clusters_polygon <- st_sfc(st_polygon(list(cbind(lonlat_Fun_sor_clusters_df_unique$Longitude, lonlat_Fun_sor_clusters_df_unique$Latitude)))) %>%
+  st_set_crs(4326)
+
+s2_make_polygon(longitude = 
+  as.vector(lonlat_Fun_sor_clusters_df_unique$Longitude),  latitude = as.vector(lonlat_Fun_sor_clusters_df_unique$Latitude),
+  feature_id = lonlat_Fun_sor_clusters_df_unique$Fun_sor_clusters,
+  oriented = F,
+  check = T
+  # ring_id = c(1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1)
+)
+
+
+# Convert to sf POINTS
+sf_points_Fun_sor_clusters <- st_as_sf(lonlat_Fun_sor_clusters_df_unique,
+                      coords = c("Longitude", "Latitude"),
+                      crs = 4326)
+
+# Group by cluster and create convex hulls
+sf_hulls_Fun_sor_clusters <- sf_points_Fun_sor_clusters %>%
+  group_by(Fun_sor_clusters) %>%
+  filter(n() >= 3) %>%
+  summarise(geometry = st_combine(geometry)) %>%
+  mutate(geometry = st_convex_hull(geometry)) %>%
+  st_as_sf()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Split by cluster and keep only those with 3+ points
+valid_Fun_sor_clusters <- lonlat_Fun_sor_clusters_df_unique %>%
+  group_by(Fun_sor_clusters) %>%
+  filter(n() >= 3) %>%
+  group_split()
+
+# Generate polygons
+s2_polygons_Fun_sor_clusters <- lapply(valid_Fun_sor_clusters, function(df) {
+  s2_make_polygon(
+    longitude = df$Longitude,
+    latitude = df$Latitude,
+    feature_id = as.character(unique(df$Fun_sor_clusters)),
+    oriented = FALSE,
+    check = TRUE
+  )
+})
+
+# Combine into one s2 object
+s2_polygons_combined <- do.call(c, s2_polygons)
+
+# Optional: label by cluster
+names(s2_polygons_combined) <- sapply(valid_clusters, function(df) unique(as.character(df$Fun_sor_clusters)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 polygon <- pracma::polyarea(lonlat_F1u$Longitude, lonlat_F1u$Latitude)
 
   Bac_all.geo<-as(subset(sd, select = c(Longitude,Latitude)), "data.frame")
@@ -2860,14 +2644,15 @@ polygon <- pracma::polyarea(lonlat_F1u$Longitude, lonlat_F1u$Latitude)
 # library(sf)
 library(pracma)
 
-  
-x_coordinates_1<-c(786.0,712.3,717.7,804.9,866.1,877.5,866.0,823.2,765.5,791.8,830.3,846.9,937.1,941.1,983.2,1020.5,997.1,996.9,921.5,921.2,850.6,850.6,786.0)
 
-y_coordinates_1<-c(139.8,245.3,291.7,335.6,352.7,402.4,492.9,560.1,603.6,631.7,617.8,618.1,538.5,476.4,443.0,338.4,232.7,232.7,145.0,145.0,121.0,120.7,139.8)
+  
+# x_coordinates_1<-c(786.0,712.3,717.7,804.9,866.1,877.5,866.0,823.2,765.5,791.8,830.3,846.9,937.1,941.1,983.2,1020.5,997.1,996.9,921.5,921.2,850.6,850.6,786.0)
+
+# y_coordinates_1<-c(139.8,245.3,291.7,335.6,352.7,402.4,492.9,560.1,603.6,631.7,617.8,618.1,538.5,476.4,443.0,338.4,232.7,232.7,145.0,145.0,121.0,120.7,139.8)
 
 # Transform your list of points to a polygon, create a simple feature from them and set its crs according to its EPSG code (here I set it to UTM 15 N)
 polygon <- st_sfc(st_polygon(list(cbind(x_coordinates_1,y_coordinates_1)))) %>%
-  st_set_crs(32615)
+  st_set_crs(4326)
 
 # Plot the polygon to check if geoemtry is the expected
 plot(lonlat_F7u,axes = TRUE)
@@ -2928,23 +2713,24 @@ plot(lonlat_F3u,axes = TRUE)
 data.frame(lonlat_F3u$Latitude,lonlat_F3u$Longitude)
 ```
 
+
 ## Table of fungal clusters
 
 \
 [in-progress]\
 
-| Cluster | total n | Within-cluster mean dissimilarity (𝝱-div) | Mean cluster 𝝰-diversity (SD) | Cluster 𝛄-diversity | Site(s) | Grass(es) | Characteristics† | Exclusive features |   |
+| Cluster | total n | Within-cluster mean dissimilarity (𝝱-div) | Mean cluster 𝝰-diversity (SD) | Cluster 𝛄-diversity | Site(s) | Grass(es) | Characteristics† | Exclusive features |     |
 |:-------|:------:|:------:|:------:|:------:|:-------|:-------|--------|--------|--------|
-| F1 | 183 | `r md_Fwc_clus_sor_k10.df.self[1]` | `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F1"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F1"]),0)`) | `r Fun_gamma2[1]` |  |  | spans pH range |  |  |
-| F2 | 10 | `r md_Fwc_clus_sor_k10.df.self[2]` | `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F2"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F2"]),0)`) | `r Fun_gamma2[2]` | SFA | SCSC (only grass present) |  | Site=SFA |  |
-| F3 | 29 | `r md_Fwc_clus_sor_k10.df.self[3]` | `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F3"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F3"]),0)`) | `r Fun_gamma2[3]` | KAE |  | lower pH\*\*\*\* (5.9 - 7.2, mean 6.3) | Site=KAE (of the 32 KAE samples, only 3 others were in diff clusters) |  |
-| F4 | 29 | `r md_Fwc_clus_sor_k10.df.self[4]` | `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F4"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F4"]),0)`) | `r Fun_gamma2[4]` | mostly LAR (n=27) |  | high pH\*\*\*\* (7.2 - 8.2, mean 8.0) |  |  |
-| F5 | 17 | `r md_Fwc_clus_sor_k10.df.self[5]` | `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F5"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F5"]),0)`) | `r Fun_gamma2[5]` |  |  | lower pH\*\*\*\* (5.6 - 7.6, mean 6.2) |  |  |
-| F6 | 32 | `r md_Fwc_clus_sor_k10.df.self[6]` | `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F6"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F6"]),0)`) | `r Fun_gamma2[6]` |  |  | lower pH\*\*\*\* (5.1 - 7.8, mean 6.2) |  |  |
-| F7 | 38 | `r md_Fwc_clus_sor_k10.df.self[7]` | `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F7"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F7"]),0)`) | `r Fun_gamma2[7]` |  |  |  |  |  |
-| F8 | 53 | `r md_Fwc_clus_sor_k10.df.self[8]` | `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F8"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F8"]),0)`) | `r Fun_gamma2[8]` |  |  | high pH\*\* (7.1 - 7.8, mean 7.6) |  |  |
-| F9 | 56 | `r md_Fwc_clus_sor_k10.df.self[9]` | `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F9"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F9"]),0)`) | `r Fun_gamma2[9]` |  |  | high pH\*\*\*\* (6.8 - 8.3, mean 7.8) |  |  |
-| F10 | 37 | `r md_Fwc_clus_sor_k10.df.self[10]` | `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F10"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F10"]),0)`) | `r Fun_gamma2[10]` | BNP,DMT,FMT,SEV | BOER (n=33), BOGR (n=4) | high pH\* (6.8 - 8.3, mean 7.5) |  |  |
+| F1      |   183   |            `r md_Fwc_self[1]`             |  `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F1"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F1"]),0)`)  |  `r Fun_gamma2[1]`  |                   |                           | spans pH range                         |                                                                       |     |
+| F2      |   10    |            `r md_Fwc_self[2]`             |  `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F2"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F2"]),0)`)  |  `r Fun_gamma2[2]`  | SFA               | SCSC (only grass present) |                                        | Site=SFA                                                              |     |
+| F3      |   29    |            `r md_Fwc_self[3]`             |  `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F3"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F3"]),0)`)  |  `r Fun_gamma2[3]`  | KAE               |                           | lower pH\*\*\*\* (5.9 - 7.2, mean 6.3) | Site=KAE (of the 32 KAE samples, only 3 others were in diff clusters) |     |
+| F4      |   29    |            `r md_Fwc_self[4]`             |  `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F4"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F4"]),0)`)  |  `r Fun_gamma2[4]`  | mostly LAR (n=27) |                           | high pH\*\*\*\* (7.2 - 8.2, mean 8.0)  |                                                                       |     |
+| F5      |   17    |            `r md_Fwc_self[5]`             |  `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F5"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F5"]),0)`)  |  `r Fun_gamma2[5]`  |                   |                           | lower pH\*\*\*\* (5.6 - 7.6, mean 6.2) |                                                                       |     |
+| F6      |   32    |            `r md_Fwc_self[6]`             |  `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F6"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F6"]),0)`)  |  `r Fun_gamma2[6]`  |                   |                           | lower pH\*\*\*\* (5.1 - 7.8, mean 6.2) |                                                                       |     |
+| F7      |   38    |            `r md_Fwc_self[7]`             |  `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F7"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F7"]),0)`)  |  `r Fun_gamma2[7]`  |                   |                           |                                        |                                                                       |     |
+| F8      |   53    |            `r md_Fwc_self[8]`             |  `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F8"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F8"]),0)`)  |  `r Fun_gamma2[8]`  |                   |                           | high pH\*\* (7.1 - 7.8, mean 7.6)      |                                                                       |     |
+| F9      |   56    |            `r md_Fwc_self[9]`             |  `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F9"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F9"]),0)`)  |  `r Fun_gamma2[9]`  |                   |                           | high pH\*\*\*\* (6.8 - 8.3, mean 7.8)  |                                                                       |     |
+| F10     |   37    |            `r md_Fwc_self[10]`            | `r round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F10"]),0)` (`r round(sd(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F10"]),0)`) | `r Fun_gamma2[10]`  | BNP,DMT,FMT,SEV   | BOER (n=33), BOGR (n=4)   | high pH\* (6.8 - 8.3, mean 7.5)        |                                                                       |     |
 
 : Descriptions of fungal Sørensen distance-based clusters. Cluster 𝝰-diversity values are reported as mean number of observed OTUs (SD). Cluster 𝛄-diversity values are reported as number of observed OTUs.†variables listed are significant in all vs. base-mean Wilcox test with BH p-value corrections. \* p-value \< 0.05, \*\* \< 0.001, \*\*\* \< 0.0001, \*\*\*\* \< 1e-5.
 
@@ -3006,9 +2792,9 @@ OOB estimate of error rate: 6.40%
 **adonis2**\
 Bray-Curtis\
 
-Fungal:
+Fungal: 
 
-```{r, echo=FALSE,eval=TRUE, cache=TRUE, cache.path = "../docs/github_PAM_clustering_files/"}
+```{r, echo=FALSE,eval=TRUE, cache=TRUE}
 adonis_Fun_clus_bray<-adonis2(phyloseq::distance(Fun_wholecommunity, method="bray") ~ Fun_sor_clusters, 
           data = (as(sample_data(Fun_wholecommunity), "data.frame")))
 adonis_Fun_clus_bray
@@ -3016,9 +2802,9 @@ adonis_Fun_clus_bray
 
 \
 
-Bacterial:
+Bacterial: 
 
-```{r, echo=FALSE,eval=TRUE, cache=TRUE,cache.path = "../docs/github_PAM_clustering_files/"}
+```{r, echo=FALSE,eval=TRUE, cache=TRUE}
 adonis_Bac_clus_bray<-adonis2(phyloseq::distance(Bac_wholecommunity, method="bray") ~ Bac_sor_clusters, 
           data = (as(sample_data(Bac_wholecommunity), "data.frame")))
 adonis_Bac_clus_bray
@@ -3028,13 +2814,12 @@ adonis_Bac_clus_bray
 \
 \
 
-
 # 𝝰 - Relationships between clusters and community alpha diversity {.tabset .tabset-pills}
 
 \
 The naming conventions of alpha (and beta) diversity measures vary between sources. For example Wikipedia calls $D$ the Simpson index and $1 − D$ the Gini-Simpson index. We have followed the convention from `vegan`, to avoid confusion within the R ecosystem.
 
-```{r calc-alpha, include=FALSE,eval=TRUE,cache=TRUE,cache.path="../docs/github_PAM_clustering_files/"}
+```{r calc-alpha, include=FALSE,eval=TRUE,cache=TRUE}
 fwc_alpha <- data.frame(sample_data(Fun_wholecommunity),
                         estimate_richness(Fun_wholecommunity))
 
@@ -3118,7 +2903,7 @@ F1 and F2 had the highest species richness values (mean of `r round(mean(fwc_alp
 
 ```{r, echo=FALSE, fig.height=3.5, fig.width=5, dpi=300, out.height="70%",out.width="70%"}
 ggboxplot(fwc_alpha, x = "Fun_sor_clusters", y = "Observed",
-          fill = "Fun_sor_clusters", palette = col_n10)+ 
+          fill = "Fun_sor_clusters", palette = col_clusn10)+ 
   stat_compare_means(aes(label = after_stat(p.signif)),
                      method = "wilcox.test", ref.group = "F1", # Add pairwise p-value
                      label = "p.signif",hide.ns=T, paired = F
@@ -3147,7 +2932,7 @@ F1 and F2 had the highest Chao1 diversity (mean values of `r round(mean(fwc_alph
 
 ```{r, echo=FALSE, fig.height=4, out.width="80%"}
 ggboxplot(fwc_alpha, x = "Fun_sor_clusters", y = "Chao1",
-          fill = "Fun_sor_clusters", palette = col_n10)+ 
+          fill = "Fun_sor_clusters", palette = col_clusn10)+ 
   stat_compare_means(aes(label = after_stat(p.signif)),
                      method = "wilcox.test", ref.group = "F1", # Add pairwise p-value
                      label = "p.signif",hide.ns=T, paired = F
@@ -3230,7 +3015,7 @@ F1 and F2 had the lowest dominance (mean $D_{simpson}$ values of `r round(mean(f
 
 ```{r, echo=FALSE, fig.height=4, out.width="80%"}
 ggboxplot(fwc_alpha, x = "Fun_sor_clusters", y = "simpsonD",
-          fill = "Fun_sor_clusters", palette = col_n10)+ 
+          fill = "Fun_sor_clusters", palette = col_clusn10)+ 
   stat_compare_means(aes(label = after_stat(p.signif)),
                      method = "wilcox.test", ref.group = "F1", # Add pairwise p-value
                      label = "p.signif",hide.ns=T, paired = F
@@ -3275,7 +3060,7 @@ F1 and F2 had the highest Simpson index values (mean $1 - D_{simpson}$ values of
 # vegan::diversity(phylo2vegan_OTU(Fun_wholecommunity),index = "simpson")
 
 ggboxplot(fwc_alpha, x = "Fun_sor_clusters", y = "simpson",
-          fill = "Fun_sor_clusters", palette = col_n10)+ 
+          fill = "Fun_sor_clusters", palette = col_clusn10)+ 
   stat_compare_means(aes(label = after_stat(p.signif)),
                      method = "wilcox.test", ref.group = "F1", # Add pairwise p-value
                      label = "p.signif",hide.ns=T, paired = F
@@ -3316,7 +3101,7 @@ F1 and F2 had the highest inverse Simpson index values (mean $1 - D_{simpson_inv
 
 ```{r, echo=FALSE, fig.height=4, out.width="80%"}
 ggboxplot(fwc_alpha, x = "Fun_sor_clusters", y = "simpson_inv",
-          fill = "Fun_sor_clusters", palette = col_n10,
+          fill = "Fun_sor_clusters", palette = col_clusn10,
           ylab = "inverse Simpson")+ 
   stat_compare_means(aes(label = after_stat(p.signif)),
                      method = "wilcox.test", ref.group = "F1", # Add pairwise p-value
@@ -3357,7 +3142,7 @@ F1 and F2 had below average Simpson evenness (mean values of `r round(mean(fwc_a
 
 ```{r, echo=FALSE, fig.height=4, out.width="80%"}
 ggboxplot(fwc_alpha, x = "Fun_sor_clusters", y = "simpsoneven",
-          fill = "Fun_sor_clusters", palette = col_n10)+ 
+          fill = "Fun_sor_clusters", palette = col_clusn10)+ 
   stat_compare_means(aes(label = after_stat(p.signif)),
                      method = "wilcox.test", ref.group = "F1", # Add pairwise p-value
                      label = "p.signif",hide.ns=T, paired = F
@@ -3394,7 +3179,7 @@ round(mean(fwc_alpha$simpsoneven[fwc_alpha$Fun_sor_clusters=="F1"]),4),
 
 ```{r, echo=FALSE, fig.height=4, out.width="80%"}
 ggboxplot(fwc_alpha, x = "Fun_sor_clusters", y = "shannonH",
-          fill = "Fun_sor_clusters", palette = col_n10)+ 
+          fill = "Fun_sor_clusters", palette = col_clusn10)+ 
   stat_compare_means(aes(label = after_stat(p.signif)),
                      method = "wilcox.test", ref.group = "F1", # Add pairwise p-value
                      label = "p.signif",hide.ns=T, paired = F
@@ -3431,7 +3216,7 @@ round(mean(fwc_alpha$shannonH[fwc_alpha$Fun_sor_clusters=="F1"]),1),
 
 ```{r, echo=FALSE, fig.height=4, out.width="80%"}
 ggboxplot(fwc_alpha, x = "Fun_sor_clusters", y = "shannoneven",
-          fill = "Fun_sor_clusters", palette = col_n10)+ 
+          fill = "Fun_sor_clusters", palette = col_clusn10)+ 
   stat_compare_means(aes(label = after_stat(p.signif)),
                      method = "wilcox.test", ref.group = "F1", # Add pairwise p-value
                      label = "p.signif",hide.ns=T, paired = F
@@ -3850,7 +3635,7 @@ ggboxplot(bwc_alpha, x = "Bac_sor_clusters", y = "shannoneven",
 
 \
 
-```{r gamma-fun-calc, echo=FALSE, eval=TRUE, cache=TRUE,cache.path="../docs/github_PAM_clustering_files/"}
+```{r gamma-fun-calc, echo=FALSE, eval=TRUE, cache=TRUE}
 Fun_gamma<-vegan::specnumber(phylo2vegan_OTU(Fun_wholecommunity),
                   groups = phylo2vegan_sd(Fun_wholecommunity)$Fun_sor_clusters,
                   MARGIN=1) # MARGIN = 1, finds # of species; MARGIN = 2, finds frequencies of species
@@ -3868,11 +3653,12 @@ Fun_gamma2<-prettyNum(Fun_gamma,big.mark = ',')
 
 Fun_gamma2<-cbind(prettyNum(Fun_gamma,big.mark = ','),
   (as.data.frame(attr(md_Fwc_clus_sor_k10, "n"))[,2]))
-
-# normalized gamma (gamma/n)
-# Fun_gamma_norm <- 
-
-
+  
+# Fun_gamma\(attr(md_Fwc_clus_sor_k10, "n"))
+#   
+# attr(md_Fwc_clus_sor_k10, "n")[,2]
+# as.list(attr(md_Fwc_clus_sor_k10, "n"))
+# Fun_nsamp<-(as.data.frame(attr(md_Fwc_clus_sor_k10, "n"))[,2])
 
 Fun_gamma3temp<-as.data.frame(
   cbind("Number of OTUs" = Fun_gamma,
@@ -3888,8 +3674,8 @@ Fun_gamma3temp$`Expected mean alpha` <- (
 )
 
 
-Fun_gamma3<-cbind("Number of OTUs" = Fun_gamma2[,1],
-  "Number of samples (n)" = (as.data.frame(attr(md_Fwc_clus_sor_k10, "n"))[,2]),
+Fun_gamma3<-cbind("Number of OTUs"=Fun_gamma2[,1],
+  "Number of samples"=(as.data.frame(attr(md_Fwc_clus_sor_k10, "n"))[,2]),
   "Expected mean 𝝰" = Fun_gamma3temp$`Expected mean alpha`,
   "Observed mean 𝝰" = c(round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F1"]),1),
    round(mean(fwc_alpha$Observed[fwc_alpha$Fun_sor_clusters=="F2"]),1),
@@ -3912,7 +3698,7 @@ Fun_gamma3 %>%
       # ,format.args = format(list(big.mark = ',', digit))
       ) %>%
   kable_styling() %>%
-  scroll_box(width = "110%", height = "550px")
+  scroll_box(width = "70%", height = "550px")
 
 ```
 
@@ -3973,11 +3759,7 @@ Bac_gamma3<-cbind("Number of OTUs"=Bac_gamma2[,1],
    round(mean(bwc_alpha$Observed[bwc_alpha$Bac_sor_clusters=="B7"]),1),
    round(mean(bwc_alpha$Observed[bwc_alpha$Bac_sor_clusters=="B8"]),1),
    round(mean(bwc_alpha$Observed[bwc_alpha$Bac_sor_clusters=="B9"]),1),
-   round(mean(bwc_alpha$Observed[bwc_alpha$Bac_sor_clusters=="B10"]),1),
-   round(mean(bwc_alpha$Observed[bwc_alpha$Bac_sor_clusters=="B11"]),1),
-   round(mean(bwc_alpha$Observed[bwc_alpha$Bac_sor_clusters=="B12"]),1),
-   round(mean(bwc_alpha$Observed[bwc_alpha$Bac_sor_clusters=="B13"]),1),
-   round(mean(bwc_alpha$Observed[bwc_alpha$Bac_sor_clusters=="B14"]),1)
+   round(mean(bwc_alpha$Observed[bwc_alpha$Bac_sor_clusters=="B10"]),1)
 )
   )
 
@@ -3989,7 +3771,7 @@ Bac_gamma3 %>%
       # ,format.args = format(list(big.mark = ',', digit))
       ) %>%
   kable_styling() %>%
-  scroll_box(width = "110%", height = "550px")
+  scroll_box(width = "70%", height = "550px")
 
 ```
 
@@ -4018,11 +3800,11 @@ Bac_gamma3 %>%
 
 \
 
-```{r, echo=FALSE, warning=FALSE}
-ggboxplot(Fwc_Genus.r_otu_dat, x = "Fun_sor_clusters", y = "Fusarium",
-          fill = "Fun_sor_clusters", palette = col_n10)+ 
+```{r, echo=FALSE}
+ggboxplot(Fwc_Genus.r_otu_dat, x = "clus_sor_k10", y = "Fusarium",
+          fill = "clus_sor_k10", palette = col_clusn10)+ 
   stat_compare_means(aes(label = after_stat(p.signif)),
-                     method = "wilcox.test", ref.group = "F1", # Add pairwise comparisons p-value
+                     method = "wilcox.test", ref.group = "1", # Add pairwise comparisons p-value
                      label = "p.signif",hide.ns=T, paired = F
                      ,label.y = 0.28)+ 
   stat_compare_means(label.y = 0.3,label.x = 1.5)+     # Add global p-value
@@ -4031,14 +3813,12 @@ ggboxplot(Fwc_Genus.r_otu_dat, x = "Fun_sor_clusters", y = "Fusarium",
   theme(legend.position = "none",
         axis.text = element_text(size=12, color = "black"),
         axis.title = element_text(size=14, color = "black"))+
-  labs(title = "Genus: Fusarium",caption = "pairwise wilcox.test, ref.group = Cluster F1",
-       subtitle = paste("Cluster F1 (mean RA = ",
-                        round(mean(Fwc_Genus.r_otu_dat$Fusarium[Fwc_Genus.r_otu_dat$Fun_sor_clusters=="F1"])*100,1),
+  labs(title = "Genus: Fusarium",caption = "pairwise wilcox.test, ref.group = Cluster 1",
+       subtitle = paste("Cluster 1 (mean RA = ",
+                        round(mean(Fwc_Genus.r_otu_dat$Fusarium[Fwc_Genus.r_otu_dat$clus_sor_k10=="1"])*100,1),
                         "%) vs. all (global RA = ", 
                         round(mean(Fwc_Genus.r_otu_dat$Fusarium)*100,1),
                         "%)",sep = ""))
-
-# max(Fwc_Genus.r_otu_dat$Fusarium[Fwc_Genus.r_otu_dat$Fun_sor_clusters=="F10"])*100
 ```
 
 \
@@ -4061,7 +3841,7 @@ OTU1252_taxstring<-paste(tax_table(Fun_wholecommunity)["OTU1252",2],
                          sep = ";")
 
 ggboxplot(Fwc_rel.clus_sor_k10, x = "clus_sor_k10", y = "OTU1252",
-          fill = "clus_sor_k10", palette = as.vector(col_n10))+ 
+          fill = "clus_sor_k10", palette = col_clusn10)+ 
   stat_compare_means(aes(label = after_stat(p.signif)),
                      method = "wilcox.test", ref.group = "1", # Add pairwise comparisons p-value
                      label = "p.signif",hide.ns=T, paired = F
@@ -4093,7 +3873,7 @@ OTU6679_taxstring<-paste(tax_table(Fun_wholecommunity)["OTU6679",2],
                          sep = ";")
 
 ggboxplot(Fwc_rel.clus_sor_k10, x = "clus_sor_k10", y = "OTU6679",
-          fill = "clus_sor_k10", palette = as.vector(col_n10))+ 
+          fill = "clus_sor_k10", palette = col_clusn10)+ 
   stat_compare_means(aes(label = after_stat(p.signif)),
                      method = "wilcox.test", ref.group = "1", # Add pairwise comparisons p-value
                      label = "p.signif",hide.ns=T, paired = F
@@ -4125,7 +3905,7 @@ OTU205_taxstring<-paste(tax_table(Fun_wholecommunity)["OTU205",2],
                          sep = ";")
 
 ggboxplot(Fwc_rel.clus_sor_k10, x = "clus_sor_k10", y = "OTU205",
-          fill = "clus_sor_k10", palette = as.vector(col_n10))+ 
+          fill = "clus_sor_k10", palette = col_clusn10)+ 
   stat_compare_means(aes(label = after_stat(p.signif)),
                      method = "wilcox.test", ref.group = "1", # Add pairwise comparisons p-value
                      label = "p.signif",hide.ns=T, paired = F
@@ -4272,88 +4052,13 @@ ggboxplot(Fwc_rel.clus_sor_k10, x = "clus_sor_k10", y = "OTU205",
 \
 \
 
-# Relationships among sites and fungal sub-assemblages
-
-\
-
-## Chord diagram {.tabset}
-
-### fungal emphasis
-
-```{r, echo=FALSE,eval=TRUE}
-library(circlize)
-
-# Transform input data in a adjacency matrix
-adjacencyData1 <- with(sd, table(Fun_sor_clusters, Site))
-
-# Extract ordered site levels (BLM first, HPG later)
-site_order <- levels(Site_colors_list$site_levels_orderedfactor)
-
-# Reorder adjacencyData1 columns accordingly
-adjacencyData1_reordered <- adjacencyData1[, site_order]
-Site_colors_list$color_latlong_mapping
-
-# Check Column Names Match
-# setdiff(site_order, colnames(adjacencyData1))
-  # should return (character(0))
-
-
-# Create ordered site color vector
-site_cols_latlong_ordered <- Site_colors_list$color_latlong_mapping[site_order]
-
-# colored by cluster, sort=T, decreasing=F
-chordDiagram(adjacencyData1_reordered, transparency = 0.5
-             , link.sort = TRUE, link.decreasing = F
-             ,grid.col = c(site_cols_latlong_ordered,col_n10)
-)
-
-# colored by cluster, sort=F, decreasing=F
-chordDiagram(adjacencyData1_reordered, transparency = 0.5
-             , link.sort = F, link.decreasing = F
-             ,grid.col = c(site_cols_latlong_ordered,col_n10)
-)
-
-
-site_fun_grid_cols <- c(site_cols_latlong_ordered,col_n10)
-
-# colored by cluster, sort=T, decreasing=T
-chordDiagram(adjacencyData1_reordered, transparency = 0.5
-             , link.sort = TRUE, link.decreasing = T
-             ,grid.col = site_fun_grid_cols
-)
-
-# colored by site, sort=F, decreasing=T
-# chordDiagram(t(adjacencyData1_reordered), transparency = 0.5
-#              # , link.sort = F, link.decreasing = T
-#              ,grid.col = site_fun_grid_cols
-#              , link.zindex = rank(t(adjacencyData1_reordered))
-#              , scale = T
-# )
-
-# circos.clear()
-# circos.par(start.degree = 175)
-
-# colored by cluster, sort=T, decreasing=T
-chordDiagram(adjacencyData1_reordered, transparency = 0.5
-             , link.sort = TRUE, link.decreasing = T
-             ,grid.col = site_fun_grid_cols
-             , link.zindex = rank(adjacencyData1_reordered)
-             , directional = -1
-             # , direction.type = "arrows",
-             #    link.arr.col = "grey", 
-             #    link.arr.length = 0.2
-)
-```
-
-
-
 # Relationships among bacterial-fungal clusters
 
 \
 
 ## Chord diagram {.tabset}
 
-### fungal emphasis
+### fungal emphasis 
 
 ```{r, echo=FALSE,eval=TRUE}
   # Transform input data in a adjacency matrix
@@ -4366,21 +4071,24 @@ library(circlize)
 
 #fungal links
 chordDiagram(adjacencyData1, transparency = 0.5
-             ,grid.col = c(col_n10,col_n14))
+             ,grid.col = c(col_clusn10,col_n14))
 
 chordDiagram(adjacencyData1, transparency = 0.5
              , link.sort = TRUE, link.decreasing = F
-             ,grid.col = c(col_n10,col_n14)
+             ,grid.col = c(col_clusn10,col_n14)
 )
 
 chordDiagram(adjacencyData1, transparency = 0.5
              , link.sort = T, link.decreasing = T
-             ,grid.col = c(col_n10,col_n14)
+             ,grid.col = c(col_clusn10,col_n14)
 )
 
 ```
 
-### bacterial emphasis
+
+
+
+### bacterial emphasis 
 
 ```{r, echo=FALSE,eval=TRUE}
   # Transform input data in a adjacency matrix
@@ -4390,15 +4098,18 @@ adjacencyData1 <- with(sd, table(Fun_sor_clusters, Bac_sor_clusters))
 
 chordDiagram(t(adjacencyData1), transparency = 0.5
              , link.sort = TRUE, link.decreasing = F
-             ,grid.col = c(col_n14,col_n10)
+             ,grid.col = c(col_n14,col_clusn10)
 )
 
 chordDiagram(t(adjacencyData1), transparency = 0.5
              , link.sort = TRUE, link.decreasing = T
-             ,grid.col = c(col_n14,col_n10)
+             ,grid.col = c(col_n14,col_clusn10)
 )
 
 ```
+
+
+
 
 ## Computing multiple categorical factor pairwise comparisons
 
@@ -4460,7 +4171,8 @@ ggplot(data = sd, aes(x=Bac_sor_clusters, y=Fun_sor_clusters))+
 
 ```
 
-```{r, include=FALSE, eval=FALSE}
+
+```{r, eval=FALSE}
 ### You need several libraries
 library(circlize)
 library(migest)
@@ -4572,6 +4284,8 @@ df1$sum1[i] = df1$sum1[i] + abs(m[i, j])
 df1$sum2[j] = df1$sum2[j] + abs(m[i, j])
 }
 ```
+
+
 
 # hide {.unnumbered .hidden .unlisted}
 
