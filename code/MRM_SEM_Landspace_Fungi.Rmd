@@ -37,8 +37,8 @@ output:
 ```{r global-options, include=FALSE,eval=T}
 library(knitr)
 
-FIG_PATH="../docs/github_MRM_SEM_figures/"
-CACHE_PATH="../docs/github_MRM_SEM_cache/"
+FIG_PATH="../docs/github_MRM_SEM__fungi_figures/"
+CACHE_PATH="../docs/github_MRM_SEM_fungi_cache/"
 
 ## ~~create directories~~ ##
 ###########################################
@@ -464,7 +464,7 @@ extract_env_dist_pred_names <- function(mrm_result) {
 }
 
 # Example usage:
-cat(extract_env_dist_pred_names(MRM.all_Bac.linear.sor_Var_All))
+# cat(extract_env_dist_pred_names(MRM.all_Bac.linear.sor_Var_All))
 
 extract_sorted_env_dist_pred_names <- function(mrm_result) {
   # Get coefficient names and values
@@ -487,7 +487,7 @@ extract_sorted_env_dist_pred_names <- function(mrm_result) {
 }
 
 # Example usage:
-cat(extract_sorted_env_dist_pred_names(MRM.all_Bac.linear.sor_Var_All))
+# cat(extract_sorted_env_dist_pred_names(MRM.all_Bac.linear.sor_Var_All))
 
 
 # extract_sorted_env_dist_pred_names_filtered by pval
@@ -549,7 +549,7 @@ extract_nonsignif_env_dist_pred_names <- function(mrm_result, alpha = 0.05) {
 }
 
 # Example usage:
-cat(extract_nonsignif_env_dist_pred_names(MRM.all_Bac.linear.sor_Var_All))
+# cat(extract_nonsignif_env_dist_pred_names(MRM.all_Bac.linear.sor_Var_All))
 ```
 
 
@@ -1054,34 +1054,35 @@ as.data.frame(MRM.all_Fun.linear.sor_Var_All$coef)[order(abs(as.data.frame(MRM.a
 MRM.all_Fun.linear.sor_Var_All_DS <- MRM(
   betapart_results[["Fun"]][["all"]][["pairwise"]][["beta.sor"]] ~
     env_dist_matrices[["all"]][["ngrass_persite_Fun"]] + 
-     env_dist_matrices[["all"]][["geodist_Fun"]] +
-      env_dist_matrices[["all"]][["GDD3yr_m.std_Fun"]] + 
-      env_dist_matrices[["all"]][["ppt3yr_m.std_Fun"]] + 
-      env_dist_matrices[["all"]][["soil_water_content_m.std_Fun"]] + 
-      env_dist_matrices[["all"]][["pH_m.std_Fun"]] + 
-      env_dist_matrices[["all"]][["phos_m.std_Fun"]] + 
-      env_dist_matrices[["all"]][["ammonium_m.std_Fun"]] + 
-      env_dist_matrices[["all"]][["avg_SRL_m.std_Fun"]] + 
-      env_dist_matrices[["all"]][["avg_SLA_m.std_Fun"]] + 
-      env_dist_matrices[["all"]][["herbivory_perc_m.std_Fun"]] + 
-      env_dist_matrices[["all"]][["nsamples_per_Site_Fun"]] + 
+    env_dist_matrices[["all"]][["ngrasses_at_site_within_Fun_sor_clus2_Fun"]] +
+    env_dist_matrices[["all"]][["Fun_Shannon_Fun"]] +
+    env_dist_matrices[["all"]][["ngrass_perFun_sor_clusters_Fun"]] + 
+    env_dist_matrices[["all"]][["ppt3yr_m.std_Fun"]] + 
+    env_dist_matrices[["all"]][["nsamples_at_site_within_Fun_sor_clus2_Fun"]] +
+    env_dist_matrices[["all"]][["GDD3yr_m.std_Fun"]] + 
+    env_dist_matrices[["all"]][["nsamples_per_Site_Fun"]] + 
+    env_dist_matrices[["all"]][["herbivory_perc_m.std_Fun"]] + 
+    env_dist_matrices[["all"]][["Fun_InvSimpson_Fun"]] +
       env_dist_matrices[["all"]][["nsamples_perBac_sor_clusters_Fun"]] + 
+      env_dist_matrices[["all"]][["Fun_Observed_Fun"]] +
       env_dist_matrices[["all"]][["nsamples_perFun_sor_clusters_Fun"]] + 
-      
-      # env_dist_matrices[["all"]][["ngrass_perBac_sor_clusters_Fun"]] + 
-      env_dist_matrices[["all"]][["ngrass_perFun_sor_clusters_Fun"]] + 
-        env_dist_matrices[["all"]][["nsamples_at_site_within_Fun_sor_clus2_Fun"]] +
-        env_dist_matrices[["all"]][["ngrasses_at_site_within_Fun_sor_clus2_Fun"]] + 
-      # env_dist_matrices[["all"]][["Bac_gamma_Site_Fun"]] +
       env_dist_matrices[["all"]][["Fun_gamma_Site_Fun"]] +
+    env_dist_matrices[["all"]][["geodist_Fun"]] +
+    env_dist_matrices[["all"]][["Bac_gamma_Site_Fun"]],
+  
+      # env_dist_matrices[["all"]][["soil_water_content_m.std_Fun"]] +
+      # env_dist_matrices[["all"]][["pH_m.std_Fun"]] +
+      # env_dist_matrices[["all"]][["phos_m.std_Fun"]] +
+      # env_dist_matrices[["all"]][["ammonium_m.std_Fun"]] +
+      # env_dist_matrices[["all"]][["avg_SRL_m.std_Fun"]] +
+      # env_dist_matrices[["all"]][["avg_SLA_m.std_Fun"]] +
+      # env_dist_matrices[["all"]][["ngrass_perBac_sor_clusters_Fun"]] + 
         # env_dist_matrices[["all"]][["Bac_Observed_Fun"]] +
-        env_dist_matrices[["all"]][["Fun_Observed_Fun"]] +
-      env_dist_matrices[["all"]][["Bac_Chao1_Fun"]] +
+      # env_dist_matrices[["all"]][["Bac_Chao1_Fun"]] +
       # env_dist_matrices[["all"]][["Fun_Chao1_Fun"]] +
         # env_dist_matrices[["all"]][["Bac_InvSimpson_Fun"]] +
-        env_dist_matrices[["all"]][["Fun_InvSimpson_Fun"]] +
-      env_dist_matrices[["all"]][["Bac_Shannon_Fun"]] +
-      env_dist_matrices[["all"]][["Fun_Shannon_Fun"]],
+      # env_dist_matrices[["all"]][["Bac_Shannon_Fun"]],
+      
     method = "linear", nperm = 1000)
 ```
 

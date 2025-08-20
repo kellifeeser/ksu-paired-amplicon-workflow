@@ -177,6 +177,7 @@ links:
 -   MRM Results
 
     -   <a href="github_MRM_SEM_Landspace_Bacteria.html" target="_blank">Bacteria - Landscape-scale</a> (last updated 20 May 2025)
+    -   <a href="github_MRM_SEM_Landspace_Fungi.html" target="_blank">Fungi - Landscape-scale</a> (last updated 18 July 2025)
 
 \
 \

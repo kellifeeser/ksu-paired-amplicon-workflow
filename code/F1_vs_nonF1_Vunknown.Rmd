@@ -1,0 +1,573 @@
+---
+title: "Fungal F1 vs. non-F1"
+author: "Kelli Feeser"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+    keep_md: yes
+  html_notebook:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+\
+
+# Set-up {.unlisted .unnumbered .hidden}
+
+```{r global-options, include=FALSE,eval=T}
+
+FIG_PATH = "../docs/github_F1vnonF1/"
+CACHE_PATH = "../docs/github_F1vnonF1_cache/"
+
+## ~~create directories~~ ##
+###########################################
+dir.create(FIG_PATH, showWarnings = T,recursive = T)
+dir.create(CACHE_PATH, showWarnings = T,recursive = T)
+###########################################
+
+knitr::opts_chunk$set(fig.path=FIG_PATH,
+                      cache.path = CACHE_PATH)
+opts_knit$set(eval.after = "fig.cap")
+knitr::opts_chunk$set(fig.pos = '!h')
+options(knitr.kable.NA = '')
+```
+
+## load packages
+
+```{r load-packages, eval=T, message=F,results='hide',warning=F, include=FALSE}
+library("vegan"); packageVersion("vegan") # ‘2.6.10’
+library("phyloseq"); packageVersion("phyloseq") # ‘1.50.0’
+library("betapart"); packageVersion("betapart") # ‘1.6’
+library("ecodist"); packageVersion("ecodist") # ‘2.1.3’
+library("measurements"); packageVersion("measurements") # ‘1.5.1’
+library("geosphere"); packageVersion("geosphere") # ‘1.5.20’
+  # The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,
+  # which was just loaded, were retired in October 2023.
+  # Please refer to R-spatial evolution reports for details, especially
+  # https://r-spatial.org/r/2023/05/15/evolution4.html.
+  # It may be desirable to make the sf package available;
+  # package maintainers should consider adding sf to Suggests:.
+library("gdata"); packageVersion("gdata") # ‘3.0.1’
+# library("spam"); packageVersion("spam") # ‘2.9.1’
+library("ggplot2"); packageVersion("ggplot2") # ‘3.5.1’
+library("ggpubr"); packageVersion("ggpubr") # ‘0.6.0’
+library("cowplot"); packageVersion("cowplot") # ‘1.1.3’
+library("geodist"); packageVersion("geodist") # ‘0.1.0’
+library("knitr"); packageVersion("knitr") # ‘1.49’
+library("kableExtra"); packageVersion("kableExtra") # ‘1.4.0’
+
+source("RAM_bulk_harvester.R")
+```
+
+## load cache & rds
+
+```{r load-cache, include=FALSE, eval=T}
+# Load RDS
+  # OBJECT <- if (file.exists('OBJECT.rds')) {
+  #   readRDS('OBJECT.rds')
+  # } else {
+  #   "The value of `OBJECT` is not available yet"
+  # }
+
+env_dist_matrices <- readRDS(file = "../processed_data/clean_rds_saves/env_dist_matrices.rds")
+betapart_results <- readRDS(file = "../processed_data/clean_rds_saves/betapart_results.rds")
+
+# Load chunk cache / chunk cache object
+  # knitr::load_cache('CHUNK-NAME', 'OBJECT')
+  # knitr::load_cache('calc-DD-BF-all')
+
+knitr::load_cache('calc-Fun-clus2-sor-sim-sne-geo')
+```
+
+
+# Pure spatial effects (S)
+
+## Spatial Distance Decay
+
+### Fungal F1 vs. non-F1
+
+Spatial (geographic) distance decay - Fitting distance decay models to pairwise community dissimilarity\
+
+- Spatial distance in kilometers\
+    -   We assessed the increase of community dissimilarity within each fungal subassemblage group (F1 vs. non-F1) with geographic distance (equivalent to the distance decay of similarity), using `as.matrix(geodist(fungal_F1.geo, measure = 'geodesic' )/1000)`. We then generated a distance matrix containing the geographic distance, based on longitude and latitude (in kilometers) among the pairwise comparisons for each group.\ \ 
+
+The subassemblage groups span significantly different distributions of geographic distances (Wilcoxon rank sum test; )
+
+```{r wilcox-Fun-clus2-geodist, echo=FALSE}
+library(dplyr)
+library(e1071)
+library(car)
+# If not installed: install.packages("nortest")
+library(nortest)
+
+dist1 <- env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]]
+dist2 <- env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]]
+
+# Convert 'dist' to numeric vectors
+vec1 <- as.numeric(dist1)  # F1
+vec2 <- as.numeric(dist2)  # non-F1
+
+# Create tidy dataframe
+dist_df <- data.frame(
+  Distance = c(vec1, vec2),
+  Group = factor(c(rep("F1", length(vec1)), rep("non-F1", length(vec2))),
+                 levels = c("F1", "non-F1"))
+)
+
+# Summary stats
+summary_stats <- dist_df %>%
+  group_by(Group) %>%
+  summarise(
+    N = n(),
+    Mean = mean(Distance),
+    Median = median(Distance),
+    Variance = var(Distance),
+    SD = sd(Distance),
+    Min = min(Distance),
+    Max = max(Distance),
+    Skewness = skewness(Distance),
+    Kurtosis = kurtosis(Distance),
+    .groups = "drop"
+  )
+
+# Normality
+# Anderson-Darling test for large sample normality
+ad_f1 <- nortest::ad.test(vec1)
+ad_nonf1 <- nortest::ad.test(vec2)
+
+# Optionally also run Kolmogorov–Smirnov against normal
+ks_f1 <- ks.test(vec1, "pnorm", mean(vec1), sd(vec1))
+ks_nonf1 <- ks.test(vec2, "pnorm", mean(vec2), sd(vec2))
+
+# Updated logic for mean test based on AD or KS
+if (ad_f1$p.value > 0.05 & ad_nonf1$p.value > 0.05 &
+    abs(var(vec1) - var(vec2)) < 0.5 * max(var(vec1), var(vec2))) {
+  mean_test <- t.test(Distance ~ Group, data = dist_df)
+  test_label <- "t-test"
+} else {
+  mean_test <- wilcox.test(Distance ~ Group, data = dist_df)
+  test_label <- "Wilcoxon rank-sum test"
+}
+# Variance test
+var_test <- leveneTest(Distance ~ Group, data = dist_df)
+
+# Custom colors
+col_f1 <- "#8E0152"
+col_f1_alpha <- "#8E015266"
+col_nonf1 <- "#7FBC41"
+col_nonf1_alpha <- "#276419"
+
+fill_colors <- c("F1" = col_f1, "non-F1" = col_nonf1)
+
+# Violin + Boxplot + Jitter
+p_violin <- ggplot(dist_df, aes(x = Group, y = Distance, fill = Group)) +
+  geom_violin(alpha = 0.3, trim = FALSE) +
+  geom_boxplot(width = 0.15, outlier.shape = NA, alpha = 0.9) +
+  geom_jitter(width = 0.1, size = 0.7, alpha = 0.1) +
+  scale_fill_manual(values = fill_colors) +
+  labs(
+    title = "Comparison of Spatial Distances (within groups)",
+    subtitle = paste0(
+      "Boxplot of spatial distances between F1 and non-F1 samples. ",
+      "F1 spans a maximum distance of ", round(max(vec1)), " km ",
+      "(mean ± SD: ", round(mean(vec1), 1), " ± ", round(sd(vec1), 1), "). ",
+      "non-F1 spans a maximum distance of ", round(max(vec2)), " km ",
+      "(mean ± SD: ", round(mean(vec2), 1), " ± ", round(sd(vec2), 1), "). ",
+      "The groups differed in mean (", test_label, 
+      "; W = ", round(mean_test$statistic, 2), 
+      ", p = ", signif(mean_test$p.value, 3), "). ",
+      "Variance comparison (Levene’s test: F = ", round(var_test$`F value`[1], 2), 
+      ", p = ", signif(var_test$`Pr(>F)`[1], 3), ")."
+    ),
+    x = NULL, y = "Distance (km)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# Q-Q plots
+qq_f1 <- ggplot(data.frame(Distance = vec1), aes(sample = Distance)) +
+  stat_qq(color = col_f1) +
+  stat_qq_line(color = col_f1_alpha) +
+  labs(title = "Q-Q Plot: F1") +
+  theme_minimal()
+
+qq_nonf1 <- ggplot(data.frame(Distance = vec2), aes(sample = Distance)) +
+  stat_qq(color = col_nonf1) +
+  stat_qq_line(color = col_nonf1_alpha) +
+  labs(title = "Q-Q Plot: non-F1") +
+  theme_minimal()
+
+# Combine all plots
+final_plot <- plot_grid(
+  plot_grid(qq_f1, qq_nonf1, labels = c("A", "B"), ncol = 2),
+  p_violin + labs(caption = "Figure 1: Q-Q plots (A, B) and distribution (C) of spatial distances within F1 and non-F1 groups."),
+  labels = c("", "C"),
+  ncol = 1,
+  rel_heights = c(0.4, 0.6)
+)
+
+# Show plot
+print(final_plot)
+
+# Show summary stats table
+kable(summary_stats, digits = 2, caption = "Summary statistics for within-group spatial distances") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+
+```
+
+
+
+```{r fig-spatial-dist, fig.cap = "Figure 1. Q–Q plots and distribution of spatial distances within F1 and non-F1 groups.", fig.width=10, fig.height=6, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(e1071)
+library(car)
+library(nortest)
+library(cowplot)
+library(knitr)
+library(kableExtra)
+library(glue)
+
+dist1 <- env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]]
+dist2 <- env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]]
+
+# Data prep
+vec1 <- as.numeric(dist1)
+vec2 <- as.numeric(dist2)
+
+dist_df <- data.frame(
+  Distance = c(vec1, vec2),
+  Group = factor(c(rep("F1", length(vec1)), rep("non-F1", length(vec2))),
+                 levels = c("F1", "non-F1"))
+)
+
+# Summary stats
+summary_stats <- dist_df %>%
+  group_by(Group) %>%
+  summarise(
+    N = n(),
+    Mean = mean(Distance),
+    SD = sd(Distance),
+    Median = median(Distance),
+    Min = min(Distance),
+    Max = max(Distance),
+    Variance = var(Distance),
+    Skewness = skewness(Distance),
+    Kurtosis = kurtosis(Distance),
+    .groups = "drop"
+  )
+
+# Normality tests
+ad_f1 <- ad.test(vec1)
+ad_nonf1 <- ad.test(vec2)
+
+# Variance test
+var_test <- leveneTest(Distance ~ Group, data = dist_df)
+
+# Mean/median test
+if (ad_f1$p.value > 0.05 & ad_nonf1$p.value > 0.05 &
+    abs(var(vec1) - var(vec2)) < 0.5 * max(var(vec1), var(vec2))) {
+  mean_test <- t.test(Distance ~ Group, data = dist_df)
+  test_label <- "t-test"
+} else {
+  mean_test <- wilcox.test(Distance ~ Group, data = dist_df)
+  test_label <- "Wilcoxon rank-sum test"
+}
+
+# Add flags to summary table
+summary_stats <- summary_stats %>%
+  mutate(
+    Normality = c(ifelse(ad_f1$p.value < 0.05, "No", "Yes"),
+                  ifelse(ad_nonf1$p.value < 0.05, "No", "Yes"))
+  )
+
+var_p <- var_test$`Pr(>F)`[1]
+mean_p <- mean_test$p.value
+
+summary_stats <- summary_stats %>%
+  mutate(
+    Var_Differs = ifelse(var_p < 0.05, "Yes", "No"),
+    Mean_Differs = ifelse(mean_p < 0.05, "Yes", "No")
+  )
+
+# Custom colors
+col_f1 <- "#8E0152"; col_f1_line <- "#8E015266"
+col_nonf1 <- "#7FBC41"; col_nonf1_line <- "#276419"
+fill_colors <- c("F1" = col_f1, "non-F1" = col_nonf1)
+
+# Minimal black theme with min font size 14
+black_theme <- theme_minimal(base_size = 14) +
+  theme(
+    text = element_text(color = "black"),
+    axis.text = element_text(color = "black"),
+    axis.title = element_text(color = "black"),
+    plot.title = element_text(color = "black", face = "bold"),
+    strip.text = element_text(color = "black")
+  )
+
+# Q–Q plots
+qq_f1 <- ggplot(data.frame(Distance = vec1), aes(sample = Distance)) +
+  stat_qq(color = col_f1) + stat_qq_line(color = col_f1_line) +
+  labs(title = "Q–Q Plot: F1") +
+  black_theme
+
+qq_nonf1 <- ggplot(data.frame(Distance = vec2), aes(sample = Distance)) +
+  stat_qq(color = col_nonf1) + stat_qq_line(color = col_nonf1_line) +
+  labs(title = "Q–Q Plot: non-F1") +
+  black_theme
+
+# Violin + boxplot
+p_dist <- ggplot(dist_df, aes(x = Group, y = Distance, fill = Group)) +
+  geom_violin(trim = FALSE, alpha = 0.3) +
+  geom_boxplot(width = 0.15, outlier.shape = NA, alpha = 0.9) +
+  geom_jitter(width = 0.1, alpha = 0.1, size = 0.4) +
+  scale_fill_manual(values = fill_colors) +
+  labs(title = "C. Distance Distributions", y = "Distance (km)", x = NULL) +
+  black_theme +
+  theme(legend.position = "none")
+
+# Combine plots
+plot_grid(
+  plot_grid(qq_f1, qq_nonf1, labels = c("A", "B"), ncol = 2),
+  p_dist,
+  ncol = 1, rel_heights = c(0.4, 0.6)
+)
+```
+
+
+```{r fig1-summary-table-ext-stats, results='asis'}
+# Extended stats
+f1_ext <- data.frame(
+  Group = "F1",
+  IQR = IQR(vec1),
+  Range = diff(range(vec1)),
+  CV = sd(vec1) / mean(vec1)
+)
+
+nf1_ext <- data.frame(
+  Group = "non-F1",
+  IQR = IQR(vec2),
+  Range = diff(range(vec2)),
+  CV = sd(vec2) / mean(vec2)
+)
+
+# Merge with base stats
+group_stats <- summary_stats %>%
+  left_join(bind_rows(f1_ext, nf1_ext), by = "Group")
+
+# Create comparison row with test results embedded in columns
+comparison_row <- data.frame(
+  Group = "Comparison",
+  N = NA,
+  Mean = glue::glue("{ifelse(mean_p < 0.05, 'different', 'not different')} (p = {signif(mean_p, 3)})"),
+  SD = NA,
+  Median = NA,
+  Min = NA,
+  Max = NA,
+  Variance = glue::glue("{ifelse(var_p < 0.05, 'different', 'not different')} (p = {signif(var_p, 3)})"),
+  Skewness = NA,
+  Kurtosis = NA,
+  Normality = NA,
+  IQR = NA,
+  Range = NA,
+  CV = NA,
+  Cohens_d = round(cohen_d, 2),
+  Log_Response_Ratio = round(log_ratio, 2)
+)
+
+# Final table
+final_stats <- bind_rows(group_stats, comparison_row)
+
+# Render it
+kable(final_stats, digits = 2, caption = "Table 1. Summary statistics for within-group spatial distances (km), with comparison-level test results embedded in 'Comparison' row.") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), font_size = 10, full_width = FALSE)
+```
+
+
+
+```{r fig1-summary-text, results='asis'}
+f1 <- final_stats %>% filter(Group == "F1")
+nf1 <- final_stats %>% filter(Group == "non-F1")
+
+# Compare values
+greater_var <- ifelse(f1$Variance > nf1$Variance, "F1", "non-F1")
+greater_mean <- ifelse(f1$Mean > nf1$Mean, "F1", "non-F1")
+greater_skew <- ifelse(f1$Skewness > nf1$Skewness, "F1", "non-F1")
+greater_kurt <- ifelse(f1$Kurtosis > nf1$Kurtosis, "F1", "non-F1")
+greater_cv <- ifelse(f1$CV > nf1$CV, "F1", "non-F1")
+greater_iqr <- ifelse(f1$IQR > nf1$IQR, "F1", "non-F1")
+
+cat(glue::glue("
+**Figure 1 Summary:**  
+
+F1 distances were {ifelse(f1$Normality == 'No', 'not ', '')}normally distributed (Anderson–Darling *p* = {signif(ad_f1$p.value, 3)}).\  
+
+Mean ± SD = {round(f1$Mean, 1)} ± {round(f1$SD, 1)} km,  
+Skewness = {round(f1$Skewness, 2)}, Kurtosis = {round(f1$Kurtosis, 2)}.  
+
+non-F1 distances were {ifelse(nf1$Normality == 'No', 'not ', '')}normally distributed (p = {signif(ad_nonf1$p.value, 3)}).  
+
+Mean ± SD = {round(nf1$Mean, 1)} ± {round(nf1$SD, 1)} km,  
+Skewness = {round(nf1$Skewness, 2)}, Kurtosis = {round(nf1$Kurtosis, 2)}.  
+
+Group variances differed {ifelse(var_p < 0.05, '**significantly**', 'non-significantly')}  
+(Levene’s *F* = {round(var_test$`F value`[1], 2)}, *p* = {signif(var_p, 3)}),  
+with **{greater_var}** showing greater variance.  
+
+Central tendency differed {ifelse(mean_p < 0.05, '**significantly**', 'non-significantly')}  
+({test_label}, *p* = {signif(mean_p, 3)}),  
+with **{greater_mean}** having the greater mean distance.  
+
+F1 had a {ifelse(f1$CV > nf1$CV, 'higher', 'lower')} coefficient of variation (CV = {round(f1$CV, 2)}) than non-F1 (CV = {round(nf1$CV, 2)}).  
+
+The groups differed in interquartile range, with **{greater_iqr}** having greater spread (IQR).  
+
+Cohen's *d* = {round(cohen_d, 2)}; log-response ratio = {round(log_ratio, 2)}.
+  
+---
+
+**Ecological Interpretation:**  
+F1 appears to be more spatially clustered than non-F1.  
+This is supported by its lower variance, smaller interquartile range, and lower coefficient of variation,  
+indicating less spread in pairwise spatial distances.  
+The distribution also exhibits lower skewness and kurtosis, suggesting fewer extreme distances and a more central tendency.  
+In contrast, non-F1 distances are more dispersed, possibly reflecting broader habitat use or sampling across a wider spatial domain.
+"))
+```
+
+```{r fig1-summary-table, results='asis'}
+kable(summary_stats, digits = 2, caption = "Table 1. Summary statistics for spatial distances within F1 and non-F1 groups") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+
+    -   The F1 subassemblage spans a maximum distance of `r round(max(env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]]))` km between samples\
+
+    -   The non-F1 subassemblage group spans a maximum distance of `r round(max(env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]]))` km\
+
+Distance-decay relationships between geographic distance (in km) among fungal communities in F1 vs. non-F1 subassemblages and i) total community pairwise dissimilarity (β~sor~), ii) spatial turnover-resultant dissimilarity (β~sim~), and iii) nestedness-resultant dissimilarity (β~sne~) using 999 permutations. Differences between F1 and non-F1 model parameters were assessed via block-site bootstrap whether the parameters of both models are equal (n = 999 bootstrap resamples). Both tests were conducted independently, one for the equality of the first parameters (intercepts) of both models, and for the equality of the second parameters (slopes) of both models of each dissimilarity measure.\
+
+```{r calc-Fun-clus2-sor-sim-sne-geo, warning=T,eval=TRUE,cache=T}
+#sor
+# F1
+decay.Fun_sor_clus2F1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]], y.type="dissim", model.type="exp", perm = 999)
+
+# non-F1
+decay.Fun_sor_clus2nonF1.exp.sor<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1_Fun"]]$beta.sor, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp", perm = 999)
+
+#sor
+# F1
+decay.Fun_sor_clus2F1.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["F1_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]], y.type="dissim", model.type="exp", perm = 999)
+
+# non-F1
+decay.Fun_sor_clus2nonF1.exp.sim<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1_Fun"]]$beta.sim, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp", perm = 999)
+
+#sne
+# F1
+decay.Fun_sor_clus2F1.exp.sne<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["F1_Fun"]]$beta.sne, x=env_dist_matrices[["Fun_sor_clus2"]][["F1_geodist"]], y.type="dissim", model.type="exp", perm = 999)
+
+# non-F1
+decay.Fun_sor_clus2nonF1.exp.sne<-decay.model(y=betapart_results[["Fun"]][["Fun_sor_clus2"]][["pairwise"]][["non-F1_Fun"]]$beta.sne, x=env_dist_matrices[["Fun_sor_clus2"]][["non-F1_geodist"]], y.type="dissim", model.type="exp", perm = 999)
+
+
+
+# Site-block bootstrap
+
+# Assessing the differences between parameters of two distance-decay models computed with decay.model().
+zdepDDBF_F1nonF1_sor<-zdep(decay.Fun_sor_clus2F1.exp.sor, decay.Fun_sor_clus2nonF1.exp.sor, resamples=999, st.val = c(1, 0))
+
+zdepDDBF_F1nonF1_sim<-zdep(decay.Fun_sor_clus2F1.exp.sim, decay.Fun_sor_clus2nonF1.exp.sim, resamples=999, st.val = c(1, 0))
+
+zdepDDBF_F1nonF1_sne<-zdep(decay.Fun_sor_clus2F1.exp.sne, decay.Fun_sor_clus2nonF1.exp.sne, resamples=999, st.val = c(1, 0))
+```
+
+
+```{r plot-Fun-clus-sor-sim-geo, warning=T,eval=TRUE,cache=F, fig.dim=c(8,4),fig.dpi=250}
+par(mfrow = c(1, 3),#c(nr, nc) 
+    mar = c(2, 2, 2.5, 2),# c(bottom, left, top, right) defaults mar  c(5.1, 4.1, 4.1, 2.1)
+    oma = (c(3, 0, 2, 0) + 0.1))
+
+# sor
+############################################################
+plot.decay.pretty(decay.Fun_sor_clus2F1.exp.sor, col=paste(col_n10[1],"66",sep = ""), add=F, main="Total Dissimilarity (βsor)\nFungi",cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
+
+plot.decay.pretty(decay.Fun_sor_clus2nonF1.exp.sor, col="#7FBC41", add=T, main="Total Dissimilarity (βsor)\nFungi: non-F1", cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line="#276419",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext((paste("F1 - ",round(decay.Fun_sor_clus2F1.exp.sor$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2F1.exp.sor$p.value,3),")",sep = "")),side=1,line=-1,adj=0.05,outer = F,padj = 0,col=col_n10[1])
+mtext((paste("non-F1 - ",round(decay.Fun_sor_clus2nonF1.exp.sor$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2nonF1.exp.sor$p.value,3),")",sep = "")),side=1,line=-2.2,adj=0.05,outer = F,padj = 0, col="#7FBC41")
+mtext((paste("pseudo R2 (p-value)",sep = "")),side=1,line=-3.4,adj=0.05,outer = F,padj = 0, col="black")
+############################################################
+
+
+
+# sim
+############################################################
+plot.decay.pretty(decay.Fun_sor_clus2F1.exp.sim, col=paste(col_n10[1],"66",sep = ""), add=F, main="Turnover-Resultant Dissimilarity (βsim)\nFungi",cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
+
+plot.decay.pretty(decay.Fun_sor_clus2nonF1.exp.sim, col="#7FBC41", add=T, main="Turnover-Resultant Dissimilarity (βsim)\nFungi: non-F1", cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+           col.line="#276419",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext((paste("F1 - ",round(decay.Fun_sor_clus2F1.exp.sim$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2F1.exp.sim$p.value,3),")",sep = "")),side=1,line=-1,adj=0.05,outer = F,padj = 0,col=col_n10[1])
+mtext((paste("non-F1 - ",round(decay.Fun_sor_clus2nonF1.exp.sim$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2nonF1.exp.sim$p.value,3),")",sep = "")),side=1,line=-2.2,adj=0.05,outer = F,padj = 0, col="#7FBC41")
+mtext((paste("pseudo R2 (p-value)",sep = "")),side=1,line=-3.4,adj=0.05,outer = F,padj = 0, col="black")
+############################################################
+
+
+# sne
+############################################################
+plot.decay.pretty(decay.Fun_sor_clus2F1.exp.sne, col=paste(col_n10[1],"66",sep = ""), add=F, main="Nestedness-Resultant Dissimilarity (βsne)\nFungi",cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,0.5),las=1, lty=1,lwd=5,
+           col.line=col_n10[1],xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext("\nDistance between Communities (in km)", side = 1, line = 1, outer = TRUE) # side 1=bottom, 2=left, 3=top, 4=right
+
+plot.decay.pretty(decay.Fun_sor_clus2nonF1.exp.sne, col="#7FBC41", add=T, main="Nestedness-Resultant (βsne)\nFungi: non-F1", cex.main=0.9,
+           xlim = c(0,1600),ylim = c(0,0.5),las=1, lty=1,lwd=5,
+           col.line="#276419",xaxp = c(0,1500,3),
+           ylab="",xlab="")
+mtext((paste("F1 - ",round(decay.Fun_sor_clus2F1.exp.sne$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2F1.exp.sne$p.value,3),")",sep = "")),side=3,line=-3.4,adj=0.05,outer = F,padj = 0,col=col_n10[1])
+mtext((paste("non-F1 - ",round(decay.Fun_sor_clus2nonF1.exp.sne$pseudo.r.squared,3)," (",round(decay.Fun_sor_clus2nonF1.exp.sne$p.value,3),")",sep = "")),side=3,line=-2.2,adj=0.05,outer = F,padj = 0, col="#7FBC41")
+mtext((paste("pseudo R2 (p-value)",sep = "")),side=3,line=-1,adj=0.05,outer = F,padj = 0, col="black")
+
+# plot.decay.pretty(decay.Fun_sor_clus2nonF1.exp.sor, col="#7FBC41", add=T, main="non-F1",
+#            xlim = c(0,1600),ylim = c(0,1),las=1, lty=1,lwd=5,
+#            col.line="#276419",xaxp = c(0,1500,3),
+#            ylab="",xlab="")
+
+```
+
+
+
