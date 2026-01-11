@@ -1,0 +1,2476 @@
+---
+title: "RAM: Spatial Origins and Cross-Kingdom Congruence in Bacterial and Fungal Communities - Storyline 3"
+subtitle: "Residualized regressions: does fungal community structure bacterial?"
+author: "Kelli Feeser"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+  bookdown::html_document2:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+    keep_md: yes
+  html_notebook:
+    code_folding: hide
+    css: styles.css
+    number_sections: yes
+    toc: yes
+    toc_depth: 4
+    toc_float: true
+    fig.caption: yes
+editor_options:
+  chunk_output_type: inline
+bibliography: RAMreferences.bib
+notes:
+  - "add 'csl: apa.csl  # optional for APA-style formatting' to yaml"
+---
+
+```{r global-options, include=FALSE,eval=T}
+library(knitr)
+# FIG_PATH = "../docs/residualizedregressions/"
+CACHE_PATH = "../docs/residualizedregressions_cache/"
+
+## ~~create directories~~ ##
+###########################################
+# dir.create(FIG_PATH, showWarnings = T,recursive = T)
+dir.create(CACHE_PATH, showWarnings = T,recursive = T)
+###########################################
+
+knitr::opts_chunk$set(#fig.path=FIG_PATH,
+                      cache.path = CACHE_PATH)
+opts_knit$set(eval.after = "fig.cap")
+knitr::opts_chunk$set(fig.pos = '!h', echo = F)
+options(knitr.kable.NA = '')
+```
+
+\
+
+::: homelink
+<a href="https://kellifeeser.github.io/ksu-paired-amplicon-workflow/index.html" target="_blank" style="text-align:right">Back to Home</a>
+:::
+
+\
+
+------------------------------------------------------------------------
+
+Document last updated: `r Sys.Date()`
+
+------------------------------------------------------------------------
+
+\
+
+```{r, include=FALSE,eval=TRUE}
+library(ggplot2)
+library(dplyr)
+library(e1071)
+library(car)
+library(nortest)
+library(knitr)
+library(kableExtra)
+library(glue)
+library(boot)
+library(coin)
+library(phyloseq)
+library(effsize)
+library(boot)
+library(bookdown)
+library(geosphere)  # for distances
+library(spdep)      # for correlograms
+library(vegan)      # for ecological distances
+library(cowplot)    # for figure layout
+library(ggpubr)     # for publication annotations
+# library(tidyverse)
+# detach("package:spam", unload = TRUE)
+
+source("RAM_bulk_harvester.R")
+
+betapart_results <- readRDS(file = "../processed_data/clean_rds_saves/betapart_results.rds")
+
+env_dist_matrices <- readRDS(file = "../processed_data/clean_rds_saves/env_dist_matrices.rds")
+
+
+```
+
+# Methods
+
+All analyses were conducted in R (version 4.4.3), using the packages betapart 1.6.1, vegan 2.7-2, emmeans 2.0.1, dplyr 1.1.4, and tidyr 1.3.2.
+
+**Sample-level beta-diversity**
+
+Pairwise beta-diversity was calculated separately for fungal and bacterial communities using presence–absence data. Sørensen dissimilarity (βsor) and its turnover (βsim) and nestedness-resultant (βsne) components were computed for each dataset using pairwise decomposition. All beta-diversity metrics were defined at the sample level, with each observation representing a comparison between two samples.
+
+**Pairwise predictors**
+
+Sample-level attributes were assigned to both members of each sample pair, including fungal state, site identity, and vegetation attributes. Fungal state was represented in two ways: (i) symmetric fungal state pairings, encoding unordered combinations of state membership, and (ii) directional state contrasts, encoding ordered transitions between fungal states (for example, F1→F3 versus F3→F1). Site identity and vegetation predictors were defined as pairwise attributes for each comparison.
+
+**Site-level bacterial species pools**
+
+Regional bacterial species pools were defined at the site level as the set of taxa observed across all bacterial communities sampled within a site. A taxon was recorded as present at a site if it was detected in at least one sample from that site. Bacterial pools therefore represent the observed bacterial inventory at each site, independent of host identity. Individual bacterial communities were treated as realizations of this site-level inventory. Additional details, including the leave-one-out implementation and statistical considerations for pairwise data, are provided in the Supplementary Methods.
+
+**Site-level pool realization metrics**
+
+To quantify deviation of individual bacterial communities from the site-level species pool, Sørensen dissimilarity (βsor) and its turnover (βsim) and nestedness-resultant (βsne) components were calculated using pairwise decomposition. Deviation from the pool was quantified by comparing each community to the site-level species pool while excluding the focal community from the pool definition. Pool realization metrics were incorporated into pairwise analyses by assigning each community’s βsor, βsim, and βsne values to sample pairs and representing contrasts as absolute differences between paired communities.
+
+**Fungal community dispersion**
+
+Variation in fungal community dispersion was quantified using distance-to-centroid measures derived from fungal beta-diversity. Dispersion was computed at the sample level, and absolute differences in dispersion between paired samples were used as predictors capturing differences in within-state fungal heterogeneity.
+
+**Statistical analyses and model structure**
+
+Linear models were fitted with bacterial beta-diversity components as response variables. For each bacterial response (βsor, βsim, βsne), baseline models included fungal compositional dissimilarity, a matched bacterial pool realization contrast, fungal dispersion differences, and host-pair identity. Analyses were conducted at the level of pairwise sample comparisons, with site-level quantities treated as contextual attributes rather than independent response variables.
+
+To evaluate correspondence between fungal and bacterial beta-diversity components, we fit a planned 3×3 set of models in which each bacterial response was modeled separately as a function of each fungal beta-diversity component (βsor, βsim, βsne), while holding the remaining baseline predictors constant.
+
+**Residualized state models**
+
+To isolate effects of fungal state independent of compositional, host-associated, and availability-related constraints, bacterial beta-diversity responses were residualized with respect to fungal compositional dissimilarity, bacterial pool realization contrasts, fungal dispersion differences, and host-pair identity. Residuals from these baseline models represent variation in bacterial beta-diversity not attributable to these factors.
+
+Fungal state effects were evaluated by modeling residual bacterial beta-diversity as a function of fungal state, using both symmetric state pairings and directional state contrasts. Residual-model R² was used to quantify the fraction of remaining variance attributable to fungal state. For completeness, we also fit full models including fungal state directly alongside all baseline predictors to confirm consistency with residualized analyses and to compare symmetric and directional representations of fungal state.
+
+**Directional state contrasts**
+
+Directional hypotheses were evaluated by comparing models parameterized with directional state contrasts to models using symmetric state pairings. Directional contrasts among fungal state transitions (for example, F1→F3 versus F3→F1) were estimated from fitted models.
+
+[Placeholder: contrast specification and reporting]
+
+## Supplementary Methods
+
+**Construction of site-level species pools and leave-one-out implementation**
+
+Site-level bacterial species pools were defined as the union of taxa observed across all samples collected within a site. To quantify deviation of individual bacterial communities from this inventory without trivial self-inclusion, pool comparisons were implemented using a leave-one-out formulation in which the focal community was excluded from the pool definition prior to calculating beta-diversity components. This approach ensures that pool deviation reflects differences relative to taxa observed elsewhere within the site rather than inclusion of the focal sample in its own reference set.
+
+**Pool realization contrasts**
+
+Pool realization metrics were derived for each community using pairwise beta-diversity decomposition and subsequently incorporated into pairwise analyses as absolute differences between samples. Pool contrasts were matched to the bacterial response component under analysis (βsor, βsim, or βsne). These contrasts encode asymmetry in realization of the locally observed site-level inventory and were treated as constraints rather than focal predictors.
+
+**Fungal dispersion metrics**
+
+Fungal community dispersion was quantified using multivariate dispersion analysis implemented in vegan. Distance-to-centroid values were computed for each fungal community based on fungal beta-diversity, and absolute differences in dispersion between paired samples were used as predictors capturing differences in within-state fungal variability.
+
+**Statistical considerations for pairwise data**
+
+All models were fitted to pairwise sample comparisons, which are not statistically independent due to shared samples across comparisons. Accordingly, inference focused on effect sizes, including baseline model R² and residual-model R² for fungal state effects. Nominal p-values from linear models were not used as primary evidence of effect strength. Dependence-aware approaches, such as permutation at the sample level or clustered variance estimation, would be required for formal hypothesis testing of pairwise effects.
+
+# Code
+
+```{r overview}
+###############################################################################
+# PAIRWISE BETA-DIVERSITY PIPELINE — DESIGN INVARIANTS
+#
+# This pipeline analyzes pairwise beta-diversity (betapart) at the SAMPLE level
+# with SITE-level pool attributes and DIRECTIONAL predictors.
+#
+# -----------------------------
+# CORE DESIGN DECISIONS
+# -----------------------------
+#
+# 1. Beta-diversity distances (β_sor, β_sim, β_sne) are SYMMETRIC by definition.
+#    - d(A, B) == d(B, A)
+#    - Distances NEVER encode directionality.
+#
+# 2. Directionality (A → B vs B → A) is encoded ONLY in PREDICTORS,
+#    not in distances and not in row identity.
+#
+# 3. Statistical inference (lm, MRM, Mantel-style models) is done on
+#    UNIQUE UNORDERED DYADS (one triangle).
+#    - This avoids pseudo-replication and inflated degrees of freedom.
+#
+# 4. Directional hypotheses (e.g. Fungal cluster F1 → F3 vs F3 → F1)
+#    are tested by:
+#      - directional predictor variables (e.g. "F1_F3")
+#      - model comparison or paired contrasts
+#
+# 5. Site-level pool beta-diversity is:
+#    - symmetric
+#    - defined on UNORDERED site pairs
+#    - treated as an ATTRIBUTE of sample–sample pairs
+#
+# 6. X16S_ID != SampleID.
+#    - Bacterial beta-diversity is ALWAYS mapped to SampleID
+#      before merging with fungal data or metadata.
+#
+# -----------------------------
+# CONSEQUENCES
+# -----------------------------
+#
+# - NO full N × N expansions unless strictly necessary.
+# - NO ordering (pmin/pmax) on identity columns (Sample1, Sample2).
+# - ALL ordering is explicit and used ONLY for lookup keys.
+#
+# If any of these assumptions are violated, STOP and refactor —
+# do not patch downstream.
+##############################################################################
+```
+
+```{r directionality, echo=FALSE, eval=FALSE}
+# The correct way to encode directional fungal cluster effects
+# 
+# Step 1: Keep sample-level direction (don’t reorder)
+  # 
+  # We already have this implicitly:
+  # 
+  # Sample1, Sample2
+  # Clus10_1, Clus10_2
+
+# Step 2: Create a directional cluster pair
+  # 
+  # Do not use pmin/pmax.
+  # 
+  df_resid2 <- df_resid2 %>%
+    mutate(
+      Fungal_cluster_pair_dir =
+        paste(Clus10_1, Clus10_2, sep = "_")
+    )
+  # 
+  # 
+  # Now:
+  # 
+  # F1_F3 ≠ F3_F1
+  # 
+  # direction exists only in the predictor
+
+# Step 3: (Optional but recommended) keep the symmetric version too
+# 
+  # This lets you test whether direction adds anything.
+
+df_resid2 <- df_resid2 %>%
+  mutate(
+    Fungal_cluster_pair_sym =
+      paste(pmin(Clus10_1, Clus10_2),
+            pmax(Clus10_1, Clus10_2),
+            sep = "_")
+  )
+
+
+# Modeling strategy that actually makes sense
+
+# Model 1: symmetric effect only
+m_sym <- lm(
+  Bac_beta_sim_resid ~ Fungal_cluster_pair_sym,
+  data = df_resid2
+)
+
+# Model 2: directional effect
+m_dir <- lm(
+  Bac_beta_sim_resid ~ Fungal_cluster_pair_dir,
+  data = df_resid2
+)
+
+# Compare them
+anova(m_sym, m_dir)
+
+# This answers:
+
+# Does allowing F1→F3 to differ from F3→F1 improve model fit?
+
+
+
+# Interpreting contrasts like F1→F3 vs F3→F1
+
+# Once you fit m_dir, you can do:
+
+emmeans::emmeans(m_dir, ~ Fungal_cluster_pair_dir)
+
+# Or explicitly:
+
+emmeans::contrast(
+  emmeans(m_dir, ~ Fungal_cluster_pair_dir),
+  method = list("F1_F3 vs F3_F1" = c(0, 1, -1, rep(0, ...)))
+)
+
+
+# (Exact contrast vector depends on factor ordering.)
+
+# One very important caveat (statistical, not coding)
+# Because:
+# (A,B) and (B,A) share the same response value,
+# but have different predictors,
+# you are reusing the same distance twice.
+# This means:
+# coefficients are interpretable,
+# SEs are optimistic unless you account for dyadic dependence.
+
+
+# Practical fix
+# 
+# At minimum:
+# treat results as exploratory, or
+# cluster SEs by unordered dyad, or
+# test directionality via paired contrasts (preferred).
+# 
+# A paired test approach:
+
+df_dir_pairs <- df_resid2 %>%
+  mutate(
+    dyad = paste(pmin(Sample1, Sample2),
+                 pmax(Sample1, Sample2))
+  ) %>%
+  filter(Clus10_1 != Clus10_2)
+
+# wide: one row per dyad
+df_wide <- tidyr::pivot_wider(
+  df_dir_pairs,
+  names_from = Fungal_cluster_pair_dir,
+  values_from = Bac_beta_sim_resid
+)
+
+# Then test F1_F3 - F3_F1 within dyads.
+```
+
+```{r INVARIANTS}
+# INVARIANTS USED THROUGHOUT THIS PIPELINE
+#
+# 1. Beta-diversity distances are SYMMETRIC.
+#    -> Distances are never directional.
+#
+# 2. Directionality (A→B vs B→A) lives ONLY in predictors
+#    (e.g. fungal cluster transitions).
+#
+# 3. Statistical inference is done on UNIQUE UNORDERED DYADS
+#    (one triangle), unless explicitly stated otherwise.
+#
+# 4. Directional predictors are tested by paired contrasts
+#    or by models that compare A→B vs B→A within the same dyad.
+#
+# 5. X16S_ID != SampleID, so bacterial data are mapped BEFORE joining.
+
+```
+
+```{r load-diss}
+# Load all relevant dissimilarity matrices
+fun_beta_sor <- betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sor
+fun_beta_sim <- betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sim
+fun_beta_sne <- betapart_results[["Fun"]][["all"]][["pairwise"]]$beta.sne
+
+bac_beta_sor <- betapart_results[["Bac"]][["all"]][["pairwise"]]$beta.sor
+bac_beta_sim <- betapart_results[["Bac"]][["all"]][["pairwise"]]$beta.sim
+bac_beta_sne <- betapart_results[["Bac"]][["all"]][["pairwise"]]$beta.sne
+```
+
+```{r build-fungal-beta-diversity}
+# Convert fungal beta matrices to long form
+# Keep ONE row per unordered sample pair
+# (Var1 < Var2 defines the triangle)
+
+df_fun_beta <- as.data.frame(as.table(as.matrix(fun_beta_sor))) %>%
+  dplyr::filter(as.character(Var1) < as.character(Var2)) %>%
+  dplyr::rename(
+    Sample1 = Var1,
+    Sample2 = Var2,
+    Fun_beta_sor = Freq
+  ) %>%
+  dplyr::left_join(
+    as.data.frame(as.table(as.matrix(fun_beta_sim))) %>%
+      dplyr::filter(as.character(Var1) < as.character(Var2)) %>%
+      dplyr::rename(
+        Sample1 = Var1,
+        Sample2 = Var2,
+        Fun_beta_sim = Freq
+      ),
+    by = c("Sample1", "Sample2")
+  ) %>%
+  dplyr::left_join(
+    as.data.frame(as.table(as.matrix(fun_beta_sne))) %>%
+      dplyr::filter(as.character(Var1) < as.character(Var2)) %>%
+      dplyr::rename(
+        Sample1 = Var1,
+        Sample2 = Var2,
+        Fun_beta_sne = Freq
+      ),
+    by = c("Sample1", "Sample2")
+  )
+
+```
+
+```{r build-bacterial-beta-diversity}
+# map X16S → SampleID first
+bac_id_map <- sd %>%
+  dplyr::select(SampleID, X16S_ID)
+
+# Helper to convert bacterial matrices into SampleID space
+build_bac_beta <- function(bac_mat, value_name, id_map) {
+  as.data.frame(as.table(as.matrix(bac_mat))) %>%
+    dplyr::filter(as.character(Var1) < as.character(Var2)) %>%
+    dplyr::rename(X1 = Var1, X2 = Var2, !!value_name := Freq) %>%
+    dplyr::left_join(id_map, by = c("X1" = "X16S_ID")) %>%
+    dplyr::rename(Sample1 = SampleID) %>%
+    dplyr::left_join(id_map, by = c("X2" = "X16S_ID")) %>%
+    dplyr::rename(Sample2 = SampleID) %>%
+    dplyr::select(Sample1, Sample2, !!value_name)
+}
+
+bac_sor_df <- build_bac_beta(bac_beta_sor, "Bac_beta_sor", bac_id_map)
+bac_sim_df <- build_bac_beta(bac_beta_sim, "Bac_beta_sim", bac_id_map)
+bac_sne_df <- build_bac_beta(bac_beta_sne, "Bac_beta_sne", bac_id_map)
+
+```
+
+```{r merge-fun-bac-diss}
+# Merge fungal + bacterial beta (still one triangle) 
+  # each row = one dyad
+  # no duplication
+  # still symmetric
+
+df_beta <- df_fun_beta %>%
+  dplyr::inner_join(bac_sor_df, by = c("Sample1", "Sample2")) %>%
+  dplyr::inner_join(bac_sim_df, by = c("Sample1", "Sample2")) %>%
+  dplyr::inner_join(bac_sne_df, by = c("Sample1", "Sample2"))
+
+
+# Assertion / invariant checks
+# A. Sample-level beta invariants
+# --- ASSERT: one row per unordered sample dyad ---
+stopifnot(
+  nrow(df_beta) ==
+    n_distinct(
+      paste(
+        pmin(df_beta$Sample1, df_beta$Sample2),
+        pmax(df_beta$Sample1, df_beta$Sample2)
+      )
+    )
+)
+
+# --- ASSERT: no self-pairs ---
+stopifnot(
+  all(df_beta$Sample1 != df_beta$Sample2)
+)
+
+# If this fails, a problem was introduced:
+  # both triangles, or
+  # self-comparisons
+```
+
+```{r add-metadata}
+# Add sample-level metadata (clusters, site, grass)
+
+df_beta <- df_beta %>%
+  dplyr::left_join(
+    sd %>% dplyr::select(SampleID, Fun_sor_clusters, Site, Grass),
+    by = c("Sample1" = "SampleID")
+  ) %>%
+  dplyr::rename(
+    Clus1 = Fun_sor_clusters,
+    Site1 = Site,
+    Grass1 = Grass
+  ) %>%
+  dplyr::left_join(
+    sd %>% dplyr::select(SampleID, Fun_sor_clusters, Site, Grass),
+    by = c("Sample2" = "SampleID")
+  ) %>%
+  dplyr::rename(
+    Clus2 = Fun_sor_clusters,
+    Site2 = Site,
+    Grass2 = Grass
+  )
+
+# normalize factor handling
+df_beta <- df_beta %>%
+  mutate(
+    Clus1  = as.character(Clus1),
+    Clus2  = as.character(Clus2),
+    Site1  = as.character(Site1),
+    Site2  = as.character(Site2),
+    Grass1 = as.character(Grass1),
+    Grass2 = as.character(Grass2)
+  )
+```
+
+```{r directional-symmetric-predictors}
+# Create directional and symmetric predictors
+  # Directionality exists only in Fungal_cluster_dir.
+  # Distances remain symmetric.
+
+df_beta <- df_beta %>%
+  mutate(
+    # Directional fungal cluster transition
+    Fungal_cluster_dir = paste(Clus1, Clus2, sep = "_"),
+
+    # Symmetric fungal cluster pair
+    Fungal_cluster_sym = paste(
+      pmin(as.character(Clus1), as.character(Clus2)),
+      pmax(as.character(Clus1), as.character(Clus2)),
+      sep = "_"
+    ),
+
+    # Symmetric site pair
+    Site_pair = paste(
+      pmin(Site1, Site2),
+      pmax(Site1, Site2),
+      sep = "_"
+    ),
+
+    # Symmetric grass pair
+    Grass_pair = paste(
+      pmin(Grass1, Grass2),
+      pmax(Grass1, Grass2),
+      sep = "_"
+    )
+  )
+
+# Assertion / invariant checks
+# A. Sample-level beta invariants
+# --- ASSERT: one row per unordered sample dyad ---
+stopifnot(
+  nrow(df_beta) ==
+    n_distinct(
+      paste(
+        pmin(df_beta$Sample1, df_beta$Sample2),
+        pmax(df_beta$Sample1, df_beta$Sample2)
+      )
+    )
+)
+
+# --- ASSERT: no self-pairs ---
+stopifnot(
+  all(df_beta$Sample1 != df_beta$Sample2)
+)
+
+# If this fails, problem reintroduced:
+  # both triangles, or
+  # self-comparisons
+```
+
+### Interpretation guide (logic for translating selectively in the Discussion)
+
+Large abs(βsne₁ − βsne₂): the two communities differ strongly in how incompletely they realize the site-level inventory; bacterial turnover may plausibly arise from asymmetric filtering or establishment limitation.
+
+Large abs(βsim₁ − βsim₂): the two communities differ in the extent of localized or idiosyncratic recruitment within the site context.
+
+Small abs(βsne) and abs(βsim) combined with large bacterial turnover: differences are unlikely to be explained by availability or realization alone, strengthening inference of identity-level fungal effects.
+
+------------------------------------------------------------------------
+
+**β_sim (turnover / idiosyncrasy)**
+
+Interpretation
+
+How much does this rhizosphere contain taxa not observed in other samples at the same site?
+
+Mechanistically:
+
+-   patchy dispersal
+
+-   rare colonists
+
+-   stochastic recruitment
+
+-   fine-scale microhabitat differentiation
+
+This is not redundancy with dispersion:
+
+-   dispersion = spread of samples relative to centroid
+
+-   β_sim_LOO = directional deviation of one sample relative to the observed site inventory
+
+------------------------------------------------------------------------
+
+If you observe…
+
+**A. abs(βsne~pool1~ − βsne~pool2~) is large**
+
+**Interpretation:**
+
+The two communities differ strongly in how completely they realize the site-level inventory
+
+One community is substantially more filtered or dispersal-limited relative to what is locally observed
+
+Differences in bacterial turnover could plausibly arise from asymmetric realization alone
+
+If fungal identity effects persist after controlling for this:
+
+fungal states structure bacterial turnover beyond simple filtering intensity
+
+**B. abs(βsim~pool1~ − βsim~pool2~) is large**
+
+**Interpretation:**
+
+-   The two communities differ in the extent of localized or idiosyncratic recruitment relative to other communities at the same site
+-   This captures patchy recruitment or rare taxa within the site context, not external novelty
+-   If fungal identity effects persist:
+    -   fungal states influence bacterial assembly in ways not reducible to localized stochasticity or patchiness
+
+**C. Both abs(β~sne~) and abs(β~sim~) are small, but bacterial turnover is large**
+
+**Interpretation:**
+
+-   The two communities are similarly constrained by local availability and realization
+-   Differences in bacterial turnover are unlikely to be explained by pool structure alone
+-   Strong support for identity-level fungal effects
+-   This is the strongest case for BFI argument.
+
+**D. Pool-realization terms explain most variation; fungal identity weakens**
+
+**Interpretation:**
+
+-   Local availability and realization dominate bacterial assembly
+-   Fungal identity effects may be secondary or conditional
+-   This is still biologically interpretable and defensible.
+
+------------------------------------------------------------------------
+
+```{r bac-regional-species-pool-v2, cache=TRUE}
+# Add site-level bacterial pool beta
+
+# Convert to long format with site info
+bac_df <- as.data.frame(decostand(phylo2vegan_OTU(Bac_wholecommunity), method = "pa"))
+bac_df$SampleID <- rownames(bac_df)
+
+bac_df <- left_join(bac_df, as.data.frame(phylo2vegan_sd(Bac_wholecommunity)), by = "SampleID")
+
+sample_meta <- phylo2vegan_sd(Bac_wholecommunity) 
+
+bac_otu_df <- as.data.frame(phylo2vegan_OTU(Bac_wholecommunity)) 
+bac_otu_df$SampleID <- as.character(rep(nrow(bac_otu_df)))
+bac_otu_df$SampleID <- rownames(bac_otu_df)
+
+bac_otu_df[ , setdiff(names(bac_otu_df), "SampleID")] <- lapply(
+  bac_otu_df[ , setdiff(names(bac_otu_df), "SampleID")],
+  function(x) as.numeric(x > 0)
+)
+
+# Join with full sample metadata
+bac_otu_meta <- dplyr::left_join(bac_otu_df, sample_meta, by = "SampleID")
+
+
+# Identify OTU columns 
+otu_cols <- bac_otu_meta %>%
+  dplyr::select(where(is.numeric)) %>%
+  names()
+
+
+# Function: leave-one-out pool β for one site
+# This returns one row per sample with βsor / βsim / βsne
+# relative to the site pool excluding that sample.
+library(betapart)
+
+compute_site_LOO_pool_beta <- function(df_site, otu_cols) {
+
+  results <- lapply(seq_len(nrow(df_site)), function(i) {
+
+    focal_sample <- df_site$SampleID[i]
+
+    # focal assemblage (force PA, force NA -> 0)
+    focal_vec <- as.numeric(df_site[i, otu_cols, drop = TRUE] > 0)
+    focal_vec[is.na(focal_vec)] <- 0
+    names(focal_vec) <- otu_cols
+
+    # leave-one-out pool (union of others, force PA)
+    pool_vec <- as.numeric(
+      colSums(df_site[-i, otu_cols, drop = FALSE] > 0, na.rm = TRUE) > 0
+    )
+    names(pool_vec) <- otu_cols
+
+    # combine into PA matrix
+    comp_mat <- rbind(
+      SAMPLE = focal_vec,
+      POOL   = pool_vec
+    )
+
+    comp_mat <- as.data.frame(comp_mat)
+
+    # final guarantee
+    stopifnot(
+      all(as.vector(as.matrix(comp_mat)) %in% c(0, 1))
+    )
+
+    # Sørensen partitioning
+    beta <- betapart::beta.pair(
+      comp_mat,
+      index.family = "sorensen"
+    )
+
+    tibble::tibble(
+      SampleID = focal_sample,
+      Bac_pool_sor_LOO = as.numeric(beta$beta.sor),
+      Bac_pool_sim_LOO = as.numeric(beta$beta.sim),
+      Bac_pool_sne_LOO = as.numeric(beta$beta.sne)
+    )
+  })
+
+  dplyr::bind_rows(results)
+}
+
+
+
+
+# Apply per site
+bac_pool_LOO <- bac_otu_meta %>%
+  dplyr::group_by(Site) %>%
+  dplyr::group_modify(~ compute_site_LOO_pool_beta(.x, otu_cols)) %>%
+  dplyr::ungroup()
+
+# Sanity check:
+stopifnot(
+  nrow(bac_pool_LOO) == nrow(bac_otu_meta),
+  !any(is.na(bac_pool_LOO$Bac_pool_sor_LOO)),
+  !any(is.na(bac_pool_LOO$Bac_pool_sim_LOO)),
+  !any(is.na(bac_pool_LOO$Bac_pool_sne_LOO))
+)
+
+summary(bac_pool_LOO$Bac_pool_sim_LOO)
+summary(bac_pool_LOO$Bac_pool_sne_LOO)
+summary(bac_pool_LOO$Bac_pool_sor_LOO)
+
+
+all.equal(
+  bac_pool_LOO$Bac_pool_sor_LOO,
+  bac_pool_LOO$Bac_pool_sim_LOO + bac_pool_LOO$Bac_pool_sne_LOO
+)
+
+stopifnot(
+  nrow(bac_pool_LOO) == nrow(bac_otu_meta),
+  !any(is.na(bac_pool_LOO))
+)
+
+# Expected behavior:
+# βsne generally > 0
+# βsim often small but non-zero
+# βsor = βsim + βsne
+
+# Attach ITS IDs to bac_pool_LOO using X16S_ID
+bac_pool_LOO <- bac_pool_LOO %>%
+  dplyr::left_join(
+    sd %>% dplyr::select(SampleID, X16S_ID),
+    by = c("SampleID" = "X16S_ID")
+  )
+
+# Attach LOO pool values to pairwise dataframe
+df_beta_pool <- df_beta %>%
+  dplyr::left_join(
+    bac_pool_LOO,
+    by = c("Sample1" = "SampleID.y")
+  ) %>%
+  dplyr::rename(
+    Bac_pool_sor_1 = Bac_pool_sor_LOO,
+    Bac_pool_sim_1 = Bac_pool_sim_LOO,
+    Bac_pool_sne_1 = Bac_pool_sne_LOO
+  ) %>%
+  dplyr::left_join(
+    bac_pool_LOO,
+    by = c("Sample2" = "SampleID.y")
+  ) %>%
+  dplyr::rename(
+    Bac_pool_sor_2 = Bac_pool_sor_LOO,
+    Bac_pool_sim_2 = Bac_pool_sim_LOO,
+    Bac_pool_sne_2 = Bac_pool_sne_LOO
+  )
+
+df_beta_pool <- df_beta_pool %>%
+  dplyr::select(
+    -Site.x, -Site.y,
+    -SampleID.x, -SampleID.y
+  )
+
+# Define pairwise pool-realization contrasts (to use in models)
+df_beta_pool <- df_beta_pool %>%
+  dplyr::mutate(
+    Bac_pool_sor_diff = abs(Bac_pool_sor_1 - Bac_pool_sor_2),
+    Bac_pool_sim_diff = abs(Bac_pool_sim_1 - Bac_pool_sim_2),
+    Bac_pool_sne_diff = abs(Bac_pool_sne_1 - Bac_pool_sne_2)
+  )
+
+# Final sanity checks (strongly recommended)
+stopifnot(
+  !any(is.na(df_beta_pool$Bac_pool_sor_diff)),
+  !any(is.na(df_beta_pool$Bac_pool_sim_diff)),
+  !any(is.na(df_beta_pool$Bac_pool_sne_diff))
+)
+
+# df_beta_pool has:
+# A site-level availability context, defined as the observed inventory at that site
+# A per-sample realization of that context via LOO βsor / βsim / βsne
+# A pairwise contrast capturing asymmetry in realization between two samples
+# So in regression:
+# Bac_pool_sne_diff controls for differences in under-realization / filtering
+# Bac_pool_sim_diff controls for differences in localized or idiosyncratic recruitment
+```
+
+```{r add-fungal-dispersion, cache=TRUE}
+# 1. Compute fungal beta diversity matrix  
+# 2. Map sample-to-cluster info 
+# Ensure you have a vector like: 
+fun_cluster_vector <- sample_data(Fun_wholecommunity)$Fun_sor_clusters # or use df_beta$Fungal_cluster 
+
+# 3. Run betadisper 
+Fun_sor_clus_disp <- betadisper(fun_beta_sor, group = fun_cluster_vector) 
+
+# 4. Test for dispersion differences among fungal clusters 
+# anova(Fun_sor_clus_disp) 
+
+# Extract per-sample distances 
+df_disp_fun <- data.frame( SampleID = names(Fun_sor_clus_disp$distances), Sample_dispersion = Fun_sor_clus_disp$distances )
+
+# Add fungal dispersion (symmetric)
+df_beta_pool_disp <- df_beta_pool %>%
+  dplyr::left_join(df_disp_fun, by = c("Sample1" = "SampleID")) %>%
+  dplyr::rename(Fun_disp_1 = Sample_dispersion) %>%
+  dplyr::left_join(df_disp_fun, by = c("Sample2" = "SampleID")) %>%
+  dplyr::rename(Fun_disp_2 = Sample_dispersion) %>%
+  mutate(
+    Fungal_dispersion_diff = abs(Fun_disp_1 - Fun_disp_2)
+  )
+
+
+
+# Assertion / invariant checks
+
+
+# Directional predictor sanity
+# --- ASSERT: directional fungal transitions exist ---
+stopifnot(
+  any(df_beta_pool_disp$Fungal_cluster_dir !=
+        paste(df_beta_pool_disp$Clus2, df_beta_pool_disp$Clus1, sep = "_"))
+)
+
+# --- ASSERT: symmetric and directional predictors differ ---
+stopifnot(
+  any(df_beta_pool_disp$Fungal_cluster_dir != df_beta_pool_disp$Fungal_cluster_sym)
+)
+
+# If this fails:
+# directionality was collapsed somewhere
+# or the predictor was built incorrectly
+
+
+# Optional: one-line “panic button”
+  # 
+  # When debugging:
+  # glimpse(df_beta)
+  # 
+  # You should always see:
+  # Sample1, Sample2 → identity
+  # Fungal_cluster_dir → directional
+  # Fungal_cluster_sym → symmetric
+  # Site_pair → symmetric lookup
+  # Bac_beta_* → responses
+  # Bac_pool_* → attributes
+  # 
+  # If any of those roles blur, stop.
+stopifnot(
+  any(df_beta_pool_disp$Fungal_cluster_dir !=
+        paste(df_beta_pool_disp$Clus2, df_beta_pool_disp$Clus1, sep = "_"))
+)
+which(names(df_beta_pool_disp) == "")
+
+# directional‐predictor
+stopifnot(
+  "Fungal_cluster_dir" %in% names(df_beta_pool_disp),
+  "Fungal_cluster_sym" %in% names(df_beta_pool_disp),
+  "Clus1" %in% names(df_beta_pool_disp),
+  "Clus2" %in% names(df_beta_pool_disp)
+)
+```
+
+```{r include=FALSE, eval=FALSE}
+# Modeling: directional contrasts
+# Symmetric baseline
+
+m_sym <- lm(
+  Bac_beta_sim ~ Fungal_cluster_sym + Bac_pool_sim + Fungal_dispersion_diff,
+  data = df_beta
+)
+
+# Directional test
+m_dir <- lm(
+  Bac_beta_sim ~ Fungal_cluster_dir + Bac_pool_sim + Fungal_dispersion_diff,
+  data = df_beta
+)
+
+# Does direction matter?
+anova(m_sym, m_dir)
+
+# Directional contrasts
+library(emmeans)
+
+emmeans(m_dir, ~ Fungal_cluster_dir)
+
+# Example explicit contrast
+emmeans::contrast(
+  emmeans(m_dir, ~ Fungal_cluster_dir),
+  method = list("F1_F3 vs F3_F1" = c(0, 1, -1, rep(0, ...)))
+)
+
+```
+
+# Regressions
+
+```{r}
+# library(dplyr)
+
+# start from your joined table (rename if needed)
+dat <- df_beta_pool_disp %>%
+  mutate(
+    across(c(Sample1, Sample2, Site1, Site2, Grass_pair,
+             Fungal_cluster_dir, Fungal_cluster_sym), as.character)
+  )
+
+```
+
+## Collinearity
+
+```{r, results='hide', cache=TRUE}
+num_pred <- dat %>%
+  select(
+    Fun_beta_sor, Fun_beta_sim, Fun_beta_sne,
+    Bac_pool_sor_diff, Bac_pool_sim_diff, Bac_pool_sne_diff,
+    Fungal_dispersion_diff
+  ) %>%
+  na.omit()
+
+cor_mat <- cor(num_pred, method = "pearson")
+round(cor_mat, 2)
+# in the same model, dont have Fun_beta_sim and Fun_beta_sor, Bac_pool_sor_diff and Bac_pool_sne_diff
+
+# VIF
+library(car)
+
+vif_screen <- lm(
+  Bac_beta_sim ~ Fun_beta_sim + Bac_pool_sim_diff + Fungal_dispersion_diff,
+  data = dat
+)
+car::vif(vif_screen)
+
+vif_screen2 <- lm(
+  Bac_beta_sor ~ Fun_beta_sor + Bac_pool_sor_diff + Fungal_dispersion_diff,
+  data = dat
+)
+car::vif(vif_screen2)
+```
+
+## Summary 3x3 table
+
+-   `base_R2` tells you how much is explained by constraints + chosen fungal metric.
+-   `state_R2` is the identity signal after residualization (directly comparable across the 9 cells).
+-   `fungal_beta_est/p` describes which fungal component aligns with the bacterial response in the baseline.
+
+Table X. Summary of regression results from the 3×3 cross-component analysis relating bacterial and fungal β-diversity components. Each row corresponds to a bacterial response component (βsor, βsim, βsne), and each column corresponds to a fungal predictor component (βsor, βsim, βsne). For each combination, the baseline model included the fungal β-diversity component, a matched bacterial pool-realization contrast, fungal dispersion differences, and host-pair identity. Residuals from these baseline models were then regressed on fungal state to quantify identity-level effects independent of compositional, availability, dispersion, and host constraints. Reported values include baseline model R², residual-model R² for fungal state (fraction of remaining variance explained by state), and selected coefficient estimates from baseline models. Residual-model R² values are interpreted as measures of association strength rather than formal hypothesis tests due to non-independence of pairwise comparisons. **Residual state R² values are not additive with baseline R² values and represent the proportion of variance remaining after baseline constraints are accounted for.**
+
+Column definitions: Baseline R² and adjusted R² correspond to the baseline constraint model including fungal β-diversity, matched bacterial pool-realization contrasts, fungal dispersion differences, and host-pair identity. Residual state R² corresponds to the R² of the residualized state-only model and represents the fraction of variance remaining after baseline constraints that is attributable to fungal state. Fungal β coefficients and pool contrast coefficients are taken from the baseline models. State F, degrees of freedom (df₁, df₂), and p-values correspond to the overall F-test of the residualized state model and are reported for completeness.
+
+Alt/shorter legend: Table X. Results of the 3×3 cross-component regression analysis relating bacterial (rows) and fungal (columns) β-diversity components. Baseline models included fungal β-diversity, matched bacterial pool-realization contrasts, fungal dispersion differences, and host-pair identity. Residual-model R² values quantify variance in bacterial β-diversity remaining after baseline constraints that is attributable to fungal state.
+
+```{r, cache=TRUE}
+library(dplyr)
+library(broom)
+
+# dat is your analysis dataframe with:
+# Bac_beta_sor/sim/sne
+# Fun_beta_sor/sim/sne
+# Bac_pool_sor_diff/sim_diff/sne_diff
+# Grass_pair
+# Fungal_dispersion_diff
+# Fungal_cluster_dir
+
+bac_responses <- c("sor", "sim", "sne")
+fun_preds     <- c("sor", "sim", "sne")
+
+out <- list()
+
+for (b in bac_responses) {
+  for (f in fun_preds) {
+
+    y <- paste0("Bac_beta_", b)
+    x <- paste0("Fun_beta_", f)
+    pool <- paste0("Bac_pool_", b, "_diff")
+
+    # baseline constraints model (no state)
+    form_base <- as.formula(
+      paste(y, "~", x, "+", pool, "+ Fungal_dispersion_diff + Grass_pair")
+    )
+
+    m_base <- lm(form_base, data = dat)
+
+    # residuals for state test
+    dat_sub <- dat %>%
+      filter(complete.cases(.[, all.vars(form_base)])) %>%
+      mutate(resid_y = resid(m_base))
+
+    # state test on residuals (directional)
+    m_state <- lm(resid_y ~ Fungal_cluster_dir, data = dat_sub)
+
+    out[[paste(b, f, sep = "_")]] <- tibble(
+      Bac_response = b,
+      Fun_predictor = f,
+
+      n = nrow(dat_sub),
+
+      base_R2 = summary(m_base)$r.squared,
+      base_adjR2 = summary(m_base)$adj.r.squared,
+
+      # incremental variance explained by state on residuals
+      state_R2 = summary(m_state)$r.squared,
+
+      # overall significance of state term
+      state_F = unname(summary(m_state)$fstatistic["value"]),
+      state_df1 = unname(summary(m_state)$fstatistic["numdf"]),
+      state_df2 = unname(summary(m_state)$fstatistic["dendf"]),
+      state_p = pf(
+        summary(m_state)$fstatistic["value"],
+        summary(m_state)$fstatistic["numdf"],
+        summary(m_state)$fstatistic["dendf"],
+        lower.tail = FALSE
+      ),
+
+      # fungal beta coefficient in baseline model (effect direction/magnitude)
+      fungal_beta_est = coef(summary(m_base))[x, "Estimate"],
+      fungal_beta_p   = coef(summary(m_base))[x, "Pr(>|t|)"],
+
+      pool_est = coef(summary(m_base))[pool, "Estimate"],
+      pool_p   = coef(summary(m_base))[pool, "Pr(>|t|)"]
+    )
+  }
+}
+
+grid_results <- bind_rows(out) %>%
+  arrange(
+    factor(Bac_response, levels = c("sor", "sim", "sne")),
+    factor(Fun_predictor, levels = c("sor", "sim", "sne"))
+  )
+
+# grid_results
+```
+
+```{r grid-table}
+library(knitr)
+library(kableExtra)
+
+grid_results %>%
+  kable(col.names = c(
+      "Bacterial β",
+      "Fungal β",
+      "n",
+      "Baseline R²",
+      "Baseline adj. R²",
+      "Residual state R²",
+      "State F",
+      "df₁",
+      "df₂",
+      "State p",
+      "Fungal β coef.",
+      "Fungal β p",
+      "Pool coef.",
+      "Pool p"
+    ),
+    digits = 3,
+    caption = "Summary of 3×3 cross-component regression results"
+  ) %>%
+  scroll_box(width = "100%", height = "300px")
+```
+
+**Column Names**
+
+Baseline R² / adj. R² - R² of the baseline constraint model (no state)
+
+Residual state R² - R² from the residualized state-only model - fraction of variance remaining after constraints explained by fungal state
+
+Fungal β coefficient (fungal_beta_est) - coefficient of the fungal β-diversity predictor in the baseline model
+
+Pool contrast coefficient (Pool contrast coefficient) - coefficient of the matched bacterial pool-realization contrast in the baseline model
+
+State F / df / p - overall F-test for the residualized state model - reported for completeness, not primary inference
+
+\
+
+## Baseline constraint models (no residuals) {.tabset}
+
+Model Roles:
+
+-   **Full models** = secondary confirmation and directionality check
+-   Residualized models = primary inference for magnitude of state effect (next section)
+
+\
+
+### Fun_sor {.tabset}
+
+**Fungal total dissimilarity**
+
+This establishes whether:\
+- fungal total dissimilarity alone matters,\
+- pool constraint adds explanatory power,\
+- dispersion adds explanatory power beyond those\
+
+Stepwise build-up:\
+
+#### y = F~diss~+pool+F~disp~
+
+Response: Bac_beta_sor\
+Predictors: Fun_beta_sor, Bac_pool_sor_diff, Fungal_dispersion_diff\
+
+```{r}
+m0_Bsor_Fsor <- lm(
+  Bac_beta_sor ~ Fun_beta_sor,
+  data = dat
+)
+
+m1_Bsor_Fsor <- lm(
+  Bac_beta_sor ~ Fun_beta_sor + Bac_pool_sor_diff,
+  data = dat
+)
+
+m2_Bsor_Fsor <- lm(
+  Bac_beta_sor ~ Fun_beta_sor + Bac_pool_sor_diff + Fungal_dispersion_diff,
+  data = dat
+)
+
+
+# summary(m0_sor)
+
+anova(m0_Bsor_Fsor, m1_Bsor_Fsor, m2_Bsor_Fsor)  # nested comparison
+summary(m2_Bsor_Fsor)
+```
+
+#### F~diss~+pool+F~disp~+Host
+
+**Adding Grass_pair**
+
+```{r}
+base_Bsor_Fsor <- lm(
+  Bac_beta_sor ~ Fun_beta_sor + Bac_pool_sor_diff +
+    Fungal_dispersion_diff + Grass_pair,
+  data = dat
+)
+
+anova(m2_Bsor_Fsor, base_Bsor_Fsor)
+summary(base_Bsor_Fsor)
+```
+
+#### F~diss~+pool+F~disp~+Host+F~state~
+
+**Full models: Adding Fungal state identity (no residuals)**
+
+These are full models where:
+
+i)  fungal compositional dissorilarity,
+ii) pool-realization contrast,
+iii) fungal dispersion,
+iv) host pairing,
+
+are treated as covariates sorultaneously, and (v) fungal state is added as an additional predictor (with directional and symmetric variations).\
+
+They test whether fungal state explains additional variation when included directly alongside all other covariates.\
+
+Purpose:
+
+-   show consistency
+-   demonstrate that state is not an artifact of residualization
+-   confirm directionality vs symmetry via AIC
+
+But they are not ideal for quantifying state effect size, because variance attribution is shared among correlated predictors (see residualized models).
+
+```{r}
+m4_Bsor_Fsor_sym <- lm(
+  Bac_beta_sor ~ Fun_beta_sor + Bac_pool_sor_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_sym,
+  data = dat
+)
+
+m4_Bsor_Fsor_dir <- lm(
+  Bac_beta_sor ~ Fun_beta_sor + Bac_pool_sor_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_dir,
+  data = dat
+)
+
+#
+m4_Bsim_Fsor_sym <- lm(
+  Bac_beta_sim ~ Fun_beta_sor + Bac_pool_sor_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_sym,
+  data = dat
+)
+
+
+m4_Bsim_Fsor_dir <- lm(
+  Bac_beta_sim ~ Fun_beta_sor + Bac_pool_sor_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_dir,
+  data = dat
+)
+
+#
+m4_Bsne_Fsor_sym <- lm(
+  Bac_beta_sne ~ Fun_beta_sor + Bac_pool_sor_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_sym,
+  data = dat
+)
+
+m4_Bsne_Fsor_dir <- lm(
+  Bac_beta_sne ~ Fun_beta_sor + Bac_pool_sor_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_dir,
+  data = dat
+)
+
+anova(base_Bsor_Fsor, m4_Bsor_Fsor_sym)
+anova(base_Bsor_Fsor, m4_Bsor_Fsor_dir)
+
+AIC(base_Bsor_Fsor, m4_Bsor_Fsor_sym, m4_Bsor_Fsor_dir)
+summary(m4_Bsor_Fsor_dir)
+```
+
+------------------------------------------------------------------------
+
+### Fun_sim {.tabset}
+
+**Fungal turnover-resultant dissimilarity**
+
+This establishes whether:\
+- fungal total turnover alone matters,\
+- pool constraint adds explanatory power,\
+- dispersion adds explanatory power beyond those\
+
+Stepwise build-up:\
+
+#### y = F~diss~+pool+F~disp~
+
+Response: Bac_beta_sim\
+Predictors: Fun_beta_sim, Bac_pool_sim_diff, Fungal_dispersion_diff\
+
+```{r}
+m0_Bsim_Fsim <- lm(
+  Bac_beta_sim ~ Fun_beta_sim,
+  data = dat
+)
+
+m1_Bsim_Fsim <- lm(
+  Bac_beta_sim ~ Fun_beta_sim + Bac_pool_sim_diff,
+  data = dat
+)
+
+m2_Bsim_Fsim <- lm(
+  Bac_beta_sim ~ Fun_beta_sim + Bac_pool_sim_diff + Fungal_dispersion_diff,
+  data = dat
+)
+
+
+# summary(m0_sim)
+
+anova(m0_Bsim_Fsim, m1_Bsim_Fsim, m2_Bsim_Fsim)  # nested comparison
+summary(m2_Bsim_Fsim)
+```
+
+#### F~diss~+pool+F~disp~+Host
+
+**Adding Grass_pair**
+
+```{r}
+base_Bsim_Fsim <- lm(
+  Bac_beta_sim ~ Fun_beta_sim + Bac_pool_sim_diff +
+    Fungal_dispersion_diff + Grass_pair,
+  data = dat
+)
+
+anova(m2_Bsim_Fsim, base_Bsim_Fsim)
+summary(base_Bsim_Fsim)
+```
+
+#### F~diss~+pool+F~disp~+Host+F~state~
+
+**Full models: Adding Fungal state identity (no residuals)**
+
+These are full models where:
+
+i)  fungal compositional dissimilarity,
+ii) pool-realization contrast,
+iii) fungal dispersion,
+iv) host pairing,
+
+are treated as covariates simultaneously, and (v) fungal state is added as an additional predictor (with directional and symmetric variations).\
+
+They test whether fungal state explains additional variation when included directly alongside all other covariates.\
+
+Purpose:
+
+-   show consistency
+-   demonstrate that state is not an artifact of residualization
+-   confirm directionality vs symmetry via AIC
+
+But they are not ideal for quantifying state effect size, because variance attribution is shared among correlated predictors (see residualized models).
+
+```{r}
+#
+m4_Bsor_Fsim_sym <- lm(
+  Bac_beta_sor ~ Fun_beta_sim + Bac_pool_sim_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_sym,
+  data = dat
+)
+
+m4_Bsor_Fsim_dir <- lm(
+  Bac_beta_sor ~ Fun_beta_sim + Bac_pool_sim_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_dir,
+  data = dat
+)
+
+#
+m4_Bsim_Fsim_sym <- lm(
+  Bac_beta_sim ~ Fun_beta_sim + Bac_pool_sim_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_sym,
+  data = dat
+)
+
+m4_Bsim_Fsim_dir <- lm(
+  Bac_beta_sim ~ Fun_beta_sim + Bac_pool_sim_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_dir,
+  data = dat
+)
+
+#
+m4_Bsne_Fsim_sym <- lm(
+  Bac_beta_sne ~ Fun_beta_sim + Bac_pool_sim_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_sym,
+  data = dat
+)
+
+m4_Bsne_Fsim_dir <- lm(
+  Bac_beta_sne ~ Fun_beta_sim + Bac_pool_sim_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_dir,
+  data = dat
+)
+
+anova(base_Bsim_Fsim, m4_Bsim_Fsim_sym)
+anova(base_Bsim_Fsim, m4_Bsim_Fsim_dir)
+
+AIC(base_Bsim_Fsim, m4_Bsim_Fsim_sym, m4_Bsim_Fsim_dir)
+summary(m4_Bsim_Fsim_dir)
+```
+
+------------------------------------------------------------------------
+
+### Fun_sne {.tabset}
+
+**Fungal nestedness-resultant dissneilarity**
+
+This establishes whether:\
+- fungal total nestedness alone matters,\
+- pool constraint adds explanatory power,\
+- dispersion adds explanatory power beyond those\
+
+Stepwise build-up:\
+
+#### y = F~diss~+pool+F~disp~
+
+Response: Bac_beta_sne\
+Predictors: Fun_beta_sne, Bac_pool_sne_diff, Fungal_dispersion_diff\
+
+```{r}
+m0_Bsne_Fsne <- lm(
+  Bac_beta_sne ~ Fun_beta_sne,
+  data = dat
+)
+
+m1_Bsne_Fsne <- lm(
+  Bac_beta_sne ~ Fun_beta_sne + Bac_pool_sne_diff,
+  data = dat
+)
+
+m2_Bsne_Fsne <- lm(
+  Bac_beta_sne ~ Fun_beta_sne + Bac_pool_sne_diff + Fungal_dispersion_diff,
+  data = dat
+)
+
+
+# summary(m0_sne)
+
+anova(m0_Bsne_Fsne, m1_Bsne_Fsne, m2_Bsne_Fsne)  # nested comparison
+summary(m2_Bsne_Fsne)
+```
+
+#### F~diss~+pool+F~disp~+Host
+
+**Adding Grass_pair**
+
+```{r}
+base_Bsne_Fsne <- lm(
+  Bac_beta_sne ~ Fun_beta_sne + Bac_pool_sne_diff +
+    Fungal_dispersion_diff + Grass_pair,
+  data = dat
+)
+
+anova(m2_Bsne_Fsne, base_Bsne_Fsne)
+summary(base_Bsne_Fsne)
+```
+
+#### F~diss~+pool+F~disp~+Host+F~state~
+
+**Full models: Adding Fungal state identity (no residuals)**
+
+These are full models where:
+
+i)  fungal compositional dissneilarity,
+ii) pool-realization contrast,
+iii) fungal dispersion,
+iv) host pairing,
+
+are treated as covariates simultaneously, and (v) fungal state is added as an additional predictor (with directional and symmetric variations).\
+
+They test whether fungal state explains additional variation when included directly alongside all other covariates.\
+
+Purpose:
+
+-   show consistency
+-   demonstrate that state is not an artifact of residualization
+-   confirm directionality vs symmetry via AIC
+
+But they are not ideal for quantifying state effect size, because variance attribution is shared among correlated predictors (see residualized models).
+
+```{r}
+#
+m4_Bsor_Fsne_sym <- lm(
+  Bac_beta_sor ~ Fun_beta_sne + Bac_pool_sne_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_sym,
+  data = dat
+)
+
+m4_Bsor_Fsne_dir <- lm(
+  Bac_beta_sor ~ Fun_beta_sne + Bac_pool_sne_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_dir,
+  data = dat
+)
+
+#
+m4_Bsim_Fsne_sym <- lm(
+  Bac_beta_sim ~ Fun_beta_sne + Bac_pool_sne_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_sym,
+  data = dat
+)
+
+m4_Bsim_Fsne_dir <- lm(
+  Bac_beta_sim ~ Fun_beta_sne + Bac_pool_sne_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_dir,
+  data = dat
+)
+
+#
+m4_Bsne_Fsne_sym <- lm(
+  Bac_beta_sne ~ Fun_beta_sne + Bac_pool_sne_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_sym,
+  data = dat
+)
+
+m4_Bsne_Fsne_dir <- lm(
+  Bac_beta_sne ~ Fun_beta_sne + Bac_pool_sne_diff + Fungal_dispersion_diff + Grass_pair +
+    Fungal_cluster_dir,
+  data = dat
+)
+anova(base_Bsne_Fsne, m4_Bsne_Fsne_sym)
+anova(base_Bsne_Fsne, m4_Bsne_Fsne_dir)
+
+AIC(base_Bsne_Fsne, m4_Bsne_Fsne_sym, m4_Bsne_Fsne_dir)
+summary(m4_Bsne_Fsne_dir)
+```
+
+------------------------------------------------------------------------
+
+## Residualized state models (residuals from constraint-only models) {.tabset}
+
+**Isolating Fungal State via residualized models**
+
+-   All non-state structure is removed *first*
+-   State explains variance in what remains
+-   $R^2$ is: fraction of residual variance attributable to state
+
+These are ideal for:
+
+-   isolating the identity-level signal
+-   comparing effect sizes across the 3×3 grid
+-   avoiding collinearity
+
+Model Roles:
+
+-   Full models = secondary confirmation and directionality check (previous section)
+    -   Bac_beta_sor ~ fungal β + pool + dispersion + host + fungal state
+    -   compare symmetric vs directional via AIC
+    -   confirm that state effects persist without residualization
+    -   not used to quantify state effect size
+
+-   **Residualized models** = primary inference for magnitude of state effect
+    -   residuals(base_Bsor_Fsor) ~ fungal state
+    -   state effect size = residual R²
+    -   used in the 3×3 grid table (state_R2)
+    -   used for all main Results claims about state
+
+### y = Bac~sor~ {.tabset .tabset-pills}
+
+#### F~sor~
+
+```{r}
+# base (formula in baseline models)
+par(mfrow = c(2, 2))
+plot(base_Bsor_Fsor)
+mtext("Base: Bsor_Fsor", outer = TRUE, line = -1)
+
+# resid
+dat_Bsor_Fsor_resid <- dat %>%
+  mutate(Bsor_Fsor_resid = resid(base_Bsor_Fsor))
+
+hist(dat_Bsor_Fsor_resid$Bsor_Fsor_resid,
+     breaks = 50,
+     main = "Residuals: Bac_beta_sor | constraints")
+
+# symmetric
+mr_Bsor_Fsor_sym <- lm(Bsor_Fsor_resid ~ Fungal_cluster_sym, data = dat_Bsor_Fsor_resid)
+
+# directional
+mr_Bsor_Fsor_dir <- lm(Bsor_Fsor_resid ~ Fungal_cluster_dir, data = dat_Bsor_Fsor_resid)
+
+# Report residual R² (fraction of remaining variance explained by state/state effect size)
+summary(mr_Bsor_Fsor_sym)$r.squared
+summary(mr_Bsor_Fsor_dir)$r.squared
+
+# AIC - Lower AIC = better description of residual structure
+# answers: Does directionality add explanatory structure beyond unordered state pairing?
+AIC(mr_Bsor_Fsor_sym, mr_Bsor_Fsor_dir)
+```
+
+#### F~sim~
+
+```{r}
+# base (formula in baseline models)
+
+base_Bsor_Fsim <- lm(
+  Bac_beta_sor ~ Fun_beta_sim + Bac_pool_sim_diff +
+    Fungal_dispersion_diff + Grass_pair,
+  data = dat
+)
+
+par(mfrow = c(2, 2))
+plot(base_Bsor_Fsim)
+mtext("Base: Bsor_Fsim", outer = TRUE, line = -1)
+
+# resid
+dat_Bsor_Fsim_resid <- dat %>%
+  mutate(Bsor_Fsim_resid = resid(base_Bsor_Fsim))
+
+hist(dat_Bsor_Fsim_resid$Bsor_Fsim_resid,
+     breaks = 50,
+     main = "Residuals: Bac_beta_sor | constraints")
+
+# symmetric
+mr_Bsor_Fsim_sym <- lm(Bsor_Fsim_resid ~ Fungal_cluster_sym, data = dat_Bsor_Fsim_resid)
+
+# directional
+mr_Bsor_Fsim_dir <- lm(Bsor_Fsim_resid ~ Fungal_cluster_dir, data = dat_Bsor_Fsim_resid)
+
+# Report residual R² (fraction of remaining variance explained by state/state effect size)
+summary(mr_Bsor_Fsim_sym)$r.squared
+summary(mr_Bsor_Fsim_dir)$r.squared
+
+# AIC - Lower AIC = better description of residual structure
+# answers: Does directionality add explanatory structure beyond unordered state pairing?
+AIC(mr_Bsor_Fsim_sym, mr_Bsor_Fsim_dir)
+```
+
+#### F~sne~
+
+```{r}
+# base (formula in baseline models)
+base_Bsor_Fsne <- lm(
+  Bac_beta_sor ~ Fun_beta_sne + Bac_pool_sim_diff +
+    Fungal_dispersion_diff + Grass_pair,
+  data = dat
+)
+
+par(mfrow = c(2, 2))
+plot(base_Bsor_Fsne)
+mtext("Base: Bsor_Fsne", outer = TRUE, line = -1)
+
+# resid
+dat_Bsor_Fsne_resid <- dat %>%
+  mutate(Bsor_Fsne_resid = resid(base_Bsor_Fsne))
+
+hist(dat_Bsor_Fsne_resid$Bsor_Fsne_resid,
+     breaks = 50,
+     main = "Residuals: Bac_beta_sor | constraints")
+
+# symmetric
+mr_Bsor_Fsne_sym <- lm(Bsor_Fsne_resid ~ Fungal_cluster_sym, data = dat_Bsor_Fsne_resid)
+
+# directional
+mr_Bsor_Fsne_dir <- lm(Bsor_Fsne_resid ~ Fungal_cluster_dir, data = dat_Bsor_Fsne_resid)
+
+# Report residual R² (fraction of remaining variance explained by state/state effect size)
+summary(mr_Bsor_Fsne_sym)$r.squared
+summary(mr_Bsor_Fsne_dir)$r.squared
+
+# AIC - Lower AIC = better description of residual structure
+# answers: Does directionality add explanatory structure beyond unordered state pairing?
+AIC(mr_Bsor_Fsne_sym, mr_Bsor_Fsne_dir)
+```
+
+### y = Bac~sim~ {.tabset .tabset-pills}
+
+#### F~sor~
+
+```{r}
+# base (formula in baseline models)
+base_Bsim_Fsor <- lm(
+  Bac_beta_sim ~ Fun_beta_sor + Bac_pool_sim_diff +
+    Fungal_dispersion_diff + Grass_pair,
+  data = dat
+)
+
+# resid
+dat_Bsim_Fsor_resid <- dat %>%
+  mutate(Bsim_Fsor_resid = resid(base_Bsim_Fsor))
+
+hist(dat_Bsim_Fsor_resid$Bsim_Fsor_resid,
+     breaks = 50,
+     main = "Residuals: Bac_beta_sim | constraints")
+
+# symmetric
+mr_Bsim_Fsor_sym <- lm(Bsim_Fsor_resid ~ Fungal_cluster_sym, data = dat_Bsim_Fsor_resid)
+
+# directional
+mr_Bsim_Fsor_dir <- lm(Bsim_Fsor_resid ~ Fungal_cluster_dir, data = dat_Bsim_Fsor_resid)
+
+# Report residual R² (fraction of remaining variance explained by state/state effect size)
+summary(mr_Bsim_Fsor_sym)$r.squared
+summary(mr_Bsim_Fsor_dir)$r.squared
+
+# AIC - Lower AIC = better description of residual structure
+# answers: Does directionality add explanatory structure beyond unordered state pairing?
+AIC(mr_Bsim_Fsor_sym, mr_Bsim_Fsor_dir)
+```
+
+#### F~sim~
+
+```{r}
+# base (formula in baseline models)
+
+# resid
+dat_Bsim_Fsim_resid <- dat %>%
+  mutate(Bsim_Fsim_resid = resid(base_Bsim_Fsim))
+
+hist(dat_Bsim_Fsim_resid$Bsim_Fsim_resid,
+     breaks = 50,
+     main = "Residuals: Bac_beta_sim | constraints")
+
+# symmetric
+mr_Bsim_Fsim_sym <- lm(Bsim_Fsim_resid ~ Fungal_cluster_sym, data = dat_Bsim_Fsim_resid)
+
+# directional
+mr_Bsim_Fsim_dir <- lm(Bsim_Fsim_resid ~ Fungal_cluster_dir, data = dat_Bsim_Fsim_resid)
+
+# Report residual R² (fraction of remaining variance explained by state/state effect size)
+summary(mr_Bsim_Fsim_sym)$r.squared
+summary(mr_Bsim_Fsim_dir)$r.squared
+
+# AIC - Lower AIC = better description of residual structure
+# answers: Does directionality add explanatory structure beyond unordered state pairing?
+AIC(mr_Bsim_Fsim_sym, mr_Bsim_Fsim_dir)
+```
+
+#### F~sne~
+
+```{r}
+# base (formula in baseline models)
+base_Bsim_Fsne <- lm(
+  Bac_beta_sim ~ Fun_beta_sne + Bac_pool_sim_diff +
+    Fungal_dispersion_diff + Grass_pair,
+  data = dat
+)
+
+# resid
+dat_Bsim_Fsne_resid <- dat %>%
+  mutate(Bsim_Fsne_resid = resid(base_Bsim_Fsne))
+
+hist(dat_Bsim_Fsne_resid$Bsim_Fsne_resid,
+     breaks = 50,
+     main = "Residuals: Bac_beta_sim | constraints")
+
+# symmetric
+mr_Bsim_Fsne_sym <- lm(Bsim_Fsne_resid ~ Fungal_cluster_sym, data = dat_Bsim_Fsne_resid)
+
+# directional
+mr_Bsim_Fsne_dir <- lm(Bsim_Fsne_resid ~ Fungal_cluster_dir, data = dat_Bsim_Fsne_resid)
+
+# Report residual R² (fraction of remaining variance explained by state/state effect size)
+summary(mr_Bsim_Fsne_sym)$r.squared
+summary(mr_Bsim_Fsne_dir)$r.squared
+
+# AIC - Lower AIC = better description of residual structure
+# answers: Does directionality add explanatory structure beyond unordered state pairing?
+AIC(mr_Bsim_Fsne_sym, mr_Bsim_Fsne_dir)
+```
+
+### y = Bac~sne~ {.tabset .tabset-pills}
+
+#### F~sor~
+
+```{r}
+# base (formula in baseline models)
+base_Bsne_Fsor <- lm(
+  Bac_beta_sne ~ Fun_beta_sor + Bac_pool_sim_diff +
+    Fungal_dispersion_diff + Grass_pair,
+  data = dat
+)
+
+# resid
+dat_Bsne_Fsor_resid <- dat %>%
+  mutate(Bsne_Fsor_resid = resid(base_Bsne_Fsor))
+
+hist(dat_Bsne_Fsor_resid$Bsne_Fsor_resid,
+     breaks = 50,
+     main = "Residuals: Bac_beta_sne | constraints")
+
+# symmetric
+mr_Bsne_Fsor_sym <- lm(Bsne_Fsor_resid ~ Fungal_cluster_sym, data = dat_Bsne_Fsor_resid)
+
+# directional
+mr_Bsne_Fsor_dir <- lm(Bsne_Fsor_resid ~ Fungal_cluster_dir, data = dat_Bsne_Fsor_resid)
+
+# Report residual R² (fraction of remaining variance explained by state/state effect size)
+summary(mr_Bsne_Fsor_sym)$r.squared
+summary(mr_Bsne_Fsor_dir)$r.squared
+
+# AIC - Lower AIC = better description of residual structure
+# answers: Does directionality add explanatory structure beyond unordered state pairing?
+AIC(mr_Bsne_Fsor_sym, mr_Bsne_Fsor_dir)
+```
+
+#### F~sim~
+
+```{r}
+# base (formula in baseline models)
+base_Bsne_Fsim <- lm(
+  Bac_beta_sne ~ Fun_beta_sim + Bac_pool_sim_diff +
+    Fungal_dispersion_diff + Grass_pair,
+  data = dat
+)
+
+# resid
+dat_Bsne_Fsim_resid <- dat %>%
+  mutate(Bsne_Fsim_resid = resid(base_Bsne_Fsim))
+
+hist(dat_Bsne_Fsim_resid$Bsne_Fsim_resid,
+     breaks = 50,
+     main = "Residuals: Bac_beta_sne | constraints")
+
+# symmetric
+mr_Bsne_Fsim_sym <- lm(Bsne_Fsim_resid ~ Fungal_cluster_sym, data = dat_Bsne_Fsim_resid)
+
+# directional
+mr_Bsne_Fsim_dir <- lm(Bsne_Fsim_resid ~ Fungal_cluster_dir, data = dat_Bsne_Fsim_resid)
+
+# Report residual R² (fraction of remaining variance explained by state/state effect size)
+summary(mr_Bsne_Fsim_sym)$r.squared
+summary(mr_Bsne_Fsim_dir)$r.squared
+
+# AIC - Lower AIC = better description of residual structure
+# answers: Does directionality add explanatory structure beyond unordered state pairing?
+AIC(mr_Bsne_Fsim_sym, mr_Bsne_Fsim_dir)
+```
+
+#### F~sne~
+
+```{r}
+# base (formula in baseline models)
+
+# resid
+dat_Bsne_Fsne_resid <- dat %>%
+  mutate(Bsne_Fsne_resid = resid(base_Bsne_Fsne))
+
+hist(dat_Bsne_Fsne_resid$Bsne_Fsne_resid,
+     breaks = 50,
+     main = "Residuals: Bac_beta_sne | constraints")
+
+# symmetric
+mr_Bsne_Fsne_sym <- lm(Bsne_Fsne_resid ~ Fungal_cluster_sym, data = dat_Bsne_Fsne_resid)
+
+# directional
+mr_Bsne_Fsne_dir <- lm(Bsne_Fsne_resid ~ Fungal_cluster_dir, data = dat_Bsne_Fsne_resid)
+
+# Report residual R² (fraction of remaining variance explained by state/state effect size)
+summary(mr_Bsne_Fsne_sym)$r.squared
+summary(mr_Bsne_Fsne_dir)$r.squared
+
+# AIC - Lower AIC = better description of residual structure
+# answers: Does directionality add explanatory structure beyond unordered state pairing?
+AIC(mr_Bsne_Fsne_sym, mr_Bsne_Fsne_dir)
+```
+
+
+---
+
+# Tables
+
+## Table X. Residualized state effects table (main text)
+
+```{r}
+## --------------------------------------------
+## Table: Residualized fungal state effects
+## (Primary inference for Storyline #3)
+## --------------------------------------------
+
+extract_state_R2 <- function(model, bac_resp, fun_pred, state_type) {
+  data.frame(
+    Bacterial_response = bac_resp,
+    Fungal_predictor   = fun_pred,
+    State_encoding     = state_type,
+    Residual_state_R2  = summary(model)$r.squared,
+    n                 = nobs(model)
+  )
+}
+
+state_R2_table <- rbind(
+  extract_state_R2(mr_Bsor_Fsor_dir, "βsor", "βsor", "directional"),
+  extract_state_R2(mr_Bsor_Fsim_dir, "βsor", "βsim", "directional"),
+  extract_state_R2(mr_Bsor_Fsne_dir, "βsor", "βsne", "directional"),
+
+  extract_state_R2(mr_Bsim_Fsor_dir, "βsim", "βsor", "directional"),
+  extract_state_R2(mr_Bsim_Fsim_dir, "βsim", "βsim", "directional"),
+  extract_state_R2(mr_Bsim_Fsne_dir, "βsim", "βsne", "directional"),
+
+  extract_state_R2(mr_Bsne_Fsor_dir, "βsne", "βsor", "directional"),
+  extract_state_R2(mr_Bsne_Fsim_dir, "βsne", "βsim", "directional"),
+  extract_state_R2(mr_Bsne_Fsne_dir, "βsne", "βsne", "directional")
+)
+
+state_R2_table
+
+```
+
+Residual_state_R2 = proportion of variance remaining after baseline constraints explained by fungal state.
+
+
+## Baseline explanatory power (main text or SI)
+
+```{r}
+## --------------------------------------------
+## Table: Baseline model explanatory power
+## (Context for residualization)
+## --------------------------------------------
+
+extract_base_R2 <- function(model, bac_resp, fun_pred) {
+  data.frame(
+    Bacterial_response = bac_resp,
+    Fungal_predictor   = fun_pred,
+    Base_R2            = summary(model)$r.squared,
+    Base_adj_R2        = summary(model)$adj.r.squared
+  )
+}
+
+base_R2_table <- rbind(
+  extract_base_R2(base_Bsor_Fsor, "βsor", "βsor"),
+  extract_base_R2(base_Bsor_Fsim, "βsor", "βsim"),
+  extract_base_R2(base_Bsor_Fsne, "βsor", "βsne"),
+
+  extract_base_R2(base_Bsim_Fsor, "βsim", "βsor"),
+  extract_base_R2(base_Bsim_Fsim, "βsim", "βsim"),
+  extract_base_R2(base_Bsim_Fsne, "βsim", "βsne"),
+
+  extract_base_R2(base_Bsne_Fsor, "βsne", "βsor"),
+  extract_base_R2(base_Bsne_Fsim, "βsne", "βsim"),
+  extract_base_R2(base_Bsne_Fsne, "βsne", "βsne")
+)
+
+base_R2_table
+
+```
+
+
+## Directionality test via AIC (FULL MODELS)
+
+Why this table exists
+
+-   Tests whether directional state contrasts outperform symmetric ones.
+-   Uses full models on original response scale.
+
+```{r}
+## --------------------------------------------
+## Table: Directional vs symmetric state encoding
+## (Model selection via AIC; full models)
+## --------------------------------------------
+
+extract_AIC_dir_sym <- function(sym_model, dir_model, bac_resp, fun_pred) {
+  aic <- AIC(sym_model, dir_model)
+  data.frame(
+    Bacterial_response = bac_resp,
+    Fungal_predictor   = fun_pred,
+    AIC_symmetric      = aic$AIC[1],
+    AIC_directional    = aic$AIC[2],
+    Delta_AIC          = aic$AIC[2] - aic$AIC[1]
+  )
+}
+
+AIC_table <- rbind(
+  extract_AIC_dir_sym(m4_Bsor_Fsor_sym, m4_Bsor_Fsor_dir, "βsor", "βsor"),
+  extract_AIC_dir_sym(m4_Bsor_Fsim_sym, m4_Bsor_Fsim_dir, "βsor", "βsim"),
+  extract_AIC_dir_sym(m4_Bsor_Fsne_sym, m4_Bsor_Fsne_dir, "βsor", "βsne"),
+
+  extract_AIC_dir_sym(m4_Bsim_Fsor_sym, m4_Bsim_Fsor_dir, "βsim", "βsor"),
+  extract_AIC_dir_sym(m4_Bsim_Fsim_sym, m4_Bsim_Fsim_dir, "βsim", "βsim"),
+  extract_AIC_dir_sym(m4_Bsim_Fsne_sym, m4_Bsim_Fsne_dir, "βsim", "βsne"),
+
+  extract_AIC_dir_sym(m4_Bsne_Fsor_sym, m4_Bsne_Fsor_dir, "βsne", "βsor"),
+  extract_AIC_dir_sym(m4_Bsne_Fsim_sym, m4_Bsne_Fsim_dir, "βsne", "βsim"),
+  extract_AIC_dir_sym(m4_Bsne_Fsne_sym, m4_Bsne_Fsne_dir, "βsne", "βsne")
+)
+
+AIC_table
+
+```
+
+\
+\
+
+## Full-model confirmation (state included directly; SI)
+
+Why this table exists
+
+-   Confirms that state effects persist without residualization.
+-   Not used for effect size
+
+```{r}
+## --------------------------------------------
+## Table: Full model confirmation
+## (State included with all covariates)
+## --------------------------------------------
+
+extract_full_model_info <- function(base_model, full_model, bac_resp, fun_pred) {
+  data.frame(
+    Bacterial_response = bac_resp,
+    Fungal_predictor   = fun_pred,
+    Base_R2            = summary(base_model)$r.squared,
+    Full_R2            = summary(full_model)$r.squared,
+    Delta_R2           = summary(full_model)$r.squared - summary(base_model)$r.squared,
+    Delta_AIC          = AIC(full_model) - AIC(base_model)
+  )
+}
+
+full_model_table <- rbind(
+  extract_full_model_info(base_Bsim_Fsim, m4_Bsim_Fsim_dir, "βsim", "βsim"),
+  extract_full_model_info(base_Bsor_Fsor, m4_Bsor_Fsor_dir, "βsor", "βsor"),
+  extract_full_model_info(base_Bsne_Fsne, m4_Bsne_Fsne_dir, "βsne", "βsne")
+)
+
+full_model_table
+
+```
+
+\
+\
+
+## Placeholder for contrasts (SI)
+
+```{r}
+## --------------------------------------------
+## Placeholder: Directional state contrasts
+## (to be filled once contrasts are finalized)
+## --------------------------------------------
+
+# library(emmeans)
+# emm <- emmeans(m4_Bsim_Fsim_dir, ~ Fungal_cluster_dir)
+# contrast(emm, method = "pairwise", adjust = "fdr")
+
+```
+
+---
+
+
+## Interpretating Models
+
+1.  **Primary analysis should be framed around βsor (total bacterial dissimilarity), because:**
+
+-   It is the most interpretable, least assumption-laden response
+-   Reviewers expect it as the “headline” beta-diversity result
+-   It answers the basic question:
+    -   Does fungal state matter for bacterial community differences at all?
+
+**Model structure**
+
+Residualize everything except state:
+
+Bac_beta_sor \~ Fun_beta_sor + Bac_pool_sor_diff + Fungal_dispersion_diff + Grass_pair
+
+Then test:
+
+residuals \~ Fungal_cluster_dir
+
+**Relevance**
+
+If fungal state does not explain residual βsor:
+
+-   there is no reason to parse mechanisms
+-   splitting into sim/sne looks like fishing
+
+If fungal state does explain residual βsor:
+
+-   we’ve established a real, identity-level effect
+-   now it is justified to ask what kind of beta-diversity is changing
+
+2.  **(Secondary analysis): split into sim vs sne**
+
+Only after Step 1 succeeds do we branch.
+
+**Why this split is meaningful for your system**
+
+Given your design:
+
+βsim (turnover):
+
+-   replacement of taxa
+-   sensitivity to who colonizes vs who doesn’t
+-   aligns with identity-driven restructuring, competitive replacement, or functional niche switching
+
+βsne (nestedness):
+
+-   differential realization of available taxa
+-   aligns with filtering, constraint, or incomplete colonization
+-   tightly linked to your pool-realization logic
+-   we may see stronger effects in βsne or βsor than in βsim and that is informative
+
+**Step 3 (How to interpret outcomes)**
+
+Here’s the interpretation map that reviewers will implicitly use.
+
+**Case A: Strong effect in βsor, driven mostly by βsne**
+
+Likely outcome
+
+*Interpretation:*
+
+-   Fungal states primarily alter how completely bacterial communities realize the available inventory
+-   Identity effects operate through filtering or constraint, not wholesale replacement
+-   Consistent with fungal states acting as selective environments rather than replacement engines
+-   This fits extremely well with:
+    -   pool-realization framework
+    -   dispersion control
+    -   host-independent identity effects
+-   This is a strong mechanistic result.
+
+**Case B: Strong effect in βsim**
+
+*Interpretation:*
+
+-   Fungal states promote taxon replacement
+-   Different fungal states actively restructure bacterial membership
+-   Suggests strong functional differentiation among fungal clusters
+-   This is flashier, but not required for a strong story.
+
+**Case C: βsor significant, βsim and βsne weaker individually**
+
+*Interpretation:*
+
+-   Effects are distributed across mechanisms
+-   Identity acts on multiple axes simultaneously
+-   We report βsor as primary, sim/sne as complementary
+-   Still acceptable.
+
+**Case D: No effect in βsor, effects only in sim or sne**
+
+This is the weakest case, and unexpected.
+
+*Interpretation becomes harder:*
+
+-   reviewers may ask why total dissimilarity doesn’t change
+-   you would need to argue fine-scale redistribution without net change
+-   You probably won’t be here given what you’ve already seen.
+
+**Where NOT to split (important)**
+
+Do not:
+
+-   start with sim/sne as primary responses
+-   residualize sim and sne before establishing a βsor effect
+-   frame sim/sne as independent hypotheses
+
+That invites the criticism:
+
+-   “Why decompose if the total effect isn’t established?”
+
+**How to present this cleanly in a paper Results structure (recommended)**
+
+1.  **Primary result**
+    -   Fungal state explains residual bacterial βsor after controlling for composition, pool realization, dispersion, and host.
+2.  **Mechanistic decomposition**
+    -   Partitioning βsor reveals that identity effects are concentrated in βsne (and/or βsim).
+3.  **Interpretation**
+    -   Identity-level fungal effects act primarily by constraining or reshaping bacterial realization of the site-level pool.
+
+**One sentence summary**
+
+*We therefore treated βsor as the primary response to establish identity-level effects, and subsequently examined βsim and βsne to infer the mechanisms through which fungal community state structures bacterial communities.*
+
+That sentence alone justifies the sequencing.
+
+**Bottom line**
+
+-   Start with βsor
+-   Split into βsim / βsne only after βsor shows an effect
+-   Expect βsne to carry much of the signal given your design — and that is a strength
+
+### Interpretation of the 9-way design
+
+Cross-component mapping that asks:
+
+> **Which component of fungal β-diversity best aligns with (and potentially explains) each component of bacterial β-diversity, once pool realization contrasts, host identity, and fungal dispersion differences are controlled?**
+
+So the 3×3 grid is about mechanistic correspondence across β components
+
+-   When the response is **bacterial βsim**, we’re asking whether bacterial turnover is best associated with:
+    -   fungal total difference (βsor),
+    -   fungal turnover (βsim),
+    -   or fungal nestedness (βsne),
+    -   **holding constant** the bacterial pool realization term matched to turnover (your `Bac_pool_sim_diff`) and other constraints.
+-   Likewise for **bacterial βsne**: testing whether bacterial nestedness aligns more with fungal nestedness vs fungal turnover vs total.
+
+**Table**
+
+-   `state_R2` → R² of residual state model
+
+If we keep `state_p`, it should be clearly framed as:
+
+-   “all state models were significant at p \< 0.001”
+
+-   not as a differentiating metric across cells
+
+# To-Do
+
+[] Hide stepwise and diagnostic chunks
+
+[] Display grid_results once in main Results
+
+[] Decide which bacterial responses are main vs SI
+
+[] Add SI sections for full models and contrasts
+
+[] Write Results text referring only to Table X and SI refs
+
+Once that’s done -\> finished with Results for this storyline.
+
+# Results and Discussion
+
+## How to keep the narrative clean
+
+**Main text**
+
+-   Residual state effect sizes table (state_R2_table)
+    -   One paragraph interpreting ranges and consistency\
+
+-   One sentence on directionality (from AIC_table)
+
+-   Select one primary fungal predictor per bacterial response (maybe the “matched” one: sor→sor, sim→sim, sne→sne) and present:
+
+    -   baseline model
+    -   residual state test
+    -   key contrasts (directional)
+
+- 
+
+
+------------------------------------------------------------------------
+
+**SI**
+
+Mention full models once, briefly: Including fungal state directly in the full model yielded consistent conclusions…
+
+A. One table: 3×3 grid summary
+
+-   Displayed columns:
+
+    -   Bacterial response
+    -   Fungal predictor
+    -   Baseline R²
+    -   Residual state R²
+    -   Fungal β coefficient, pool coefficient
+
+This table supports all of these statements: fungal β explains some variation, state explains substantial residual variation, pattern holds across β components
+
+B. One short paragraph per bacterial response, each having:
+
+-   point to rows of Table X
+-   state direction and magnitude
+-   avoid model-by-model narration
+-   Full model (m4\*) coefficient tables
+
+    -   summary(m4\_\*)
+    -   anova(base, full)
+    -   AIC(...)
+
+
+
+-   Individual contrast outputs
+
+-   βsim-only analyses if not central
+
+**SI Results: Full models including fungal state**
+
+-   full_model_table
+
+**SI Results: Directional vs symmetric state comparisons**
+
+-   Symmetric vs directional AIC comparisons (AIC_table)
+
+\
+\
+
+------------------------------------------------------------------------
+
+## Storyline 3: Regression models of bacterial β-diversity
+
+Residual-model R² values are summarized separately from the full 3×3 regression grid to emphasize the magnitude of fungal state effects independent of baseline constraints; the complete grid of models and additional variants are provided in the Supplementary Results.
+
+Across all bacterial β-diversity components, host-pair identity and fungal state were dominant predictors in linear models that also included fungal β-diversity, a matched bacterial pool-realization contrast, and fungal dispersion differences. A planned 3×3 design, in which each bacterial response (βsor, βsim, βsne) was evaluated against each fungal β-diversity component (βsor, βsim, βsne), was used to distinguish correspondence between fungal and bacterial β components from state-associated variation not explained by those components.
+
+### Baseline constraints and component correspondence
+
+In baseline constraint models excluding fungal state, fungal β-diversity was consistently associated with bacterial β-diversity, with effect direction depending on the fungal β component. For bacterial βsor, fungal βsor and βsim showed small positive coefficients (0.0380 and 0.0362, with p-values 3.78 × 10⁻⁶³ and 7.43 × 10⁻⁶⁶, respectively), whereas fungal βsne had a negative coefficient (−0.0602; p = 6.56 × 10⁻¹¹). For bacterial βsim, fungal βsor and βsim were again positive (0.0157; p = 2.34 × 10⁻⁹ and 0.0213; p = 3.13 × 10⁻¹⁸), while fungal βsne was strongly negative (−0.143; p = 9.31 × 10⁻⁴²). For bacterial βsne, all fungal predictors were positive, with fungal βsne showing the largest coefficient (0.0860; p = 5.99 × 10⁻⁴²).
+
+Baseline R² values differed by bacterial response component but were stable across fungal predictor choice. For bacterial βsor, baseline R² ranged from 0.217 to 0.221 across fungal β predictors; for bacterial βsim, from 0.143 to 0.145; and for bacterial βsne, from 0.0596 to 0.0615. The limited variation within each bacterial response indicates that fungal βsor and βsim provide similar explanatory content at this level of analysis, whereas fungal βsne contributes distinct but not dominant changes in baseline model fit.
+
+Together, these results indicate correspondence between fungal and bacterial β-diversity components after accounting for host pairing, pool-realization contrasts, and fungal dispersion differences. At the same time, they show that fungal β-diversity alone does not account for a large fraction of bacterial β-diversity, establishing scope for additional structure associated with fungal state.
+
+### Contribution of pool realization and host pairing
+
+Matched pool-realization contrasts were strongly positive in baseline models for bacterial βsor and βsne but near zero for bacterial βsim. Pool coefficients were approximately 0.265–0.271 for bacterial βsor and 0.086–0.092 for bacterial βsne across fungal predictors, whereas coefficients in bacterial βsim models were small. Under this formulation, pool-realization contrasts represent asymmetry in how bacterial communities draw from site-level species pools and are treated as constraints rather than focal drivers.
+
+Host pairing accounted for substantial variation in bacterial βsim. In the stepwise build-up for bacterial βsim, adding host pairing to the baseline constraints model produced a large reduction in residual sum of squares (62.933 on 14 degrees of freedom; F = 632.19; p < 2.2 × 10⁻¹⁶), increasing R² to 0.143 (adjusted R² = 0.1429). Several host-pair coefficients were large relative to continuous predictors, indicating strong host-associated structure in bacterial turnover. Host pairing therefore constitutes a major constraint that must be accounted for when evaluating fungal state effects.
+
+### Fungal state effects beyond baseline constraints
+
+After residualizing bacterial β-diversity responses with respect to fungal β-diversity components, pool-realization contrasts, fungal dispersion differences, and host pairing, fungal state explained a substantial fraction of the remaining variation in all three bacterial components (Table X). Residual-model R² values ranged from 0.246 to 0.258 for bacterial βsor, from 0.210 to 0.214 for bacterial βsim, and from 0.137 to 0.145 for bacterial βsne across the 3×3 design.
+
+Residual state R² values were stable across fungal predictor choice within each bacterial response, despite high collinearity between fungal βsor and βsim and partial orthogonality of fungal βsne. This indicates that fungal state captures structure in bacterial β-diversity that is not absorbed by any single fungal β-diversity component included in the baseline models. State effects were largest for bacterial βsor and βsim, with smaller but still substantial values for bacterial βsne, indicating that fungal state is associated with multiple facets of bacterial compositional variation.
+
+### Integration across β-diversity components and full-model analyses
+
+Results from residualized models were consistent with full models in which fungal state was included directly alongside all baseline covariates. In the bacterial βsim models, inclusion of fungal state increased R² from 0.143 to 0.413 (adjusted R² = 0.412). In these models, coefficients associated with fungal βsim increased in magnitude, pool-realization contrasts became non-negligible, and fungal dispersion effects attenuated. These patterns indicate that fungal state captures a dominant axis of variation overlapping with, but not reducible to, fungal β-diversity, dispersion, and pool-realization effects.
+
+### [Placeholder: Directional state contrast results]
+
+## Global Discussion
+\
+
+## SI Results
+
+-   Alternative metrics (βsim)
+
+-   Non-residualized models
+
+-   Robustness checks
+
+**SI**
+
+Put the full 9-way grid table in SI and stepwise model build up
+
+**Identity-level effects persist after accounting for fungal dispersion**
+
+-   By jointly controlling for fungal compositional dissimilarity, fungal dispersion, and regional bacterial pool heterogeneity (including turnover and nestedness components), we isolate an identity-level effect of fungal community state on bacterial turnover that cannot be explained by distance, variability, or background species availability alone.
+
+In addition to controlling for fungal compositional dissimilarity and regional bacterial pool heterogeneity, we explicitly accounted for within-cluster fungal variability by incorporating fungal community dispersion as a covariate. Fungal dispersion quantifies the extent of internal compositional spread within fungal clusters and captures differences in how heterogeneous or cohesive fungal community states are.
+
+Even after accounting for differences in fungal dispersion, fungal subassemblage identity remained a strong predictor of bacterial beta diversity. This indicates that identity-level effects are not driven solely by differences in within-cluster variability or compositional spread, but instead reflect emergent properties of distinct fungal community states. In other words, bacterial turnover responds not only to how variable fungal communities are internally, but to which fungal community state is present.
+
+The persistence of identity-level effects after controlling for fungal dispersion strengthens the interpretation of fungal clusters as discrete filtering regimes rather than as arbitrary partitions of compositional space. Some fungal states exert consistent structuring effects on bacterial communities despite high internal compositional heterogeneity, whereas others exhibit weaker effects even when compositionally distinct. This reinforces the conclusion that fungal subassemblages function as biologically meaningful community states that shape bacterial assembly beyond compositional distance, background species availability, and internal variability.
+
+
+
+## Methods (alt) {.unlisted .unnumbered .hidden}
+
+### Community data and sample metadata
+
+### Sample-level beta diversity
+
+Pairwise beta diversity among samples was quantified separately for fungal and bacterial communities using Sørensen dissimilarity. For each domain, Sørensen dissimilarity was partitioned into turnover (β_sim) and nestedness-resultant (β_sne) components using the *betapart* package. These quantities represent, respectively, compositional replacement among samples and differences attributable to richness gradients.
+
+All beta-diversity metrics were defined at the sample level, with each observation representing a comparison between two samples. Distances were treated as symmetric measures of compositional dissimilarity.
+
+### Site-level bacterial regional species pools
+
+To characterize broader-scale compositional context, bacterial communities were aggregated to the site level to define regional species pools. A regional species pool was defined as the set of bacterial taxa observed across all samples within a site, representing the potential assemblage available at that location.
+
+Sørensen dissimilarity and its turnover and nestedness components were calculated among site-level regional pools using *betapart*. These site-level pool dissimilarities represent differences in the composition of bacterial species pools among sites and were treated as site-level attributes, subsequently associated with sample-level comparisons based on the sites from which samples were drawn.
+
+### Directional fungal cluster predictors
+
+Fungal communities were classified into discrete clusters based on Sørensen dissimilarity structure. For each pairwise sample comparison, fungal cluster identity was recorded for both samples, allowing the definition of directional fungal cluster transitions (e.g. F1→F3 versus F3→F1). These directional predictors encode asymmetric contrasts in fungal community state between the two samples in a comparison and were used to test whether bacterial beta diversity differed depending on the direction of fungal cluster change.
+
+In addition, a symmetric fungal cluster pairing factor was defined to represent unordered combinations of fungal cluster identities, allowing explicit comparison of directional versus non-directional representations of fungal community similarity.
+
+### Additional predictors
+
+Vegetation type was incorporated as a symmetric pairwise predictor, representing whether two samples shared the same vegetation class or differed in vegetation type. Fungal community dispersion was quantified at the sample level using multivariate dispersion analysis (*vegan*), and the absolute difference in dispersion between samples was used as a predictor capturing differences in within-cluster fungal heterogeneity.
+
+### Statistical analyses
+
+Linear models were used to relate bacterial beta-diversity components to fungal community predictors, site-level bacterial pool dissimilarity, and additional covariates. Models addressed the question of whether bacterial compositional differences among samples were associated with fungal community state, including whether asymmetric fungal cluster transitions explained additional variation beyond symmetric cluster associations. All statistical analyses were conducted at the level of pairwise sample comparisons, with site-level quantities treated as contextual attributes rather than independent response variables.
+
+Directional hypotheses were evaluated by comparing models parameterized with directional fungal cluster transitions to models using symmetric fungal cluster pairings. Estimated marginal means and planned contrasts were computed using *emmeans* to directly compare specific directional transitions (e.g. F1→F3 versus F3→F1).
+
+We evaluated correspondence between fungal and bacterial β-diversity components by fitting a full 3×3 set of models in which each bacterial response (βsor, βsim, βsne) was modeled separately as a function of each fungal component (βsor, βsim, βsne), while matching the bacterial pool-realization contrast to the bacterial response and controlling for host identity and fungal dispersion differences.
+
+#### Residualization and state testing
+
+To evaluate effects of fungal community state independently of compositional, host-associated, and availability-related constraints, we used a residual-based modeling framework. Bacterial $\beta$-diversity responses were first modeled as functions of fungal compositional dissimilarity, bacterial pool-realization contrasts, fungal dispersion differences, and host-pair identity. Residuals from these models represent variation not attributable to these factors and were subsequently modeled as a function of fungal state. This approach allows the magnitude of state-associated effects to be quantified directly as variance explained in the residual response. For completeness, we also report full models including fungal state as an additional predictor, which yield consistent conclusions regarding the presence and relative strength of state effects.
+
+or\
+
+To isolate effects of fungal community state independent of compositional, environmental, and availability constraints, bacterial beta-diversity responses were residualized with respect to fungal compositional dissimilarity, bacterial pool realization contrasts, fungal dispersion, and host identity. Residuals from these baseline models represent variation in bacterial beta diversity not attributable to these factors. Fungal community state effects were then evaluated by modeling residual bacterial beta diversity as a function of fungal cluster identity, allowing assessment of identity-level effects beyond composition, local availability, dispersion, and host context.
+
+For bacterial response Y∈{βsor,βsim,βsne}Y \in {\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\beta\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*{sor},\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\beta{sim}, \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\beta\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*{sne}}Y∈{βsor​,βsim​,βsne​} and fungal predictor X∈{βsor,βsim,βsne}X\* \in {\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\beta{sor}, \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\beta\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*{sim},\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\* \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\beta{sne}}X∈{βsor​,βsim​,βsne​}:
+
+**Baseline (no state)**
+
+Y∼X+pool_diffY+dispersion_diff+Grass_pairY \sim X + \text{pool\_diff}\_Y + \text{dispersion\_diff} + \text{Grass\_pair}Y∼X+pool_diffY​+dispersion_diff+Grass_pair
+
+**State test (on residuals)**
+
+1.  Fit baseline, take residuals
+
+2.  Test:resid(Y)∼Fungal_cluster_dir\text{resid}(Y) \sim \text{Fungal\_cluster\_dir}resid(Y)∼Fungal_cluster_dir
+
+
+## OLD-Storyline 3: regression models of bacterial β-diversity components  {.unlisted .unnumbered .hidden}
+
+To emphasize the magnitude of fungal state effects independent of baseline constraints, we summarize residual-model R2 values separately from the full 3×3 regression grid, which is provided for completeness.
+
+Across all bacterial β-diversity components, host-pair identity and fungal state were the dominant predictors in linear models that also included fungal compositional dissimilarity, a matched bacterial pool-realization contrast, and fungal dispersion differences. The 3×3 design (each bacterial response βsor,βsim,βsne evaluated against each fungal predictor βsor,βsim,βsne) was used to distinguish correspondence between fungal and bacterial β components from state-associated variation not explained by those components.
+
+### 3.1 Baseline constraint models and component correspondence  {.unlisted .unnumbered .hidden}
+
+(covers fungal β associations + pool contrasts + host effects)
+
+In baseline constraints models excluding fungal state, fungal compositional dissimilarity was consistently associated with bacterial dissimilarity, with effect direction depending on the fungal β component. For bacterial βsor, fungal βsor and βsim showed small positive coefficients (0.0380 and 0.0362, with p-values 3.78 × 10⁻⁶³ and 7.43 × 10⁻⁶⁶, respectively), whereas fungal βsne had a negative coefficient (−0.0602; p = 6.56 × 10⁻¹¹). For bacterial βsim, fungal βsor and βsim were again positive (0.0157; p = 2.34 × 10⁻⁹ and 0.0213; p = 3.13 × 10⁻¹⁸, respectively), while fungal βsne was strongly negative (−0.143; p = 9.31 × 10⁻⁴²). For bacterial βsne, all fungal predictors were positive, with fungal βsne showing the largest coefficient (0.0860; p = 5.99 × 10⁻⁴²). These patterns are consistent with a decomposition in which fungal βsne captures an axis of variation distinct from fungal βsor and βsim, which were highly correlated (r = 0.97), whereas βsne was only weakly to moderately correlated with them.
+
+Baseline R² values differed by bacterial response component but were stable across fungal predictor choice. For bacterial βsor, baseline R² ranged from 0.217 to 0.221 across fungal β predictors; for bacterial βsim, from 0.143 to 0.145; and for bacterial βsne, from 0.0596 to 0.0615. The limited variation within each bacterial response indicates that fungal βsor and βsim provide similar explanatory content at this level of analysis, whereas fungal βsne contributes distinct but not dominant changes in baseline model fit.
+
+These baseline associations are appropriately interpreted as component-level correspondence rather than evidence of causal sufficiency. They establish that bacterial dissimilarity covaries with fungal dissimilarity after accounting for host pairing, a matched pool-realization contrast, and fungal dispersion differences, but the coefficients themselves are small relative to the variance explained by other predictors. This constrains claims about fungal compositional distance alone: the models support association, not explanatory completeness.
+
+### 3.2 Fungal state effects on residual bacterial β-diversity  {.unlisted .unnumbered .hidden}
+
+(primary result; residualized models; Table X)
+
+3.3 Directionality of fungal state contrasts
+(AIC-based result; brief; SI reference)
+
+3.4 Relationship to full-model analyses
+(reconciliation with m4 models; short)
+
+3.5 Scope and limitations
+
+
+### Pool-realization contrasts: strong for βsor and βsne, weak for βsim in baseline models  {.unlisted .unnumbered .hidden}
+
+The matched pool-realization contrast was strongly positive in baseline models for bacterial βsor and βsne but near zero for bacterial βsim. Pool coefficients were \~0.265–0.271 for bacterial βsor across fungal predictors, and \~0.086–0.092 for bacterial βsne. By contrast, pool coefficients in bacterial βsim models were small (e.g., -0.00344, -0.00792, -0.00200 in the three fungal-predictor variants). This pattern is consistent with your intended construction: the pool-realization contrast is designed to encode asymmetry in how completely samples draw from a site-defined inventory (operationalized via LOO), which should map more directly onto total dissimilarity and the βsne component than onto pure turnover βsim. The models support that mapping at the level of coefficient magnitude.
+
+Two caveats matter for interpretation. First, because the pool contrast is derived from LOO pool–sample comparisons, it is not an independent “environmental” predictor; it is an operational constraint reflecting local availability/realization. Second, the response is pairwise, so this coefficient describes association at the level of pairwise sample comparisons; it does not by itself localize mechanism to a specific ecological process without additional evidence (e.g., direct colonization limitation metrics, time series, or manipulations).
+
+### Host pairing accounts for substantial variance in bacterial βsim  {.unlisted .unnumbered .hidden}
+
+In the stepwise build-up for bacterial βsim, adding host pairing to the baseline constraints model produced a large reduction in residual sum of squares (62.933 on 14 degrees of freedom; F = 632.19; p \< 2.2 × 10⁻¹⁶), increasing R² to 0.143 (adjusted R² = 0.1429). Several host-pair coefficients were large in magnitude relative to continuous predictors, indicating that host pairing captures substantial systematic structure in bacterial turnover under this model specification.
+
+This result establishes an important constraint on downstream interpretation. Any fungal state effect that persists after controlling for host pairing is not trivially explained by the vegetation categories encoded in the model. At the same time, this does not exclude the possibility that finer-scale host-associated variables, such as host-by-site chemical differences not explicitly represented here, contribute to residual variation. Given the sampling design, in which chemistry was measured at the host-by-site level, this limitation should be borne in mind when interpreting residual effects.
+
+### Fungal state explains a large fraction of residual variation across bacterial β components
+
+(Patterns for turnover-only dissimilarity differed and are reported in SI Results)
+
+After residualizing bacterial β responses on baseline constraints (fungal β, matched pool-realization contrast, fungal dispersion differences, and host pairing), fungal state (`Fungal_cluster_dir`) explained a substantial fraction of remaining variance in all three bacterial components. In the 3×3 grid, `state_R2` ranged:
+
+-   For bacterial βsor: 0.246–0.258 across fungal predictors.
+
+-   For bacterial βsim: 0.210–0.214 across fungal predictors.
+
+-   For bacterial βsne: 0.137–0.145 across fungal predictors.
+
+Two features of this pattern are noteworthy.
+
+1.  **Magnitude and consistency.** State $R^2$ values are large in absolute terms for residual models, and they are stable within each bacterial response across fungal predictor choice. Stability is informative here because fungal βsor and βsim are highly collinear, and fungal βsne is partially orthogonal; yet state $R^2$ remains comparable across these alternatives. The most conservative statement supported by these values is that fungal state captures structure in bacterial β that is not absorbed by any single fungal β component included as a covariate in the baseline.
+
+2.  **Component dependence.** State explained the largest fraction of residual variation for bacterial βsor and βsim, with smaller (but still substantial) values for bacterial βsne. This does not support a claim that state effects are “primarily nestedness-resultant” or “primarily turnover”; instead, it supports a narrower conclusion: fungal state is associated with broad bacterial compositional differences that include both βsim and βsne contributions, with stronger correspondence to total dissimilarity and turnover than to the nestedness-resultant component under this model specification.
+
+> A skeptical reviewer will likely point out that these models are fit on pairwise comparisons that share samples, which violates independence assumptions for standard p-values. That criticism is valid for inference based on nominal p-values. The effect sizes here, however, are expressed as residual-model $R^2$, which remains a descriptive measure of explained variance under the fitted model, though it should be interpreted as association strength rather than a formal test statistic. If you intend to make inferential claims (e.g., “significant” state effects), you will likely need dependence-aware inference (e.g., permutation at the sample level respecting exchangeability constraints, or clustered/robust variance estimates at the sample and/or site level). The current results support the claim that state-associated structure is large and consistent; they do not, on their own, justify fine-grained statements about uncertainty without such adjustments.
+
+### Reconciliation with the single-model build-up you showed for bacterial βsim\beta\_{sim}βsim  {.unlisted .unnumbered .hidden}
+
+The single-track build-up for bacterial βsim is consistent with the 3 × 3 grid summary and provides additional context. In the constraints-only model excluding host, fungal βsim (estimate 0.0268; p \< 2 × 10⁻¹⁶) and fungal dispersion differences (estimate 0.0902; p \< 2 × 10⁻¹⁶) were positive predictors of bacterial βsim, whereas the pool-realization contrast was not supported (estimate −0.0030; p = 0.761). Adding host pairing markedly increased R² to 0.143, and adding fungal state increased R² further to 0.413 (adjusted R² = 0.412).
+
+In the state-inclusive model, the coefficient associated with fungal βsim increased substantially (0.4575), the pool-realization contrast became positive and non-negligible (0.0344; p = 3.35 × 10⁻⁵), and the dispersion term attenuated and was no longer supported (estimate −0.00693; p = 0.134). This shift does not, by itself, indicate a causal mediation structure. Rather, it indicates that fungal state captures a major axis of variation that overlaps with variation previously attributed to fungal dispersion differences and, to a lesser extent, pool asymmetry in the turnover response. The most conservative interpretation is that fungal state functions as a higher-level descriptor of fungal community differences that is not fully summarized by any single continuous metric.
+
+### Implications and limits  {.unlisted .unnumbered .hidden}
+
+The analyses quantify associations between fungal state and bacterial β-diversity after accounting for fungal compositional dissimilarity, host pairing, fungal dispersion, and asymmetry in realization of site-level bacterial species pools. Under this framework, fungal state captures structured variation in bacterial composition that is not explained by continuous β-diversity measures or other modeled constraints. These results describe correspondence among multivariate community patterns and do not estimate causal mechanisms of bacterial community change. In particular, fungal state may integrate multiple unmodeled axes of variation, including functional traits, environmental covariates, or historical contingencies that are not resolved by the present design.
+
+Similarly, differences in the magnitude of residual state R² among β-diversity components indicate that fungal state is associated with multiple aspects of bacterial compositional variation, rather than isolating a single turnover- or nestedness-resultant process. Interpretation is therefore limited to the structure and strength of these associations under the specified models. Because analyses are conducted on pairwise sample comparisons, effect sizes are reported as variance explained and interpreted as descriptive measures of association; formal hypothesis testing would require inference procedures that explicitly account for non-independence among comparisons.
+
+### [Placeholder: Contrast results subsection]  {.unlisted .unnumbered .hidden}
+
+[Insert directional contrast results for `Fungal_cluster_dir` here, including: number of contrasts tested, definition of reference level, effect size distribution, and examples of contrasts with the largest absolute effects. Tie each claim to specific coefficients and confidence intervals, ideally using an estimated-marginal-means framework (emmeans) or planned contrasts, and note how uncertainty was handled given dyadic dependence.]
+
+## Notes  {.unlisted .unnumbered .hidden}
+
+**Testing directionality**
+
+To test contrasts like:
+
+Is Bac β_sim different when fungal cluster = F1 → F3 vs F3 → F1?
+
+we need one of these to be true:
+
+1.  There is a biological ordering (time, source–sink, gradient)
+2.  We define an explicit reference direction
+3.  We encode directional predictors, not directional distances
+
+We do not need asymmetric distances but we do need asymmetric predictors.
+
+## Regional bacterial species pools  {.unlisted .unnumbered .hidden}
+
+### Methods — Site-level species pool and realization metrics  {.unlisted .unnumbered .hidden}
+
+-   pairwise beta decomposition via beta.pair
+
+-   Regional species pools are defined as site-level availability contexts, and pool-realization metrics quantify how individual communities differ from what is observed elsewhere within that context.
+
+-   To represent the set of bacterial taxa potentially available for rhizosphere colonization within each site, we defined a regional species pool at the site level as the union of all bacterial taxa observed across samples collected at that site, irrespective of host identity. This site-level pool reflects the maximal locally observed inventory of taxa under shared dispersal sources and site-level environmental context.
+
+-   Does fungal community identity structure bacterial assembly beyond what is explainable by (i) fungal compositional distance, (ii) local bacterial availability, and (iii) realized filtering within sites?
+
+Regional bacterial species pools were defined at the site level as the set of taxa observed across all bacterial communities sampled within a site. This pool represents the locally observed inventory of taxa potentially available for rhizosphere colonization under shared site-level dispersal sources and environmental context. Individual bacterial communities were treated as realizations of this site-level inventory.
+
+To quantify how strongly each bacterial community deviated from the site-level species pool, Sørensen dissimilarity and its turnover (βsim) and nestedness-resultant (βsne) components were calculated using pairwise decomposition. Deviation from the pool was quantified by comparing each community to the site-level species pool while excluding the focal community from the pool definition. This formulation ensures that deviation reflects differences in how a community realizes the locally observed inventory, rather than trivial inclusion of the community in its own reference set.
+
+Under this definition, βsne quantifies the extent to which a bacterial community under-realizes taxa present in the site-level inventory, consistent with filtering or incomplete establishment of locally available taxa. βsim quantifies taxa present in a focal community that are not observed elsewhere within the same site, capturing localized or idiosyncratic recruitment within the site context. Total deviation from the site-level inventory is represented by βsor.
+
+Species-pool realization metrics were incorporated into pairwise analyses by assigning each community’s βsor, βsim, and βsne values to sample pairs and representing contrasts as absolute differences between paired communities, for example abs(βsim₁ − βsim₂) and abs(βsne₁ − βsne₂). These terms control for differences in how strongly bacterial communities deviate from the locally observed site-level inventory prior to evaluating effects of fungal community structure and other predictors.
+
+**Sample-level beta-diversity**
+
+Pairwise beta-diversity was calculated separately for fungal and bacterial communities using presence–absence data. Sørensen dissimilarity (β_sor) and its turnover (β_sim) and nestedness (β_sne) components were computed for each dataset.
+
+**Pairwise predictors**
+
+Sample-level attributes were assigned to both members of each sample pair, including fungal community cluster membership, site identity, and vegetation attributes. Predictors describing fungal cluster structure were constructed in two ways: (i) symmetric fungal cluster pairs, encoding pairwise combinations of cluster membership, and (ii) ordered cluster transitions (to represent directional contrasts between cluster states, e.g., F1→F3 versus F3→F1). Site identity and vegetation predictors were defined as pairwise attributes for each comparison.
+
+**Site-level bacterial species pools**
+
+Bacterial species pools were defined at the site level by aggregating sample-level presence–absence data such that a taxon was recorded as present at a site if it was detected in at least one sample from that site. This yielded a site-level representation of bacterial species pools. Differentiation among site-level species pools was quantified using Sørensen dissimilarity and its turnover and nestedness components.
+
+**Fungal community dispersion**
+
+Variation in fungal community dispersion was quantified using distance-to-centroid measures derived from fungal beta-diversity. Sample-level dispersion values were associated with sample pairs, and absolute differences in dispersion between paired samples were calculated.
+
+**Statistical analyses and model structure**
+
+Linear models were fitted with bacterial beta-diversity components as response variables and included fungal cluster predictors, site-level bacterial pool beta-diversity, and fungal dispersion differences as explanatory variables. Analyses were conducted at the level of pairwise sample comparisons.
+
+To assess whether directional fungal cluster transitions explained variation in bacterial beta-diversity beyond symmetric effects, models incorporating directional predictors were compared with models including only symmetric cluster predictors. Directional contrasts among fungal cluster transitions (e.g., F1→F3 versus F3→F1) were estimated from fitted models.
+
+### Results / Discussion framing — controlling for site-level availability and realization  {.unlisted .unnumbered .hidden}
+
+-   By explicitly controlling for how strongly each bacterial community deviates from the locally observed site inventory, we isolate fungal identity effects that cannot be attributed to differences in availability, under-realization, or localized recruitment.
+
+After accounting for differences in realization of the site-level bacterial species pool, fungal community identity remained a strong predictor of bacterial turnover. The realization metrics control for variation in how completely bacterial communities draw from the locally observed inventory (βsne) and for localized recruitment of taxa not observed elsewhere within the same site (βsim). The persistence of fungal identity effects after inclusion of these terms indicates that bacterial turnover is not driven solely by differences in local availability or by asymmetric realization of site-level taxa.
+
+Instead, fungal community states exert additional, identity-specific effects on bacterial community structure that are independent of compositional distance, site-level availability, and the degree to which individual communities realize the local species pool. This pattern supports the interpretation that fungal communities function as discrete structuring regimes for bacterial assembly rather than acting solely through gradients of compositional dissimilarity or background availability.
+
+------------------------------------------------------------------------
+
+After controlling for fungal compositional dissimilarity and contrasts in bacterial pool realization, fungal community identity remained a strong predictor of bacterial turnover. Pool-realization metrics explicitly account for differences in how individual bacterial communities deviate from the locally observed site inventory, including both under-realization of taxa observed elsewhere at the site (β<sub>SNE</sub>) and localized taxa not observed in other communities from the same site (β<sub>SIM</sub>). The persistence of fungal identity effects after accounting for these contrasts indicates that bacterial turnover is not driven solely by differences in local availability, filtering intensity, or localized recruitment. Instead, fungal community states impose additional, identity-specific structuring on bacterial community outcomes.

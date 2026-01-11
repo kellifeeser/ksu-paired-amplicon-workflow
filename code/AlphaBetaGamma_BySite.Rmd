@@ -110,12 +110,15 @@ library("betapart"); packageVersion("betapart") #‘1.6’
 library("kableExtra"); packageVersion("kableExtra") #‘1.4.0’
 library("broom"); packageVersion("broom") #‘1.0.7’
 library("huxtable"); packageVersion("huxtable") #‘5.6.0’
+library("officer"); packageVersion("officer") #‘0.6.10’
+library("flextable"); packageVersion("flextable") #‘0.9.10’
 
   # library(BiocManager)
   # BiocManager::install("microbiome")
 
 
 source("ksu_colors.R")
+source("RAM_bulk_harvester.R")
 ```
 
 \
@@ -244,8 +247,8 @@ check_richness_merge_match_type <- function(physeq_obj, richness_phylobj) {
   cat("Best match type for richness merge:", match_type, "\n")
 }
 # library(dplyr)
-# check_richness_merge_match_type(Fun_wholecommunity, richness_phylobj = Bac_wholecommunity)
-# check_richness_merge_match_type(Bac_wholecommunity, richness_phylobj = Fun_wholecommunity)
+# check_richness_merge_match_type(Fun_wholecommunity, richness_phylobj = Bac_wholecommunity) # X16S_ID
+# check_richness_merge_match_type(Bac_wholecommunity, richness_phylobj = Fun_wholecommunity) # ITS_ID
 # ENDcheck_richness_merge_match_type ----
 
 
@@ -356,287 +359,7 @@ add_crosskingdom_richness <- function(physeq_obj, richness_phylobj, prefix) {
 \
 \
 
-## Calculate site gamma ($\gamma_{site}$) {.hidden .unlisted .unnumbered}
-
-```{r gamma-Bac-calc-site, echo=FALSE, eval=TRUE, cache=TRUE}
-bwc_alpha_Site <- data.frame(sample_data(Bac_wholecommunity),
-                        estimate_richness(Bac_wholecommunity))
-
-# add Site gamma to *wc_alpha_Site
-if (!"Bac_gamma_Site" %in% colnames(bwc_alpha_Site)) { bwc_alpha_Site <- bwc_alpha_Site %>% left_join(data.frame("Site" = names(Bac_gamma_Site), "Bac_gamma_Site" = Bac_gamma_Site), by = "Site") }
-
-# add sample number per site
-if (!"nsamples_per_Site" %in% colnames(bwc_alpha_Site)) {
-  bwc_alpha_Site$nsamples_per_Site <- ave(as.numeric(factor(bwc_alpha_Site$SampleID)), bwc_alpha_Site$Site, FUN = function(x) length(unique(x)))
-}
-
-# add gamma_over_n per site
-if (!"Bac_Gamma_over_n" %in% colnames(bwc_alpha_Site)) {
-  bwc_alpha_Site$Bac_Gamma_over_n <- (bwc_alpha_Site$Bac_gamma_Site / bwc_alpha_Site$nsamples_per_Site)
-}
-
-Bac_gamma_Site<-vegan::specnumber(phylo2vegan_OTU(Bac_wholecommunity),
-                  groups = phylo2vegan_sd(Bac_wholecommunity)$Site,
-                  MARGIN=1) # MARGIN = 1, finds # of species; MARGIN = 2, finds frequencies of species
-
-Bac_gamma_Site2<-prettyNum(Bac_gamma_Site,big.mark = ',')
-
-Bac_gamma_Site2<-cbind(prettyNum(Bac_gamma_Site,big.mark = ','),
-  (as.data.frame(attr(md_bwc_Site, "n"))[,2]))
-  
-# mean observed alpha by Site
-Bac_obs_mean_alpha<-aggregate(Observed~Site,bwc_alpha_Site,mean)
-
-# obs/site gamma
-bwc_alpha_Site$Obs_overSitegamma<-bwc_alpha_Site$Observed/bwc_alpha_Site$Bac_gamma_Site
-
-Bac_Obs_overSitegamma_mean<-aggregate(Obs_overSitegamma~Site,bwc_alpha_Site,mean)
-
-Bac_Obs_overSitegamma_sd<-as.data.frame(aggregate(bwc_alpha_Site$Obs_overSitegamma, list(bwc_alpha_Site$Site), FUN=sd))
-colnames(Bac_Obs_overSitegamma_sd)[1]<-"Site"
-colnames(Bac_Obs_overSitegamma_sd)[2]<-"Obs_overSitegamma_sd"
-
-# add sd to mean of prop gamma per sample by Site 
-Bac_Obs_overSitegamma_mean2<-cbind(Bac_Obs_overSitegamma_mean,"Obs_overSitegamma_sd"=Bac_Obs_overSitegamma_sd$Obs_overSitegamma_sd)
-colnames(Bac_Obs_overSitegamma_mean2)[2]<-"Obs_overSitegamma_mean"
-
-# aggregate # of grass hosts per site
-ngrass_persite.df<-aggregate(ngrass_persite~Site,sd,mean)
-
-# aggregate gamma_over_n
-Bac_Gamma_over_n_persite.df<-aggregate(Bac_Gamma_over_n~Site,bwc_alpha_Site,mean)
-
-
-# Bac_gamma_SiteFREQ<-vegan::specnumber(phylo2vegan_OTU(Bac_wholecommunity),
-#                   groups = phylo2vegan_sd(Bac_wholecommunity)$Site,
-#                   MARGIN=2) # MARGIN = 1, finds # of species; MARGIN = 2, finds frequencies of species
-
-# does BLM have 4689 unique otus?
-# BLM<-subset_samples(Bac_wholecommunity,Site=="BLM")
-# BLM <- prune_taxa(taxa_sums(BLM) > 0, BLM)
-
-
-Bac_gamma_Site3temp<-as.data.frame(
-  cbind("Gamma (# total unique OTUs)" = Bac_gamma_Site,
-        "ngrass_persite" = as.numeric(ngrass_persite.df$ngrass_persite),
-        "n (# of samples per site)"=(as.data.frame(attr(md_bwc_Site, "n"))[,2]),
-        "Gamma_over_n" = as.numeric(round(Bac_Gamma_over_n_persite.df$Bac_Gamma_over_n,1)),
-        "Observed mean 𝝰" = as.numeric(round(Bac_obs_mean_alpha$Observed,1)),
-        "mean prop. of gamma / sample" = as.numeric(Bac_Obs_overSitegamma_mean2$Obs_overSitegamma_mean),
-        "sd prop. of gamma / sample" = as.numeric(Bac_Obs_overSitegamma_mean2$Obs_overSitegamma_sd)
-        )
-)
-
-Bac_gamma_Site3<-cbind("Gamma (# total unique OTUs)"=Bac_gamma_Site2[,1],
-                       "n (# of samples per site)"=(as.data.frame(attr(md_bwc_Site, "n"))[,2]),
-                       "# of grass hosts per site" = Bac_gamma_Site3temp$ngrass_persite,
-                       "Gamma / n" = prettyNum(Bac_gamma_Site3temp$Gamma_over_n, big.mark = ","),
-                       "Observed mean 𝝰" = prettyNum(Bac_gamma_Site3temp$`Observed mean 𝝰`,big.mark = ","),
-                       "mean prop. of gamma detected per sample" = round(Bac_gamma_Site3temp$`mean prop. of gamma / sample`,3),
-                       "SD prop. of gamma detected per sample" = round(Bac_gamma_Site3temp$`sd prop. of gamma / sample`,3)
-  )
-```
-
-```{r gamma-Fun-calc-site, echo=FALSE, eval=TRUE, cache=TRUE}
-fwc_alpha_Site <- data.frame(sample_data(Fun_wholecommunity),
-                        estimate_richness(Fun_wholecommunity))
-
-# add Site gamma to *wc_alpha_Site
-if (!"Fun_gamma_Site" %in% colnames(fwc_alpha_Site)) { fwc_alpha_Site <- fwc_alpha_Site %>% left_join(data.frame("Site" = names(Fun_gamma_Site), "Fun_gamma_Site" = Fun_gamma_Site), by = "Site") }
-
-# add sample number per site
-if (!"nsamples_per_Site" %in% colnames(fwc_alpha_Site)) {
-  fwc_alpha_Site$nsamples_per_Site <- ave(as.numeric(factor(fwc_alpha_Site$SampleID)), fwc_alpha_Site$Site, FUN = function(x) length(unique(x)))
-}
-
-# add gamma_over_n per site
-if (!"Fun_Gamma_over_n" %in% colnames(fwc_alpha_Site)) {
-  fwc_alpha_Site$Fun_Gamma_over_n <- (fwc_alpha_Site$Fun_gamma_Site / fwc_alpha_Site$nsamples_per_Site)
-}
-
-Fun_gamma_Site<-vegan::specnumber(phylo2vegan_OTU(Fun_wholecommunity),
-                  groups = phylo2vegan_sd(Fun_wholecommunity)$Site,
-                  MARGIN=1) # MARGIN = 1, finds # of species; MARGIN = 2, finds frequencies of species
-
-Fun_gamma_Site2<-prettyNum(Fun_gamma_Site,big.mark = ',')
-
-Fun_gamma_Site2<-cbind(prettyNum(Fun_gamma_Site,big.mark = ','),
-  (as.data.frame(attr(md_Fwc_Site, "n"))[,2]))
-  
-# mean observed alpha by Site
-Fun_obs_mean_alpha<-aggregate(Observed~Site,fwc_alpha_Site,mean)
-
-# obs/site gamma
-fwc_alpha_Site$Obs_overSitegamma<-fwc_alpha_Site$Observed/fwc_alpha_Site$Fun_gamma_Site
-
-Fun_Obs_overSitegamma_mean<-aggregate(Obs_overSitegamma~Site,fwc_alpha_Site,mean)
-
-Fun_Obs_overSitegamma_sd<-as.data.frame(aggregate(fwc_alpha_Site$Obs_overSitegamma, list(fwc_alpha_Site$Site), FUN=sd))
-colnames(Fun_Obs_overSitegamma_sd)[1]<-"Site"
-colnames(Fun_Obs_overSitegamma_sd)[2]<-"Obs_overSitegamma_sd"
-
-# add sd to mean of prop gamma per sample by Site 
-Fun_Obs_overSitegamma_mean2<-cbind(Fun_Obs_overSitegamma_mean,"Obs_overSitegamma_sd"=Fun_Obs_overSitegamma_sd$Obs_overSitegamma_sd)
-colnames(Fun_Obs_overSitegamma_mean2)[2]<-"Obs_overSitegamma_mean"
-
-# aggregate # of grass hosts per site
-ngrass_persite.df<-aggregate(ngrass_persite~Site,sd,mean)
-
-# aggregate gamma_over_n
-Fun_Gamma_over_n_persite.df<-aggregate(Fun_Gamma_over_n~Site,fwc_alpha_Site,mean)
-
-# Fun_gamma_SiteFREQ<-vegan::specnumber(phylo2vegan_OTU(Fun_wholecommunity),
-#                   groups = phylo2vegan_sd(Fun_wholecommunity)$Site,
-#                   MARGIN=2) # MARGIN = 1, finds # of species; MARGIN = 2, finds frequencies of species
-
-# does BLM have 983 unique otus?
-# BLM<-subset_samples(Fun_wholecommunity,Site=="BLM")
-# BLM <- prune_taxa(taxa_sums(BLM) > 0, BLM)
-
-
-Fun_gamma_Site3temp<-as.data.frame(
-  cbind("Gamma (# total unique OTUs)" = Fun_gamma_Site,
-        "ngrass_persite" = as.numeric(ngrass_persite.df$ngrass_persite),
-        "n (# of samples per site)"=(as.data.frame(attr(md_Fwc_Site, "n"))[,2]),
-        "Gamma_over_n" = as.numeric(round(Fun_Gamma_over_n_persite.df$Fun_Gamma_over_n,1)),
-        "Observed mean 𝝰" = as.numeric(round(Fun_obs_mean_alpha$Observed,1)),
-        "mean prop. of gamma / sample" = as.numeric(Fun_Obs_overSitegamma_mean2$Obs_overSitegamma_mean),
-        "sd prop. of gamma / sample" = as.numeric(Fun_Obs_overSitegamma_mean2$Obs_overSitegamma_sd)
-        )
-)
-
-Fun_gamma_Site3<-cbind("Gamma (# total unique OTUs)"=Fun_gamma_Site2[,1],
-                       "n (# of samples per site)"=(as.data.frame(attr(md_Fwc_Site, "n"))[,2]),
-                       "# of grass hosts per site" = Fun_gamma_Site3temp$ngrass_persite,
-                       "Gamma / n" = prettyNum(Fun_gamma_Site3temp$Gamma_over_n, big.mark = ","),
-                       "Observed mean 𝝰" = prettyNum(Fun_gamma_Site3temp$`Observed mean 𝝰`,big.mark = ","),
-                       "mean prop. of gamma detected per sample" = round(Fun_gamma_Site3temp$`mean prop. of gamma / sample`,3),
-                       "SD prop. of gamma detected per sample" = round(Fun_gamma_Site3temp$`sd prop. of gamma / sample`,3)
-  )
-```
-
-\
-
-## BvF summary stats
-
-```{r diversity-summary-inline-group-labels, echo=F, message=FALSE, warning=FALSE}
-
-compare_symbol <- function(bac, fun, tol = 1e-6) {
-  if (abs(bac - fun) < tol) "=" else if (bac > fun) ">" else "<"
-}
-
-# Raw data
-bac_vals <- list(
-  gamma = Bac_gamma_Site,
-  alpha = bwc_alpha_Site$Observed,
-  mean_alpha = Bac_obs_mean_alpha$Observed
-)
-
-fun_vals <- list(
-  gamma = Fun_gamma_Site,
-  alpha = fwc_alpha_Site$Observed,
-  mean_alpha = Fun_obs_mean_alpha$Observed
-)
-
-# Function to generate summary rows
-make_rows <- function(label, bac_vec, fun_vec, digits_range = 1, digits_mean = 0, digits_sd = 0) {
-  tibble(
-    Metric = c("min", "max", "mean ± sd"),
-    Bacteria = c(
-      round(min(bac_vec), digits_range),
-      round(max(bac_vec), digits_range),
-      paste0(round(mean(bac_vec), digits_mean), " ± ", round(sd(bac_vec), digits_sd))
-    ),
-    `B > F` = c(
-      compare_symbol(min(bac_vec), min(fun_vec)),
-      compare_symbol(max(bac_vec), max(fun_vec)),
-      compare_symbol(mean(bac_vec), mean(fun_vec))
-    ),
-    Fungi = c(
-      round(min(fun_vec), digits_range),
-      round(max(fun_vec), digits_range),
-      paste0(round(mean(fun_vec), digits_mean), " ± ", round(sd(fun_vec), digits_sd))
-    )
-  ) %>%
-    add_row(Metric = paste0("**_", label, "_**"), Bacteria = "", `B > F` = "", Fungi = "", .before = 1)
-}
-
-# Combine all rows
-diversity_table <- bind_rows(
-  make_rows("γ<sub>site</sub> diversity", bac_vals$gamma, fun_vals$gamma, digits_range = 0),
-  make_rows("Sample-level α", bac_vals$alpha, fun_vals$alpha, digits_range = 0),
-  make_rows("Site mean α", bac_vals$mean_alpha, fun_vals$mean_alpha, digits_range = 0)
-)
-
-# Final table
-diversity_table %>%
-  kable(format = "html", escape = FALSE, align = c("l", "c", "c", "c"),
-        caption = "Summary of Alpha and Gamma Diversity Metrics by Kingdom") %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
-  column_spec(2:4, extra_css = "text-align: center;")
-```
-
-
-\
-\
-
-## Tables of gamma and alpha diversity metrics with derived measures by Site for Bacteria and Fungi {.tabset .tabset-pills}
-
-\
-
-### Bacteria-Archaea
-
-\
-
-```{r, echo=TRUE,message=TRUE,eval=TRUE}
-Bac_gamma_Site3 %>%
-  kbl(caption = "Gamma diversity of sites: bacteria",
-            align = 'c',
-      # col.names = c("Number of OTUs","Number of samples")
-      # ,format.args = format(list(big.mark = ',', digit))
-      ) %>%
-  kable_styling() %>%
-  scroll_box(width = "90%", height = "250px")
-```
-
-
-\
-\
-
-### Fungi
-
-\
-
-```{r, echo=TRUE,message=TRUE,eval=TRUE}
-Fun_gamma_Site3 %>%
-  kbl(caption = "Gamma diversity of sites: fungi",
-            align = 'c',
-      # col.names = c("Number of OTUs","Number of samples")
-
-      # ,format.args = format(list(big.mark = ',', digit))
-      ) %>%
-  kable_styling() %>%
-  scroll_box(width = "90%", height = "250px")
-```
-
-\
-\
-
-
-# Mean beta dissimilarities by Site
-
-\
-
-## Background 
-
-\
-
-If two groups of sampling units are truly different (e.g. in their species composition), then average of the within-group compositional dissimilarities should be less than the average of the dissimilarities between two random collection of sampling units drawn from the entire population.\
-
-**Within-group (Site) values should be << the overall/global average if true difference in location (differences in mean *or* dispersion) exists.**\
-
-This difference may be one of location (differences in mean) or one of spread (differences in within-group distance). That is, it may find a significant difference between two groups simply because one of those groups has a greater dissimilarities among its sampling units.\
-\
+## Calculate mean dissimilarity matrices by Site {.hidden .unlisted .unnumbered}
 
 
 ```{r mean-diss-bySite-Bac-NEW, include=FALSE,eval=TRUE, cache=TRUE}
@@ -722,7 +445,307 @@ md_Fwc_Site.r <- round(md_Fwc_Site,digits = 3)
 ```
 
 
-```{r REMOVE?mean-diss-bySite-Bac, include=FALSE,eval=TRUE, cache=TRUE}
+
+## Calculate site gamma ($\gamma_{site}$) {.hidden .unlisted .unnumbered}
+
+```{r gamma-Bac-calc-site, echo=FALSE, eval=TRUE, cache=TRUE}
+bwc_alpha_Site <- data.frame(sample_data(Bac_wholecommunity),
+                        estimate_richness(Bac_wholecommunity))
+
+# gamma Site diversity
+Bac_gamma_Site<-vegan::specnumber(phylo2vegan_OTU(Bac_wholecommunity),
+                  groups = phylo2vegan_sd(Bac_wholecommunity)$Site,
+                  MARGIN=1) # MARGIN = 1, finds # of species; MARGIN = 2, finds frequencies of species
+
+Bac_gamma_Site2<-prettyNum(Bac_gamma_Site,big.mark = ',')
+
+Bac_gamma_Site2<-cbind(prettyNum(Bac_gamma_Site,big.mark = ','),
+  (as.data.frame(attr(md_Bwc_Site, "n"))[,2]))
+
+# add Site gamma to *wc_alpha_Site
+if (!"Bac_gamma_Site" %in% colnames(bwc_alpha_Site)) { bwc_alpha_Site <- bwc_alpha_Site %>% left_join(data.frame("Site" = names(Bac_gamma_Site), "Bac_gamma_Site" = Bac_gamma_Site), by = "Site") }
+
+
+# add sample number per site
+if (!"nsamples_per_Site" %in% colnames(bwc_alpha_Site)) {
+  bwc_alpha_Site$nsamples_per_Site <- ave(as.numeric(factor(bwc_alpha_Site$SampleID)), bwc_alpha_Site$Site, FUN = function(x) length(unique(x)))
+}
+
+# add gamma_over_n per site
+if (!"Bac_Gamma_over_n" %in% colnames(bwc_alpha_Site)) {
+  bwc_alpha_Site$Bac_Gamma_over_n <- (bwc_alpha_Site$Bac_gamma_Site / bwc_alpha_Site$nsamples_per_Site)
+}
+
+
+# mean observed alpha by Site
+Bac_obs_mean_alpha<-aggregate(Observed~Site,bwc_alpha_Site,mean)
+
+# sd of mean observed alpha by Site (within Site sd)
+Bac_obs_mean_alpha_withinSite_sd <- aggregate(x = bwc_alpha_Site$Observed, by = list(bwc_alpha_Site$Site), FUN = sd)
+
+
+# obs/site gamma
+bwc_alpha_Site$Obs_overSitegamma<-bwc_alpha_Site$Observed/bwc_alpha_Site$Bac_gamma_Site
+
+Bac_Obs_overSitegamma_mean<-aggregate(Obs_overSitegamma~Site,bwc_alpha_Site,mean)
+
+Bac_Obs_overSitegamma_sd<-as.data.frame(aggregate(bwc_alpha_Site$Obs_overSitegamma, list(bwc_alpha_Site$Site), FUN=sd))
+colnames(Bac_Obs_overSitegamma_sd)[1]<-"Site"
+colnames(Bac_Obs_overSitegamma_sd)[2]<-"Obs_overSitegamma_sd"
+
+# add sd to mean of prop gamma per sample by Site 
+Bac_Obs_overSitegamma_mean2<-cbind(Bac_Obs_overSitegamma_mean,"Obs_overSitegamma_sd"=Bac_Obs_overSitegamma_sd$Obs_overSitegamma_sd)
+colnames(Bac_Obs_overSitegamma_mean2)[2]<-"Obs_overSitegamma_mean"
+
+# aggregate # of grass hosts per site
+ngrass_persite.df<-aggregate(ngrass_persite~Site,sd,mean)
+
+# aggregate gamma_over_n
+Bac_Gamma_over_n_persite.df<-aggregate(Bac_Gamma_over_n~Site,bwc_alpha_Site,mean)
+
+
+# Bac_gamma_SiteFREQ<-vegan::specnumber(phylo2vegan_OTU(Bac_wholecommunity),
+#                   groups = phylo2vegan_sd(Bac_wholecommunity)$Site,
+#                   MARGIN=2) # MARGIN = 1, finds # of species; MARGIN = 2, finds frequencies of species
+
+# does BLM have 4689 unique otus?
+# BLM<-subset_samples(Bac_wholecommunity,Site=="BLM")
+# BLM <- prune_taxa(taxa_sums(BLM) > 0, BLM)
+
+
+Bac_gamma_Site3temp<-as.data.frame(
+  cbind("Gamma (# total unique OTUs)" = Bac_gamma_Site,
+        "ngrass_persite" = as.numeric(ngrass_persite.df$ngrass_persite),
+        "n (# of samples per site)"=(as.data.frame(attr(md_Bwc_Site, "n"))[,2]),
+        "Gamma_over_n" = as.numeric(round(Bac_Gamma_over_n_persite.df$Bac_Gamma_over_n,1)),
+        "Observed mean 𝝰" = as.numeric(round(Bac_obs_mean_alpha$Observed,1)),
+        "mean prop. of gamma / sample" = as.numeric(Bac_Obs_overSitegamma_mean2$Obs_overSitegamma_mean),
+        "sd prop. of gamma / sample" = as.numeric(Bac_Obs_overSitegamma_mean2$Obs_overSitegamma_sd)
+        )
+)
+
+Bac_gamma_Site3<-cbind("Gamma (# total unique OTUs)"=Bac_gamma_Site2[,1],
+                       "n (# of samples per site)"=(as.data.frame(attr(md_Bwc_Site, "n"))[,2]),
+                       "# of grass hosts per site" = Bac_gamma_Site3temp$ngrass_persite,
+                       "Gamma / n" = prettyNum(Bac_gamma_Site3temp$Gamma_over_n, big.mark = ","),
+                       "Observed mean 𝝰" = prettyNum(Bac_gamma_Site3temp$`Observed mean 𝝰`,big.mark = ","),
+                       "mean prop. of gamma detected per sample" = round(Bac_gamma_Site3temp$`mean prop. of gamma / sample`,3),
+                       "SD prop. of gamma detected per sample" = round(Bac_gamma_Site3temp$`sd prop. of gamma / sample`,3)
+  )
+```
+
+```{r gamma-Fun-calc-site, echo=FALSE, eval=TRUE, cache=TRUE}
+fwc_alpha_Site <- data.frame(sample_data(Fun_wholecommunity),
+                        estimate_richness(Fun_wholecommunity))
+
+
+Fun_gamma_Site<-vegan::specnumber(phylo2vegan_OTU(Fun_wholecommunity),
+                  groups = phylo2vegan_sd(Fun_wholecommunity)$Site,
+                  MARGIN=1) # MARGIN = 1, finds # of species; MARGIN = 2, finds frequencies of species
+
+Fun_gamma_Site2<-prettyNum(Fun_gamma_Site,big.mark = ',')
+
+Fun_gamma_Site2<-cbind(prettyNum(Fun_gamma_Site,big.mark = ','),
+  (as.data.frame(attr(md_Fwc_Site, "n"))[,2]))
+  
+
+# add Site gamma to *wc_alpha_Site
+if (!"Fun_gamma_Site" %in% colnames(fwc_alpha_Site)) { fwc_alpha_Site <- fwc_alpha_Site %>% left_join(data.frame("Site" = names(Fun_gamma_Site), "Fun_gamma_Site" = Fun_gamma_Site), by = "Site") }
+
+# add sample number per site
+if (!"nsamples_per_Site" %in% colnames(fwc_alpha_Site)) {
+  fwc_alpha_Site$nsamples_per_Site <- ave(as.numeric(factor(fwc_alpha_Site$SampleID)), fwc_alpha_Site$Site, FUN = function(x) length(unique(x)))
+}
+
+# add gamma_over_n per site
+if (!"Fun_Gamma_over_n" %in% colnames(fwc_alpha_Site)) {
+  fwc_alpha_Site$Fun_Gamma_over_n <- (fwc_alpha_Site$Fun_gamma_Site / fwc_alpha_Site$nsamples_per_Site)
+}
+
+
+# mean observed alpha by Site
+Fun_obs_mean_alpha<-aggregate(Observed~Site,fwc_alpha_Site,mean)
+
+# sd of mean observed alpha by Site (within Site sd)
+Fun_obs_mean_alpha_withinSite_sd <- aggregate(x = fwc_alpha_Site$Observed, by = list(fwc_alpha_Site$Site), FUN = sd)
+
+
+# obs/site gamma
+fwc_alpha_Site$Obs_overSitegamma<-fwc_alpha_Site$Observed/fwc_alpha_Site$Fun_gamma_Site
+
+Fun_Obs_overSitegamma_mean<-aggregate(Obs_overSitegamma~Site,fwc_alpha_Site,mean)
+
+Fun_Obs_overSitegamma_sd<-as.data.frame(aggregate(fwc_alpha_Site$Obs_overSitegamma, list(fwc_alpha_Site$Site), FUN=sd))
+colnames(Fun_Obs_overSitegamma_sd)[1]<-"Site"
+colnames(Fun_Obs_overSitegamma_sd)[2]<-"Obs_overSitegamma_sd"
+
+# add sd to mean of prop gamma per sample by Site 
+Fun_Obs_overSitegamma_mean2<-cbind(Fun_Obs_overSitegamma_mean,"Obs_overSitegamma_sd"=Fun_Obs_overSitegamma_sd$Obs_overSitegamma_sd)
+colnames(Fun_Obs_overSitegamma_mean2)[2]<-"Obs_overSitegamma_mean"
+
+# aggregate # of grass hosts per site
+ngrass_persite.df<-aggregate(ngrass_persite~Site,sd,mean)
+
+# aggregate gamma_over_n
+Fun_Gamma_over_n_persite.df<-aggregate(Fun_Gamma_over_n~Site,fwc_alpha_Site,mean)
+
+# Fun_gamma_SiteFREQ<-vegan::specnumber(phylo2vegan_OTU(Fun_wholecommunity),
+#                   groups = phylo2vegan_sd(Fun_wholecommunity)$Site,
+#                   MARGIN=2) # MARGIN = 1, finds # of species; MARGIN = 2, finds frequencies of species
+
+# does BLM have 983 unique otus?
+# BLM<-subset_samples(Fun_wholecommunity,Site=="BLM")
+# BLM <- prune_taxa(taxa_sums(BLM) > 0, BLM)
+
+
+Fun_gamma_Site3temp<-as.data.frame(
+  cbind("Gamma (# total unique OTUs)" = Fun_gamma_Site,
+        "ngrass_persite" = as.numeric(ngrass_persite.df$ngrass_persite),
+        "n (# of samples per site)"=(as.data.frame(attr(md_Fwc_Site, "n"))[,2]),
+        "Gamma_over_n" = as.numeric(round(Fun_Gamma_over_n_persite.df$Fun_Gamma_over_n,1)),
+        "Observed mean 𝝰" = as.numeric(round(Fun_obs_mean_alpha$Observed,1)),
+        "mean prop. of gamma / sample" = as.numeric(Fun_Obs_overSitegamma_mean2$Obs_overSitegamma_mean),
+        "sd prop. of gamma / sample" = as.numeric(Fun_Obs_overSitegamma_mean2$Obs_overSitegamma_sd)
+        )
+)
+
+Fun_gamma_Site3<-cbind("Gamma (# total unique OTUs)"=Fun_gamma_Site2[,1],
+                       "n (# of samples per site)"=(as.data.frame(attr(md_Fwc_Site, "n"))[,2]),
+                       "# of grass hosts per site" = Fun_gamma_Site3temp$ngrass_persite,
+                       "Gamma / n" = prettyNum(Fun_gamma_Site3temp$Gamma_over_n, big.mark = ","),
+                       "Observed mean 𝝰" = prettyNum(Fun_gamma_Site3temp$`Observed mean 𝝰`,big.mark = ","),
+                       "mean prop. of gamma detected per sample" = round(Fun_gamma_Site3temp$`mean prop. of gamma / sample`,3),
+                       "SD prop. of gamma detected per sample" = round(Fun_gamma_Site3temp$`sd prop. of gamma / sample`,3)
+  )
+```
+
+\
+
+## BvF summary stats
+
+```{r diversity-summary-inline-group-labels, echo=F, message=FALSE, warning=FALSE}
+
+compare_symbol <- function(bac, fun, tol = 1e-6) {
+  if (abs(bac - fun) < tol) "=" else if (bac > fun) ">" else "<"
+}
+
+# Raw data
+bac_vals <- list(
+  gamma = Bac_gamma_Site,
+  alpha = bwc_alpha_Site$Observed,
+  mean_alpha = Bac_obs_mean_alpha$Observed,
+  mean_site_gamma_persample = Bac_Obs_overSitegamma_mean$Obs_overSitegamma*100
+)
+
+fun_vals <- list(
+  gamma = Fun_gamma_Site,
+  alpha = fwc_alpha_Site$Observed,
+  mean_alpha = Fun_obs_mean_alpha$Observed,
+  mean_site_gamma_persample = Fun_Obs_overSitegamma_mean$Obs_overSitegamma*100
+)
+
+# Function to generate summary rows
+make_rows <- function(label, bac_vec, fun_vec, digits_range = 1, digits_mean = 0, digits_sd = 0) {
+  tibble(
+    Metric = c("min", "max", "mean ± sd"),
+    Bacteria = c(
+      round(min(bac_vec), digits_range),
+      round(max(bac_vec), digits_range),
+      paste0(round(mean(bac_vec), digits_mean), " ± ", round(sd(bac_vec), digits_sd))
+    ),
+    `B vs. F` = c(
+      compare_symbol(min(bac_vec), min(fun_vec)),
+      compare_symbol(max(bac_vec), max(fun_vec)),
+      compare_symbol(mean(bac_vec), mean(fun_vec))
+    ),
+    Fungi = c(
+      round(min(fun_vec), digits_range),
+      round(max(fun_vec), digits_range),
+      paste0(round(mean(fun_vec), digits_mean), " ± ", round(sd(fun_vec), digits_sd))
+    )
+  ) %>%
+    add_row(Metric = paste0("**_", label, "_**"), Bacteria = "", `B vs. F` = "", Fungi = "", .before = 1)
+}
+
+# Combine all rows
+diversity_table <- bind_rows(
+  make_rows("γ<sub>site</sub> diversity", bac_vals$gamma, fun_vals$gamma, digits_range = 0),
+  make_rows("Site mean α", bac_vals$mean_alpha, fun_vals$mean_alpha, digits_range = 0),
+  make_rows("Sample-level α", bac_vals$alpha, fun_vals$alpha, digits_range = 0),
+  make_rows("Mean prop. of γ<sub>site</sub> detected per sample (as %)", bac_vals$mean_site_gamma_persample, fun_vals$mean_site_gamma_persample, digits_range = 1)
+)
+
+# Final table
+diversity_table %>%
+  kable(format = "html", escape = FALSE, align = c("l", "c", "c", "c"),
+        caption = "Summary of Alpha and Gamma Diversity Metrics by Kingdom") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
+  column_spec(2:4, extra_css = "text-align: center;")
+```
+
+\
+\
+
+## Tables of gamma and alpha diversity metrics with derived measures by Site for Bacteria and Fungi {.tabset .tabset-pills}
+
+\
+
+### Bacteria-Archaea
+
+\
+
+```{r, echo=TRUE,message=TRUE,eval=TRUE}
+Bac_gamma_Site3 %>%
+  kbl(caption = "Gamma diversity of sites: bacteria",
+            align = 'c',
+      # col.names = c("Number of OTUs","Number of samples")
+      # ,format.args = format(list(big.mark = ',', digit))
+      ) %>%
+  kable_styling() %>%
+  scroll_box(width = "100%", height = "1050px")
+```
+
+
+\
+\
+
+### Fungi
+
+\
+
+```{r, echo=TRUE,message=TRUE,eval=TRUE}
+Fun_gamma_Site3 %>%
+  kbl(caption = "Gamma diversity of sites: fungi",
+            align = 'c',
+      # col.names = c("Number of OTUs","Number of samples")
+
+      # ,format.args = format(list(big.mark = ',', digit))
+      ) %>%
+  kable_styling() %>%
+  scroll_box(width = "90%", height = "250px")
+```
+
+\
+\
+
+
+# Mean beta dissimilarities by Site
+
+\
+
+## Background 
+
+\
+
+If two groups of sampling units are truly different (e.g. in their species composition), then average of the within-group compositional dissimilarities should be less than the average of the dissimilarities between two random collection of sampling units drawn from the entire population.\
+
+**Within-group (Site) values should be << the overall/global average if true difference in location (differences in mean *or* dispersion) exists.**\
+
+This difference may be one of location (differences in mean) or one of spread (differences in within-group distance). That is, it may find a significant difference between two groups simply because one of those groups has a greater dissimilarities among its sampling units.\
+\
+
+
+```{r REMOVE?mean-diss-bySite-Bac, include=FALSE,eval=F, cache=TRUE}
 Bac_wc_sorensen_distmat <- as.matrix(beta.pair(decostand(phylo2vegan_OTU(Bac_wholecommunity), method = "pa"), index.family = "sorensen")$beta.sor)
 
 Bac_wc_sorensen_dist<-as.dist(Bac_wc_sorensen_distmat)

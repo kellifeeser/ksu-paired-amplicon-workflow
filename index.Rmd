@@ -179,6 +179,10 @@ links:
     -   <a href="github_MRM_SEM_Landspace_Bacteria.html" target="_blank">Bacteria - Landscape-scale</a> (last updated 20 May 2025)
     -   <a href="github_MRM_SEM_Landspace_Fungi.html" target="_blank">Fungi - Landscape-scale</a> (last updated 18 July 2025)
 
+-   Residualized regressions and full models (effect of fungal state on bacterial dissimilarity after controlling for i) fungal dissimilarity, ii) fungal state dispersion, iii) bacterial regional species pool, and iv) host)
+
+    -   <a href="residualizedregressions." target="_blank">Bacteria - Landscape-scale</a> (last updated 11 Jan 2025)
+
 \
 \
 
