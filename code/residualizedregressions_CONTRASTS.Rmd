@@ -1,0 +1,188 @@
+Yes. Below is **clean, co-author-level R code** to generate **directional fungal state contrasts** in a way that is:
+
+* consistent with your **model logic**,
+* appropriate for **SI Results** (not main text),
+* explicit about **what is being contrasted and why**, and
+* robust to reviewer scrutiny.
+
+I’ll give you:
+
+1. **Which model to use for contrasts (important)**
+2. **The contrast strategy (what to estimate)**
+3. **Concrete R code you can copy/paste**
+4. **What to report vs not report**
+
+---
+
+## 1️⃣ Which model to use for contrasts (locked)
+
+**Use the full directional models (`m4_*_dir`)**, not the residualized models.
+
+Why:
+
+* contrasts require predictions on the **original response scale**
+* `emmeans()` assumes a meaningful response distribution
+* residualized models are for **effect size**, not for estimating marginal means
+
+So, for example:
+
+* bacterial βsim × fungal βsim → `m4_Bsim_Fsim_dir`
+* bacterial βsor × fungal βsor → `m4_Bsor_Fsor_dir`
+
+---
+
+## 2️⃣ Contrast strategy (what exactly you are testing)
+
+You want to test contrasts like:
+
+> Is bacterial β different for fungal state F1→F3 versus F3→F1?
+
+That means:
+
+* **pairwise contrasts among levels of `Fungal_cluster_dir`**
+* contrasts are **directional**, not symmetric
+* comparisons are **within the same model**, conditional on all covariates
+
+You do **not** need:
+
+* all possible pairwise contrasts for interpretation
+* but you may compute them for completeness and then subset
+
+---
+
+## 3️⃣ R code: directional state contrasts with `emmeans`
+
+### A. Load package
+
+```r
+library(emmeans)
+```
+
+---
+
+### B. Estimated marginal means for directional state
+
+Example for bacterial turnover, fungal βsim:
+
+```r
+emm_Bsim_Fsim_dir <- emmeans(
+  m4_Bsim_Fsim_dir,
+  ~ Fungal_cluster_dir
+)
+```
+
+This estimates the **adjusted mean bacterial βsim** for each directional fungal state transition, holding other covariates at their reference or average values (per emmeans defaults).
+
+---
+
+### C. Pairwise directional contrasts (full set)
+
+```r
+contr_Bsim_Fsim_dir <- contrast(
+  emm_Bsim_Fsim_dir,
+  method = "pairwise",
+  adjust = "fdr"
+)
+
+summary(contr_Bsim_Fsim_dir)
+```
+
+This yields:
+
+* estimated differences
+* standard errors
+* confidence intervals
+* adjusted p-values
+
+**This output belongs in SI.**
+
+---
+
+### D. Targeted directional contrasts (recommended)
+
+Rather than interpreting hundreds of contrasts, define **explicit directional pairs**.
+
+Example: F1→F3 vs F3→F1
+
+```r
+custom_contrasts <- list(
+  "F1_to_F3 vs F3_to_F1" = c(
+    "F1_F3" =  1,
+    "F3_F1" = -1
+  )
+)
+
+contrast(
+  emm_Bsim_Fsim_dir,
+  custom_contrasts,
+  adjust = "none"
+)
+```
+
+This is the **cleanest way** to test biologically meaningful directionality.
+
+---
+
+### E. Loop across responses / fungal β components (optional)
+
+If you want to automate this for all `m4_*_dir` models:
+
+```r
+models <- list(
+  Bsor_Fsor = m4_Bsor_Fsor_dir,
+  Bsor_Fsim = m4_Bsor_Fsim_dir,
+  Bsor_Fsne = m4_Bsor_Fsne_dir,
+  Bsim_Fsor = m4_Bsim_Fsor_dir,
+  Bsim_Fsim = m4_Bsim_Fsim_dir,
+  Bsim_Fsne = m4_Bsim_Fsne_dir,
+  Bsne_Fsor = m4_Bsne_Fsor_dir,
+  Bsne_Fsim = m4_Bsne_Fsim_dir,
+  Bsne_Fsne = m4_Bsne_Fsne_dir
+)
+
+contrast_results <- lapply(models, function(m) {
+  emm <- emmeans(m, ~ Fungal_cluster_dir)
+  contrast(emm, method = "pairwise", adjust = "fdr")
+})
+```
+
+You can then extract summaries as needed.
+
+---
+
+## 4️⃣ What to report (and what not)
+
+### Report (SI Results)
+
+* Direction and magnitude of selected directional contrasts
+* Confidence intervals
+* Adjusted p-values
+* Statement that contrasts are estimated from full models
+
+### Do NOT report
+
+* emmeans from residualized models
+* all pairwise contrasts in main text
+* marginal means without contrasts
+
+---
+
+## 5️⃣ One sentence for SI Methods (if needed)
+
+> Directional state contrasts were estimated from full models using estimated marginal means, allowing direct comparison of ordered fungal state transitions while holding other predictors constant.
+
+That’s sufficient.
+
+---
+
+## Bottom line
+
+* ✔ Use `m4_*_dir` models
+* ✔ Use `emmeans()` for contrasts
+* ✔ Focus on **directional comparisons**, not exhaustive pairwise interpretation
+* ✔ Keep all contrast results in **SI**
+
+If you want next, I can:
+
+* help you **select which contrasts are worth showing**, or
+* help you **format the contrast tables** for SI so they’re readable and reviewer-proof.

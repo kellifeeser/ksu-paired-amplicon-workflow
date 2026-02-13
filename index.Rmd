@@ -181,9 +181,9 @@ links:
 
 \
 
--   Residualized regressions and full models (effect of fungal state on bacterial dissimilarity after controlling for i) fungal dissimilarity, ii) fungal state dispersion, iii) bacterial regional species pool, and iv) host)
+-   Residualized regressions and full models (effect of fungal state on bacterial dissimilarity after controlling for i) fungal dissimilarity, ii) fungal state dispersion, iii) bacterial regional species pool, and iv) host). <a href="residualizedregressions_untrimmed2.html" target="_blank">(untrimmed)</a>
 
-    -   <a href="residualizedregressions.html" target="_blank">Storyline 3: Residualized regressions</a> (last updated 04 Feb 2026)
+    -   <a href="residualizedregressions_clean.html" target="_blank">Storyline 3: Residualized regressions</a> (last updated 04 Feb 2026)
 
 \
 \
